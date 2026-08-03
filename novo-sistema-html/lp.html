@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Ventus Formaturas — A plataforma completa de gestão de formaturas universitárias. Pacotes, fotos, convidados e eventos em um só lugar." />
+<meta name="theme-color" content="#1E3A8A" />
+<title>Ventus Formaturas · A plataforma da sua formatura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/padrao-lp.css">
+<style>
+/* Customizações específicas para a LP da plataforma */
+.modulos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.modulo-card {
+  position: relative;
+  padding: 36px 32px;
+  background: white;
+  border-radius: var(--r-xl);
+  border-left: 3px solid var(--dourado);
+  box-shadow: var(--shadow-sm);
+  transition: transform .3s, box-shadow .3s;
+}
+.modulo-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.modulo-num {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dourado);
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: block;
+}
+.modulo-card h3 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+.modulo-card p { font-size: 14px; color: var(--neutro-600); line-height: 1.7; margin-bottom: 16px; }
+.modulo-card ul { list-style: none; font-size: 13px; }
+.modulo-card li { padding: 4px 0; color: var(--neutro-700); display: flex; align-items: start; gap: 8px; }
+.modulo-card li::before { content: '✓'; color: var(--dourado); font-weight: 700; flex-shrink: 0; }
+
+.modulos { background: var(--bege); }
+
+/* Hero stats: usar dados da plataforma */
+.hero-eyebrow { font-size: clamp(56px, 9vw, 96px); }
+</style>
+</head>
+<body>
+
+<!-- SVG SPRITE (carregado inline) -->
+<svg class="icon-svg-sprite" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></symbol>
+    <symbol id="i-facebook" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
+    <symbol id="i-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
+    <symbol id="i-banknote" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============== HEADER ============== -->
+<header class="top">
+  <div class="wrap">
+    <a href="lp.html" class="logo" style="font-family:var(--serif);font-weight:800;font-size:24px;color:var(--azul-700);">
+      <span style="display:inline-flex;align-items:center;gap:10px;">
+        <span style="width:44px;height:44px;background:var(--grad-hero);color:white;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:22px;">V</span>
+        Ventus
+      </span>
+    </a>
+
+    <nav class="main-nav">
+      <a href="#sobre">Sobre</a>
+      <a href="#modulos">Plataforma</a>
+      <a href="#parceiras">Parceiras</a>
+      <a href="#depoimentos">Depoimentos</a>
+      <a href="#contato">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a href="https://wa.me/553898639570" class="btn-orcamento" target="_blank" rel="noopener">Solicitar orçamento</a>
+      <a href="acesso.html" class="btn-login">
+        <svg class="icon icon-sm"><use href="#i-lock"/></svg> Acessar Portal
+      </a>
+      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
+        <svg class="icon icon-md"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#sobre" onclick="toggleMenu()">Sobre</a>
+  <a href="#modulos" onclick="toggleMenu()">Plataforma</a>
+  <a href="#parceiras" onclick="toggleMenu()">Parceiras</a>
+  <a href="#depoimentos" onclick="toggleMenu()">Depoimentos</a>
+  <a href="#contato" onclick="toggleMenu()">Contato</a>
+  <a href="https://wa.me/553898639570" class="btn-orcamento">Solicitar orçamento</a>
+  <a href="acesso.html" class="btn-login"><svg class="icon icon-sm"><use href="#i-lock"/></svg> Acessar Portal</a>
+</div>
+
+<!-- ============== HERO ============== -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="slide" style="background:radial-gradient(ellipse at 70% 30%, rgba(212,175,55,0.3), transparent 60%);"></div>
+    <div class="slide" style="background:radial-gradient(ellipse at 30% 70%, rgba(37,99,235,0.4), transparent 60%);"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag">A plataforma da sua formatura · Montes Claros / MG</div>
+    <h1 class="hero-eyebrow">Inesquecível.</h1>
+    <p class="hero-headline">Pacote, pagamento, convidados, fotos e eventos — <strong>tudo numa plataforma só</strong>, do contrato à entrega das fotos editadas.</p>
+    <div class="hero-actions">
+      <a href="acesso.html" class="btn-hero btn-hero-primary">
+        <svg class="icon icon-sm"><use href="#i-lock"/></svg>
+        Entrar na minha turma
+      </a>
+      <a href="#modulos" class="btn-hero btn-hero-secondary">
+        Conheça a plataforma
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">1.924</div>
+        <div class="hero-stat-lbl">Formandos</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">123</div>
+        <div class="hero-stat-lbl">Turmas</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">726</div>
+        <div class="hero-stat-lbl">Eventos realizados</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">10+</div>
+        <div class="hero-stat-lbl">Anos de história</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">Role para conhecer <svg class="icon icon-sm"><use href="#i-arrow-down"/></svg></div>
+</section>
+
+<!-- ============== DIFERENCIAIS ============== -->
+<section class="diferenciais" id="sobre">
+  <div class="wrap">
+    <div class="section-head-center" style="margin-bottom: 64px;">
+      <span class="section-tag">Por que Ventus</span>
+      <h2 class="section-title">Estrutura própria. Tecnologia de ponta. Equipe dedicada.</h2>
+      <p class="section-sub">10 anos de experiência em formaturas universitárias, agora numa plataforma única que substitui 4 a 6 ferramentas isoladas — pra você ter visão e controle de cada momento.</p>
+    </div>
+
+    <div class="diferenciais-grid">
+      <div class="dif-card">
+        <div class="dif-icon"><svg class="icon icon-lg"><use href="#i-banknote"/></svg></div>
+        <h3>Parcelamento 21x sem juros</h3>
+        <p>Asaas integrado: PIX, boleto e cartão até 21x, com lembretes automáticos no WhatsApp.</p>
+      </div>
+      <div class="dif-card">
+        <div class="dif-icon"><svg class="icon icon-lg"><use href="#i-camera"/></svg></div>
+        <h3>Fotos por reconhecimento facial</h3>
+        <p>Cada formando vê a galeria filtrada pelo próprio rosto, sem precisar caçar foto em pasta gigante.</p>
+      </div>
+      <div class="dif-card">
+        <div class="dif-icon"><svg class="icon icon-lg"><use href="#i-qr"/></svg></div>
+        <h3>Check-in em &lt; 3 segundos</h3>
+        <p>Convidado escaneia o QR no WhatsApp e a portaria imprime a pulseira na hora — sem fila.</p>
+      </div>
+      <div class="dif-card">
+        <div class="dif-icon"><svg class="icon icon-lg"><use href="#i-sparkle"/></svg></div>
+        <h3>Estúdio próprio climatizado</h3>
+        <p>Espaço de beleza no local, iluminação profissional e cenários variados — em Montes Claros.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== MÓDULOS DA PLATAFORMA ============== -->
+<section class="modulos" id="modulos">
+  <div class="wrap">
+    <div class="section-head-center" style="margin-bottom: 80px;">
+      <span class="section-tag">Os 4 módulos</span>
+      <h2 class="section-title">Tudo que sua formatura precisa, num só lugar</h2>
+      <p class="section-sub">Substituímos sistema de cobrança + planilha de convidados + lista da portaria + galeria do Drive + WhatsApp manual por uma plataforma única, integrada de ponta a ponta.</p>
+    </div>
+
+    <div class="modulos-grid">
+      <div class="modulo-card reveal">
+        <span class="modulo-num">01 — VENDAS</span>
+        <h3>Pacotes & pagamento</h3>
+        <p>Bronze, Prata, Ouro ou Diamante. Contrato com assinatura digital ZapSign, cobrança automática via Asaas em 21x sem juros.</p>
+        <ul>
+          <li>Assinatura simples (aceite + IP) ou digital</li>
+          <li>PIX, boleto, cartão de crédito até 21x</li>
+          <li>Notas Fiscais automáticas</li>
+          <li>Lembretes de cobrança via VAI WhatsApp</li>
+        </ul>
+      </div>
+
+      <div class="modulo-card reveal">
+        <span class="modulo-num">02 — DIVULGAÇÃO</span>
+        <h3>Convidados & RSVP</h3>
+        <p>Cota de convidados por pacote, cadastro pelo aluno, convite com QR único no WhatsApp. Campanhas automáticas D-90, D-30, D-7.</p>
+        <ul>
+          <li>QR único por convidado (HMAC assinado)</li>
+          <li>RSVP público sem login</li>
+          <li>Templates aprovados pela Meta</li>
+          <li>Página pública da turma com countdown</li>
+        </ul>
+      </div>
+
+      <div class="modulo-card reveal">
+        <span class="modulo-num">03 — ACESSO</span>
+        <h3>Check-in no evento</h3>
+        <p>Tablet em modo quiosque na portaria: scan do QR em <strong>menos de 3 segundos</strong>, impressão da pulseira na hora com nome e categoria.</p>
+        <ul>
+          <li>Pulseira VIP, comum, comissão, imprensa</li>
+          <li>Modo offline resiliente</li>
+          <li>Painel ao vivo no escritório</li>
+          <li>Zebra ZD510-HC antimicrobiana</li>
+        </ul>
+      </div>
+
+      <div class="modulo-card reveal">
+        <span class="modulo-num">04 — FOTOGRAFIA</span>
+        <h3>Galeria + WhatsApp</h3>
+        <p>AWS Rekognition separa fotos por aluno automaticamente. Galeria personalizada, seleção com créditos, edição e entrega final via WhatsApp.</p>
+        <ul>
+          <li>Upload em massa &lt; 5GB/sessão</li>
+          <li>Threshold facial 80% (configurável)</li>
+          <li>1 retoque grátis por foto</li>
+          <li>Compre fotos extras avulsas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ESTÚDIO ============== -->
+<section class="estudio">
+  <div class="wrap">
+    <div class="estudio-grid">
+      <div class="estudio-img" style="background:linear-gradient(135deg,#1E3A8A,#7C3AED);"></div>
+      <div class="estudio-text">
+        <span class="section-tag">Estrutura exclusiva</span>
+        <h2 class="section-title">Um estúdio completo,<br>pensado para você.</h2>
+        <p>Climatizado, com iluminação profissional e adaptável a turmas de qualquer tamanho — o estúdio Ventus é o cenário onde sua história universitária ganha imagens à altura.</p>
+        <p>Inclui espaço próprio de beleza para que você se prepare no local, sem correria, com calma e equipe pronta.</p>
+
+        <div class="estudio-features">
+          <div class="estudio-feature">
+            <div class="ico"><svg class="icon icon-md"><use href="#i-sparkle"/></svg></div>
+            <h4>Climatizado</h4>
+            <p>Conforto térmico em qualquer estação</p>
+          </div>
+          <div class="estudio-feature">
+            <div class="ico"><svg class="icon icon-md"><use href="#i-camera"/></svg></div>
+            <h4>Iluminação pro</h4>
+            <p>Equipamento Profoto e softboxes</p>
+          </div>
+          <div class="estudio-feature">
+            <div class="ico"><svg class="icon icon-md"><use href="#i-target"/></svg></div>
+            <h4>Espaço beleza</h4>
+            <p>Maquiagem e cabelo no local</p>
+          </div>
+          <div class="estudio-feature">
+            <div class="ico"><svg class="icon icon-md"><use href="#i-package"/></svg></div>
+            <h4>Cenários variados</h4>
+            <p>Para todos os estilos de ensaio</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PARCEIRAS (instituições reais) ============== -->
+<section class="parceiras" id="parceiras">
+  <div class="wrap">
+    <div class="section-head-center" style="margin-bottom: 64px;">
+      <span class="section-tag">Comunidade Ventus</span>
+      <h2 class="section-title">20+ instituições confiam na Ventus</h2>
+      <p class="section-sub">Da UNIMONTES à FUNORTE, da FIPMOC ao IFNMG. 1.924 formandos atendidos em 123 turmas.</p>
+    </div>
+
+    <div class="parceiras-grid">
+      <div class="parceira"><div class="parceira-icon">UM</div>UNIMONTES</div>
+      <div class="parceira"><div class="parceira-icon">FU</div>FUNORTE</div>
+      <div class="parceira"><div class="parceira-icon">IF</div>IFNMG</div>
+      <div class="parceira"><div class="parceira-icon">FI</div>FIPMOC</div>
+      <div class="parceira"><div class="parceira-icon">GR</div>Grau Técnico</div>
+      <div class="parceira"><div class="parceira-icon">UF</div>UFMG</div>
+      <div class="parceira"><div class="parceira-icon">IE</div>IESC</div>
+      <div class="parceira"><div class="parceira-icon">FA</div>FASI</div>
+      <div class="parceira"><div class="parceira-icon">AB</div>ABO</div>
+      <div class="parceira"><div class="parceira-icon">PR</div>PROZ</div>
+      <div class="parceira"><div class="parceira-icon">IN</div>INDYU</div>
+      <div class="parceira" style="background: var(--grad-hero); color: white; border: none;">+ Sua atlética</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== DEPOIMENTOS ============== -->
+<section class="depoimentos" id="depoimentos">
+  <div class="wrap">
+    <div class="section-head-center" style="margin-bottom: 80px;">
+      <span class="section-tag">Quem viveu, conta</span>
+      <h2 class="section-title">A confiança de quem se formou com a gente</h2>
+    </div>
+
+    <div class="depoimentos-grid">
+      <div class="depo-card">
+        <div class="depo-stars">
+          <svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg>
+        </div>
+        <p class="depo-text">A plataforma da Ventus mudou tudo. Pagamos pelo app, vimos as fotos no app, conferimos a lista de convidados no app. Nenhum estresse, nenhuma planilha perdida.</p>
+        <div class="depo-author">
+          <div class="depo-avatar">CA</div>
+          <div class="depo-author-info">
+            <h5>Camila Almeida</h5>
+            <span>Medicina T85 · UNIMONTES · 2026/1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depo-card">
+        <div class="depo-stars">
+          <svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg>
+        </div>
+        <p class="depo-text">Como comissão, fomos atendidos do começo ao fim. A Ventus assumiu tudo e nos deixou tranquilos pra curtir. Reconhecimento facial nas fotos foi o que mais surpreendeu — chegou tudo no WhatsApp já filtrado.</p>
+        <div class="depo-author">
+          <div class="depo-avatar">JL</div>
+          <div class="depo-author-info">
+            <h5>Juliana Lima Carvalho</h5>
+            <span>Fisioterapia UNIFIPMOC · 2024/2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depo-card">
+        <div class="depo-stars">
+          <svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg><svg class="icon icon-sm"><use href="#i-star"/></svg>
+        </div>
+        <p class="depo-text">21x sem juros foi diferencial absurdo. Várias colegas só conseguiram aderir por isso. E o painel da comissão dá visibilidade pra cada inadimplência sem expor ninguém no grupo.</p>
+        <div class="depo-author">
+          <div class="depo-avatar">RS</div>
+          <div class="depo-author-info">
+            <h5>Tiago Moreira Souza Mota</h5>
+            <span>Direito FUNORTE · 2023/2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA FINAL ============== -->
+<section class="cta-final" id="orcamento">
+  <div class="wrap cta-final-content">
+    <span class="section-tag" style="color: var(--dourado-claro); padding-left: 0;">Vamos conversar?</span>
+    <h2>Sua formatura começa <em style="color: var(--dourado-claro); font-style: normal;">aqui</em>.</h2>
+    <p>Já é da nossa turma? Acesse o portal. Quer conhecer? A gente responde no WhatsApp.</p>
+    <div class="hero-actions" style="justify-content: center;">
+      <a href="acesso.html" class="btn-hero btn-hero-primary">
+        <svg class="icon icon-sm"><use href="#i-lock"/></svg>
+        Acessar minha turma
+      </a>
+      <a href="https://wa.me/5538998639570" class="btn-hero btn-hero-secondary" target="_blank" rel="noopener">
+        <svg class="icon icon-sm"><use href="#i-message"/></svg> Falar pelo WhatsApp · (38) 99863-9570
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer id="contato">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="lp.html" class="logo logo-light" style="color:white;font-family:var(--serif);font-weight:800;font-size:24px;">
+          <span style="display:inline-flex;align-items:center;gap:10px;">
+            <span style="width:44px;height:44px;background:white;color:var(--azul-700);border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:22px;">V</span>
+            Ventus Formaturas
+          </span>
+        </a>
+        <p class="desc" style="margin-top: 16px;">A plataforma única para formaturas universitárias em Montes Claros/MG. Estúdio próprio, equipe qualificada e tecnologia que cuida de cada detalhe.</p>
+        <div class="social-row">
+          <a href="#" aria-label="Instagram"><svg class="icon icon-md"><use href="#i-instagram"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg class="icon icon-md"><use href="#i-facebook"/></svg></a>
+          <a href="https://wa.me/5538998639570" aria-label="WhatsApp"><svg class="icon icon-md"><use href="#i-message"/></svg></a>
+        </div>
+      </div>
+
+      <div>
+        <h4>Plataforma</h4>
+        <ul>
+          <li><a href="#modulos">Vendas e Pagamento</a></li>
+          <li><a href="#modulos">Convidados e RSVP</a></li>
+          <li><a href="#modulos">Check-in no Evento</a></li>
+          <li><a href="#modulos">Fotos e WhatsApp</a></li>
+          <li><a href="acesso.html">Acessar Portal</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="#sobre">Sobre Nós</a></li>
+          <li><a href="#parceiras">Parceiras</a></li>
+          <li><a href="#depoimentos">Depoimentos</a></li>
+          <li><a href="public/turma.html">Página da turma</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contato</h4>
+        <div class="contato-item">
+          <span class="ico"><svg class="icon icon-sm"><use href="#i-map-pin"/></svg></span>
+          <span>Rua São Marcos, 60<br>Todos os Santos<br>Montes Claros · MG</span>
+        </div>
+        <div class="contato-item">
+          <span class="ico"><svg class="icon icon-sm"><use href="#i-phone"/></svg></span>
+          <span>(38) 99863-9570</span>
+        </div>
+        <div class="contato-item">
+          <span class="ico"><svg class="icon icon-sm"><use href="#i-mail"/></svg></span>
+          <span>sonheconosco@<br>ventusformaturas.com.br</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Ventus Formaturas. Todos os direitos reservados.</span>
+      <span>CNPJ XX.XXX.XXX/0001-XX · Política de Privacidade · Termos</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/padrao-lp.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

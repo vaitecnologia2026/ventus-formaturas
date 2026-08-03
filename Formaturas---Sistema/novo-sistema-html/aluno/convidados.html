@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convidados — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: var(--gray-100); padding-bottom:80px;">
+
+<div class="phone-frame">
+  <div class="mobile-header">
+    <a href="inicio.html" style="color:white;text-decoration:none;"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+    <strong style="font-size:16px;">Convidados</strong>
+    <i data-lucide="filter" class="w-5 h-5"></i>
+  </div>
+
+  <!-- Cota -->
+  <div style="background:white;padding:18px 20px;border-bottom:1px solid var(--gray-200);">
+    <div class="flex justify-between items-center mb-2">
+      <strong>BAILE + AFTER</strong>
+      <span style="font-size:13px;color:var(--gray-500);">cota: <strong style="color:var(--gray-900);">3 / 8</strong></span>
+    </div>
+    <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;">
+      <div style="width:37.5%;height:100%;background:var(--primary-600);"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray-500);margin-top:6px;">Ainda pode adicionar 5 convidados. Trocas até 26/04 (D-7).</div>
+  </div>
+
+  <!-- Botão de adicionar -->
+  <div style="padding:16px 20px 0;">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
+      <i data-lucide="user-plus" class="w-5 h-5"></i>
+      Adicionar convidado
+    </button>
+  </div>
+
+  <!-- Lista -->
+  <div style="padding:20px;">
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;">Confirmados (2)</strong>
+
+    <div style="background:white;border-radius:14px;border:1px solid var(--gray-200);margin-top:10px;overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--gray-100);" class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">RA</div>
+          <div>
+            <strong style="font-size:14px;">Roberto Almeida</strong>
+            <div style="font-size:12px;color:var(--gray-500);">Pai · (38) 99863-4567</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="badge badge-success" style="font-size:10px;">Confirmou</span>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">VIP</div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;" class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">RC</div>
+          <div>
+            <strong style="font-size:14px;">Rosa Costa</strong>
+            <div style="font-size:12px;color:var(--gray-500);">Mãe · (38) 99863-4568</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="badge badge-success" style="font-size:10px;">Confirmou</span>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">VIP</div>
+        </div>
+      </div>
+    </div>
+
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;display:block;margin-top:24px;">Aguardando RSVP (1)</strong>
+
+    <div style="background:white;border-radius:14px;border:1px solid var(--gray-200);margin-top:10px;overflow:hidden;">
+      <div style="padding:14px 16px;" class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="avatar" style="background:var(--gray-100);color:var(--gray-700);">FC</div>
+          <div>
+            <strong style="font-size:14px;">Fernanda Costa</strong>
+            <div style="font-size:12px;color:var(--gray-500);">Irmã · (38) 99863-4569</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="badge badge-warning" style="font-size:10px;">Pendente</span>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Comum</div>
+          <a href="#" style="font-size:11px;color:var(--primary-600);font-weight:600;text-decoration:none;">Reenviar</a>
+        </div>
+      </div>
+    </div>
+
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;display:block;margin-top:24px;">Slots disponíveis (5)</strong>
+    <div style="background:white;border-radius:14px;border:1px dashed var(--gray-300);margin-top:10px;padding:16px;text-align:center;color:var(--gray-500);font-size:13px;">
+      <i data-lucide="user-plus" class="w-6 h-6" style="margin:0 auto 8px;color:var(--gray-400);"></i>
+      <div>Cada convidado recebe um QR único no WhatsApp.</div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="inicio.html" class="bottom-nav-item"><i data-lucide="home"></i>Início</a>
+  <a href="galeria.html" class="bottom-nav-item"><i data-lucide="image"></i>Fotos</a>
+  <a href="pagamento.html" class="bottom-nav-item"><i data-lucide="credit-card"></i>Pagar</a>
+  <a href="convidados.html" class="bottom-nav-item active"><i data-lucide="users"></i>Convidados</a>
+  <a href="#" class="bottom-nav-item"><i data-lucide="user"></i>Perfil</a>
+</nav>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

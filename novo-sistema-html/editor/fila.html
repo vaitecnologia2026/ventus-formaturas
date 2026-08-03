@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Fila do Editor — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.tile { background-image: linear-gradient(135deg, #1E3A8A, #7C3AED); }
+.tile.t2 { background-image: linear-gradient(135deg, #16A34A, #1E3A8A); }
+.tile.t3 { background-image: linear-gradient(135deg, #F59E0B, #DC2626); }
+.tile.t4 { background-image: linear-gradient(135deg, #0EA5E9, #1E3A8A); }
+.tile.t5 { background-image: linear-gradient(135deg, #EC4899, #7C3AED); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Editor</div></div></div>
+  <a href="fila.html" class="sidebar-link active"><i data-lucide="palette"></i>Fila de edição</a>
+  <a href="#" class="sidebar-link"><i data-lucide="check-circle"></i>Finalizadas</a>
+  <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Minha produtividade</a>
+  <div class="sidebar-footer"><div class="avatar">RB</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Renato Beto</div><div style="font-size:11px;opacity:.6;">Editor freelancer</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar pacote, turma, aluno…"></div>
+    <div class="flex gap-2"><span class="badge badge-info">SLA: 3 a 5 dias</span></div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);">Editor / Fila de edição</div>
+    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Fila de edição</h1>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Aguardando</div><div class="kpi-value">87</div><div class="kpi-trend" style="color:var(--gray-500);">12 pacotes · 7 turmas</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FCE7F3;color:#9D174D;"><i data-lucide="palette" class="w-5 h-5"></i></div><div class="kpi-label">Em edição (você)</div><div class="kpi-value">23</div><div class="kpi-trend" style="color:var(--gray-500);">3 pacotes</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check" class="w-5 h-5"></i></div><div class="kpi-label">Finalizadas hoje</div><div class="kpi-value">45</div><div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +18% vs ontem</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Atrasadas</div><div class="kpi-value" style="color:var(--danger);">8</div><div class="kpi-trend down">>5 dias</div></div>
+    </div>
+
+    <div class="grid gap-4" style="grid-template-columns: repeat(2, 1fr);">
+
+      <!-- Pacote em edição -->
+      <div class="card">
+        <div style="background:linear-gradient(135deg, var(--primary-900), #7C3AED);color:white;padding:18px;border-radius:12px 12px 0 0;">
+          <div class="flex justify-between items-start">
+            <div>
+              <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;">Em edição</div>
+              <strong style="font-size:18px;display:block;margin-top:2px;">Pacote · Camila Almeida</strong>
+              <div style="font-size:13px;opacity:.85;margin-top:2px;">MEDICINA T85 · BAILE + AFTER (40 fotos)</div>
+            </div>
+            <span class="badge" style="background:rgba(255,255,255,.2);color:white;">Você</span>
+          </div>
+          <div class="flex gap-4 mt-3" style="font-size:12px;opacity:.85;">
+            <span><i data-lucide="clock" class="inline w-3 h-3"></i> Pegou há 2h</span>
+            <span><i data-lucide="calendar" class="inline w-3 h-3"></i> Vence em 4 dias</span>
+            <span><i data-lucide="image" class="inline w-3 h-3"></i> 23 / 40 finalizadas</span>
+          </div>
+        </div>
+        <div class="card-body" style="padding:14px;">
+          <div class="photo-grid" style="grid-template-columns:repeat(8,1fr);gap:6px;">
+            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="upload" class="w-4 h-4"></i> Subir versões</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="check" class="w-4 h-4"></i> Marcar finalizado</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="background:linear-gradient(135deg, var(--primary-900), #7C3AED);color:white;padding:18px;border-radius:12px 12px 0 0;">
+          <div class="flex justify-between items-start">
+            <div>
+              <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;">Em edição</div>
+              <strong style="font-size:18px;display:block;margin-top:2px;">Pacote · Pedro Henrique</strong>
+              <div style="font-size:13px;opacity:.85;margin-top:2px;">MEDICINA T85 · FOTO CONVITE (30 fotos)</div>
+            </div>
+            <span class="badge" style="background:rgba(255,255,255,.2);color:white;">Você</span>
+          </div>
+          <div class="flex gap-4 mt-3" style="font-size:12px;opacity:.85;">
+            <span><i data-lucide="clock" class="inline w-3 h-3"></i> Pegou há 1d</span>
+            <span><i data-lucide="calendar" class="inline w-3 h-3"></i> Vence amanhã</span>
+            <span><i data-lucide="image" class="inline w-3 h-3"></i> 14 / 30</span>
+          </div>
+        </div>
+        <div class="card-body" style="padding:14px;">
+          <div class="photo-grid" style="grid-template-columns:repeat(8,1fr);gap:6px;">
+            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
+            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="upload" class="w-4 h-4"></i> Subir versões</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="check" class="w-4 h-4"></i> Marcar finalizado</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card mt-6">
+      <div class="card-header"><div class="card-title">Aguardando · disponíveis para pegar</div><span class="badge">12 pacotes</span></div>
+      <table class="table">
+        <thead><tr><th>Pacote</th><th>Turma</th><th>Evento</th><th class="num">Fotos</th><th>Vence em</th><th>Prioridade</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><strong>Júlia Ribeiro</strong></td><td>MEDICINA T85</td><td>BAILE + AFTER</td><td class="num">40</td><td>5 dias</td><td><span class="badge badge-danger">Alta</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
+          <tr><td><strong>Tiago Moreira Mendes</strong></td><td>MEDICINA T85</td><td>FOTOS FAMÍLIA</td><td class="num">20</td><td>5 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
+          <tr><td><strong>Igor Martins Rocha</strong></td><td>DIREITO UNIMONTES</td><td>FAMILY DAY (10 fotos)</td><td class="num">10</td><td>3 dias</td><td><span class="badge badge-danger">Alta</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
+          <tr><td><strong>Fernanda Alves Lopes</strong></td><td>LETRAS UNIMONTES</td><td>POSICIONAMENTO IMAGEM</td><td class="num">15</td><td>4 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
+          <tr><td><strong>Beatriz Lima</strong></td><td>UNIFICADA - IPATINGA</td><td>COLAÇÃO OFICIAL (30)</td><td class="num">30</td><td>6 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
+          <tr><td><strong>João Vinícius</strong></td><td>ENG. FLORESTAL UFMG</td><td>COLAÇÃO OFICIAL (30)</td><td class="num">30</td><td>2 dias</td><td><span class="badge badge-danger">Urgente</span></td><td><button class="btn btn-primary btn-sm">Pegar pacote</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

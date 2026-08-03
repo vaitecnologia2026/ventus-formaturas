@@ -1,0 +1,267 @@
+/* ============================================================
+   Ventus Formaturas — Design System (protótipo)
+   Identidade: azul + branco · mobile-first p/ aluno · desktop p/ admin
+   ============================================================ */
+
+:root {
+  --azul-900: #0F1F4F;
+  --azul-800: #1E3A8A;
+  --azul-700: #1D4ED8;
+  --azul-600: #2563EB;
+  --azul-500: #3B82F6;
+  --azul-400: #60A5FA;
+  --azul-100: #DBEAFE;
+  --azul-50:  #EFF6FF;
+  --branco:   #FFFFFF;
+  --neutro-50:  #F8FAFC;
+  --neutro-100: #F1F5F9;
+  --neutro-200: #E2E8F0;
+  --neutro-300: #CBD5E1;
+  --neutro-400: #94A3B8;
+  --neutro-500: #64748B;
+  --neutro-600: #475569;
+  --neutro-700: #334155;
+  --neutro-800: #1E293B;
+  --neutro-900: #0F172A;
+  --sucesso: #10B981;
+  --sucesso-bg: #D1FAE5;
+  --aviso:   #F59E0B;
+  --aviso-bg: #FEF3C7;
+  --erro:    #EF4444;
+  --erro-bg: #FEE2E2;
+  --vip:     #FBBF24;
+  --grad: linear-gradient(135deg, #0F1F4F 0%, #1E3A8A 50%, #2563EB 100%);
+  --grad-soft: linear-gradient(135deg, rgba(30,58,138,0.05) 0%, rgba(37,99,235,0.05) 100%);
+  --shadow-sm: 0 1px 2px rgba(15,31,79,0.06);
+  --shadow-md: 0 4px 12px rgba(15,31,79,0.08);
+  --shadow-lg: 0 10px 30px rgba(15,31,79,0.12);
+  --shadow-xl: 0 20px 50px rgba(15,31,79,0.18);
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 100px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--neutro-900);
+  background: var(--neutro-50);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ===================== LOGO ===================== */
+.logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; color: var(--azul-800); }
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--grad);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 900; font-size: 16px;
+  box-shadow: var(--shadow-md);
+}
+.logo-mark.lg { width: 48px; height: 48px; font-size: 24px; border-radius: 12px; }
+
+/* ===================== BOTÕES ===================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--r-md);
+  font-weight: 600; font-size: 14px;
+  transition: transform .15s, box-shadow .15s, background .2s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--azul-600); color: white; }
+.btn-primary:hover { background: var(--azul-700); }
+.btn-ghost { background: transparent; color: var(--azul-700); border: 1px solid var(--neutro-200); }
+.btn-ghost:hover { border-color: var(--azul-400); background: var(--azul-50); }
+.btn-white { background: white; color: var(--azul-800); box-shadow: var(--shadow-md); }
+.btn-lg { padding: 16px 28px; font-size: 16px; border-radius: var(--r-md); }
+.btn-block { width: 100%; }
+.btn-icon-only { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
+
+/* ===================== BADGES ===================== */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 600;
+}
+.badge-success { background: var(--sucesso-bg); color: #065F46; }
+.badge-warn    { background: var(--aviso-bg); color: #92400E; }
+.badge-error   { background: var(--erro-bg); color: #991B1B; }
+.badge-info    { background: var(--azul-50); color: var(--azul-700); }
+.badge-vip     { background: #FEF3C7; color: #92400E; }
+
+/* ===================== CARDS ===================== */
+.card {
+  background: white;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--neutro-200);
+  padding: 20px;
+}
+.card-elevated { box-shadow: var(--shadow-md); border: none; }
+
+/* ===================== HEADERS ===================== */
+.h-mobile {
+  background: white;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--neutro-200);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.h-back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--neutro-700); font-weight: 500; }
+.h-mobile h1 { font-size: 16px; font-weight: 700; }
+.h-mobile-actions { display: flex; gap: 8px; }
+
+/* Bottom nav (mobile aluno) */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: white;
+  border-top: 1px solid var(--neutro-200);
+  display: flex; justify-content: space-around;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index: 50;
+}
+.bottom-nav a {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 14px;
+  font-size: 11px; color: var(--neutro-500);
+  border-radius: var(--r-sm);
+}
+.bottom-nav a.active { color: var(--azul-700); }
+.bottom-nav a .ico { font-size: 22px; }
+
+/* ===================== ADMIN LAYOUT ===================== */
+.admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.admin-sidebar {
+  background: var(--azul-900);
+  color: white;
+  padding: 24px 16px;
+}
+.admin-sidebar .logo { color: white; margin-bottom: 32px; }
+.admin-sidebar .nav-section {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin: 24px 12px 8px;
+}
+.admin-nav { display: flex; flex-direction: column; gap: 2px; }
+.admin-nav a {
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  display: flex; align-items: center; gap: 10px;
+  transition: background .15s;
+}
+.admin-nav a:hover { background: rgba(255,255,255,0.06); color: white; }
+.admin-nav a.active { background: rgba(37,99,235,0.4); color: white; font-weight: 600; }
+.admin-main { background: var(--neutro-50); }
+.admin-topbar {
+  background: white;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--neutro-200);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-topbar .crumb { font-size: 13px; color: var(--neutro-500); }
+.admin-topbar .crumb b { color: var(--neutro-900); font-weight: 600; }
+.admin-content { padding: 32px; }
+.admin-content h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+.admin-content > p.lead { font-size: 14px; color: var(--neutro-600); margin-bottom: 24px; }
+
+/* ===================== KPIS ===================== */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi { padding: 20px; border-radius: var(--r-md); background: white; border: 1px solid var(--neutro-200); }
+.kpi-label { font-size: 12px; font-weight: 600; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi-num { font-size: 28px; font-weight: 800; color: var(--neutro-900); margin-top: 4px; }
+.kpi-delta { font-size: 12px; margin-top: 6px; }
+.kpi-delta.up   { color: var(--sucesso); }
+.kpi-delta.down { color: var(--erro); }
+.kpi.highlight { background: var(--grad); color: white; border: none; }
+.kpi.highlight .kpi-label { color: rgba(255,255,255,0.7); }
+.kpi.highlight .kpi-num { color: white; }
+
+/* ===================== TABELAS ===================== */
+.table-wrap { background: white; border-radius: var(--r-md); border: 1px solid var(--neutro-200); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { background: var(--neutro-50); padding: 12px 16px; text-align: left; font-weight: 600; color: var(--neutro-600); font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+tbody td { padding: 14px 16px; border-top: 1px solid var(--neutro-100); }
+tbody tr:hover { background: var(--neutro-50); }
+
+/* ===================== AVATAR ===================== */
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--azul-100); color: var(--azul-700); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===================== UTIL ===================== */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.text-sm { font-size: 14px; } .text-xs { font-size: 12px; }
+.text-muted { color: var(--neutro-500); }
+.font-semi { font-weight: 600; } .font-bold { font-weight: 700; } .font-extra { font-weight: 800; }
+.mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; } .mt-8 { margin-top: 32px; }
+.mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+
+/* ===================== MOBILE PHONE FRAME (para preview no desktop) ===================== */
+.phone-frame {
+  max-width: 420px;
+  margin: 0 auto;
+  background: white;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* ===================== TOAST ===================== */
+.toast-banner {
+  background: var(--azul-50); color: var(--azul-700);
+  border-left: 4px solid var(--azul-600);
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.toast-banner.success { background: var(--sucesso-bg); color: #065F46; border-left-color: var(--sucesso); }
+.toast-banner.warn { background: var(--aviso-bg); color: #92400E; border-left-color: var(--aviso); }
+
+/* ===================== PROGRESS ===================== */
+.progress { height: 6px; background: var(--neutro-200); border-radius: var(--r-full); overflow: hidden; }
+.progress-bar { height: 100%; background: var(--azul-600); border-radius: var(--r-full); transition: width .4s; }
+.progress-bar.success { background: var(--sucesso); }
+.progress-bar.warn { background: var(--aviso); }
+
+/* ===================== ÍCONES SVG ===================== */
+.icon {
+  width: 1.1em; height: 1.1em;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  vertical-align: -0.15em;
+}
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 22px; height: 22px; }
+.icon-lg { width: 28px; height: 28px; }
+
+/* ===================== LINK PROTÓTIPO TAG ===================== */
+.proto-tag {
+  position: fixed; bottom: 16px; right: 16px;
+  background: rgba(15,31,79,0.9);
+  color: white;
+  padding: 8px 14px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 100;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  backdrop-filter: blur(8px);
+}
+.proto-tag:hover { background: var(--azul-800); }

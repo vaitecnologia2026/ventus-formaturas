@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Usuários — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .role-link { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:8px; color:var(--gray-700); text-decoration:none; font-size:14px; cursor:pointer; transition: all .12s; }
+  .role-link:hover { background: var(--gray-50); }
+  .role-link.active { background: var(--primary-50); color: var(--primary-800); font-weight: 600; }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
+  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
+  <div class="sidebar-section">Sistema</div>
+  <a href="usuarios.html" class="sidebar-link active"><i data-lucide="shield-check"></i>Usuários</a>
+  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input id="user-search" type="text" placeholder="Buscar usuário por nome ou email…"></div>
+    <button class="btn btn-primary btn-sm"><i data-lucide="user-plus" class="w-4 h-4"></i> Novo usuário</button>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Sistema / Usuários</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Usuários e permissões</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">RBAC granular substitui as 8 flags <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">menu_*</code> do legado. Clique num papel para ver os usuários daquele perfil.</p>
+
+    <div class="grid gap-6" style="grid-template-columns: 280px 1fr;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Por papel</div></div>
+        <div id="role-list" style="padding:8px 12px;">
+          <!-- Renderizado por JS -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="role-title">Operadores Ventus</div>
+          <span class="badge badge-info" id="role-badge">— usuários</span>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>Usuário</th><th>Tipo</th><th id="col-extra">Áreas (OS)</th><th>2FA</th><th>Último acesso</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="users-body"></tbody>
+        </table>
+        <div id="users-empty" style="display:none;padding:48px 24px;text-align:center;color:var(--gray-500);">
+          <i data-lucide="user-x" class="w-8 h-8" style="margin:0 auto 12px;color:var(--gray-300);"></i>
+          <div style="font-weight:600;">Nenhum usuário encontrado</div>
+          <div style="font-size:13px;margin-top:4px;">Tente outro papel ou termo de busca.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const ROLES = [
+  { id: 'ADMIN_TENANT',         label: 'Admin Tenant',          count: 2,    title: 'Administradores Ventus',       extra: 'Áreas (OS)' },
+  { id: 'OPERADOR_FINANCEIRO',  label: 'Operador Financeiro',   count: 1,    title: 'Operadores · Financeiro',      extra: 'Áreas (OS)' },
+  { id: 'OPERADOR_COMERCIAL',   label: 'Operador Comercial',    count: 1,    title: 'Operadores · Comercial',       extra: 'Áreas (OS)' },
+  { id: 'OPERADOR_CERIMONIAL',  label: 'Operador Cerimonial',   count: 1,    title: 'Operadores · Cerimonial',      extra: 'Áreas (OS)' },
+  { id: 'OPERADOR_ADMIN',       label: 'Operador Administrativo', count: 2,  title: 'Operadores · Administrativo',  extra: 'Áreas (OS)' },
+  { id: 'OPERADOR_QUALIDADE',   label: 'Operador Qualidade',    count: 1,    title: 'Operadores · Qualidade',       extra: 'Áreas (OS)' },
+  { id: 'VENDEDOR',             label: 'Vendedor',              count: 6,    title: 'Vendedores',                   extra: 'Comissão' },
+  { id: 'FOTOGRAFO',            label: 'Fotógrafo',             count: 3,    title: 'Fotógrafos',                   extra: 'Especialidade' },
+  { id: 'EDITOR',               label: 'Editor',                count: 4,    title: 'Editores de fotos',            extra: 'SLA médio' },
+  { id: 'OPERADOR_EVENTO',      label: 'Operador Evento',       count: 2,    title: 'Operadores de evento',         extra: 'Eventos' },
+  { id: 'COMISSAO',             label: 'Comissão',              count: 82,   title: 'Comissão de turmas',           extra: 'Turma' },
+  { id: 'FORMANDO',             label: 'Formando',              count: 1924, title: 'Formandos',                    extra: 'Turma' },
+];
+
+const USERS = {
+  ADMIN_TENANT: [
+    { name:'Elison Perini', email:'elison@ventus.com',                   tipo:'ADMIN_TENANT', extra:'Todas',       totp:true,  last:'Agora',      status:'Ativo' },
+    { name:'Bruno Sena',    email:'bruno@ventusprodutora.com.br',        tipo:'ADMIN_TENANT', extra:'Todas',       totp:true,  last:'2h atrás',   status:'Ativo' },
+  ],
+  OPERADOR_FINANCEIRO: [
+    { name:'Mariana Souza', email:'mariana.financ@ventus.com',           tipo:'OPERADOR_FINANCEIRO', extra:'<span class="tag-os-area tag-FINANCEIRO">FINANCEIRO</span>', totp:true, last:'Agora', status:'Ativo' },
+  ],
+  OPERADOR_COMERCIAL: [
+    { name:'Fernando Gontijo', email:'nandogontijo@gmail.com',            tipo:'OPERADOR_COMERCIAL', extra:'<span class="tag-os-area tag-COMERCIAL">COMERCIAL</span>', totp:false, last:'3d atrás', status:'Ativo' },
+  ],
+  OPERADOR_CERIMONIAL: [
+    { name:'Ana Carolina Vieira', email:'cerimonial@ventus.com',          tipo:'OPERADOR_CERIMONIAL', extra:'<span class="tag-os-area tag-CERIMONIAL">CERIMONIAL</span>', totp:false, last:'1d atrás', status:'Ativo' },
+  ],
+  OPERADOR_ADMIN: [
+    { name:'Renato Soares Ribeiro', email:'rsrmoc@gmail.com',             tipo:'OPERADOR_ADMIN', extra:'<span class="tag-os-area tag-EDICAO">EDIÇÃO</span> <span class="tag-os-area tag-QUALIDADE">QUALIDADE</span>', totp:false, last:'1d atrás', status:'Ativo' },
+    { name:'Debora Damasceno',    email:'debora@ventus.com',              tipo:'OPERADOR_ADMIN', extra:'<span class="tag-os-area tag-ADMINISTRATIVO">ADMIN</span>', totp:false, last:'5h atrás', status:'Ativo' },
+  ],
+  OPERADOR_QUALIDADE: [
+    { name:'Fillipe Costa', email:'fillipe.qa@ventus.com',                tipo:'OPERADOR_QUALIDADE', extra:'<span class="tag-os-area tag-QUALIDADE">QUALIDADE</span>', totp:false, last:'4h atrás', status:'Ativo' },
+  ],
+  VENDEDOR: [
+    { name:'Tiago Moreira Carvalho Santos', email:'rafael@ventus.com',           tipo:'VENDEDOR', extra:'10%',  totp:false, last:'1h atrás',  status:'Ativo' },
+    { name:'Ana Clara Celestino',    email:'anaclara@ventus.com',         tipo:'VENDEDOR', extra:'10%',  totp:false, last:'3h atrás',  status:'Ativo' },
+    { name:'Marcos Vieira Andrade',       email:'geovanna@ventus.com',         tipo:'VENDEDOR', extra:'12%',  totp:false, last:'Agora',     status:'Ativo' },
+    { name:'Fernando Gontijo',       email:'fernando.vd@ventus.com',      tipo:'VENDEDOR', extra:'8%',   totp:false, last:'2d atrás',  status:'Ativo' },
+    { name:'Debora Damasceno',       email:'debora.vd@ventus.com',        tipo:'VENDEDOR', extra:'CLT',  totp:false, last:'5h atrás',  status:'Ativo' },
+    { name:'Thaíná',                 email:'thaina@ventus.com',           tipo:'VENDEDOR', extra:'10%',  totp:false, last:'1d atrás',  status:'Ativo' },
+  ],
+  FOTOGRAFO: [
+    { name:'Bruno Sena',     email:'bruno.foto@ventus.com',                tipo:'FOTOGRAFO', extra:'Eventos · Cerimônia', totp:false, last:'2h atrás',  status:'Ativo' },
+    { name:'Renato R.',      email:'renato.foto@ventus.com',               tipo:'FOTOGRAFO', extra:'Cerimônia',           totp:false, last:'1d atrás',  status:'Ativo' },
+    { name:'Lucas Pereira',  email:'lucas@freelance.com',                  tipo:'FOTOGRAFO', extra:'Festas (freelancer)', totp:false, last:'3d atrás',  status:'Ativo' },
+  ],
+  EDITOR: [
+    { name:'Renato Beto',     email:'beto.editor@ventus.com',              tipo:'EDITOR', extra:'2,8d',  totp:false, last:'30min atrás', status:'Ativo' },
+    { name:'Camila Oliveira', email:'camila.edit@ventus.com',              tipo:'EDITOR', extra:'3,1d',  totp:false, last:'1h atrás',    status:'Ativo' },
+    { name:'João Marcos',     email:'jm@freelance-foto.com',               tipo:'EDITOR', extra:'4,5d',  totp:false, last:'2d atrás',    status:'Ativo' },
+    { name:'Helena Vieira',   email:'helena.edit@freelance.com',           tipo:'EDITOR', extra:'3,4d',  totp:false, last:'4h atrás',    status:'Ativo' },
+  ],
+  OPERADOR_EVENTO: [
+    { name:'Carlos Eduardo Lima', email:'carlos.evento@ventus.com',         tipo:'OPERADOR_EVENTO', extra:'BAILE T84',          totp:false, last:'há 5min', status:'Ativo' },
+    { name:'Juliana Mota',        email:'juliana.evento@ventus.com',        tipo:'OPERADOR_EVENTO', extra:'COLAÇÃO UFMG (15/05)',totp:false, last:'1d atrás', status:'Ativo' },
+  ],
+  COMISSAO: [
+    { name:'Camila Almeida',     email:'wa: (38) 99863-1234',               tipo:'COMISSAO',  extra:'MEDICINA T85',                  totp:false, last:'Agora',      status:'Ativo' },
+    { name:'Pedro Henrique',     email:'wa: (38) 99863-1235',               tipo:'COMISSAO',  extra:'MEDICINA T85',                  totp:false, last:'2h atrás',   status:'Ativo' },
+    { name:'Júlia Ribeiro',      email:'wa: (38) 99863-1236',               tipo:'COMISSAO',  extra:'MEDICINA T85',                  totp:false, last:'4h atrás',   status:'Ativo' },
+    { name:'Carolina Reis Pereira',     email:'wa: (31) 99821-4567',               tipo:'COMISSAO',  extra:'ENG. FLORESTAL UFMG',           totp:false, last:'1d atrás',   status:'Ativo' },
+    { name:'Gabriela Nunes',  email:'wa: (38) 99863-7788',               tipo:'COMISSAO',  extra:'ODONTOLOGIA - FUNORTE',         totp:false, last:'5h atrás',   status:'Ativo' },
+    { name:'Igor Martins Rocha',         email:'wa: (38) 99863-9911',               tipo:'COMISSAO',  extra:'DIREITO - UNIMONTES',           totp:false, last:'2d atrás',   status:'Ativo' },
+    { name:'Fernanda Alves Lopes',  email:'wa: (38) 99863-2222',               tipo:'COMISSAO',  extra:'LETRAS - UNIMONTES',            totp:false, last:'6h atrás',   status:'Ativo' },
+    { name:'Beatriz Lima',       email:'wa: (33) 99777-1234',               tipo:'COMISSAO',  extra:'UNIFICADA - IPATINGA',          totp:false, last:'3d atrás',   status:'Ativo' },
+  ],
+  FORMANDO: [
+    { name:'Camila Almeida',     email:'camila@email.com',                  tipo:'FORMANDO',  extra:'MEDICINA T85',                  totp:false, last:'Agora',     status:'Ativo' },
+    { name:'Pedro Henrique',     email:'pedro@email.com',                   tipo:'FORMANDO',  extra:'MEDICINA T85',                  totp:false, last:'2h atrás',  status:'Ativo' },
+    { name:'Júlia Ribeiro',      email:'julia@email.com',                   tipo:'FORMANDO',  extra:'MEDICINA T85',                  totp:false, last:'1d atrás',  status:'Ativo' },
+    { name:'Tiago Moreira Mendes',      email:'rafael.m@email.com',                tipo:'FORMANDO',  extra:'MEDICINA T85',                  totp:false, last:'3d atrás',  status:'Ativo' },
+    { name:'João Vinícius',      email:'joao.v@email.com',                  tipo:'FORMANDO',  extra:'ENG. FLORESTAL UFMG',           totp:false, last:'4h atrás',  status:'Ativo' },
+    { name:'Fernanda Alves Lopes',  email:'mclara@email.com',                  tipo:'FORMANDO',  extra:'LETRAS UNIMONTES',              totp:false, last:'2h atrás',  status:'Ativo' },
+    { name:'Igor Martins Rocha',         email:'davi.r@email.com',                  tipo:'FORMANDO',  extra:'DIREITO UNIMONTES',             totp:false, last:'5h atrás',  status:'Ativo' },
+    { name:'Ana Carolina S.',    email:'ana.cs@email.com',                  tipo:'FORMANDO',  extra:'UNIFICADA IPATINGA',            totp:false, last:'1d atrás',  status:'Ativo' },
+    { name:'Roberto Cardoso',    email:'roberto@email.com',                 tipo:'FORMANDO',  extra:'MEDICINA T84',                  totp:false, last:'8h atrás',  status:'Ativo' },
+    { name:'Fernanda Lima',      email:'fernanda@email.com',                tipo:'FORMANDO',  extra:'PSICOLOGIA UNIFIPMOC',          totp:false, last:'2d atrás',  status:'Ativo' },
+  ],
+};
+
+let activeRole = 'ADMIN_TENANT';
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+}
+
+function renderRoleList() {
+  const wrap = document.getElementById('role-list');
+  wrap.innerHTML = ROLES.map(r => `
+    <a class="role-link ${r.id === activeRole ? 'active' : ''}" data-role="${r.id}">
+      <span>${r.label}</span>
+      <span class="badge ${r.id === activeRole ? 'badge-info' : ''}">${r.count.toLocaleString('pt-BR')}</span>
+    </a>
+  `).join('');
+  wrap.querySelectorAll('.role-link').forEach(el => {
+    el.addEventListener('click', () => selectRole(el.dataset.role));
+  });
+}
+
+function renderUsers(filter = '') {
+  const role = ROLES.find(r => r.id === activeRole);
+  document.getElementById('role-title').textContent = role.title + (role.id === 'COMISSAO' || role.id === 'FORMANDO' ? ' (mostrando 8 de ' + role.count + ')' : ' (' + role.count + ')');
+  document.getElementById('role-badge').textContent = role.label;
+  document.getElementById('col-extra').textContent = role.extra;
+
+  const all = USERS[activeRole] || [];
+  const f = filter.trim().toLowerCase();
+  const list = f
+    ? all.filter(u => u.name.toLowerCase().includes(f) || u.email.toLowerCase().includes(f))
+    : all;
+
+  const body = document.getElementById('users-body');
+  const empty = document.getElementById('users-empty');
+
+  if (list.length === 0) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    body.innerHTML = list.map(u => `
+      <tr>
+        <td>
+          <div class="flex items-center gap-3">
+            <div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">${initials(u.name)}</div>
+            <div>
+              <div style="font-weight:600;">${u.name}</div>
+              <div style="font-size:12px;color:var(--gray-500);">${u.email}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge ${u.tipo === 'ADMIN_TENANT' ? 'badge-info' : ''}">${u.tipo}</span></td>
+        <td>${u.extra}</td>
+        <td>${u.totp
+          ? '<i data-lucide="shield-check" class="w-4 h-4" style="color:var(--success);"></i>'
+          : '<i data-lucide="shield" class="w-4 h-4" style="color:var(--gray-400);"></i>'}</td>
+        <td>${u.last}</td>
+        <td><span class="badge ${u.status === 'Ativo' ? 'badge-success' : ''}">${u.status}</span></td>
+        <td class="text-right"><button class="btn btn-ghost btn-icon" data-no-toast><i data-lucide="more-horizontal" class="w-4 h-4"></i></button></td>
+      </tr>
+    `).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function selectRole(roleId) {
+  activeRole = roleId;
+  renderRoleList();
+  renderUsers(document.getElementById('user-search').value);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderRoleList();
+  renderUsers();
+  document.getElementById('user-search').addEventListener('input', (e) => renderUsers(e.target.value));
+});
+</script>
+
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

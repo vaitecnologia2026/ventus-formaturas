@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: linear-gradient(180deg, #1E3A8A 0%, #172554 100%); min-height:100vh;">
+
+<div class="phone-frame" style="background:transparent; padding-top:60px;">
+  <div style="text-align:center;color:white;margin-bottom:48px;">
+    <div style="display:inline-flex;width:64px;height:64px;background:white;color:var(--primary-900);border-radius:18px;align-items:center;justify-content:center;font-weight:800;font-size:28px;margin-bottom:16px;">V</div>
+    <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;margin:0 0 8px;">Ventus Formaturas</h1>
+    <p style="opacity:.75;font-size:15px;margin:0;">Sua experiência completa de formatura</p>
+  </div>
+
+  <div style="background:white;border-radius:20px 20px 0 0;padding:32px 24px;min-height:60vh;">
+    <h2 class="text-2xl font-bold mb-1" style="color:var(--gray-900);">Bem-vindo!</h2>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Entre com seu WhatsApp — vamos enviar um link único pra você acessar.</p>
+
+    <div class="mb-4">
+      <label class="label">WhatsApp</label>
+      <div style="position:relative;">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gray-500);font-size:14px;">🇧🇷 +55</span>
+        <input class="input" placeholder="(38) 99863-1234" value="(38) 99863-1234" style="padding-left:74px;">
+      </div>
+      <div class="help">Você receberá um link no WhatsApp em alguns segundos.</div>
+    </div>
+
+    <button onclick="document.getElementById('sent').style.display='block';this.style.display='none';" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;">
+      <i data-lucide="message-circle" class="w-5 h-5"></i>
+      Enviar link no WhatsApp
+    </button>
+
+    <div id="sent" style="display:none;margin-top:24px;padding:20px;background:#DCFCE7;border-radius:12px;color:#166534;">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="check-circle" class="w-5 h-5"></i><strong>Enviado!</strong></div>
+      <p style="font-size:14px;">Verifique seu WhatsApp. Volte aqui e clique no link para entrar.</p>
+      <a href="inicio.html" class="btn btn-primary btn-sm mt-3" style="background:#166534;">Já cliquei no link →</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="text-align:center;font-size:13px;color:var(--gray-500);">
+      Não recebeu? <a href="#" style="color:var(--primary-600);font-weight:600;">Tentar por email</a>
+    </div>
+
+    <div style="margin-top:24px;text-align:center;">
+      <a href="../index.html" style="font-size:12px;color:var(--gray-400);text-decoration:none;">← Voltar ao hub</a>
+    </div>
+  </div>
+</div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

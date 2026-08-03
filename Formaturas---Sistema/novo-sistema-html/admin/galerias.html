@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Galerias — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
+  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
+  <a href="galerias.html" class="sidebar-link active"><i data-lucide="images"></i>Galerias</a>
+  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar galeria, evento, turma…"></div>
+    <button class="btn btn-primary btn-sm"><i data-lucide="upload" class="w-4 h-4"></i> Nova galeria</button>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Galerias e Fotos</div>
+    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Galerias e fotos</h1>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="folder" class="w-5 h-5"></i></div><div class="kpi-label">Galerias ativas</div><div class="kpi-value">42</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="image" class="w-5 h-5"></i></div><div class="kpi-label">Fotos no R2</div><div class="kpi-value">18.412</div><div class="kpi-trend" style="color:var(--gray-500);">~75 GB</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="scan-face" class="w-5 h-5"></i></div><div class="kpi-label">Indexadas (Rekognition)</div><div class="kpi-value">17.890</div><div class="kpi-trend" style="color:var(--success);">97%</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Sem face detectada</div><div class="kpi-value">522</div><div class="kpi-trend" style="color:var(--gray-500);">galeria "Geral"</div></div>
+    </div>
+
+    <div class="grid gap-4" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="card">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#1E3A8A,#A855F7);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">BAILE + AFTER</div>
+        <div class="card-body">
+          <div class="flex justify-between mb-2"><strong>MEDICINA T84 - UNIMONTES</strong><span class="badge badge-info">240 fotos</span></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 12/04/2026 · Foto. Bruno Sena</div>
+          <div class="flex justify-between" style="font-size:13px;">
+            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> Processadas: 240</span>
+            <span><i data-lucide="palette" class="inline w-3 h-3" style="color:#EC4899;"></i> Selecionadas: 187</span>
+          </div>
+          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Ver fotos</button><button class="btn btn-primary btn-sm" style="flex:1;">Publicar</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#16A34A,#1E3A8A);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">COLAÇÃO OFICIAL</div>
+        <div class="card-body">
+          <div class="flex justify-between mb-2"><strong>ENG. FLORESTAL - UFMG</strong><span class="badge badge-info">1.430 fotos</span></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 18/04/2026 · Foto. Renato R.</div>
+          <div class="flex justify-between" style="font-size:13px;">
+            <span><i data-lucide="loader-2" class="inline w-3 h-3" style="color:var(--warning);"></i> Processando: 1.412 / 1.430</span>
+          </div>
+          <div style="height:6px;background:var(--gray-100);border-radius:3px;margin-top:8px;overflow:hidden;"><div style="width:98.7%;height:100%;background:var(--primary-600);"></div></div>
+          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;opacity:.6;" disabled>Aguardando…</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#F59E0B,#DC2626);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">FAMILY DAY</div>
+        <div class="card-body">
+          <div class="flex justify-between mb-2"><strong>DIREITO - UNIMONTES</strong><span class="badge badge-success">Entregue</span></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 02/04/2026</div>
+          <div class="flex justify-between" style="font-size:13px;">
+            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> 89 fotos</span>
+            <span style="color:var(--gray-500);">31 alunos · 100% entregues</span>
+          </div>
+          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Ver galeria</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">FOTO CONVITE</div>
+        <div class="card-body">
+          <div class="flex justify-between mb-2"><strong>ODONTOLOGIA - FUNORTE</strong><span class="badge badge-warning">Aguardando seleção</span></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 20/04/2026</div>
+          <div class="flex justify-between" style="font-size:13px;">
+            <span><i data-lucide="palette" class="inline w-3 h-3" style="color:#EC4899;"></i> 28/39 selecionaram</span>
+          </div>
+          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Lembrar comissão</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#0EA5E9,#1E3A8A);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">CULTO ECUMÊNICO</div>
+        <div class="card-body">
+          <div class="flex justify-between mb-2"><strong>ENFERMAGEM - FUNORTE</strong><span class="badge badge-info">412 fotos</span></div>
+          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 19/04/2026</div>
+          <div class="flex justify-between" style="font-size:13px;">
+            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> Indexada</span>
+            <span style="color:var(--gray-500);">Pronto para publicar</span>
+          </div>
+          <div class="flex gap-2 mt-3"><button class="btn btn-primary btn-sm" style="flex:1;">Publicar para alunos</button></div>
+        </div>
+      </div>
+
+      <div class="card" style="border:2px dashed var(--gray-300);background:transparent;display:grid;place-items:center;min-height:280px;cursor:pointer;">
+        <div class="text-center">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:grid;place-items:center;margin:0 auto 12px;"><i data-lucide="upload" class="w-6 h-6"></i></div>
+          <div style="font-weight:600;color:var(--gray-700);">Nova galeria</div>
+          <div style="font-size:13px;color:var(--gray-500);margin-top:4px;">Upload em massa via fotógrafo</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Check-in · Ventus Portaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  body { background: var(--neutro-900); color: white; }
+  .kiosk-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+  .kiosk-top {
+    padding: 16px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .kiosk-top .ev {
+    font-size: 14px; color: rgba(255,255,255,0.6);
+  }
+  .kiosk-top .ev b { color: white; font-weight: 700; }
+
+  .kiosk-status {
+    display: flex; gap: 24px; align-items: center;
+    font-size: 13px;
+  }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--sucesso); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .kiosk-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+  }
+
+  .scanner-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    position: relative;
+  }
+  .scanner-frame {
+    width: 480px;
+    max-width: 100%;
+    aspect-ratio: 1;
+    background: #1a1f3a;
+    border-radius: var(--r-xl);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    background-image: linear-gradient(135deg, #1a1f3a 0%, #0F1F4F 100%);
+  }
+  .scanner-frame::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .scanner-corner {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-color: var(--azul-400);
+    border-style: solid;
+    border-width: 0;
+  }
+  .scanner-corner.tl { top: 24px; left: 24px; border-top-width: 4px; border-left-width: 4px; border-radius: var(--r-md) 0 0 0; }
+  .scanner-corner.tr { top: 24px; right: 24px; border-top-width: 4px; border-right-width: 4px; border-radius: 0 var(--r-md) 0 0; }
+  .scanner-corner.bl { bottom: 24px; left: 24px; border-bottom-width: 4px; border-left-width: 4px; border-radius: 0 0 0 var(--r-md); }
+  .scanner-corner.br { bottom: 24px; right: 24px; border-bottom-width: 4px; border-right-width: 4px; border-radius: 0 0 var(--r-md) 0; }
+  .scanner-line {
+    position: absolute;
+    top: 50%; left: 24px; right: 24px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--azul-400), transparent);
+    box-shadow: 0 0 8px var(--azul-400);
+    animation: scan 2.4s infinite ease-in-out;
+  }
+  @keyframes scan { 0%, 100% { transform: translateY(-160px); } 50% { transform: translateY(160px); } }
+  .scanner-center {
+    position: absolute;
+    inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    pointer-events: none;
+  }
+  .scanner-center .ico { font-size: 48px; margin-bottom: 16px; }
+  .scanner-center .txt { font-size: 18px; font-weight: 600; }
+
+  .scanner-instructions {
+    margin-top: 32px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+  }
+  .scanner-instructions h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: white; }
+  .scanner-instructions p { font-size: 14px; }
+
+  .scanner-actions {
+    display: flex; gap: 12px;
+    margin-top: 24px;
+  }
+  .scanner-actions .btn {
+    background: rgba(255,255,255,0.06);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 14px 24px;
+  }
+  .scanner-actions .btn:hover { background: rgba(255,255,255,0.12); }
+
+  .recent-panel {
+    background: rgba(255,255,255,0.03);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    padding: 24px;
+    display: flex; flex-direction: column;
+  }
+  .recent-panel h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .mini-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 14px;
+    border-radius: var(--r-md);
+  }
+  .mini-stat .lbl { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .mini-stat .num { font-size: 22px; font-weight: 800; margin-top: 4px; }
+  .mini-stat .num.success { color: var(--sucesso); }
+
+  .recent-item {
+    display: flex; gap: 12px; align-items: center;
+    padding: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: var(--r-md);
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .recent-item .avatar {
+    background: var(--azul-700);
+    color: white;
+  }
+  .recent-item .info { flex: 1; }
+  .recent-item .nome { font-weight: 600; font-size: 14px; }
+  .recent-item .meta { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .recent-item .check {
+    color: var(--sucesso);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Modal de sucesso após scan (estado mostrado) */
+  .success-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,31,79,0.8);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  .success-card {
+    background: white;
+    color: var(--neutro-900);
+    border-radius: var(--r-xl);
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+  }
+  .success-card .ico-success {
+    width: 80px; height: 80px;
+    background: var(--sucesso-bg);
+    color: var(--sucesso);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 16px;
+  }
+  .success-card .nome { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 8px; }
+  .success-card .badge-cat { display: inline-block; background: #FEF3C7; color: #92400E; padding: 6px 16px; border-radius: var(--r-full); font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+  .success-card .printing {
+    background: var(--azul-50);
+    color: var(--azul-700);
+    padding: 14px;
+    border-radius: var(--r-md);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .success-card .printing .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--azul-200, var(--azul-100));
+    border-top-color: var(--azul-700);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 1100px) {
+    .kiosk-main { grid-template-columns: 1fr; }
+    .recent-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="kiosk-shell">
+
+  <header class="kiosk-top">
+    <div class="logo" style="color: white;">
+      <span class="logo-mark">V</span>
+      <span style="color: white;">Ventus · Portaria</span>
+    </div>
+    <div class="ev">
+      Evento: <b>Baile Enfermagem FIP 2026/2</b> · Buffet Versalhes
+    </div>
+    <div class="kiosk-status">
+      <div class="flex items-center gap-2"><span class="pulse"></span> <span>Online</span></div>
+      <div>🖨 Zebra OK</div>
+      <div>👤 Op: Carla</div>
+    </div>
+  </header>
+
+  <main class="kiosk-main">
+
+    <section class="scanner-area">
+      <div class="scanner-frame">
+        <div class="scanner-corner tl"></div>
+        <div class="scanner-corner tr"></div>
+        <div class="scanner-corner bl"></div>
+        <div class="scanner-corner br"></div>
+        <div class="scanner-line"></div>
+        <div class="scanner-center">
+          <div class="ico">📷</div>
+          <div class="txt">Aponte para o QR<br/>do convidado</div>
+        </div>
+      </div>
+
+      <div class="scanner-instructions">
+        <h2>Câmera ativa</h2>
+        <p>QR detectado em ~500ms. Pulseira impressa em 3 segundos.</p>
+      </div>
+
+      <div class="scanner-actions">
+        <button class="btn">🔍 Buscar por nome</button>
+        <button class="btn">📋 Lista completa</button>
+        <button class="btn">⚠️ Reportar problema</button>
+      </div>
+    </section>
+
+    <aside class="recent-panel">
+      <h3>Resumo de hoje</h3>
+      <div class="stat-row">
+        <div class="mini-stat">
+          <div class="lbl">Confirmados</div>
+          <div class="num">142</div>
+        </div>
+        <div class="mini-stat">
+          <div class="lbl">Chegaram</div>
+          <div class="num success">98</div>
+        </div>
+        <div class="mini-stat">
+          <div class="lbl">Tempo médio</div>
+          <div class="num">2.7s</div>
+        </div>
+        <div class="mini-stat">
+          <div class="lbl">Pulseiras OK</div>
+          <div class="num">98 / 98</div>
+        </div>
+      </div>
+
+      <h3>Últimos check-ins</h3>
+      <div class="recent-item">
+        <span class="avatar">RC</span>
+        <div class="info">
+          <div class="nome">Roberta Castro Mendonça</div>
+          <div class="meta">Convidada de Marina · há 12 segundos</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="recent-item">
+        <span class="avatar">JC</span>
+        <div class="info">
+          <div class="nome">João Carlos Pereira</div>
+          <div class="meta">Convidado de Lucas · há 47 segundos</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="recent-item">
+        <span class="avatar">FA</span>
+        <div class="info">
+          <div class="nome">Fernanda Almeida Lima ⭐</div>
+          <div class="meta">VIP · convidada de Lucas · há 1 min</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="recent-item">
+        <span class="avatar">MT</span>
+        <div class="info">
+          <div class="nome">Marcos Tavares Júnior</div>
+          <div class="meta">Convidado de Camila · há 2 min</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="recent-item">
+        <span class="avatar">AS</span>
+        <div class="info">
+          <div class="nome">Adriana Silva Rocha</div>
+          <div class="meta">Convidada de Pedro · há 3 min</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<!-- Estado: validação OK + impressão (visualmente para mostrar) -->
+<div class="success-overlay">
+  <div class="success-card">
+    <div class="ico-success">✓</div>
+    <div class="nome">Roberta Castro Mendonça</div>
+    <div class="badge-cat">Convidada · Marina (Comissão)</div>
+    <div class="printing">
+      <span class="spinner"></span>
+      Imprimindo pulseira... pegue no balcão à sua direita
+    </div>
+    <div style="font-size: 13px; color: var(--neutro-500);">Próximo convidado em ~3s</div>
+  </div>
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

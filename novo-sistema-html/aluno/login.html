@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Ventus Formaturas</title>
+<meta name="description" content="Acesse sua formatura pelo WhatsApp — pacote, fotos, convidados e pagamento na palma da mão.">
+<meta name="theme-color" content="#0A1430">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --azul-900: #0A1430;
+    --azul-700: #1E3A8A;
+    --azul-600: #2563EB;
+    --azul-100: #DBEAFE;
+    --bege:     #FAF7F2;
+    --neutro-200: #E2E8F0;
+    --neutro-400: #94A3B8;
+    --neutro-500: #64748B;
+    --neutro-600: #475569;
+    --neutro-900: #0F172A;
+    --dourado: #D4AF37;
+    --dourado-claro: #F4E4A6;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  body {
+    font-family: var(--sans);
+    background: var(--azul-900);
+    color: white;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+
+  .page {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HERO TOP — foto com gradient */
+  .hero {
+    position: relative;
+    height: 320px;
+    background: url('../assets/img/photos/foto-3.jpg') center / cover;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 70% 30%, rgba(212,175,55,0.18) 0%, transparent 45%),
+      linear-gradient(180deg, rgba(10,20,48,0.4) 0%, rgba(10,20,48,0.95) 100%);
+  }
+  .hero-content {
+    position: absolute; inset: 0;
+    z-index: 2;
+    padding: 32px 28px;
+    display: flex; flex-direction: column;
+  }
+  .back-link {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 4px;
+    align-self: flex-start;
+  }
+  .back-link:hover { color: white; }
+  .brand-mark {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: white; color: var(--azul-700);
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 22px;
+    margin-top: auto;
+    margin-bottom: 14px;
+  }
+  .hero-eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dourado-claro);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 em { font-style: italic; color: var(--dourado-claro); }
+
+  /* CARD FORM */
+  .form-card {
+    background: white;
+    color: var(--neutro-900);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 28px 40px;
+    flex: 1;
+    margin-top: -20px;
+    position: relative;
+    z-index: 3;
+  }
+  .form-card h2 {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--azul-900);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .form-card p.lede {
+    font-size: 14px;
+    color: var(--neutro-600);
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  .label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--neutro-700);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--neutro-500);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .input {
+    width: 100%;
+    padding: 14px 14px 14px 76px;
+    border: 1px solid var(--neutro-200);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--neutro-900);
+    background: var(--bege);
+    font-family: inherit;
+    outline: none;
+    transition: all .2s;
+  }
+  .input:focus {
+    background: white;
+    border-color: var(--azul-700);
+    box-shadow: 0 0 0 3px var(--azul-100);
+  }
+  .help {
+    font-size: 12px;
+    color: var(--neutro-500);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    padding: 16px;
+    background: var(--azul-700);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform .15s, box-shadow .2s, background .2s;
+    box-shadow: 0 10px 30px rgba(37,99,235,0.25);
+  }
+  .btn:hover { background: var(--azul-600); transform: translateY(-2px); box-shadow: 0 14px 38px rgba(37,99,235,0.35); }
+  .btn .ico { width: 18px; height: 18px; display: inline-flex; }
+
+  .sent {
+    margin-top: 24px;
+    padding: 18px 20px;
+    background: var(--bege);
+    border-left: 3px solid var(--dourado);
+    border-radius: 10px;
+    color: var(--neutro-700);
+    display: none;
+  }
+  .sent.show { display: block; }
+  .sent strong { color: var(--azul-900); display: block; font-family: var(--serif); font-size: 16px; margin-bottom: 6px; }
+  .sent p { font-size: 13.5px; line-height: 1.55; margin-bottom: 12px; }
+  .sent a {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--azul-900); color: white;
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--neutro-200);
+    margin: 24px 0;
+  }
+  .alt-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--neutro-500);
+  }
+  .alt-link a {
+    color: var(--azul-700);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-content">
+      <a href="../index.html" class="back-link">
+        <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+        voltar
+      </a>
+      <div class="brand-mark">V</div>
+      <div class="hero-eyebrow">A sua formatura</div>
+      <h1>Tudo no seu <em>celular</em>, da assinatura à última foto.</h1>
+    </div>
+  </header>
+
+  <main class="form-card">
+    <h2>Acesse pelo WhatsApp</h2>
+    <p class="lede">Envie seu número e receba um link único de acesso. Sem senha.</p>
+
+    <label class="label" for="wa">WhatsApp</label>
+    <div class="input-wrap">
+      <span class="input-prefix">🇧🇷 +55</span>
+      <input id="wa" class="input" placeholder="(38) 99863-1234" value="(38) 99863-1234">
+    </div>
+    <p class="help">Você receberá o link em poucos segundos.</p>
+
+    <button onclick="document.getElementById('sent').classList.add('show'); this.style.display='none';" class="btn">
+      <i data-lucide="message-circle" class="ico"></i>
+      Enviar link no WhatsApp
+    </button>
+
+    <div id="sent" class="sent">
+      <strong>Enviado.</strong>
+      <p>Verifique seu WhatsApp e toque no link recebido para entrar no app da formatura.</p>
+      <a href="inicio.html">
+        Já cliquei no link
+        <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="alt-link">
+      Não recebeu? <a href="#">Tentar por e-mail</a>
+    </div>
+  </main>
+</div>
+
+<script>
+  if (window.lucide) lucide.createIcons();
+</script>
+<script src="../assets/js/auth.js?v=2"></script>
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

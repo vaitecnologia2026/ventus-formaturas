@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Turmas — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <div class="sidebar-section">Geral</div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link active"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
+  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
+  <div class="sidebar-section">Produção</div>
+  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias e Fotos</a>
+  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
+  <div class="sidebar-section">Sistema</div>
+  <a href="usuarios.html" class="sidebar-link"><i data-lucide="shield-check"></i>Usuários</a>
+  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
+  <a href="relatorios.html" class="sidebar-link"><i data-lucide="file-text"></i>Relatórios</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div><div style="font-size:11px;opacity:.6;">Admin</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar turma…"></div>
+    <div class="flex gap-3 items-center">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Nova turma</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <div style="font-size:13px;color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Turmas</div>
+        <h1 class="text-2xl font-bold mt-1" style="color:var(--gray-900);">Turmas</h1>
+      </div>
+      <div class="flex gap-2">
+        <span class="badge badge-info">123 cadastradas</span>
+        <span class="badge badge-success">38 ativas</span>
+        <span class="badge">85 arquivadas</span>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+      <div class="card-body" style="padding:16px;">
+        <div class="grid grid-cols-4 gap-3">
+          <div><label class="label">Faculdade</label><select class="select"><option>Todas</option><option>UNIMONTES</option><option>FUNORTE</option><option>IFNMG</option><option>FIPMOC</option><option>GRAU</option></select></div>
+          <div><label class="label">Curso</label><select class="select"><option>Todos</option><option>MEDICINA</option><option>DIREITO</option><option>ENFERMAGEM</option><option>PSICOLOGIA</option></select></div>
+          <div><label class="label">Status</label><select class="select"><option>Todos</option><option selected>Ativa</option><option>Arquivada</option></select></div>
+          <div><label class="label">Vendedor</label><select class="select"><option>Todos</option><option>RAFAEL CARVALHO</option><option>ANA CLARA CELESTINO</option><option>GEOVANNA ANDRADE</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Turma</th>
+            <th>Faculdade</th>
+            <th>Curso</th>
+            <th class="num">Alunos</th>
+            <th class="num">Vl. Contrato</th>
+            <th>Previsão</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">UNIFICADA - IPATINGA</a><div style="font-size:12px;color:var(--gray-500);">Resp. Beatriz Lima · Vd. Tiago Moreira</div></td><td>IPATINGA</td><td>Várias</td><td class="num">100</td><td class="num">R$ 94.200,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td class="text-right"><a href="turma-detalhe.html" class="btn btn-ghost btn-icon"><i data-lucide="chevron-right" class="w-4 h-4"></i></a></td></tr>
+          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">ENGENHARIA FLORESTAL - UFMG</a><div style="font-size:12px;color:var(--gray-500);">Resp. Carolina Reis · Vd. Marcos Vieira</div></td><td>UFMG</td><td>Eng. Florestal</td><td class="num">72</td><td class="num">R$ 81.500,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">MEDICINA T84 - UNIMONTES</a><div style="font-size:12px;color:var(--gray-500);">Sem responsável atribuído · Vd. Tiago Moreira</div></td><td>UNIMONTES</td><td>Medicina</td><td class="num">23</td><td class="num">R$ 76.300,00</td><td>Jul/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">MEDICINA - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Daniela Souza · Vd. Tiago Moreira</div></td><td>UNIMONTES</td><td>Medicina</td><td class="num">25</td><td class="num">R$ 68.900,00</td><td>Set/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">LETRAS-INGLÊS/.../ENFERMAGEM - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Fernanda Alves · Vd. Marcos Vieira · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>UNIMONTES</td><td>5 cursos</td><td class="num">73</td><td class="num">R$ 65.400,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">ODONTOLOGIA - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Gabriela Nunes · Vd. Ana Clara</div></td><td>FUNORTE</td><td>Odontologia</td><td class="num">39</td><td class="num">R$ 67.016,00</td><td>Ago/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">MEDICINA T85 - UNIMONTES</strong></td><td>UNIMONTES</td><td>Medicina</td><td class="num">20</td><td class="num">R$ 61.252,99</td><td>Jul/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">ODONTOLOGIA - FASI</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Mariana Rocha · Vd. Camila Prado</div></td><td>FASI</td><td>Odontologia</td><td class="num">32</td><td class="num">R$ 57.197,58</td><td>Nov/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">UNIFICADA - IFNMG</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Larissa Dias · Vd. Tiago Moreira · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>IFNMG</td><td>Várias</td><td class="num">110</td><td class="num">R$ 46.625,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">NUTRIÇÃO/BIOMEDICINA - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Helena Costa · Vd. Ana Clara · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>FUNORTE</td><td>2 cursos</td><td class="num">27</td><td class="num">R$ 45.630,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">DIREITO - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Igor Martins · Vd. Marcos Vieira</div></td><td>UNIMONTES</td><td>Direito</td><td class="num">31</td><td class="num">R$ 42.371,00</td><td>Jan/2027</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">PUBLICIDADE - UNIFIPMOC</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Rodrigo Teixeira · Vd. Camila Prado</div></td><td>FIPMOC</td><td>Publicidade</td><td class="num">20</td><td class="num">R$ 39.040,00</td><td>Set/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+          <tr><td><strong style="color:var(--primary-700);">DIREITO - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Renata Campos · Vd. Marcos Vieira</div></td><td>FUNORTE</td><td>Direito</td><td class="num">24</td><td class="num">R$ 38.023,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
+        </tbody>
+      </table>
+      <div style="padding:16px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--gray-600);">
+        <span>Mostrando 13 de 38 turmas ativas</span>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm" disabled style="opacity:.5;"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+          <button class="btn btn-ghost btn-sm">1</button>
+          <button class="btn btn-secondary btn-sm">2</button>
+          <button class="btn btn-ghost btn-sm">3</button>
+          <button class="btn btn-ghost btn-sm"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

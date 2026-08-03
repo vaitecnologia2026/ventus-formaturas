@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>VAI WhatsApp + E-mail — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css?v=3">
+<link rel="stylesheet" href="../assets/css/app.css?v=3">
+<style>
+[data-tab-panel][hidden] { display: none !important; }
+.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
+.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
+.tab:hover { color:var(--gray-700); }
+.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
+.canal-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:5px; font-size:11px; font-weight:600; }
+.canal-pill.wa { background:#DCFCE7; color:#166534; }
+.canal-pill.em { background:#DBEAFE; color:#1E40AF; }
+.canal-resumo { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+.canal-card { padding:18px; border-radius:12px; border:1px solid var(--gray-200); background:white; display:flex; gap:14px; align-items:flex-start; }
+.canal-card .ico { width:44px; height:44px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+.canal-card.wa .ico { background:#DCFCE7; color:#166534; }
+.canal-card.em .ico { background:#DBEAFE; color:#1E40AF; }
+.canal-card.mix .ico { background:#EDE9FE; color:#5B21B6; }
+.canal-card .label { font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:.04em; font-weight:700; }
+.canal-card .val { font-size:22px; font-weight:700; color:var(--gray-900); margin-top:2px; }
+.canal-card .sub { font-size:12px; color:var(--gray-500); margin-top:2px; }
+
+/* Tema laranja Campanhas */
+.btn-orange { background:#F97316; color:white; border-color:#F97316; }
+.btn-orange:hover { background:#EA580C; border-color:#EA580C; }
+
+/* Sub-nav por canal (laranja quando ativo) */
+.canal-tabs { background:white; border:1px solid var(--gray-200); border-radius:10px; padding:6px; display:flex; gap:4px; overflow-x:auto; margin-bottom:18px; }
+.canal-tab { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:6px; font-size:13px; font-weight:500; color:var(--gray-600); text-decoration:none; white-space:nowrap; cursor:pointer; border:none; background:transparent; }
+.canal-tab:hover { background:var(--gray-50); color:var(--gray-900); }
+.canal-tab.active { background:#F97316; color:white; }
+.canal-tab.active:hover { background:#EA580C; color:white; }
+
+/* Filtro de status (pílulas) */
+.filter-pills { display:inline-flex; gap:6px; flex-wrap:wrap; }
+.filter-pill { background:white; border:1px solid var(--gray-200); border-radius:999px; padding:5px 12px; font-size:12px; font-weight:500; color:var(--gray-600); cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+.filter-pill:hover { background:var(--gray-50); }
+.filter-pill .count { color:var(--gray-400); font-weight:600; }
+.filter-pill.active { background:#FFEDD5; color:#9A3412; border-color:#FED7AA; }
+.filter-pill.active .count { color:#C2410C; }
+
+/* Status pill em linha de campanha */
+.status-pill { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; }
+.status-pill::before { content:''; width:6px; height:6px; border-radius:50%; }
+.status-pill.exec { color:#16A34A; } .status-pill.exec::before { background:#16A34A; }
+.status-pill.agend { color:#2563EB; } .status-pill.agend::before { background:#2563EB; }
+.status-pill.paus { color:#F59E0B; } .status-pill.paus::before { background:#F59E0B; }
+.status-pill.conc { color:var(--gray-500); } .status-pill.conc::before { background:var(--gray-500); }
+.status-pill.rasc { color:#9D174D; } .status-pill.rasc::before { background:#9D174D; }
+.status-pill.erro { color:#DC2626; } .status-pill.erro::before { background:#DC2626; }
+
+/* Modal Nova Campanha */
+.modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:100; display:none; align-items:center; justify-content:center; padding:24px; }
+.modal-backdrop.open { display:flex; animation: fadeIn .15s ease-out; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal { background:white; border-radius:16px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 48px rgba(15,23,42,.3); }
+.modal-header { padding:22px 24px 16px; border-bottom:1px solid var(--gray-200); display:flex; justify-content:space-between; align-items:center; }
+.modal-header h2 { font-size:18px; font-weight:700; color:var(--gray-900); margin:0; }
+.modal-close { background:none; border:none; cursor:pointer; padding:4px; color:var(--gray-500); border-radius:6px; }
+.modal-close:hover { background:var(--gray-100); color:var(--gray-900); }
+.modal-body { padding:22px 24px; display:flex; flex-direction:column; gap:16px; }
+.modal-body .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.modal-footer { padding:16px 24px 22px; border-top:1px solid var(--gray-200); display:flex; gap:10px; justify-content:flex-end; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar template, mensagem, aluno…"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm" data-no-toast onclick="openCampanhaModal()"><i data-lucide="megaphone" class="w-4 h-4"></i> Nova campanha</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo template</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comunicação</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">VAI WhatsApp + VAI E-mail</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Templates aprovados pela Meta · histórico de envios · campanhas timed (D-90, D-30, D-7, D-DAY, D+1)</p>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="message-circle" class="w-5 h-5"></i></div><div class="kpi-label">VAI WhatsApp (hoje)</div><div class="kpi-value">142</div><div class="kpi-trend up">98% entregues · 87% lidas</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="mail" class="w-5 h-5"></i></div><div class="kpi-label">VAI E-mail (hoje)</div><div class="kpi-value">38</div><div class="kpi-trend up">94% entregues · 32% abertos</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="layout-template" class="w-5 h-5"></i></div><div class="kpi-label">Templates ativos</div><div class="kpi-value">14</div><div class="kpi-trend" style="color:var(--gray-500);">10 aprovados Meta</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="megaphone" class="w-5 h-5"></i></div><div class="kpi-label">Campanhas ativas</div><div class="kpi-value">6</div><div class="kpi-trend" style="color:var(--gray-500);">timed + on-demand</div></div>
+    </div>
+
+    <div class="tabs">
+      <a href="#" class="tab active" data-tab="templates">Templates (14)</a>
+      <a href="#" class="tab" data-tab="historico">Histórico de envios</a>
+      <a href="#" class="tab" data-tab="campanhas">Campanhas (6)</a>
+    </div>
+
+    <div data-tab-panel="templates" class="grid gap-4 mb-6" style="grid-template-columns:repeat(2,1fr);">
+
+      <div class="card">
+        <div class="card-header"><strong>Templates VAI WhatsApp <span class="badge badge-success" style="margin-left:8px;">10 aprovados Meta</span></strong></div>
+        <table class="table">
+          <thead><tr><th>Chave</th><th>Trigger</th><th>Uso/mês</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>cobranca_lembrete</strong><div style="font-size:12px;color:var(--gray-500);">D-7 antes do venc.</div></td><td>cron diário</td><td class="num">412</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>cobranca_paga</strong></td><td>webhook Asaas</td><td class="num">387</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>cobranca_atraso</strong></td><td>D+3, D+15</td><td class="num">42</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>convite_evento</strong></td><td>cadastro convidado</td><td class="num">418</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>lembrete_rsvp</strong></td><td>D-3 evento</td><td class="num">96</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>confirmacao_recebida</strong></td><td>RSVP confirmado</td><td class="num">317</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>dia_evento</strong></td><td>D-DAY 12h</td><td class="num">89</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>galeria_pronta</strong></td><td>upload concluído</td><td class="num">12</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>selecao_recebida</strong></td><td>aluno finaliza seleção</td><td class="num">187</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+            <tr><td><strong>fotos_finalizadas</strong></td><td>editor termina pacote</td><td class="num">23</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><strong>Templates VAI E-mail</strong></div>
+        <table class="table">
+          <thead><tr><th>Nome</th><th>Trigger</th><th>Uso/mês</th><th>Open rate</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Boas vindas Ventus</strong></td><td>contrato assinado</td><td class="num">22</td><td>54%</td></tr>
+            <tr><td><strong>2ª via boleto</strong></td><td>solicitação</td><td class="num">87</td><td>42%</td></tr>
+            <tr><td><strong>NFe emitida</strong></td><td>auto após pagto</td><td class="num">412</td><td>21%</td></tr>
+            <tr><td><strong>Comunicado mensal</strong></td><td>1º dia útil</td><td class="num">198</td><td>33%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div data-tab-panel="historico" hidden><div class="card">
+      <div class="card-header"><div class="card-title">Histórico de envios (últimas 24h)</div>
+        <div class="flex gap-2">
+          <select class="select" style="width:120px;font-size:13px;padding:6px 10px;"><option>Todos canais</option><option>VAI WhatsApp</option><option>VAI E-mail</option></select>
+          <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todos status</option><option>Entregue</option><option>Lido</option><option>Falhou</option></select>
+        </div>
+      </div>
+      <table class="table">
+        <thead><tr><th>Quando</th><th>Para</th><th>Canal</th><th>Template</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>há 2min</td><td><strong>Camila Almeida</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>cobranca_lembrete</td><td><span class="badge badge-success">📩 Lido</span></td></tr>
+          <tr><td>há 5min</td><td><strong>Pedro Henrique</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>cobranca_lembrete</td><td><span class="badge badge-info">✓✓ Entregue</span></td></tr>
+          <tr><td>há 8min</td><td><strong>Júlia Ribeiro</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>cobranca_atraso</td><td><span class="badge badge-warning">✓ Enviado</span></td></tr>
+          <tr><td>há 14min</td><td><strong>Marcos Silva</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>convite_evento</td><td><span class="badge badge-success">📩 Lido</span></td></tr>
+          <tr><td>há 22min</td><td><strong>Beatriz Lima</strong></td><td><span class="canal-pill em"><i data-lucide="mail" class="w-3 h-3"></i> VAI E-mail</span></td><td>NFe emitida</td><td><span class="badge badge-info">✓ Entregue</span></td></tr>
+          <tr><td>há 32min</td><td><strong>Igor Martins Rocha</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>convite_evento</td><td><span class="badge badge-success">📩 Lido</span></td></tr>
+          <tr><td>há 1h</td><td><strong>(número inválido)</strong></td><td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> VAI WhatsApp</span></td><td>cobranca_lembrete</td><td><span class="badge badge-danger">✗ Falhou</span></td></tr>
+          <tr><td>há 2h</td><td><strong>Fernanda Alves Lopes</strong></td><td><span class="canal-pill em"><i data-lucide="mail" class="w-3 h-3"></i> VAI E-mail</span></td><td>Comunicado mensal</td><td><span class="badge badge-success">📩 Aberto</span></td></tr>
+        </tbody>
+      </table>
+    </div></div>
+
+    <div data-tab-panel="campanhas" hidden>
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+        <div>
+          <h2 style="font-size:24px;font-weight:700;color:var(--gray-900);margin:0;letter-spacing:-0.01em;">Campanhas</h2>
+          <p style="font-size:13px;color:var(--gray-500);margin-top:4px;">Crie e operacionalize campanhas multicanal — 2 em execução · 2 agendadas</p>
+        </div>
+        <button class="btn btn-orange btn-sm" data-no-toast onclick="openCampanhaModal()"><i data-lucide="plus" class="w-4 h-4"></i> Nova campanha</button>
+      </div>
+
+      <div class="canal-tabs">
+        <button type="button" class="canal-tab active" data-canal="todos"><i data-lucide="layout-grid" class="w-4 h-4"></i> Visão geral</button>
+        <button type="button" class="canal-tab" data-canal="voz"><i data-lucide="phone-call" class="w-4 h-4"></i> Voz</button>
+        <button type="button" class="canal-tab" data-canal="whatsapp"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
+        <button type="button" class="canal-tab" data-canal="email"><i data-lucide="mail" class="w-4 h-4"></i> E-mail</button>
+        <button type="button" class="canal-tab" data-canal="sms"><i data-lucide="message-square" class="w-4 h-4"></i> SMS</button>
+        <button type="button" class="canal-tab" data-canal="rcs"><i data-lucide="rss" class="w-4 h-4"></i> RCS</button>
+        <button type="button" class="canal-tab" data-canal="calendario"><i data-lucide="calendar" class="w-4 h-4"></i> Calendário</button>
+        <button type="button" class="canal-tab" data-canal="historico"><i data-lucide="clock" class="w-4 h-4"></i> Histórico</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Campanhas</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">7 campanhas no total · 2 em execução</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+            <button class="btn btn-orange btn-sm" data-no-toast onclick="openCampanhaModal()"><i data-lucide="plus" class="w-4 h-4"></i> Nova campanha</button>
+          </div>
+        </div>
+
+        <div style="padding:14px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--gray-100);">
+          <div style="flex:1;min-width:240px;position:relative;">
+            <i data-lucide="search" class="w-4 h-4" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);"></i>
+            <input type="text" placeholder="Buscar por nome..." style="width:100%;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px 8px 36px;font-size:13px;outline:none;">
+          </div>
+          <div class="filter-pills">
+            <button type="button" class="filter-pill active" data-filter="todos">Todas <span class="count">7</span></button>
+            <button type="button" class="filter-pill" data-filter="exec">Em execução <span class="count">2</span></button>
+            <button type="button" class="filter-pill" data-filter="agend">Agendadas <span class="count">2</span></button>
+            <button type="button" class="filter-pill" data-filter="paus">Pausadas <span class="count">1</span></button>
+            <button type="button" class="filter-pill" data-filter="conc">Concluídas <span class="count">1</span></button>
+            <button type="button" class="filter-pill" data-filter="rasc">Rascunhos <span class="count">1</span></button>
+            <button type="button" class="filter-pill" data-filter="erro">Erros <span class="count">0</span></button>
+          </div>
+        </div>
+
+        <table class="table">
+          <thead><tr><th>Campanha</th><th>Canal</th><th>Status</th><th class="num">Base</th><th class="num">Processado</th><th class="num">Positivos</th><th class="num">Conv.</th><th>Período</th><th></th></tr></thead>
+          <tbody>
+            <tr data-status="exec" data-canal="whatsapp">
+              <td><strong>D-7 cobrança lembrete</strong><div style="font-size:12px;color:var(--gray-500);">há 1h</div></td>
+              <td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> WhatsApp</span></td>
+              <td><span class="status-pill exec">Em execução</span></td>
+              <td class="num">1.842</td>
+              <td class="num">1.428</td>
+              <td class="num" style="color:var(--success);font-weight:600;">412</td>
+              <td class="num">28,8%</td>
+              <td><div style="font-size:13px;">01 mai. 2026</div><div style="font-size:11px;color:var(--gray-500);">→ contínuo</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Pausar"><i data-lucide="pause" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="exec" data-canal="email">
+              <td><strong>NFe emitida</strong><div style="font-size:12px;color:var(--gray-500);">há 4h</div></td>
+              <td><span class="canal-pill em"><i data-lucide="mail" class="w-3 h-3"></i> E-mail</span></td>
+              <td><span class="status-pill exec">Em execução</span></td>
+              <td class="num">412</td>
+              <td class="num">412</td>
+              <td class="num" style="color:var(--success);font-weight:600;">137</td>
+              <td class="num">33,2%</td>
+              <td><div style="font-size:13px;">contínuo</div><div style="font-size:11px;color:var(--gray-500);">webhook</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Pausar"><i data-lucide="pause" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="agend" data-canal="whatsapp">
+              <td><strong>D-3 evento · RSVP</strong><div style="font-size:12px;color:var(--gray-500);">criada há 2d</div></td>
+              <td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> WhatsApp</span></td>
+              <td><span class="status-pill agend">Agendada</span></td>
+              <td class="num">96</td>
+              <td class="num">0</td>
+              <td class="num">—</td>
+              <td class="num">—</td>
+              <td><div style="font-size:13px;">12 mai. 2026</div><div style="font-size:11px;color:var(--gray-500);">18h00</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Editar"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="agend" data-canal="whatsapp">
+              <td><strong>D-DAY cerimônia</strong><div style="font-size:12px;color:var(--gray-500);">criada há 12d</div></td>
+              <td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> WhatsApp</span></td>
+              <td><span class="status-pill agend">Agendada</span></td>
+              <td class="num">1.418</td>
+              <td class="num">0</td>
+              <td class="num">—</td>
+              <td class="num">—</td>
+              <td><div style="font-size:13px;">15 jul. 2026</div><div style="font-size:11px;color:var(--gray-500);">12h00</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Editar"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="paus" data-canal="multi">
+              <td><strong>Cobrança em atraso</strong><div style="font-size:12px;color:var(--gray-500);">cascata WA → E-mail</div></td>
+              <td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i></span> <span class="canal-pill em"><i data-lucide="mail" class="w-3 h-3"></i></span></td>
+              <td><span class="status-pill paus">Pausada</span></td>
+              <td class="num">42</td>
+              <td class="num">42</td>
+              <td class="num" style="color:var(--warning);font-weight:600;">24</td>
+              <td class="num">57,1%</td>
+              <td><div style="font-size:13px;">desde 15 abr.</div><div style="font-size:11px;color:var(--gray-500);">pausada há 2d</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Retomar"><i data-lucide="play" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="conc" data-canal="whatsapp">
+              <td><strong>D+1 obrigado</strong><div style="font-size:12px;color:var(--gray-500);">cerimônia 26/04</div></td>
+              <td><span class="canal-pill wa"><i data-lucide="message-circle" class="w-3 h-3"></i> WhatsApp</span></td>
+              <td><span class="status-pill conc">Concluída</span></td>
+              <td class="num">392</td>
+              <td class="num">392</td>
+              <td class="num" style="color:var(--success);font-weight:600;">376</td>
+              <td class="num">95,9%</td>
+              <td><div style="font-size:13px;">27 abr. 2026</div><div style="font-size:11px;color:var(--gray-500);">09h00</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Duplicar"><i data-lucide="copy" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Arquivar"><i data-lucide="archive" class="w-4 h-4"></i></button></div></td>
+            </tr>
+            <tr data-status="rasc" data-canal="sms">
+              <td><strong>Convite reunião pais</strong><div style="font-size:12px;color:var(--gray-500);">salvo há 1d</div></td>
+              <td><span class="canal-pill" style="background:#FEF3C7;color:#92400E;"><i data-lucide="message-square" class="w-3 h-3"></i> SMS</span></td>
+              <td><span class="status-pill rasc">Rascunho</span></td>
+              <td class="num">—</td>
+              <td class="num">0</td>
+              <td class="num">—</td>
+              <td class="num">—</td>
+              <td><div style="font-size:13px;color:var(--gray-400);">não definido</div></td>
+              <td><div class="flex gap-2"><button class="btn btn-ghost btn-icon" data-no-toast title="Continuar editando"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Detalhes"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost btn-icon" data-no-toast title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div id="campanhas-empty" hidden style="padding:32px;text-align:center;color:var(--gray-500);font-size:13px;">
+          Nenhuma campanha encontrada para esse filtro.
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modal-nova-campanha" data-no-toast>
+  <div class="modal" data-no-toast>
+    <div class="modal-header">
+      <h2><i data-lucide="megaphone" class="w-5 h-5 inline" style="vertical-align:-3px;"></i> Nova campanha</h2>
+      <button class="modal-close" data-no-toast onclick="closeCampanhaModal()" aria-label="Fechar"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="label" for="camp-nome">Nome da campanha</label>
+        <input class="input" id="camp-nome" placeholder="Ex: D-7 cobrança lembrete">
+        <div class="help">Aparece na listagem · interno</div>
+      </div>
+      <div class="row">
+        <div>
+          <label class="label" for="camp-canal">Canal de disparo</label>
+          <select class="select" id="camp-canal">
+            <option>VAI WhatsApp</option>
+            <option>VAI E-mail</option>
+            <option>Multi-canal (cascata)</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="camp-quando">Quando dispara</label>
+          <select class="select" id="camp-quando">
+            <option>Diário · horário fixo</option>
+            <option>Antes do evento (D-N)</option>
+            <option>Dia do evento (D-DAY)</option>
+            <option>Após o evento (D+N)</option>
+            <option>Ao receber pagamento</option>
+            <option>Ao emitir NFe</option>
+            <option>Cascata escalonada</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label class="label" for="camp-template">Template associado</label>
+          <select class="select" id="camp-template">
+            <option>cobranca_lembrete</option>
+            <option>cobranca_atraso</option>
+            <option>convite_evento</option>
+            <option>lembrete_rsvp</option>
+            <option>dia_evento</option>
+            <option>NFe emitida (e-mail)</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="camp-audiencia">Audiência</label>
+          <select class="select" id="camp-audiencia">
+            <option>Todos os alunos</option>
+            <option>Formandos da turma</option>
+            <option>Convidados da turma</option>
+            <option>Inadimplentes</option>
+            <option>Pagantes (pós-NFe)</option>
+          </select>
+        </div>
+      </div>
+      <div class="help" style="background:var(--gray-50);padding:12px;border-radius:8px;border-left:3px solid var(--primary-600);">
+        <i data-lucide="info" class="w-4 h-4 inline" style="vertical-align:-3px;"></i>
+        Provedor e credenciais (Z-API, SMTP) são herdados de <strong>Configurações</strong>. A campanha vai respeitar o que estiver configurado lá.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-no-toast onclick="closeCampanhaModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-no-toast onclick="submitCampanhaModal()"><i data-lucide="check" class="w-4 h-4"></i> Criar campanha</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+  function openCampanhaModal() {
+    document.getElementById('modal-nova-campanha').classList.add('open');
+    if (window.lucide) lucide.createIcons();
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCampanhaModal() {
+    document.getElementById('modal-nova-campanha').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function submitCampanhaModal() {
+    const nome = document.getElementById('camp-nome').value.trim() || 'Campanha';
+    closeCampanhaModal();
+    if (typeof showToast === 'function') showToast(`Campanha criada: ${nome}`);
+  }
+  document.getElementById('modal-nova-campanha').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-nova-campanha') closeCampanhaModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCampanhaModal();
+  });
+
+  // Filtro combinado: canal (sub-nav laranja) + status (pílulas)
+  const campState = { canal: 'todos', status: 'todos' };
+  function applyCampFilter() {
+    const rows = document.querySelectorAll('[data-tab-panel="campanhas"] tbody tr[data-status]');
+    let visible = 0;
+    rows.forEach(r => {
+      const cMatch = campState.canal === 'todos' || r.dataset.canal === campState.canal || (campState.canal === 'whatsapp' && r.dataset.canal === 'multi') || (campState.canal === 'email' && r.dataset.canal === 'multi');
+      const sMatch = campState.status === 'todos' || r.dataset.status === campState.status;
+      const show = cMatch && sMatch;
+      r.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('campanhas-empty').hidden = visible > 0;
+  }
+  document.querySelectorAll('.canal-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.canal-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      campState.canal = t.dataset.canal;
+      applyCampFilter();
+    });
+  });
+  document.querySelectorAll('.filter-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      campState.status = p.dataset.filter;
+      applyCampFilter();
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Contratos — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
+.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
+.tab:hover { color:var(--gray-700); }
+.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
+.placeholder-pill { display:inline-block; padding:3px 8px; background:#FEF3C7; color:#92400E; border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; }
+.placeholder-pill:hover { background:#FDE68A; }
+.editor-fake { min-height:280px; padding:20px; background:white; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; line-height:1.7; color:var(--gray-700); }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar contrato por número, aluno, turma…"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Disparar VAI WhatsApp</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo template</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comercial / Contratos</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Contratos & Assinaturas</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Templates com 62 placeholders dinâmicos · 198 contratos ativos · 12 em assinatura via ZapSign</p>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="file-signature" class="w-5 h-5"></i></div><div class="kpi-label">Contratos ativos</div><div class="kpi-value">198</div><div class="kpi-trend up">+ 14 este mês</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Em assinatura</div><div class="kpi-value">12</div><div class="kpi-trend" style="color:var(--gray-500);">aguardando ZapSign</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Assinados (mês)</div><div class="kpi-value">22</div><div class="kpi-trend up">tempo médio: 18h</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="file-x" class="w-5 h-5"></i></div><div class="kpi-label">Cancelados</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">1.5% taxa</div></div>
+    </div>
+
+    <div class="tabs">
+      <a href="#" class="tab active" data-tab="templates">Templates (5)</a>
+      <a href="#" class="tab" data-tab="contratos">Lista de contratos (198)</a>
+      <a href="#" class="tab" data-tab="assinatura">Em assinatura (12)</a>
+    </div>
+
+    <!-- TAB: TEMPLATES -->
+    <div data-tab-panel="templates">
+      <div class="grid gap-4" style="grid-template-columns: 1fr 1fr;">
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <strong>Contrato Padrão Ouro 2026</strong>
+              <div style="font-size:12px;color:var(--gray-500);">Versão 3 · ativa · 132 contratos gerados</div>
+            </div>
+            <span class="badge badge-success">Ativo</span>
+          </div>
+          <div class="card-body" style="padding:14px;">
+            <div class="editor-fake">
+              <p style="margin-bottom:12px;"><strong>CONTRATO DE PRESTAÇÃO DE SERVIÇOS Nº <span class="placeholder-pill">{{NR_CONTRATO}}</span></strong></p>
+              <p style="margin-bottom:12px;">Pelo presente instrumento, de um lado <strong>VENTUS PRODUTORA LTDA</strong>, e de outro <span class="placeholder-pill">{{NM_ALUNO}}</span>, CPF <span class="placeholder-pill">{{CPF}}</span>, residente em <span class="placeholder-pill">{{DS_ENDERECO}}</span>, <span class="placeholder-pill">{{NR_ENDERECO}}</span>, <span class="placeholder-pill">{{DS_BAIRRO}}</span>, <span class="placeholder-pill">{{DS_CIDADE}}</span>/<span class="placeholder-pill">{{DS_UF}}</span>...</p>
+              <p style="margin-bottom:12px;">Cláusula 1ª — A CONTRATADA prestará serviços relativos à formatura da turma <span class="placeholder-pill">{{NM_TURMA}}</span> com previsão para <span class="placeholder-pill">{{DT_PREVISAO_FORMATURA}}</span>...</p>
+              <p style="margin-bottom:12px;">Cláusula 2ª — O valor total contratado é de <span class="placeholder-pill">{{VL_CONTRATO}}</span>, parcelado em <span class="placeholder-pill">{{NR_PARCELA}}</span> parcelas mensais de <span class="placeholder-pill">{{VL_PARCELA}}</span>, com primeira parcela em <span class="placeholder-pill">{{DT_PARCELA_PRIMEIRA}}</span>.</p>
+              <p style="margin-bottom:12px;">Eventos contratados: <span class="placeholder-pill">{{LISTA_EVENTOS}}</span>.</p>
+              <p style="margin-bottom:0;color:var(--gray-400);font-size:12px;">[Texto truncado · ver template completo]</p>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button class="btn btn-secondary btn-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
+              <button class="btn btn-secondary btn-sm"><i data-lucide="eye" class="w-4 h-4"></i> Pré-visualizar</button>
+              <button class="btn btn-secondary btn-sm"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
+              <button class="btn btn-secondary btn-sm" style="margin-left:auto;"><i data-lucide="download" class="w-4 h-4"></i> Exportar PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Placeholders disponíveis (62)</div>
+            <input class="input" placeholder="Buscar…" style="width:160px;font-size:13px;padding:6px 10px;">
+          </div>
+          <div class="card-body" style="max-height:560px;overflow-y:auto;">
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📌 Aluno (15)</div>
+            <span class="placeholder-pill">{{CD_ALUNO}}</span><span class="placeholder-pill">{{NM_ALUNO}}</span><span class="placeholder-pill">{{DT_NASCIMENTO}}</span><span class="placeholder-pill">{{CPF}}</span><span class="placeholder-pill">{{RG}}</span><span class="placeholder-pill">{{FONE01}}</span><span class="placeholder-pill">{{FONE02}}</span><span class="placeholder-pill">{{WHATSAPP}}</span><span class="placeholder-pill">{{EMAIL}}</span><span class="placeholder-pill">{{CEP}}</span><span class="placeholder-pill">{{DS_ENDERECO}}</span><span class="placeholder-pill">{{NR_ENDERECO}}</span><span class="placeholder-pill">{{DS_COMPLEMENTO}}</span><span class="placeholder-pill">{{DS_BAIRRO}}</span><span class="placeholder-pill">{{DS_CIDADE}}</span><span class="placeholder-pill">{{DS_UF}}</span>
+
+            <div class="divider" style="margin:16px 0;"></div>
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">💰 Financeiro (14)</div>
+            <span class="placeholder-pill">{{NR_PARCELA}}</span><span class="placeholder-pill">{{VL_PARCELA}}</span><span class="placeholder-pill">{{DT_PARCELA_PRIMEIRA}}</span><span class="placeholder-pill">{{DT_PARCELA_ULTIMA}}</span><span class="placeholder-pill">{{VL_CONTRATO}}</span><span class="placeholder-pill">{{VL_CONTRATO_DESC}}</span><span class="placeholder-pill">{{VL_CONTRATO_LIQ}}</span><span class="placeholder-pill">{{VL_TX_BOLETO}}</span><span class="placeholder-pill">{{TT_COBRANCA}}</span><span class="placeholder-pill">{{TT_DESCONTO}}</span><span class="placeholder-pill">{{TT_LIQUIDO}}</span><span class="placeholder-pill">{{TP_PAGAMENTO}}</span><span class="placeholder-pill">{{DT_VENCIMENTO}}</span><span class="placeholder-pill">{{NR_CONTRATO}}</span>
+
+            <div class="divider" style="margin:16px 0;"></div>
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">🎓 Turma & Curso (12)</div>
+            <span class="placeholder-pill">{{NM_TURMA}}</span><span class="placeholder-pill">{{CD_TURMA}}</span><span class="placeholder-pill">{{NM_CURSO}}</span><span class="placeholder-pill">{{CD_CURSO}}</span><span class="placeholder-pill">{{NM_INSTITUICAO}}</span><span class="placeholder-pill">{{DS_TP_TURNO}}</span><span class="placeholder-pill">{{MES_FORMATURA}}</span><span class="placeholder-pill">{{ANO_FORMATURA}}</span><span class="placeholder-pill">{{DT_PREVISAO_FORMATURA}}</span><span class="placeholder-pill">{{QT_FAMILIA}}</span><span class="placeholder-pill">{{QT_CONVIDADOS}}</span><span class="placeholder-pill">{{NM_PLANO}}</span>
+
+            <div class="divider" style="margin:16px 0;"></div>
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📦 Eventos & Brindes (8)</div>
+            <span class="placeholder-pill">{{LISTA_EVENTOS}}</span><span class="placeholder-pill">{{LISTA_CERIMONIAL}}</span><span class="placeholder-pill">{{LISTA_BRINDE}}</span><span class="placeholder-pill">{{LISTA_PRODUTO}}</span><span class="placeholder-pill">{{LISTA_SERVICO}}</span><span class="placeholder-pill">{{QT_CONTRATO_FOTOS}}</span><span class="placeholder-pill">{{NM_FORMA}}</span><span class="placeholder-pill">{{DS_TP_CONTRATO}}</span>
+
+            <div class="divider" style="margin:16px 0;"></div>
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">👔 Beca & Físico (5)</div>
+            <span class="placeholder-pill">{{PLUS_SIZE}}</span><span class="placeholder-pill">{{NR_CALCA}}</span><span class="placeholder-pill">{{ALTURA}}</span><span class="placeholder-pill">{{IMG_ASSINATURA}}</span><span class="placeholder-pill">{{NR_CONTRATO_CEDIMONIAL}}</span>
+
+            <div class="divider" style="margin:16px 0;"></div>
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📅 Data & Sistema (8)</div>
+            <span class="placeholder-pill">{{DIA_ATUAL}}</span><span class="placeholder-pill">{{MES_ATUAL}}</span><span class="placeholder-pill">{{ANO_ATUAL}}</span><span class="placeholder-pill">{{VL_CERIMONIAL}}</span><span class="placeholder-pill">{{VL_CERIMONIAL_DESC}}</span><span class="placeholder-pill">{{VL_CERIMONIAL_LIQ}}</span><span class="placeholder-pill">{{VL_PROD_SERV}}</span><span class="placeholder-pill">{{VL_ASSESSORIA_CERIMONIAL}}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: LISTA DE CONTRATOS -->
+    <div data-tab-panel="contratos" hidden>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Contratos ativos (198)</div>
+          <div class="flex gap-2">
+            <select class="select" style="width:160px;font-size:13px;padding:6px 10px;"><option>Todas turmas</option><option>MEDICINA T85</option><option>DIREITO T42</option><option>ENGENHARIA T31</option></select>
+            <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todos status</option><option>Em dia</option><option>Em atraso</option><option>Quitado</option></select>
+            <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar CSV</button>
+          </div>
+        </div>
+        <table class="table">
+          <thead><tr><th>Nº</th><th>Aluno</th><th>Turma</th><th>Plano</th><th class="num">Valor</th><th class="num">Pago</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>#4291</strong></td><td>Camila Almeida</td><td>MEDICINA T85</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 11.200</td><td><span class="badge badge-success">Em dia</span></td></tr>
+            <tr><td><strong>#4290</strong></td><td>Pedro Henrique</td><td>MEDICINA T85</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 18.400</td><td><span class="badge badge-success">Quitado</span></td></tr>
+            <tr><td><strong>#4289</strong></td><td>Júlia Ribeiro</td><td>MEDICINA T85</td><td>Prata 2026</td><td class="num">R$ 14.200</td><td class="num">R$ 7.100</td><td><span class="badge badge-success">Em dia</span></td></tr>
+            <tr><td><strong>#4288</strong></td><td>Marcos Silva</td><td>DIREITO T42</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 9.200</td><td><span class="badge badge-warning">Atraso D+3</span></td></tr>
+            <tr><td><strong>#4287</strong></td><td>Beatriz Lima</td><td>DIREITO T42</td><td>Diamante 2026</td><td class="num">R$ 24.800</td><td class="num">R$ 14.880</td><td><span class="badge badge-success">Em dia</span></td></tr>
+            <tr><td><strong>#4286</strong></td><td>Igor Martins Rocha</td><td>ENGENHARIA T31</td><td>Prata 2026</td><td class="num">R$ 14.200</td><td class="num">R$ 5.680</td><td><span class="badge badge-danger">Atraso D+15</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 192 contratos · <a href="#" style="color:var(--primary-700);">ver todos</a></div>
+      </div>
+    </div>
+
+    <!-- TAB: EM ASSINATURA -->
+    <div data-tab-panel="assinatura" hidden>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Aguardando assinatura ZapSign (12)</div>
+          <button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Lembrar todos</button>
+        </div>
+        <table class="table">
+          <thead><tr><th>Enviado</th><th>Aluno</th><th>Turma</th><th>Template</th><th>Tempo na fila</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>há 2h</td><td><strong>Beatriz Costa</strong></td><td>MEDICINA T85</td><td>Ouro 2026 v3</td><td>2h</td><td><span class="badge badge-info">Visualizado</span></td></tr>
+            <tr><td>há 4h</td><td><strong>Lucas Mendes</strong></td><td>DIREITO T42</td><td>Prata 2026 v3</td><td>4h</td><td><span class="badge badge-warning">Aguardando abertura</span></td></tr>
+            <tr><td>há 8h</td><td><strong>Sofia Pereira</strong></td><td>ENGENHARIA T31</td><td>Diamante 2026 v3</td><td>8h</td><td><span class="badge badge-info">Visualizado</span></td></tr>
+            <tr><td>há 12h</td><td><strong>Tiago Moreira Gomes</strong></td><td>MEDICINA T85</td><td>Ouro 2026 v3</td><td>12h</td><td><span class="badge badge-warning">Aguardando abertura</span></td></tr>
+            <tr><td>há 18h</td><td><strong>Helena Dias</strong></td><td>DIREITO T42</td><td>Prata 2026 v3</td><td>18h</td><td><span class="badge badge-danger">Lembrete enviado</span></td></tr>
+            <tr><td>há 1d</td><td><strong>Tiago Vieira</strong></td><td>ENGENHARIA T31</td><td>Ouro 2026 v3</td><td>1d</td><td><span class="badge badge-danger">Lembrete enviado</span></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 6 envios · tempo médio até assinar: 18h</div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

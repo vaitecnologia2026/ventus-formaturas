@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Importação · Migração — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.steps { display:flex; gap:0; margin-bottom:30px; padding:0; list-style:none; }
+.step { flex:1; padding:18px 16px; background:var(--gray-50); border-right:1px solid var(--gray-200); position:relative; }
+.step:last-child { border-right:none; }
+.step-num { width:30px; height:30px; border-radius:50%; background:var(--gray-300); color:white; display:grid; place-items:center; font-weight:700; font-size:14px; margin-bottom:6px; }
+.step.done .step-num { background:#16A34A; }
+.step.done .step-num::before { content:'✓'; }
+.step.active { background:white; box-shadow:0 -3px 0 var(--primary-600) inset; }
+.step.active .step-num { background:var(--primary-600); }
+.step-title { font-weight:600; font-size:14px; color:var(--gray-900); }
+.step-sub { font-size:12px; color:var(--gray-500); margin-top:2px; }
+.step.done .step-num span { display:none; }
+.map-row { display:grid; grid-template-columns:1fr 30px 1fr 100px; gap:14px; align-items:center; padding:10px 14px; border-radius:8px; }
+.map-row:nth-child(odd) { background:var(--gray-50); }
+.map-row code { font-size:13px; padding:3px 8px; background:#1e293b; color:#a5f3fc; border-radius:4px; font-family:ui-monospace,monospace; }
+.dot-conn { color:var(--gray-400); text-align:center; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar nesta migração…"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="history" class="w-4 h-4"></i> Histórico (3)</button>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="file-text" class="w-4 h-4"></i> Documentação</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Sistema / Importação · Migração</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Importação · Migração SQL legado</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Migre o sistema antigo (MySQL · prefixo <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_*</code>) para o novo schema · 4 etapas guiadas</p>
+
+    <ol class="steps">
+      <li class="step done"><div class="step-num"><span>1</span></div><div class="step-title">Upload</div><div class="step-sub">dump SQL · 248 MB</div></li>
+      <li class="step done"><div class="step-num"><span>2</span></div><div class="step-title">Mapeamento</div><div class="step-sub">42 tabelas · 487 campos</div></li>
+      <li class="step active"><div class="step-num">3</div><div class="step-title">Validação</div><div class="step-sub">testando consistência</div></li>
+      <li class="step"><div class="step-num">4</div><div class="step-title">Confirmação</div><div class="step-sub">aplicar migração</div></li>
+    </ol>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="database" class="w-5 h-5"></i></div><div class="kpi-label">Tabelas mapeadas</div><div class="kpi-value">42 / 42</div><div class="kpi-trend up">100% concluído</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="users" class="w-5 h-5"></i></div><div class="kpi-label">Registros a migrar</div><div class="kpi-value">214K</div><div class="kpi-trend" style="color:var(--gray-500);">~ 18 min ETA</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Avisos</div><div class="kpi-value">14</div><div class="kpi-trend" style="color:var(--warning);">precisam revisão</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="x-circle" class="w-5 h-5"></i></div><div class="kpi-label">Erros bloqueantes</div><div class="kpi-value">0</div><div class="kpi-trend up">pronto p/ migrar</div></div>
+    </div>
+
+    <div class="grid gap-4 mb-6" style="grid-template-columns:2fr 1fr;">
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Mapeamento de campos · Tabela <code style="background:var(--gray-100);padding:3px 8px;border-radius:5px;">cd_aluno → alunos</code></div>
+          <div class="flex gap-2">
+            <select class="select" style="width:200px;font-size:13px;padding:6px 10px;"><option>cd_aluno → alunos</option><option>cd_turma → turmas</option><option>cd_evento → eventos</option><option>cd_foto → fotos</option><option>cd_contrato → contratos</option><option>+ 37 outras…</option></select>
+          </div>
+        </div>
+        <div class="card-body" style="padding:8px 0;">
+          <div class="map-row" style="font-weight:700;color:var(--gray-700);font-size:12px;text-transform:uppercase;letter-spacing:.04em;background:transparent;"><div>Origem (cd_*)</div><div></div><div>Destino (camelCase)</div><div>Status</div></div>
+          <div class="map-row"><div><code>cd_aluno_id</code></div><div class="dot-conn">→</div><div><code>id</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_nome</code></div><div class="dot-conn">→</div><div><code>nome</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_cpf</code></div><div class="dot-conn">→</div><div><code>cpf</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_celular</code></div><div class="dot-conn">→</div><div><code>whatsapp</code></div><div><span class="badge badge-warning">⚠ formatar</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_email</code></div><div class="dot-conn">→</div><div><code>email</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_data_nascimento</code></div><div class="dot-conn">→</div><div><code>dataNascimento</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_turma</code></div><div class="dot-conn">→</div><div><code>turmaId (FK)</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_pacote</code></div><div class="dot-conn">→</div><div><code>planoId (FK)</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_status_pgto</code></div><div class="dot-conn">→</div><div><code>statusPagamento (enum)</code></div><div><span class="badge badge-warning">⚠ converter</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_obs</code></div><div class="dot-conn">→</div><div><code>observacoes</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_responsavel</code></div><div class="dot-conn">→</div><div><code>responsavelId (FK)</code></div><div><span class="badge badge-success">OK</span></div></div>
+          <div class="map-row"><div><code>cd_aluno_lider</code></div><div class="dot-conn">→</div><div><code>flagLider (bool)</code></div><div><span class="badge badge-success">OK</span></div></div>
+        </div>
+        <div style="padding:14px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">12 de 18 campos · <a href="#" style="color:var(--primary-700);">ver todos</a></div>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg,#1E3A8A,#0F172A);color:white;border:none;">
+        <div class="card-body" style="padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <i data-lucide="play-circle" class="w-7 h-7" style="color:#60A5FA;"></i>
+            <strong style="font-size:18px;">Pronto para migrar</strong>
+          </div>
+          <p style="font-size:13px;opacity:.85;line-height:1.7;margin-bottom:18px;">
+            42 tabelas · 487 campos · 214K registros · 14 avisos não-bloqueantes.<br>
+            Migração rodará em ambiente de teste primeiro. Você poderá comparar antes/depois e revogar.
+          </p>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;background:#16A34A;color:white;font-weight:700;padding:12px;border:none;">
+            <i data-lucide="rocket" class="w-4 h-4"></i> Iniciar migração teste
+          </button>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;margin-top:8px;background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);">
+            <i data-lucide="download" class="w-4 h-4"></i> Baixar plano (PDF)
+          </button>
+          <div style="margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.15);font-size:12px;opacity:.75;line-height:1.7;">
+            ⚠ Migração roda em <strong>banco isolado</strong> primeiro.<br>
+            ✓ Backup automático antes de aplicar em produção.<br>
+            ✓ Rollback em 1 clique se algo der errado.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Avisos da validação (14)</div><span class="badge badge-warning">não-bloqueantes</span></div>
+      <table class="table">
+        <thead><tr><th>Tabela</th><th>Campo</th><th>Aviso</th><th>Ação sugerida</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_aluno</code></td><td>celular</td><td>23 registros sem DDD</td><td>Adicionar (38) automaticamente</td><td class="text-right"><button class="btn btn-secondary btn-sm">Aplicar</button></td></tr>
+          <tr><td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_aluno</code></td><td>status_pgto</td><td>Valores legados: A,P,V,C</td><td>Converter para enum: ATIVO/PAGO/VENCIDO/CANCELADO</td><td class="text-right"><button class="btn btn-secondary btn-sm">Aplicar</button></td></tr>
+          <tr><td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_evento</code></td><td>data</td><td>14 datas no formato BR (dd/mm/yyyy)</td><td>Converter para ISO 8601</td><td class="text-right"><button class="btn btn-secondary btn-sm">Aplicar</button></td></tr>
+          <tr><td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_foto</code></td><td>arquivo</td><td>3 paths apontam para servidor antigo</td><td>Reescrever para S3 cloudfront</td><td class="text-right"><button class="btn btn-secondary btn-sm">Aplicar</button></td></tr>
+          <tr><td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;">cd_contrato</code></td><td>placeholders</td><td>Templates antigos com variáveis $$nome$$</td><td>Converter para {{nome}}</td><td class="text-right"><button class="btn btn-secondary btn-sm">Aplicar</button></td></tr>
+          <tr><td colspan="5" style="text-align:center;color:var(--gray-500);font-size:13px;padding:18px;">+ 9 avisos similares · todos auto-corrigíveis</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

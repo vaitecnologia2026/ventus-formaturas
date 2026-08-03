@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Galerias · Ventus Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .kanban-col {
+    background: var(--neutro-100);
+    border-radius: var(--r-md);
+    padding: 12px;
+    min-height: 400px;
+  }
+  .kanban-col.active { background: var(--azul-50); }
+  .kanban-col-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+  }
+  .kanban-col-title { font-size: 11px; font-weight: 700; color: var(--neutro-600); text-transform: uppercase; letter-spacing: 0.05em; }
+  .kanban-col.active .kanban-col-title { color: var(--azul-700); }
+  .kanban-col-count {
+    background: white; padding: 2px 10px; border-radius: var(--r-full);
+    font-size: 11px; font-weight: 700; color: var(--neutro-700);
+  }
+  .kanban-col.active .kanban-col-count { background: var(--azul-700); color: white; }
+
+  .kanban-card {
+    background: white;
+    padding: 12px;
+    border-radius: var(--r-sm);
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    border: 1px solid transparent;
+  }
+  .kanban-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--azul-200, var(--azul-100)); }
+  .kanban-card .nome { font-weight: 600; font-size: 13px; color: var(--neutro-900); margin-bottom: 4px; }
+  .kanban-card .turma { font-size: 11px; color: var(--neutro-500); margin-bottom: 8px; }
+  .kanban-card .meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px;
+  }
+  .kanban-card .num-fotos {
+    background: var(--azul-50); color: var(--azul-700);
+    padding: 2px 8px; border-radius: var(--r-full); font-weight: 700;
+  }
+  .kanban-card .tempo {
+    color: var(--neutro-500);
+  }
+  .kanban-card .tempo.warn { color: var(--erro); font-weight: 600; }
+
+  .funil-banner {
+    background: linear-gradient(135deg, var(--azul-50), white);
+    border-left: 4px solid var(--azul-600);
+    padding: 20px 24px;
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .funil-banner h3 { font-size: 16px; font-weight: 700; color: var(--azul-800); margin-bottom: 4px; }
+  .funil-banner p { font-size: 13px; color: var(--neutro-600); }
+
+  @media (max-width: 1100px) {
+    .kanban { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo"><span class="logo-mark">V</span> Ventus</div>
+    <div class="nav-section">Operação</div>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="turma.html">Turmas</a>
+      <a href="eventos.html">Eventos</a>
+      <a href="#">Convidados</a>
+    </nav>
+    <div class="nav-section">Produção</div>
+    <nav class="admin-nav">
+      <a href="galerias.html" class="active">Galerias</a>
+      <a href="#">Fila de edição</a>
+      <a href="#">Entregas</a>
+    </nav>
+    <div class="nav-section">Financeiro</div>
+    <nav class="admin-nav">
+      <a href="financeiro.html">Recebimentos</a>
+      <a href="#">Contratos</a>
+      <a href="#">Relatórios</a>
+    </nav>
+    <div class="nav-section">Configurações</div>
+    <nav class="admin-nav">
+      <a href="pacotes.html">Pacotes</a>
+      <a href="#">Branding</a>
+      <a href="#">Equipe</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="crumb">Produção / <b>Galerias</b></div>
+      <div class="flex gap-3 items-center">
+        <button class="btn btn-ghost text-sm">Exportar relatório</button>
+        <button class="btn btn-primary text-sm">+ Upload de evento</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <h1>Funil de produção fotográfica</h1>
+      <p class="lead">Cada card é um aluno na esteira de produção. Arraste entre colunas para mudar status (em produção real).</p>
+
+      <div class="funil-banner">
+        <div style="font-size: 32px;">●</div>
+        <div style="flex:1;">
+          <h3>23 alunos em produção · ~3.2 dias média de entrega</h3>
+          <p>Meta da Ventus: < 5 dias do upload à entrega via WhatsApp · Estamos dentro da meta.</p>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Fotos uploadadas</div>
+          <div class="kpi-num">1.247</div>
+          <div class="kpi-delta">do último evento</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">IA processou</div>
+          <div class="kpi-num">100%</div>
+          <div class="kpi-delta up">face match completo</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Aguardando seleção do aluno</div>
+          <div class="kpi-num">9</div>
+          <div class="kpi-delta">alunos · em média 2 dias</div>
+        </div>
+        <div class="kpi highlight">
+          <div class="kpi-label">Entregues este mês</div>
+          <div class="kpi-num">488</div>
+          <div class="kpi-delta" style="color: rgba(255,255,255,0.85);">14 alunos · NPS 82</div>
+        </div>
+      </div>
+
+      <div class="kanban">
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title">1. Upload</div>
+            <div class="kanban-col-count">3</div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Estética FIP — Ensaio</div>
+            <div class="turma">28 alunos · 04 mai</div>
+            <div class="meta">
+              <span class="num-fotos">800 fotos</span>
+              <span class="tempo">há 2h</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Direito Funorte — Cerimônia</div>
+            <div class="turma">38 alunos · 12 mai</div>
+            <div class="meta">
+              <span class="num-fotos">aguardando</span>
+              <span class="tempo">próximo</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Fisio UNIFIPMOC — Ensaio</div>
+            <div class="turma">31 alunos · 18 mai</div>
+            <div class="meta">
+              <span class="num-fotos">aguardando</span>
+              <span class="tempo">próximo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title">2. IA processando</div>
+            <div class="kanban-col-count">1</div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Enfermagem FIP — Baile</div>
+            <div class="turma">42 alunos · ontem</div>
+            <div class="meta">
+              <span class="num-fotos">1.247 fotos</span>
+              <span class="tempo">há 30min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col active">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title">3. Aluno selecionando</div>
+            <div class="kanban-col-count">9</div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Marina Souza Lima</div>
+            <div class="turma">Enfermagem FIP · Pacote Ouro</div>
+            <div class="meta">
+              <span class="num-fotos">12 / 50</span>
+              <span class="tempo">há 2 dias</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Camila Rocha Mendes</div>
+            <div class="turma">Enfermagem FIP · Pacote Prata</div>
+            <div class="meta">
+              <span class="num-fotos">8 / 30</span>
+              <span class="tempo">há 1 dia</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Bruna Lopes Carneiro</div>
+            <div class="turma">Enfermagem FIP · Pacote Prata</div>
+            <div class="meta">
+              <span class="num-fotos">22 / 30</span>
+              <span class="tempo">há 3h</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Juliana Martins Santos</div>
+            <div class="turma">Enfermagem FIP · Pacote Ouro</div>
+            <div class="meta">
+              <span class="num-fotos">31 / 50</span>
+              <span class="tempo">há 5h</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">+ 5 alunos selecionando</div>
+            <div class="turma" style="text-align:center; color: var(--azul-700); font-weight: 600;">ver todos</div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title">4. Em edição</div>
+            <div class="kanban-col-count">3</div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Pedro Henrique Silva</div>
+            <div class="turma">Enfermagem FIP · Editor: Ana Paula</div>
+            <div class="meta">
+              <span class="num-fotos">50 fotos</span>
+              <span class="tempo warn">D+5 ⚠</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Rafael Ferraz Oliveira</div>
+            <div class="turma">Enfermagem FIP · Editor: Carlos M.</div>
+            <div class="meta">
+              <span class="num-fotos">15 fotos</span>
+              <span class="tempo">D+2</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Lucas Andrade Costa</div>
+            <div class="turma">Enfermagem FIP · Editor: Ana Paula</div>
+            <div class="meta">
+              <span class="num-fotos">50 fotos</span>
+              <span class="tempo">D+1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title">5. Entregue</div>
+            <div class="kanban-col-count">488</div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Larissa Andrade S.</div>
+            <div class="turma">Contabilidade FIP · Pacote Ouro</div>
+            <div class="meta">
+              <span class="num-fotos">★ NPS 100</span>
+              <span class="tempo" style="color:var(--sucesso); font-weight:600;">há 12h</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Gustavo Pereira O.</div>
+            <div class="turma">Contabilidade FIP · Pacote Prata</div>
+            <div class="meta">
+              <span class="num-fotos">★ NPS 9</span>
+              <span class="tempo" style="color:var(--sucesso); font-weight:600;">há 1d</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">Tatiana Ribeiro M.</div>
+            <div class="turma">Contabilidade FIP · Pacote Ouro</div>
+            <div class="meta">
+              <span class="num-fotos">★ NPS 10</span>
+              <span class="tempo" style="color:var(--sucesso); font-weight:600;">há 1d</span>
+            </div>
+          </div>
+          <div class="kanban-card">
+            <div class="nome">+ 485 entregas</div>
+            <div class="turma" style="text-align:center; color: var(--sucesso); font-weight: 600;">ver histórico</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<a href="dashboard.html" class="proto-tag">← Voltar ao dashboard</a>
+
+</body>
+</html>

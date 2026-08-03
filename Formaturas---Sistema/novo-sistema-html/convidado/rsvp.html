@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite — Marcos Silva</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: linear-gradient(180deg, #1E3A8A 0%, #172554 100%); min-height:100vh; padding-bottom:40px;">
+
+<div class="phone-frame" style="background:transparent;padding-top:0;">
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,#1E3A8A,#7C3AED);color:white;padding:40px 24px 60px;text-align:center;border-bottom-left-radius:32px;border-bottom-right-radius:32px;">
+    <div style="display:inline-flex;width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:14px;align-items:center;justify-content:center;margin-bottom:16px;font-weight:800;font-size:22px;">V</div>
+    <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;">Você foi convidado(a) para</div>
+    <h1 style="font-size:28px;font-weight:800;margin:8px 0 6px;letter-spacing:-0.02em;line-height:1.1;">BAILE + AFTER</h1>
+    <div style="font-size:14px;opacity:.8;">MEDICINA T84 - UNIMONTES</div>
+
+    <div style="display:inline-flex;gap:12px;margin-top:20px;">
+      <div style="background:rgba(255,255,255,.15);padding:8px 14px;border-radius:10px;text-align:left;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Data</div>
+        <div style="font-size:14px;font-weight:700;">22 abril</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);padding:8px 14px;border-radius:10px;text-align:left;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Horário</div>
+        <div style="font-size:14px;font-weight:700;">21h00</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);padding:8px 14px;border-radius:10px;text-align:left;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Dress code</div>
+        <div style="font-size:14px;font-weight:700;">Black tie</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card de identificação -->
+  <div style="padding:0 16px;margin-top:-30px;position:relative;z-index:5;">
+    <div style="background:white;border-radius:18px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,.2);">
+      <div style="font-size:13px;color:var(--gray-500);">Convite para</div>
+      <div style="font-size:22px;font-weight:800;color:var(--gray-900);letter-spacing:-0.01em;margin-top:2px;">Marcos Silva</div>
+      <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Convidado de <strong style="color:var(--gray-900);">Camila Almeida</strong> (formanda)</div>
+
+      <div class="divider"></div>
+
+      <!-- QR Code (CSS art) -->
+      <div style="text-align:center;">
+        <div style="display:inline-block;background:white;padding:20px;border:1px solid var(--gray-200);border-radius:14px;">
+          <div style="width:180px;height:180px;background:repeating-conic-gradient(#0F172A 0% 25%, white 0% 50%) 50% / 14px 14px;border:8px solid #0F172A;border-radius:8px;"></div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--gray-500);margin-top:10px;letter-spacing:.04em;">VTS-A3F2-91CB-7E08</div>
+      </div>
+
+      <div style="margin-top:20px;background:#FEF3C7;border-radius:12px;padding:14px;font-size:13px;color:#92400E;">
+        <strong>📱 Como entrar:</strong> apresente este QR na portaria. Você receberá uma <strong>pulseira azul (Comum)</strong> impressa na hora.
+      </div>
+    </div>
+  </div>
+
+  <!-- RSVP -->
+  <div style="padding:24px 16px 0;">
+    <div style="background:white;border-radius:18px;padding:24px;box-shadow:0 4px 12px rgba(0,0,0,.06);">
+      <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:6px;">Você confirma presença?</strong>
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Confirme até <strong>15/04</strong> para garantir sua entrada.</p>
+      <div class="flex gap-2">
+        <button class="btn btn-primary" style="flex:2;justify-content:center;padding:14px;">
+          <i data-lucide="check-circle" class="w-5 h-5"></i> Vou comparecer
+        </button>
+        <button class="btn btn-secondary" style="flex:1;justify-content:center;padding:14px;">
+          Não vou
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local -->
+  <div style="padding:16px 16px 0;">
+    <div style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.06);">
+      <div style="background:linear-gradient(135deg,#16A34A,#1E3A8A);height:140px;display:grid;place-items:center;color:white;">
+        <i data-lucide="map-pin" class="w-12 h-12"></i>
+      </div>
+      <div style="padding:18px;">
+        <strong style="font-size:16px;color:var(--gray-900);">Espaço Ventus</strong>
+        <p style="font-size:13px;color:var(--gray-600);margin-top:4px;">Rua São Marcos, 60 · Todos os Santos · Montes Claros/MG</p>
+        <div class="flex gap-2 mt-3">
+          <a href="#" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="navigation" class="w-4 h-4"></i> Como chegar</a>
+          <a href="#" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="phone" class="w-4 h-4"></i> Ligar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:24px 16px;text-align:center;color:rgba(255,255,255,.5);font-size:12px;">
+    Convite intransferível · gerado por <strong style="color:white;">Ventus Formaturas</strong>
+  </div>
+</div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

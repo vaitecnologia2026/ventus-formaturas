@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Cadastros — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.cad-tabs { display:flex; gap:6px; padding:6px; background:var(--gray-100); border-radius:10px; margin-bottom:24px; overflow-x:auto; flex-wrap:nowrap; }
+.cad-tab { padding:8px 14px; font-size:13px; font-weight:500; color:var(--gray-700); border-radius:8px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.cad-tab:hover { background:white; color:var(--primary-700); }
+.cad-tab.active { background:white; color:var(--primary-700); font-weight:700; box-shadow:var(--shadow-sm); }
+.cad-tab .badge { margin-left:6px; font-size:10px; padding:2px 6px; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input id="cad-search" type="text" placeholder="Buscar nesta aba…"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar tudo</button>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="upload" class="w-4 h-4"></i> Importar XLS</button>
+      <button class="btn btn-primary btn-sm" id="btn-novo"><i data-lucide="plus" class="w-4 h-4"></i> Novo</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Cadastros</div>
+    <div class="flex justify-between items-center mt-1 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Cadastros consolidados</h1>
+        <p class="text-sm" style="color:var(--gray-500);">17 cadastros base do sistema · usados em turmas, contratos, eventos, OS</p>
+      </div>
+    </div>
+
+    <div class="cad-tabs" id="cad-tabs"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="cad-title">—</div>
+        <div class="flex gap-2">
+          <span id="cad-count" class="badge badge-info">— itens</span>
+        </div>
+      </div>
+      <table class="table">
+        <thead id="cad-thead"></thead>
+        <tbody id="cad-tbody"></tbody>
+      </table>
+      <div id="cad-foot" style="padding:16px;text-align:center;color:var(--gray-500);font-size:13px;border-top:1px solid var(--gray-100);"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const CADASTROS = [
+  { id:'instituicoes', label:'Instituições', count:20, cols:['Nome','Mnemônico','Tipo','Cidade','Cursos','Status'], rows:[
+    ['UNIMONTES','UNIMONTES','SU','Montes Claros/MG',18,'Ativo'],
+    ['FUNORTE','FUNORTE','SU','Montes Claros/MG',12,'Ativo'],
+    ['IFNMG','IFNMG','SU/TE','Montes Claros/MG',8,'Ativo'],
+    ['FIPMOC (Unifipmoc)','FIPMOC','SU','Montes Claros/MG',9,'Ativo'],
+    ['Grau Técnico','GRAU','TE','Montes Claros/MG',6,'Ativo'],
+    ['UFMG','UFMG','SU','Belo Horizonte/MG',1,'Ativo'],
+    ['IESC','IESC','TE','Montes Claros/MG',3,'Ativo'],
+  ]},
+  { id:'cursos', label:'Cursos', count:87, cols:['Nome','Tipo','Faculdade','Duração','Alunos','Status'], rows:[
+    ['Medicina','Graduação','UNIMONTES','12 semestres',43,'Ativo'],
+    ['Direito','Graduação','UNIMONTES','10 semestres',31,'Ativo'],
+    ['Enfermagem','Graduação','FUNORTE','10 semestres',29,'Ativo'],
+    ['Odontologia','Graduação','FUNORTE','10 semestres',39,'Ativo'],
+    ['Eng. Florestal','Graduação','UFMG','10 semestres',72,'Ativo'],
+    ['Téc. Enfermagem','Técnico','GRAU','3 semestres',24,'Ativo'],
+  ]},
+  { id:'responsaveis', label:'Responsáveis', count:142, cols:['Nome','Email','WhatsApp','Funções','Status'], rows:[
+    ['Renato Soares Ribeiro','rsrmoc@gmail.com','(38) 99828-1639','Coordenador, Professor','Ativo'],
+    ['Bruno de Oliveira Sena','bruno@ventusprodutora.com.br','(38) 99164-2642','Diretoria','Ativo'],
+    ['Fernando Antunes Gontijo','nandogontijo@gmail.com','(38) 99194-4507','Pai · Coordenador','Ativo'],
+  ]},
+  { id:'lideres', label:'Líderes de comissão', count:82, cols:['Aluno','Turma','Cargo','WhatsApp','Status'], rows:[
+    ['Camila Almeida','MEDICINA T85','Presidente','(38) 99863-1234','Ativo'],
+    ['Pedro Henrique','MEDICINA T85','Tesoureiro','(38) 99863-1235','Ativo'],
+    ['Júlia Ribeiro','MEDICINA T85','Secretária','(38) 99863-1236','Ativo'],
+    ['Igor Martins Rocha','DIREITO UNIMONTES','Presidente','(38) 99863-9911','Ativo'],
+  ]},
+  { id:'vendedores', label:'Vendedores', count:6, cols:['Nome','Tipo','Telefone','% Comissão','Fotografia?','Status'], rows:[
+    ['Tiago Moreira Carvalho Santos','—','(38) 99800-0001','10%','Não','Ativo'],
+    ['Ana Clara Celestino','—','(38) 99800-0002','10%','Não','Ativo'],
+    ['Marcos Vieira Andrade','—','(38) 99800-0003','12%','Não','Ativo'],
+    ['Fernando Gontijo','OUTRAS','(38) 99800-0004','8%','Sim','Ativo'],
+    ['Debora Damasceno','CLT','(38) 99800-0005','—','Não','Ativo'],
+    ['Thaíná','—','(38) 99800-0006','10%','Sim','Ativo'],
+  ]},
+  { id:'produtos', label:'Produtos & Serviços', count:125, cols:['Nome','Tipo','Vl. Custo','Vl. Venda','Status'], rows:[
+    ['Foto extra editada','SERVICO','R$ 5,00','R$ 25,00','Ativo'],
+    ['Tratamento de imagem (lote)','SERVICO','R$ 200,00','R$ 450,00','Ativo'],
+    ['Cobertura fotográfica baile','SERVICO','R$ 1.800,00','R$ 3.500,00','Ativo'],
+    ['Mestre de cerimônia','SERVICO','R$ 1.000,00','R$ 1.800,00','Ativo'],
+    ['Decoração mesa de honra','PRODUTO','R$ 800,00','R$ 1.500,00','Ativo'],
+  ]},
+  { id:'tabelas-preco', label:'Tabelas de preço', count:14, cols:['Nome','Ano vigente','Itens','Validade','Status'], rows:[
+    ['Tabela Padrão 2026','2026',125,'01/01/2026 → 31/12/2026','Ativo'],
+    ['Tabela Cerimonial 2026','2026',38,'01/01/2026 → 31/12/2026','Ativo'],
+    ['Tabela Fotografia 2026','2026',42,'01/01/2026 → 31/12/2026','Ativo'],
+    ['Tabela Padrão 2025','2025',118,'01/01/2025 → 31/12/2025','Inativo'],
+  ]},
+  { id:'brindes', label:'Brindes', count:42, cols:['Nome','Tipo','Status'], rows:[
+    ['Álbum "Memórias" 21x30cm','ALBUM','Ativo'],
+    ['Álbum "Inesquecível" 30x40cm','ALBUM','Ativo'],
+    ['Álbum "Saudade" 30x30cm','ALBUM','Ativo'],
+    ['Link em nuvem','LINK_NUVEM','Ativo'],
+    ['Encarte personalizado','ENCARTE','Ativo'],
+    ['Pendrive individual','PENDRIVE','Inativo'],
+    ['Pendrive coletivo','PENDRIVE','Inativo'],
+  ]},
+  { id:'tipos-evento', label:'Tipos de evento', count:113, cols:['Código','Nome','Categoria','Fotos editadas','Status'], rows:[
+    ['0012','COLAÇÃO OFICIAL','CERIMONIA','—','Ativo'],
+    ['0065','COLAÇÃO OFICIAL (30 fotos editadas)','CERIMONIA','30','Ativo'],
+    ['0011','BAILE','FESTA','—','Ativo'],
+    ['0037','BAILE (40 fotos editadas)','FESTA','40','Ativo'],
+    ['0089','FAMILY DAY (você + 3 familiares)','FESTA','—','Ativo'],
+    ['0001','MISSA','CERIMONIA','—','Ativo'],
+    ['0003','FOTO CONVITE INTERNO','FOTOGRAFIA','—','Ativo'],
+  ]},
+  { id:'tipos-foto', label:'Tipos de foto', count:8, cols:['Nome','Status'], rows:[
+    ['Individual estúdio','Ativo'],['Família','Ativo'],['Cerimônia','Ativo'],['Festa','Ativo'],['Posicionamento','Ativo'],['Beca','Ativo'],
+  ]},
+  { id:'locais', label:'Locais de cerimônia', count:11, cols:['Nome','Endereço','Capacidade','Status'], rows:[
+    ['Auditório UNIMONTES','Av. Rui Braga, 100',1200,'Ativo'],
+    ['Espaço Ventus','Rua São Marcos, 60',450,'Ativo'],
+    ['Salão Ipiranga','Av. Cônego Ramiro Leite',600,'Ativo'],
+    ['Salão Royal Plaza','Av. Mestra Fininha, 800',800,'Ativo'],
+  ]},
+  { id:'hotelaria', label:'Hotelaria', count:7, cols:['Hotel','Bairro','Convênio','Diária','Status'], rows:[
+    ['Hotel Estoril','Centro','15% off','R$ 280','Ativo'],
+    ['Hotel Pampulha','Todos os Santos','20% off','R$ 320','Ativo'],
+    ['Sleep Inn','Augusta Mota','10% off','R$ 240','Ativo'],
+  ]},
+  { id:'igreja', label:'Igreja', count:9, cols:['Nome','Endereço','Capacidade','Cerimônias/mês','Status'], rows:[
+    ['Igreja Matriz','Centro',800,3,'Ativo'],
+    ['Igreja Bom Pastor','Todos os Santos',500,5,'Ativo'],
+    ['Capela Santo Antônio','Sagrada Família',200,2,'Ativo'],
+  ]},
+  { id:'fornecedores', label:'Fornecedores', count:34, cols:['Razão social','CNPJ','Categoria','Contato','Status'], rows:[
+    ['Decora Eventos LTDA','12.345.678/0001-90','Decoração','Marcos · (38) 9 9000-1111','Ativo'],
+    ['SOM PRO Equip.','98.765.432/0001-21','Áudio/Iluminação','Carlos · (38) 9 9000-2222','Ativo'],
+    ['Buffet Saboroso','11.111.111/0001-11','Buffet','Marcia · (38) 9 9000-3333','Ativo'],
+    ['Cake Royal','22.222.222/0001-22','Bolo','Renata · (38) 9 9000-4444','Ativo'],
+  ]},
+  { id:'status', label:'Status configuráveis', count:18, cols:['Categoria','Nome','Ordem','Ativo'], rows:[
+    ['Foto','NA CÂMERA',1,'Sim'],['Foto','DESCARREGADA',2,'Sim'],['Foto','EM TRATAMENTO',3,'Sim'],['Foto','TRATADAS',4,'Sim'],['Foto','SEPARADAS PARA ENTREGA',5,'Sim'],['Foto','ENTREGUES EM LINK',6,'Sim'],['Foto','ENTREGUES EM PENDRIVE',7,'Sim'],
+  ]},
+  { id:'formas-entrega', label:'Formas de entrega', count:14, cols:['Nome','Vl. Custo','Vl. Venda','Status'], rows:[
+    ['Álbum "Memórias" 21x30cm','R$ 95','R$ 280','Ativo'],
+    ['Álbum "Inesquecível" 30x40cm','R$ 280','R$ 720','Ativo'],
+    ['Link em nuvem','R$ 0','R$ 0','Ativo'],
+    ['Pendrive individual','R$ 35','R$ 90','Inativo'],
+  ]},
+  { id:'documentos', label:'Documentos', count:26, cols:['Nome','Tipo','Última versão','Status'], rows:[
+    ['Termo de uso de imagem','PDF','v3 · 12/03/2026','Ativo'],
+    ['Termo LGPD biometria','PDF','v2 · 04/01/2026','Ativo'],
+    ['Autorização de menor','PDF','v1 · 15/12/2025','Ativo'],
+    ['Recibo de pagamento','TEMPLATE','v4 · 22/04/2026','Ativo'],
+  ]},
+  { id:'modelos-contrato', label:'Modelos de contrato', count:5, cols:['Nome','Versão','Adesões','Status'], rows:[
+    ['Contrato Padrão Ouro 2026','v3',132,'Ativo'],
+    ['Contrato Padrão Diamante 2026','v2',39,'Ativo'],
+    ['Contrato Padrão Bronze 2026','v3',23,'Ativo'],
+    ['Contrato Cerimonial Avulso','v1',12,'Ativo'],
+    ['Contrato Padrão 2025','v8','—','Inativo'],
+  ]},
+];
+
+// Renderiza abas
+const tabsEl = document.getElementById('cad-tabs');
+CADASTROS.forEach((c, i) => {
+  const a = document.createElement('a');
+  a.href = '#';
+  a.className = 'cad-tab' + (i === 0 ? ' active' : '');
+  a.dataset.id = c.id;
+  a.innerHTML = `${c.label} <span class="badge">${c.count}</span>`;
+  a.addEventListener('click', e => { e.preventDefault(); selectTab(c.id); });
+  tabsEl.appendChild(a);
+});
+
+function selectTab(id) {
+  document.querySelectorAll('.cad-tab').forEach(t => t.classList.toggle('active', t.dataset.id === id));
+  const c = CADASTROS.find(x => x.id === id);
+  document.getElementById('cad-title').textContent = c.label;
+  document.getElementById('cad-count').textContent = `${c.count} itens cadastrados`;
+
+  const thead = document.getElementById('cad-thead');
+  const tbody = document.getElementById('cad-tbody');
+  thead.innerHTML = '<tr>' + c.cols.map(col => `<th>${col}</th>`).join('') + '<th></th></tr>';
+  tbody.innerHTML = c.rows.map(row => '<tr>' + row.map(cell => `<td>${cell === '—' ? '<span style="color:var(--gray-400);">—</span>' : cell}</td>`).join('') + `<td class="text-right"><button class="btn btn-ghost btn-icon" data-no-toast><i data-lucide="more-horizontal" class="w-4 h-4"></i></button></td></tr>`).join('');
+  document.getElementById('cad-foot').textContent = `Mostrando ${c.rows.length} de ${c.count}`;
+
+  if (window.lucide) lucide.createIcons();
+}
+selectTab('instituicoes');
+</script>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

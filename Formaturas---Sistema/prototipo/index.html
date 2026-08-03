@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sistema Ventus — Protótipo navegável</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/styles.css" />
+<style>
+  body { background: var(--neutro-50); }
+  .hub-hero {
+    background: var(--grad);
+    color: white;
+    padding: 80px 24px 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hub-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.1) 0%, transparent 50%);
+  }
+  .hub-content { max-width: 1100px; margin: 0 auto; position: relative; }
+  .hub-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--r-full);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+  }
+  .hub-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hub-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.85);
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .personas-section { max-width: 1100px; margin: -60px auto 80px; padding: 0 24px; position: relative; z-index: 2; }
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .persona-card {
+    background: white;
+    padding: 28px;
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-md);
+    transition: transform .25s, box-shadow .25s;
+    display: flex;
+    flex-direction: column;
+  }
+  .persona-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+  }
+  .persona-icon {
+    width: 56px; height: 56px;
+    border-radius: var(--r-md);
+    background: var(--azul-50);
+    color: var(--azul-700);
+    font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .persona-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .persona-card .role { font-size: 13px; color: var(--neutro-500); font-weight: 500; margin-bottom: 16px; }
+  .persona-card p.desc { font-size: 14px; color: var(--neutro-600); margin-bottom: 20px; flex: 1; }
+  .persona-screens { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .persona-screens a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--neutro-50);
+    border-radius: var(--r-sm);
+    font-size: 13px; font-weight: 500;
+    color: var(--neutro-700);
+    transition: background .15s, color .15s;
+  }
+  .persona-screens a:hover { background: var(--azul-50); color: var(--azul-700); }
+  .persona-screens a::before {
+    content: '→';
+    color: var(--azul-600);
+    font-weight: 700;
+  }
+  .persona-device {
+    font-size: 11px;
+    color: var(--neutro-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+  .footer-info {
+    background: white;
+    padding: 32px 24px;
+    border-top: 1px solid var(--neutro-200);
+    text-align: center;
+    font-size: 13px;
+    color: var(--neutro-500);
+  }
+  .footer-info a { color: var(--azul-700); }
+</style>
+</head>
+<body>
+
+<section class="hub-hero">
+  <div class="hub-content">
+    <div class="hub-tag">Protótipo · navegável · dados fictícios</div>
+    <div class="logo" style="justify-content:center; margin-bottom:24px;">
+      <span class="logo-mark lg" style="background: rgba(255,255,255,0.15); box-shadow: none;">V</span>
+    </div>
+    <h1 class="hub-title">Sistema Ventus Formaturas</h1>
+    <p class="hub-sub">Telas-chave do sistema, organizadas por persona. Use os links abaixo para navegar e ver como cada usuário vai interagir com a plataforma.</p>
+  </div>
+</section>
+
+<section class="personas-section">
+  <div class="personas-grid">
+
+    <!-- ALUNO -->
+    <div class="persona-card">
+      <div class="persona-icon">🎓</div>
+      <h3>Formando</h3>
+      <div class="role">Marina Souza · 22 anos · Enfermagem FIP</div>
+      <p class="desc">Acessa pelo celular. Vê suas fotos automaticamente filtradas por reconhecimento facial. Paga, escolhe, recebe.</p>
+      <div class="persona-device">📱 PWA Mobile</div>
+      <div class="persona-screens" style="margin-top: 12px;">
+        <a href="aluno/galeria.html">Galeria personalizada (com face match)</a>
+        <a href="aluno/pagamento.html">Pagamento e parcelas</a>
+        <a href="aluno/galeria-final.html">Galeria final pós-edição ✨</a>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="persona-card">
+      <div class="persona-icon">🏛️</div>
+      <h3>Admin Ventus</h3>
+      <div class="role">Elison · Diretor</div>
+      <p class="desc">Acompanha todas as turmas, financeiro consolidado e o funil de produção fotográfica em tempo real.</p>
+      <div class="persona-device">💻 Web Desktop</div>
+      <div class="persona-screens" style="margin-top: 12px;">
+        <a href="admin/dashboard.html">Dashboard — Funil de produção</a>
+        <a href="admin/turma.html">Detalhe de turma</a>
+      </div>
+    </div>
+
+    <!-- OPERADOR -->
+    <div class="persona-card">
+      <div class="persona-icon">🎫</div>
+      <h3>Operador de portaria</h3>
+      <div class="role">Funcionário Ventus · no dia do evento</div>
+      <p class="desc">Tablet em modo quiosque. Aponta para o QR do convidado. Pulseira impressa em 3 segundos.</p>
+      <div class="persona-device">📲 Tablet (kiosk)</div>
+      <div class="persona-screens" style="margin-top: 12px;">
+        <a href="operador/checkin.html">Câmera de check-in + impressão</a>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="persona-card">
+      <div class="persona-icon">🎨</div>
+      <h3>Editor de fotos</h3>
+      <div class="role">Editor freelancer parceiro</div>
+      <p class="desc">Vê a fila de pacotes selecionados pelos alunos. Pega lote, edita offline, faz upload da versão final.</p>
+      <div class="persona-device">💻 Web Desktop</div>
+      <div class="persona-screens" style="margin-top: 12px;">
+        <a href="editor/fila.html">Fila de pacotes para editar</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="footer-info">
+  <strong>Sobre este protótipo:</strong> são telas estáticas que demonstram a experiência visual do sistema final.
+  A versão real terá interatividade completa, autenticação, integração com Asaas/WhatsApp/Rekognition e sincronização em tempo real.
+  &nbsp;·&nbsp; <a href="../apresentacao.html">Voltar para apresentação</a>
+</div>
+
+</body>
+</html>

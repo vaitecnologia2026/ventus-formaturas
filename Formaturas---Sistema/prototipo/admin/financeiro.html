@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Financeiro · Ventus Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  .grafico-card {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    border-radius: var(--r-md);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .grafico-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+
+  /* Gráfico de barras simples em CSS */
+  .bar-chart {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+    height: 180px;
+    align-items: end;
+    padding: 16px 0;
+  }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--azul-500), var(--azul-700));
+    border-radius: 4px 4px 0 0;
+    transition: opacity .2s;
+    position: relative;
+    min-height: 4px;
+  }
+  .bar:hover { opacity: 0.8; }
+  .bar.recebido { background: linear-gradient(180deg, var(--sucesso), #059669); }
+  .bar.previsto { background: linear-gradient(180deg, #94A3B8, #64748B); }
+  .bar-label { font-size: 11px; color: var(--neutro-500); font-weight: 600; }
+  .bar-value { font-size: 10px; color: var(--neutro-700); font-weight: 700; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  .cobranca-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    font-size: 12px; font-weight: 600;
+  }
+  .cobranca-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 120px 120px 100px 80px 100px;
+    gap: 16px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--neutro-100);
+    align-items: center;
+    font-size: 13px;
+  }
+  .cobranca-row:hover { background: var(--neutro-50); cursor: pointer; }
+  .cobranca-row .nome { font-weight: 600; }
+  .cobranca-row .info { font-size: 11px; color: var(--neutro-500); margin-top: 2px; }
+  .cobranca-row .valor { font-weight: 700; }
+  .cobranca-row .valor.error { color: var(--erro); }
+  .cobranca-row .valor.success { color: var(--sucesso); }
+
+  @media (max-width: 1100px) {
+    .cobranca-row { grid-template-columns: 40px 1fr auto; }
+    .cobranca-row > *:not(:nth-child(-n+3)) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo"><span class="logo-mark">V</span> Ventus</div>
+    <div class="nav-section">Operação</div>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="turma.html">Turmas</a>
+      <a href="eventos.html">Eventos</a>
+      <a href="#">Convidados</a>
+    </nav>
+    <div class="nav-section">Produção</div>
+    <nav class="admin-nav">
+      <a href="galerias.html">Galerias</a>
+      <a href="#">Fila de edição</a>
+      <a href="#">Entregas</a>
+    </nav>
+    <div class="nav-section">Financeiro</div>
+    <nav class="admin-nav">
+      <a href="financeiro.html" class="active">Recebimentos</a>
+      <a href="#">Contratos</a>
+      <a href="#">Relatórios</a>
+    </nav>
+    <div class="nav-section">Configurações</div>
+    <nav class="admin-nav">
+      <a href="pacotes.html">Pacotes</a>
+      <a href="#">Branding</a>
+      <a href="#">Equipe</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="crumb">Financeiro / <b>Recebimentos</b></div>
+      <div class="flex gap-3 items-center">
+        <button class="btn btn-ghost text-sm">Exportar CSV</button>
+        <button class="btn btn-primary text-sm">+ Nova cobrança</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <h1>Recebimentos</h1>
+      <p class="lead">Visão consolidada de cobranças, pagamentos e inadimplência das 5 turmas ativas</p>
+
+      <div class="kpi-row">
+        <div class="kpi highlight">
+          <div class="kpi-label">Recebido este mês</div>
+          <div class="kpi-num">R$ 62.450</div>
+          <div class="kpi-delta" style="color: rgba(255,255,255,0.85);">↑ 18% vs mês anterior</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">A receber (próximos 30d)</div>
+          <div class="kpi-num">R$ 78.320</div>
+          <div class="kpi-delta">187 cobranças abertas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Inadimplência</div>
+          <div class="kpi-num" style="color: var(--erro);">R$ 8.470</div>
+          <div class="kpi-delta down">12 formandos · 4.6% do total</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Ticket médio</div>
+          <div class="kpi-num">R$ 2.847</div>
+          <div class="kpi-delta">por formando · pacote médio</div>
+        </div>
+      </div>
+
+      <!-- Gráfico de recebimento mensal -->
+      <div class="grafico-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3>Recebimento mensal · 2026</h3>
+          <select style="padding: 6px 12px; border: 1px solid var(--neutro-200); border-radius: var(--r-sm); font-size: 13px;">
+            <option>Últimos 12 meses</option>
+            <option>2026</option>
+            <option>2025</option>
+          </select>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-col"><div class="bar recebido" style="height: 35%;"><div class="bar-value">R$ 31k</div></div><div class="bar-label">Jan</div></div>
+          <div class="bar-col"><div class="bar recebido" style="height: 42%;"><div class="bar-value">R$ 38k</div></div><div class="bar-label">Fev</div></div>
+          <div class="bar-col"><div class="bar recebido" style="height: 48%;"><div class="bar-value">R$ 43k</div></div><div class="bar-label">Mar</div></div>
+          <div class="bar-col"><div class="bar recebido" style="height: 70%;"><div class="bar-value">R$ 62k</div></div><div class="bar-label">Abr</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 75%;"><div class="bar-value">R$ 68k</div></div><div class="bar-label">Mai</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 92%;"><div class="bar-value">R$ 84k</div></div><div class="bar-label">Jun</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 65%;"><div class="bar-value">R$ 58k</div></div><div class="bar-label">Jul</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 45%;"><div class="bar-value">R$ 41k</div></div><div class="bar-label">Ago</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 38%;"><div class="bar-value">R$ 34k</div></div><div class="bar-label">Set</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 28%;"><div class="bar-value">R$ 25k</div></div><div class="bar-label">Out</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 22%;"><div class="bar-value">R$ 19k</div></div><div class="bar-label">Nov</div></div>
+          <div class="bar-col"><div class="bar previsto" style="height: 18%;"><div class="bar-value">R$ 16k</div></div><div class="bar-label">Dez</div></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot" style="background: var(--sucesso);"></span> Recebido</div>
+          <div class="legend-item"><span class="legend-dot" style="background: var(--neutro-500);"></span> Previsto</div>
+        </div>
+      </div>
+
+      <!-- Tabela de cobranças -->
+      <div class="flex gap-3 mb-4">
+        <input type="text" placeholder="Buscar por nome do formando..." style="flex:1; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;" />
+        <select style="padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;">
+          <option>Todos status</option>
+          <option>Pago</option>
+          <option>Em aberto</option>
+          <option>Atrasado</option>
+        </select>
+        <select style="padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;">
+          <option>Todas turmas</option>
+          <option>Enfermagem FIP</option>
+          <option>Direito Funorte</option>
+        </select>
+      </div>
+
+      <div class="panel" style="background: white; border: 1px solid var(--neutro-200); border-radius: var(--r-md); overflow: hidden;">
+        <div style="padding: 14px 20px; background: var(--neutro-50); display: grid; grid-template-columns: 40px 1fr 120px 120px 100px 80px 100px; gap: 16px; font-size: 11px; font-weight: 700; color: var(--neutro-600); text-transform: uppercase; letter-spacing: 0.04em;">
+          <div></div>
+          <div>Formando · Turma</div>
+          <div>Vencimento</div>
+          <div>Valor</div>
+          <div>Parcela</div>
+          <div>Método</div>
+          <div>Status</div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">PS</div>
+          <div>
+            <div class="nome">Pedro Henrique Silva</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Ouro</div>
+          </div>
+          <div>
+            <div>10 abr · há 18 dias</div>
+            <div style="font-size: 11px; color: var(--erro); font-weight: 600; margin-top: 2px;">ATRASADO</div>
+          </div>
+          <div class="valor error">R$ 333,33</div>
+          <div>4 de 12</div>
+          <div class="text-xs">Boleto</div>
+          <div><span class="cobranca-status badge-error">Atrasado</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">MS</div>
+          <div>
+            <div class="nome">Marina Souza Lima</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Ouro</div>
+          </div>
+          <div>10 mai · em 12 dias</div>
+          <div class="valor">R$ 333,33</div>
+          <div>4 de 12</div>
+          <div class="text-xs">Pix</div>
+          <div><span class="cobranca-status badge-info">Em aberto</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">CR</div>
+          <div>
+            <div class="nome">Camila Rocha Mendes</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Prata</div>
+          </div>
+          <div>09 abr</div>
+          <div class="valor success">R$ 208,33</div>
+          <div>9 de 12</div>
+          <div class="text-xs">Pix</div>
+          <div><span class="cobranca-status badge-success">Pago</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">LA</div>
+          <div>
+            <div class="nome">Lucas Andrade Costa</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Ouro · Comissão</div>
+          </div>
+          <div>—</div>
+          <div class="valor success">R$ 4.000,00</div>
+          <div>Quitado</div>
+          <div class="text-xs">Cartão 12x</div>
+          <div><span class="cobranca-status badge-success">Pago integral</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">AT</div>
+          <div>
+            <div class="nome">Anderson Teixeira Lima</div>
+            <div class="info">Direito Funorte 2026/1 · Pacote Bronze</div>
+          </div>
+          <div>
+            <div>05 abr · há 23 dias</div>
+            <div style="font-size: 11px; color: var(--erro); font-weight: 600; margin-top: 2px;">ATRASADO</div>
+          </div>
+          <div class="valor error">R$ 125,00</div>
+          <div>3 de 12</div>
+          <div class="text-xs">Boleto</div>
+          <div><span class="cobranca-status badge-error">Atrasado</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">JM</div>
+          <div>
+            <div class="nome">Juliana Martins Santos</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Ouro</div>
+          </div>
+          <div>10 mai · em 12 dias</div>
+          <div class="valor">R$ 333,33</div>
+          <div>9 de 12</div>
+          <div class="text-xs">Cartão</div>
+          <div><span class="cobranca-status badge-info">Em aberto</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">RF</div>
+          <div>
+            <div class="nome">Rafael Ferraz Oliveira</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Bronze</div>
+          </div>
+          <div>15 abr</div>
+          <div class="valor success">R$ 125,00</div>
+          <div>8 de 12</div>
+          <div class="text-xs">Pix</div>
+          <div><span class="cobranca-status badge-success">Pago</span></div>
+        </div>
+
+        <div class="cobranca-row">
+          <div class="avatar">BL</div>
+          <div>
+            <div class="nome">Bruna Lopes Carneiro</div>
+            <div class="info">Enfermagem FIP 2026/2 · Pacote Prata</div>
+          </div>
+          <div>10 mai · em 12 dias</div>
+          <div class="valor">R$ 208,33</div>
+          <div>9 de 12</div>
+          <div class="text-xs">Pix</div>
+          <div><span class="cobranca-status badge-info">Em aberto</span></div>
+        </div>
+
+        <div style="padding: 14px 20px; background: var(--neutro-50); text-align: center;">
+          <button class="btn btn-ghost text-sm">Ver mais 179 cobranças</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<a href="dashboard.html" class="proto-tag">← Voltar ao dashboard</a>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>MEDICINA T85 — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
+.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
+.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <div class="sidebar-section">Geral</div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link active"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
+  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
+  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex gap-2"><button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Mensagem em massa</button><button class="btn btn-primary btn-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar turma</button></div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);margin-bottom:8px;">
+      <a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> /
+      <a href="turmas.html" style="color:inherit;text-decoration:none;">Turmas</a> /
+      <span style="color:var(--gray-700);">MEDICINA T85 - UNIMONTES</span>
+    </div>
+
+    <div class="card mb-6" style="background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 100%);color:white;border:none;">
+      <div class="card-body" style="padding:28px;">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="badge" style="background:rgba(255,255,255,.18);color:white;font-weight:600;">UNIMONTES · Medicina</span>
+            <h1 class="text-3xl font-bold mt-3" style="letter-spacing:-0.02em;">MEDICINA T85</h1>
+            <p style="opacity:.85;font-size:14px;margin-top:4px;">Turno noturno · Previsão de formatura: <strong>Jul/2026</strong></p>
+            <div class="flex gap-6 mt-4" style="font-size:13px;">
+              <div><span style="opacity:.7;">Vendedor:</span> <strong>RAFAEL CARVALHO</strong></div>
+              <div><span style="opacity:.7;">Comissão da turma:</span> <strong>4 representantes</strong></div>
+              <div><span style="opacity:.7;">Cor da beca:</span> <strong style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:3px;background:#1E3A8A;border:1px solid white;"></span>AZUL</strong></div>
+            </div>
+          </div>
+          <div class="flex gap-4 text-center">
+            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Alunos</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">20</div></div>
+            <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Vl. Contrato</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">R$ 61K</div></div>
+            <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Eventos</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">13</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <a href="#" class="tab active" data-tab="visao">Visão geral</a>
+      <a href="#" class="tab" data-tab="alunos">Alunos (20)</a>
+      <a href="#" class="tab" data-tab="eventos">Eventos (13)</a>
+      <a href="#" class="tab" data-tab="brindes">Brindes (60)</a>
+      <a href="#" class="tab" data-tab="contratos">Contratos</a>
+      <a href="#" class="tab" data-tab="cerimonial">Cerimonial</a>
+      <a href="#" class="tab" data-tab="os">OS (8)</a>
+      <a href="#" class="tab" data-tab="galerias">Galerias (3)</a>
+      <a href="#" class="tab" data-tab="historico">Histórico</a>
+    </div>
+
+    <div data-tab-panel="visao" class="grid gap-6" style="grid-template-columns: 2fr 1fr;">
+      <div>
+        <!-- Eventos contratados -->
+        <div class="card mb-6">
+          <div class="card-header"><div class="card-title">Eventos contratados</div><button class="btn btn-secondary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>
+          <table class="table">
+            <thead><tr><th>Evento</th><th>Data prevista</th><th>Local</th><th>Status</th><th>Fotos editadas</th></tr></thead>
+            <tbody>
+              <tr><td><strong>FOTO CONVITE INTERNO E EXTERNO</strong><div style="font-size:12px;color:var(--gray-500);">10 fotos editadas inclusas</div></td><td>14/03/2026</td><td>Estúdio Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>10/10</td></tr>
+              <tr><td><strong>FOTOS FAMÍLIA</strong> (5 familiares)</td><td>14/03/2026</td><td>Estúdio Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>20/20</td></tr>
+              <tr><td><strong>FESTA DE 100 DIAS</strong></td><td>22/04/2026</td><td>Espaço Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>—</td></tr>
+              <tr><td><strong>BAILE + AFTER (40 fotos editadas)</strong></td><td>03/05/2026</td><td>Espaço Ventus</td><td><span class="badge badge-info">Confirmado</span></td><td>0/40</td></tr>
+              <tr><td><strong>POSICIONAMENTO DE IMAGEM</strong></td><td>10/06/2026</td><td>Estúdio Ventus</td><td><span class="badge">Planejado</span></td><td>—</td></tr>
+              <tr><td><strong>COLAÇÃO OFICIAL (30 fotos editadas)</strong></td><td>15/07/2026</td><td>Auditório UNIMONTES</td><td><span class="badge">Planejado</span></td><td>0/30</td></tr>
+              <tr><td><strong>COLAÇÃO SIMBÓLICA (35 fotos editadas)</strong></td><td>15/07/2026</td><td>Auditório UNIMONTES</td><td><span class="badge">Planejado</span></td><td>0/35</td></tr>
+              <tr><td><strong>CULTO ECUMÊNICO (20 fotos editadas)</strong></td><td>16/07/2026</td><td>Igreja Matriz</td><td><span class="badge">Planejado</span></td><td>0/20</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Financeiro resumo -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Financeiro</div><a href="financeiro.html" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver detalhes →</a></div>
+          <div class="card-body">
+            <div class="grid grid-cols-3 gap-4">
+              <div><div style="font-size:12px;color:var(--gray-500);">Vl. Total contratado</div><div style="font-size:22px;font-weight:700;margin-top:2px;">R$ 61.252,99</div></div>
+              <div><div style="font-size:12px;color:var(--gray-500);">Recebido</div><div style="font-size:22px;font-weight:700;margin-top:2px;color:var(--success);">R$ 42.870,00</div><div style="font-size:11px;color:var(--gray-500);">70%</div></div>
+              <div><div style="font-size:12px;color:var(--gray-500);">A receber</div><div style="font-size:22px;font-weight:700;margin-top:2px;">R$ 18.382,99</div><div style="font-size:11px;color:var(--warning);">3 atrasadas</div></div>
+            </div>
+            <div style="height:8px;background:var(--gray-100);border-radius:4px;margin-top:16px;overflow:hidden;">
+              <div style="width:70%;height:100%;background:var(--success);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Comissão da turma -->
+        <div class="card mb-4">
+          <div class="card-header"><div class="card-title">Comissão da turma</div></div>
+          <div class="card-body" style="padding:12px 0;">
+            <div style="display:flex;flex-direction:column;">
+              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">CA</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Camila Almeida</div><div style="font-size:12px;color:var(--gray-500);">Presidente · (38) 99863-1234</div></div></div>
+              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">PH</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Pedro Henrique</div><div style="font-size:12px;color:var(--gray-500);">Tesoureiro</div></div></div>
+              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">JR</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Júlia Ribeiro</div><div style="font-size:12px;color:var(--gray-500);">Secretária</div></div></div>
+              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">RM</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Tiago Moreira Mendes</div><div style="font-size:12px;color:var(--gray-500);">Comunicação</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brindes (resumo) -->
+        <div class="card mb-4">
+          <div class="card-header"><div class="card-title">Brindes</div><span class="badge badge-warning">12 pendentes</span></div>
+          <div class="card-body" style="padding:14px 22px;">
+            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Álbum "Memórias" 21x30cm</span><strong>20</strong></div>
+            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Link em nuvem</span><strong>20</strong></div>
+            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Encartes personalizados</span><strong>20</strong></div>
+          </div>
+        </div>
+
+        <!-- Próximos compromissos -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Próximos compromissos</div></div>
+          <div class="card-body" style="padding:14px 22px;">
+            <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
+              <div style="font-size:13px;font-weight:600;">Aprovar fotos do FOTO CONVITE</div>
+              <div style="font-size:12px;color:var(--gray-500);">Vence em 2 dias · OS #0142</div>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
+              <div style="font-size:13px;font-weight:600;">Liberar pacote de seleção</div>
+              <div style="font-size:12px;color:var(--gray-500);">Vence em 5 dias</div>
+            </div>
+            <div style="padding:8px 0;">
+              <div style="font-size:13px;font-weight:600;">Fechar lista de convidados (BAILE)</div>
+              <div style="font-size:12px;color:var(--gray-500);">Vence em 12 dias</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

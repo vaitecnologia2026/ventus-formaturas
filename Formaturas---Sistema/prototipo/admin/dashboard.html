@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard · Ventus Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  .funil {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .funil-step {
+    background: white;
+    padding: 20px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--neutro-200);
+    position: relative;
+  }
+  .funil-step.active {
+    border-color: var(--azul-600);
+    box-shadow: 0 0 0 2px var(--azul-100);
+  }
+  .funil-step .step-num {
+    position: absolute; top: -10px; left: 16px;
+    background: var(--azul-700); color: white;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .funil-step .step-name {
+    font-size: 12px;
+    color: var(--neutro-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .funil-step .step-num-big {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .funil-step .step-detail {
+    font-size: 12px;
+    color: var(--neutro-500);
+    margin-top: 4px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+
+  .panel {
+    background: white;
+    border-radius: var(--r-md);
+    border: 1px solid var(--neutro-200);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--neutro-200);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .panel-header h3 { font-size: 14px; font-weight: 700; }
+  .panel-header .filter {
+    font-size: 12px;
+    color: var(--azul-700);
+    font-weight: 600;
+  }
+
+  .turma-row {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--neutro-100);
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+    transition: background .15s;
+  }
+  .turma-row:hover { background: var(--neutro-50); cursor: pointer; }
+  .turma-row:last-child { border-bottom: none; }
+  .turma-name { font-weight: 600; }
+  .turma-info { font-size: 11px; color: var(--neutro-500); margin-top: 2px; }
+  .turma-progress { width: 120px; }
+  .turma-status { font-weight: 600; }
+
+  .alert-list { padding: 8px 0; }
+  .alert-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--neutro-100);
+    display: flex; gap: 12px;
+    font-size: 13px;
+  }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-item .ico {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--aviso-bg);
+    color: var(--aviso);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .alert-item.danger .ico { background: var(--erro-bg); color: var(--erro); }
+  .alert-item.info .ico { background: var(--azul-50); color: var(--azul-700); }
+  .alert-item .alert-title { font-weight: 600; }
+  .alert-item .alert-time { font-size: 11px; color: var(--neutro-400); margin-top: 2px; }
+
+  @media (max-width: 1100px) {
+    .funil { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo"><span class="logo-mark">V</span> Ventus</div>
+    <div class="nav-section">Operação</div>
+    <nav class="admin-nav">
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="turma.html">Turmas</a>
+      <a href="eventos.html">Eventos</a>
+      <a href="#">Convidados</a>
+    </nav>
+    <div class="nav-section">Produção</div>
+    <nav class="admin-nav">
+      <a href="galerias.html">Galerias</a>
+      <a href="#">Fila de edição</a>
+      <a href="#">Entregas</a>
+    </nav>
+    <div class="nav-section">Financeiro</div>
+    <nav class="admin-nav">
+      <a href="financeiro.html">Recebimentos</a>
+      <a href="#">Contratos</a>
+      <a href="#">Relatórios</a>
+    </nav>
+    <div class="nav-section">Configurações</div>
+    <nav class="admin-nav">
+      <a href="pacotes.html">Pacotes</a>
+      <a href="#">Branding</a>
+      <a href="#">Equipe</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="crumb">Início / <b>Dashboard</b></div>
+      <div class="flex gap-3 items-center">
+        <button class="btn btn-ghost text-sm">🔍 Buscar</button>
+        <span class="avatar">EP</span>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <h1>Olá, Elison 👋</h1>
+      <p class="lead">5 turmas ativas · 187 formandos · 3 eventos nos próximos 30 dias</p>
+
+      <!-- KPIs principais -->
+      <div class="kpi-row">
+        <div class="kpi highlight">
+          <div class="kpi-label">Receita prevista (mês)</div>
+          <div class="kpi-num">R$ 62.450</div>
+          <div class="kpi-delta up" style="color: rgba(255,255,255,0.9);">↑ 18% vs mês anterior</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">A receber</div>
+          <div class="kpi-num">R$ 184.330</div>
+          <div class="kpi-delta">de 187 formandos · 12 inadimplentes</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Fotos pendentes</div>
+          <div class="kpi-num">347</div>
+          <div class="kpi-delta down">9 alunos aguardando edição</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">NPS pós-entrega</div>
+          <div class="kpi-num">82</div>
+          <div class="kpi-delta up">↑ 6 pontos</div>
+        </div>
+      </div>
+
+      <!-- Funil de produção fotográfica -->
+      <h2 style="font-size: 18px; font-weight: 700; margin: 32px 0 16px;">Funil de produção fotográfica · Tempo real</h2>
+      <div class="funil">
+        <div class="funil-step">
+          <div class="step-num">1</div>
+          <div class="step-name">Upload</div>
+          <div class="step-num-big">1.247</div>
+          <div class="step-detail">fotos uploadadas</div>
+        </div>
+        <div class="funil-step">
+          <div class="step-num">2</div>
+          <div class="step-name">IA processou</div>
+          <div class="step-num-big">1.247</div>
+          <div class="step-detail">100% face match</div>
+        </div>
+        <div class="funil-step active">
+          <div class="step-num">3</div>
+          <div class="step-name">Selecionadas</div>
+          <div class="step-num-big">412</div>
+          <div class="step-detail">por 23 alunos</div>
+        </div>
+        <div class="funil-step">
+          <div class="step-num">4</div>
+          <div class="step-name">Em edição</div>
+          <div class="step-num-big">347</div>
+          <div class="step-detail">9 alunos · ~3 dias</div>
+        </div>
+        <div class="funil-step">
+          <div class="step-num">5</div>
+          <div class="step-name">Entregues</div>
+          <div class="step-num-big">488</div>
+          <div class="step-detail">14 alunos via WhatsApp</div>
+        </div>
+      </div>
+
+      <!-- Conteúdo principal -->
+      <div class="grid-2">
+
+        <!-- Turmas ativas -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Turmas ativas</h3>
+            <a href="turma.html" class="filter">Ver todas →</a>
+          </div>
+
+          <div class="turma-row">
+            <div>
+              <div class="turma-name">Enfermagem FIP — 2026/2</div>
+              <div class="turma-info">42 formandos · Colação em 15 jun</div>
+            </div>
+            <div class="turma-progress">
+              <div class="text-xs text-muted">68% pago</div>
+              <div class="progress mt-2"><div class="progress-bar" style="width:68%"></div></div>
+            </div>
+            <div class="text-xs"><span class="badge badge-info">📸 Em produção</span></div>
+            <div>→</div>
+          </div>
+
+          <div class="turma-row">
+            <div>
+              <div class="turma-name">Direito Funorte — 2026/1</div>
+              <div class="turma-info">38 formandos · Colação em 22 jun</div>
+            </div>
+            <div class="turma-progress">
+              <div class="text-xs text-muted">82% pago</div>
+              <div class="progress mt-2"><div class="progress-bar success" style="width:82%"></div></div>
+            </div>
+            <div class="text-xs"><span class="badge badge-success">✓ Em dia</span></div>
+            <div>→</div>
+          </div>
+
+          <div class="turma-row">
+            <div>
+              <div class="turma-name">Fisioterapia UNIFIPMOC — 2026/2</div>
+              <div class="turma-info">31 formandos · Colação em 08 jul</div>
+            </div>
+            <div class="turma-progress">
+              <div class="text-xs text-muted">45% pago</div>
+              <div class="progress mt-2"><div class="progress-bar warn" style="width:45%"></div></div>
+            </div>
+            <div class="text-xs"><span class="badge badge-warn">⚠️ 5 atrasos</span></div>
+            <div>→</div>
+          </div>
+
+          <div class="turma-row">
+            <div>
+              <div class="turma-name">Estética FIP — 2026/2</div>
+              <div class="turma-info">28 formandos · Colação em 14 ago</div>
+            </div>
+            <div class="turma-progress">
+              <div class="text-xs text-muted">31% pago</div>
+              <div class="progress mt-2"><div class="progress-bar warn" style="width:31%"></div></div>
+            </div>
+            <div class="text-xs"><span class="badge badge-info">📋 Captação</span></div>
+            <div>→</div>
+          </div>
+
+          <div class="turma-row">
+            <div>
+              <div class="turma-name">Contabilidade FIP — 2026/1</div>
+              <div class="turma-info">48 formandos · Encerrada em mar</div>
+            </div>
+            <div class="turma-progress">
+              <div class="text-xs text-muted">100% entregue</div>
+              <div class="progress mt-2"><div class="progress-bar success" style="width:100%"></div></div>
+            </div>
+            <div class="text-xs"><span class="badge badge-success">✓ Concluída</span></div>
+            <div>→</div>
+          </div>
+        </div>
+
+        <!-- Alertas e ações -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Alertas e ações</h3>
+            <span class="badge badge-warn">3 novos</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item danger">
+              <div class="ico">!</div>
+              <div>
+                <div class="alert-title">5 alunos com parcela atrasada</div>
+                <div class="alert-time">Fisio UNIFIPMOC · há 2h</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="ico">⏱</div>
+              <div>
+                <div class="alert-title">Pacote de edição em D+5 sem ação</div>
+                <div class="alert-time">3 alunos · revisar com editor</div>
+              </div>
+            </div>
+            <div class="alert-item info">
+              <div class="ico">i</div>
+              <div>
+                <div class="alert-title">Nova turma cadastrada</div>
+                <div class="alert-time">Estética FIP · há 6h</div>
+              </div>
+            </div>
+            <div class="alert-item info">
+              <div class="ico">📸</div>
+              <div>
+                <div class="alert-title">Galeria liberada para 14 alunos</div>
+                <div class="alert-time">Direito Funorte · há 1 dia</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="ico">💬</div>
+              <div>
+                <div class="alert-title">Campanha D-30 disparou</div>
+                <div class="alert-time">42 mensagens · 38 entregues</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

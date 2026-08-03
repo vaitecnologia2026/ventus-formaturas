@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resumo Executivo — Ventus Formaturas</title>
+<meta name="description" content="Resumo executivo da plataforma Ventus Formaturas: diagnóstico, proposta, 4 módulos, roadmap e investimento.">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --azul-900: #0A1430;
+    --azul-700: #1E3A8A;
+    --azul-600: #2563EB;
+    --azul-100: #DBEAFE;
+    --azul-50:  #EFF6FF;
+    --bege:     #FAF7F2;
+    --dourado:  #D4AF37;
+    --neutro-200: #E2E8F0;
+    --neutro-300: #CBD5E1;
+    --neutro-400: #94A3B8;
+    --neutro-500: #64748B;
+    --neutro-600: #475569;
+    --neutro-700: #334155;
+    --neutro-800: #1E293B;
+    --neutro-900: #0F172A;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  body {
+    font-family: var(--sans);
+    color: var(--neutro-900);
+    background: var(--bege);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 48px 64px;
+    background: white;
+    box-shadow: 0 24px 60px rgba(15,31,79,0.10);
+    margin-top: 32px;
+    margin-bottom: 32px;
+    border-radius: 16px;
+  }
+  .ribbon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--neutro-200);
+    margin-bottom: 36px;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--neutro-500);
+    font-weight: 600;
+  }
+  .ribbon .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--azul-700);
+  }
+  .ribbon .brand-mark {
+    width: 32px; height: 32px;
+    background: var(--azul-700);
+    color: white;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--azul-900);
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+  h1 em { font-style: italic; color: var(--dourado); font-weight: 700; }
+  .lede {
+    font-size: 18px;
+    color: var(--neutro-600);
+    max-width: 720px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    background: var(--azul-900);
+    color: white;
+    border-radius: 14px;
+    padding: 24px 32px;
+    margin-bottom: 48px;
+    overflow: hidden;
+  }
+  .stat-row > div { padding: 8px 16px; border-right: 1px solid rgba(255,255,255,.12); }
+  .stat-row > div:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.65; margin-top: 8px; }
+  h2 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--azul-900);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .section { margin-bottom: 44px; }
+  .section-eyebrow {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--dourado); font-weight: 700; margin-bottom: 8px;
+  }
+  .section p { font-size: 15px; color: var(--neutro-700); margin-bottom: 12px; max-width: 860px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card {
+    border: 1px solid var(--neutro-200);
+    border-radius: 12px;
+    padding: 22px 22px 24px;
+    background: white;
+  }
+  .card-num {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--azul-50); color: var(--azul-700);
+    display: grid; place-items: center;
+    font-family: var(--serif); font-size: 18px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .card h3 { font-size: 15px; font-weight: 700; color: var(--azul-900); margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--neutro-600); line-height: 1.55; margin: 0; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--neutro-200);
+  }
+  .timeline > div {
+    padding: 16px 14px;
+    background: white;
+    border-right: 1px solid var(--neutro-200);
+    position: relative;
+  }
+  .timeline > div:last-child { border-right: none; }
+  .timeline > div:nth-child(odd) { background: var(--bege); }
+  .tl-week { font-size: 11px; letter-spacing: 0.1em; color: var(--dourado); text-transform: uppercase; font-weight: 700; }
+  .tl-title { font-size: 13px; font-weight: 700; color: var(--azul-900); margin: 4px 0 4px; }
+  .tl-desc { font-size: 11.5px; color: var(--neutro-600); line-height: 1.45; }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+    border: 1px solid var(--neutro-200);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    font-size: 13.5px;
+  }
+  .compare > div {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--neutro-200);
+  }
+  .compare > div:nth-last-child(-n+3) { border-bottom: none; }
+  .compare .head {
+    background: var(--azul-900);
+    color: white;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+  .compare .row-label {
+    background: var(--bege);
+    font-weight: 700;
+    color: var(--azul-900);
+  }
+  .compare .col-then { color: var(--neutro-600); border-left: 1px solid var(--neutro-200); }
+  .compare .col-now {
+    background: var(--azul-50);
+    color: var(--azul-900);
+    font-weight: 600;
+    border-left: 1px solid var(--neutro-200);
+  }
+
+  .pricetag {
+    background: linear-gradient(135deg, var(--azul-900) 0%, var(--azul-700) 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+  }
+  .pricetag h3 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pricetag p { font-size: 13.5px; opacity: 0.78; max-width: 480px; line-height: 1.5; margin: 0; }
+  .pricetag .num {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .pricetag .num small { font-size: 13px; font-weight: 500; opacity: 0.7; display: block; margin-top: 4px; letter-spacing: 0; }
+
+  .footer-cta {
+    margin-top: 36px;
+    padding: 22px 28px;
+    border-top: 2px solid var(--dourado);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .footer-cta .why {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--azul-900);
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 600px;
+  }
+  .footer-cta .next {
+    background: var(--azul-700);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .footer-cta .next:hover { background: var(--azul-600); }
+
+  .meta-foot {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--neutro-200);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--neutro-400);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 880px) {
+    .page { padding: 40px 24px 48px; margin: 16px; }
+    h1 { font-size: 36px; }
+    .stat-row { grid-template-columns: repeat(2,1fr); }
+    .stat-row > div { border-right: none; border-bottom: 1px solid rgba(255,255,255,.12); padding: 12px; }
+    .stat-row > div:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.12); }
+    .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .timeline > div { border-right: 1px solid var(--neutro-200) !important; border-bottom: 1px solid var(--neutro-200); }
+    .compare { grid-template-columns: 1fr; font-size: 12.5px; }
+    .compare > div { border-bottom: 1px solid var(--neutro-200); }
+    .pricetag { flex-direction: column; align-items: flex-start; }
+    .footer-cta { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; margin: 0; max-width: none; padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="ribbon">
+    <span class="brand"><span class="brand-mark">V</span> Ventus Formaturas</span>
+    <span>Resumo Executivo · Maio 2026</span>
+  </div>
+
+  <h1>Uma plataforma. <em>Quatro módulos.</em><br>Seis meses até a primeira formatura no novo sistema.</h1>
+
+  <p class="lede">A Ventus opera há ~10 anos sobre um sistema PHP que sustenta R$ 1,76 milhão em contratos, mas hoje toda a experiência voltada ao formando vive fora dele — em planilhas, Drive, WhatsApp manual e até quatro outras ferramentas. Esta proposta substitui essa colcha por <strong>uma plataforma única white-label</strong> que vai do contrato à entrega das fotos editadas, sem perder uma linha do CRM operacional atual.</p>
+
+  <div class="stat-row">
+    <div><div class="stat-num">1.924</div><div class="stat-label">Alunos ativos</div></div>
+    <div><div class="stat-num">123</div><div class="stat-label">Turmas em produção</div></div>
+    <div><div class="stat-num">990</div><div class="stat-label">Ordens de serviço</div></div>
+    <div><div class="stat-num">726</div><div class="stat-label">Eventos no histórico</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">O diagnóstico</div>
+    <h2>O sistema atual cobre só metade do trabalho.</h2>
+    <p>O legado em CodeIgniter (~10 anos, Bootstrap 3, jQuery 1.7+2.1, Ace Admin descontinuado) faz o CRM administrativo bem: cadastros, contratos, ordens de serviço, brindes, NFe. Mas todo lado que toca o formando — pagamento online, divulgação, RSVP, check-in, galeria de fotos, entrega via WhatsApp — roda fora do sistema, em ferramentas separadas que não se comunicam. Essa fragmentação cria 4 a 6 pontos de fricção por aluno, por evento.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">A proposta</div>
+    <h2>Os 4 módulos que faltam, integrados ao que já funciona.</h2>
+    <div class="grid-4" style="margin-top:18px;">
+      <div class="card">
+        <div class="card-num">1</div>
+        <h3>Vendas e Pagamento</h3>
+        <p>Contrato digital, pagamento online via Pix, boleto ou cartão até 21x, lembretes automáticos por WhatsApp em D-7, D-0 e D+3.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">2</div>
+        <h3>Divulgação e Convidados</h3>
+        <p>Página pública da turma com countdown, lista de convidados por formando, RSVP por token único — sem login pro convidado.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">3</div>
+        <h3>Controle de Acesso</h3>
+        <p>Quiosque com leitura de QR e impressão de pulseira nominal Zebra na hora. Painel ao vivo. Seis categorias de pulseira.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">4</div>
+        <h3>Fotografia + WhatsApp</h3>
+        <p>Reconhecimento facial filtra a galeria por aluno. Créditos de seleção, fila do editor, entrega final via WhatsApp automatizado.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">O que muda no dia-a-dia</div>
+    <h2>Antes e depois, na prática.</h2>
+    <div class="compare" style="margin-top:18px;">
+      <div class="head"></div>
+      <div class="head">Hoje</div>
+      <div class="head">Com a plataforma</div>
+
+      <div class="row-label">Aluno paga</div>
+      <div class="col-then">Boleto físico, espera 3 dias úteis, secretaria reconcilia em planilha.</div>
+      <div class="col-now">Pix em 2 cliques no app, confirmação em segundos, sistema baixa automaticamente.</div>
+
+      <div class="row-label">Convidado entra</div>
+      <div class="col-then">Lista impressa, portaria confere nome, fila demora.</div>
+      <div class="col-now">QR scan em &lt;1s, pulseira nominal impressa em 3s, painel ao vivo.</div>
+
+      <div class="row-label">Formando vê foto</div>
+      <div class="col-then">Drive com 4.000 fotos da turma. Aluno garimpa as próprias.</div>
+      <div class="col-now">App abre só as fotos com o rosto dele. Seleciona, finaliza, recebe editadas.</div>
+
+      <div class="row-label">Comissão cobra</div>
+      <div class="col-then">Mensagem manual no WhatsApp, sem trilho. Falta de pagamento gera atrito.</div>
+      <div class="col-now">Painel de adimplência por turma, lembrete automático anônimo, comissão só aprova.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">Roadmap</div>
+    <h2>Seis meses, em fases que entregam valor a cada bloco.</h2>
+    <div class="timeline" style="margin-top:18px;">
+      <div>
+        <div class="tl-week">Sem 1-5</div>
+        <div class="tl-title">Fundação + CRM</div>
+        <div class="tl-desc">Monorepo, design system, paridade total com o legado: cadastros, OS, dashboard.</div>
+      </div>
+      <div>
+        <div class="tl-week">Sem 6-8</div>
+        <div class="tl-title">OS + Migração</div>
+        <div class="tl-desc">Kanban operacional. ETL puxa todos os 1.924 alunos e 990 OS pro banco novo.</div>
+      </div>
+      <div>
+        <div class="tl-week">Sem 9-12</div>
+        <div class="tl-title">Vendas + Pagamento</div>
+        <div class="tl-desc">Asaas, ZapSign, lembretes WhatsApp, portal do formando.</div>
+      </div>
+      <div>
+        <div class="tl-week">Sem 13-16</div>
+        <div class="tl-title">Fotografia</div>
+        <div class="tl-desc">Reconhecimento facial, fila do editor, entrega automatizada.</div>
+      </div>
+      <div>
+        <div class="tl-week">Sem 17-20</div>
+        <div class="tl-title">Convidados + Acesso</div>
+        <div class="tl-desc">RSVP, check-in QR, impressão de pulseira Zebra ao vivo.</div>
+      </div>
+      <div>
+        <div class="tl-week">Sem 21-24</div>
+        <div class="tl-title">Piloto + Cutover</div>
+        <div class="tl-desc">Migração turma por turma. Legado fica read-only durante a transição.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">Investimento operacional</div>
+    <div class="pricetag">
+      <div>
+        <h3>Custo mensal de infra estimado</h3>
+        <p>Vercel + Railway + Supabase + Cloudflare R2 + Z-API + Asaas + AWS Rekognition. Escala com volume — começa pequeno e cresce com a Ventus.</p>
+      </div>
+      <div class="num" style="text-align:right;">R$ 400 – 1.000<small>por mês, infra incluída</small></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-eyebrow">Garantia</div>
+    <h2>Nada do que você tem hoje será perdido.</h2>
+    <p>Cada uma das 32 telas do sistema atual foi mapeada e tem destino no novo: 24 mantidas, 7 melhoradas, 1 expandida. O CRM operacional, OS, NFe, mensageria, modelos e relatórios continuam — só ganham mobile-first, busca global, RBAC granular, auditoria e LGPD que o legado não cobre. A migração é por turma (não Big Bang), com o legado em modo somente-leitura durante a transição.</p>
+  </div>
+
+  <div class="footer-cta">
+    <div class="why">Próximo passo: piloto na próxima formatura. Uma turma, um evento, três meses para validar — antes de migrar o resto.</div>
+    <a href="deck.html" class="next">Ver apresentação completa →</a>
+  </div>
+
+  <div class="meta-foot">
+    <span>Ventus Produtora · Montes Claros / MG</span>
+    <span>Gerado a partir das ETAPAs 1-6 · 04/05/2026</span>
+  </div>
+
+</div>
+
+</body>
+</html>

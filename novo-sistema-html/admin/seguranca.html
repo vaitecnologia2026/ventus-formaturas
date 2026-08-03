@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Segurança — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
+.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
+.tab:hover { color:var(--gray-700); }
+.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
+.session-row { display:flex; gap:14px; padding:14px; border:1px solid var(--gray-200); border-radius:10px; align-items:center; }
+.dot-status { width:10px; height:10px; border-radius:50%; }
+.dot-status.online { background:#16A34A; box-shadow:0 0 0 3px rgba(22,163,74,.18); }
+.dot-status.idle { background:#F59E0B; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar log, usuário, IP…"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar logs</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="shield-check" class="w-4 h-4"></i> Auditoria completa</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Sistema / Segurança</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Segurança & Compliance</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Logs de auditoria · sessões ativas · LGPD · backup automático</p>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="shield-check" class="w-5 h-5"></i></div><div class="kpi-label">Status sistema</div><div class="kpi-value" style="font-size:20px;">SEGURO</div><div class="kpi-trend up">0 incidentes 30d</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="users" class="w-5 h-5"></i></div><div class="kpi-label">Sessões ativas</div><div class="kpi-value">8</div><div class="kpi-trend" style="color:var(--gray-500);">3 admin · 5 op</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="key-round" class="w-5 h-5"></i></div><div class="kpi-label">2FA habilitado</div><div class="kpi-value">94%</div><div class="kpi-trend up">17 de 18 usuários</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="hard-drive" class="w-5 h-5"></i></div><div class="kpi-label">Último backup</div><div class="kpi-value" style="font-size:20px;">há 2h</div><div class="kpi-trend up">automático · S3</div></div>
+    </div>
+
+    <div class="tabs">
+      <a href="#" class="tab active" data-tab="logs">Logs de auditoria</a>
+      <a href="#" class="tab" data-tab="sessoes">Sessões ativas (8)</a>
+      <a href="#" class="tab" data-tab="lgpd">LGPD</a>
+      <a href="#" class="tab" data-tab="backup">Backup & restauração</a>
+    </div>
+
+    <div data-tab-panel="logs">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Logs de auditoria (últimas 24h)</div>
+          <div class="flex gap-2">
+            <select class="select" style="width:120px;font-size:13px;padding:6px 10px;"><option>Todos</option><option>Login</option><option>Edit</option><option>Delete</option><option>Export</option></select>
+          </div>
+        </div>
+        <table class="table">
+          <thead><tr><th>Quando</th><th>Usuário</th><th>Ação</th><th>IP</th></tr></thead>
+          <tbody>
+            <tr><td>há 2min</td><td><strong>Bruno Sena</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso admin</td><td class="num">177.9.x.42</td></tr>
+            <tr><td>há 14min</td><td><strong>Elison Perini</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">EDIT</span> Tabela de preços</td><td class="num">177.9.x.18</td></tr>
+            <tr><td>há 32min</td><td><strong>Debora D.</strong></td><td><span class="badge badge-warning">EXPORT</span> Financeiro CSV</td><td class="num">177.9.x.74</td></tr>
+            <tr><td>há 1h</td><td><strong>Renato S.</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso fotógrafo</td><td class="num">189.122.x.5</td></tr>
+            <tr><td>há 2h</td><td><strong>Marcos Vieira A.</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">EDIT</span> Contrato #4291</td><td class="num">177.9.x.18</td></tr>
+            <tr><td>há 3h</td><td><strong>Bruno Sena</strong></td><td><span class="badge badge-danger">DELETE</span> Foto #88412</td><td class="num">177.9.x.42</td></tr>
+            <tr><td>há 5h</td><td><strong>Sistema</strong></td><td><span class="badge badge-success">BACKUP</span> Snapshot S3 OK</td><td class="num">internal</td></tr>
+            <tr><td>há 8h</td><td><strong>Fernando G.</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso pai/coord.</td><td class="num">200.144.x.12</td></tr>
+            <tr><td>há 14h</td><td><strong>(falha)</strong></td><td><span class="badge badge-danger">LOGIN</span> Senha inválida 5x</td><td class="num">45.227.x.99</td></tr>
+            <tr><td>há 18h</td><td><strong>Sistema</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">CRON</span> VAI WhatsApp diário</td><td class="num">internal</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 423 eventos hoje · <a href="#" style="color:var(--primary-700);">ver tudo</a></div>
+      </div>
+    </div>
+
+    <div data-tab-panel="sessoes" hidden>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Sessões ativas agora (8)</div><span class="badge badge-success">tempo real</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="session-row">
+            <div class="dot-status online"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">Bruno Sena</strong> <span style="font-size:12px;color:var(--gray-500);">· admin</span>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">MacBook · Chrome 132 · São Paulo · há 14min</div>
+            </div>
+            <button class="btn btn-ghost btn-icon"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+          </div>
+          <div class="session-row">
+            <div class="dot-status online"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">Elison Perini</strong> <span style="font-size:12px;color:var(--gray-500);">· admin · você</span>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">MacBook · Safari 17 · Montes Claros · agora</div>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);">—</span>
+          </div>
+          <div class="session-row">
+            <div class="dot-status online"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">Debora Damasceno</strong> <span style="font-size:12px;color:var(--gray-500);">· financeiro</span>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Windows · Chrome 132 · Montes Claros · há 8min</div>
+            </div>
+            <button class="btn btn-ghost btn-icon"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+          </div>
+          <div class="session-row">
+            <div class="dot-status idle"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">Renato Soares</strong> <span style="font-size:12px;color:var(--gray-500);">· fotógrafo</span>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">iPhone · Safari mobile · há 1h · ocioso</div>
+            </div>
+            <button class="btn btn-ghost btn-icon"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+          </div>
+          <div class="session-row">
+            <div class="dot-status online"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">Marcos Vieira Andrade</strong> <span style="font-size:12px;color:var(--gray-500);">· comercial</span>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">MacBook · Chrome 132 · há 22min</div>
+            </div>
+            <button class="btn btn-ghost btn-icon"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+          </div>
+          <div class="session-row">
+            <div class="dot-status idle"></div>
+            <div style="flex:1;">
+              <strong style="font-size:14px;">+ 3 sessões</strong>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">2 operadores · 1 editor</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Ver todas</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div data-tab-panel="lgpd" hidden>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i data-lucide="scale" class="w-5 h-5 inline" style="vertical-align:-3px;"></i> LGPD · Lei 13.709</div></div>
+        <div class="card-body">
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div style="padding:14px;background:var(--gray-50);border-radius:10px;">
+              <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;font-weight:700;">Consentimentos válidos</div>
+              <div style="font-size:24px;font-weight:700;color:var(--success);margin-top:4px;">1.842</div>
+              <div style="font-size:12px;color:var(--gray-500);">de 1.924 alunos · 95.7%</div>
+            </div>
+            <div style="padding:14px;background:var(--gray-50);border-radius:10px;">
+              <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;font-weight:700;">Pendentes</div>
+              <div style="font-size:24px;font-weight:700;color:var(--warning);margin-top:4px;">82</div>
+              <div style="font-size:12px;color:var(--gray-500);">disparar VAI WhatsApp</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--gray-700);line-height:1.7;">
+            <div class="flex justify-between" style="padding:8px 0;border-bottom:1px solid var(--gray-100);"><span>📥 Solicitações de exportação dados</span><strong>3 em 30d</strong></div>
+            <div class="flex justify-between" style="padding:8px 0;border-bottom:1px solid var(--gray-100);"><span>🗑 Solicitações esquecimento</span><strong>1 em 30d</strong></div>
+            <div class="flex justify-between" style="padding:8px 0;border-bottom:1px solid var(--gray-100);"><span>🔒 DPO designado</span><strong>Bruno Sena</strong></div>
+            <div class="flex justify-between" style="padding:8px 0;"><span>📄 Política de privacidade</span><a href="#" style="color:var(--primary-700);">v3 · 04/01/2026</a></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div data-tab-panel="backup" hidden>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i data-lucide="hard-drive" class="w-5 h-5 inline" style="vertical-align:-3px;"></i> Backup & restauração</div><button class="btn btn-secondary btn-sm">Backup manual</button></div>
+        <div class="card-body">
+          <div class="alert alert-success" style="margin-bottom:14px;"><i data-lucide="check-circle" class="w-4 h-4"></i> <span>Último snapshot há 2h · S3 us-east-1 · 2.4 GB · íntegro</span></div>
+          <table class="table">
+            <thead><tr><th>Data</th><th>Tipo</th><th>Tamanho</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>30/04 · 12h00</td><td>Automático</td><td class="num">2.4 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+              <tr><td>30/04 · 06h00</td><td>Automático</td><td class="num">2.4 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+              <tr><td>30/04 · 00h00</td><td>Automático</td><td class="num">2.3 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+              <tr><td>29/04 · 18h00</td><td>Automático</td><td class="num">2.3 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+              <tr><td>29/04 · 12h00</td><td>Automático</td><td class="num">2.3 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+              <tr><td>29/04 · 09h12</td><td>Manual · Bruno</td><td class="num">2.3 GB</td><td><span class="badge badge-success">OK</span></td></tr>
+            </tbody>
+          </table>
+          <div style="padding:12px;font-size:13px;color:var(--gray-500);text-align:center;">Retenção: 30 snapshots · cron a cada 6h</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

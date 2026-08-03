@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eventos · Ventus Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  .evento-card {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition: box-shadow .2s, border-color .2s;
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 24px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .evento-card:hover { box-shadow: var(--shadow-md); border-color: var(--azul-200, var(--azul-100)); cursor: pointer; }
+  .evento-card.destaque { border-left: 4px solid var(--azul-600); }
+  .evento-card.urgente { border-left: 4px solid var(--aviso); }
+  .evento-data {
+    text-align: center;
+    background: var(--azul-50);
+    padding: 14px 8px;
+    border-radius: var(--r-md);
+  }
+  .evento-card.urgente .evento-data { background: var(--aviso-bg); }
+  .evento-data .mes { font-size: 11px; font-weight: 700; color: var(--azul-700); text-transform: uppercase; letter-spacing: 0.06em; }
+  .evento-card.urgente .evento-data .mes { color: var(--aviso); }
+  .evento-data .dia { font-size: 32px; font-weight: 800; color: var(--azul-800); line-height: 1; margin: 4px 0; }
+  .evento-card.urgente .evento-data .dia { color: #92400E; }
+  .evento-data .hora { font-size: 12px; color: var(--neutro-600); font-weight: 600; }
+
+  .evento-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .evento-info .meta {
+    font-size: 13px; color: var(--neutro-600);
+    display: flex; gap: 16px; flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .evento-info .meta span { display: flex; align-items: center; gap: 6px; }
+  .evento-rsvp {
+    text-align: right;
+    min-width: 140px;
+  }
+  .evento-rsvp .num {
+    font-size: 22px; font-weight: 800; color: var(--azul-800);
+  }
+  .evento-rsvp .num small { font-size: 14px; color: var(--neutro-500); font-weight: 600; }
+  .evento-rsvp .lbl { font-size: 11px; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .evento-rsvp .progress { margin-top: 8px; }
+
+  .filtros-bar {
+    display: flex; gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .filtros-bar input, .filtros-bar select {
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--neutro-200);
+    font-size: 14px;
+    background: white;
+    font-family: inherit;
+  }
+  .filtros-bar input { flex: 1; min-width: 280px; }
+
+  @media (max-width: 1100px) {
+    .evento-card { grid-template-columns: 80px 1fr; }
+    .evento-rsvp { grid-column: 1 / -1; text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo"><span class="logo-mark">V</span> Ventus</div>
+    <div class="nav-section">Operação</div>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="turma.html">Turmas</a>
+      <a href="eventos.html" class="active">Eventos</a>
+      <a href="#">Convidados</a>
+    </nav>
+    <div class="nav-section">Produção</div>
+    <nav class="admin-nav">
+      <a href="galerias.html">Galerias</a>
+      <a href="#">Fila de edição</a>
+      <a href="#">Entregas</a>
+    </nav>
+    <div class="nav-section">Financeiro</div>
+    <nav class="admin-nav">
+      <a href="financeiro.html">Recebimentos</a>
+      <a href="#">Contratos</a>
+      <a href="#">Relatórios</a>
+    </nav>
+    <div class="nav-section">Configurações</div>
+    <nav class="admin-nav">
+      <a href="pacotes.html">Pacotes</a>
+      <a href="#">Branding</a>
+      <a href="#">Equipe</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="crumb">Início / <b>Eventos</b></div>
+      <div class="flex gap-3 items-center">
+        <button class="btn btn-ghost text-sm">Exportar</button>
+        <button class="btn btn-primary text-sm">+ Novo evento</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <h1>Eventos</h1>
+      <p class="lead">8 eventos confirmados nos próximos 90 dias · 547 formandos esperados</p>
+
+      <div class="kpi-row">
+        <div class="kpi highlight">
+          <div class="kpi-label">Próximo evento</div>
+          <div class="kpi-num" style="font-size: 22px;">15 jun · 19h</div>
+          <div class="kpi-delta" style="color: rgba(255,255,255,0.85);">Colação Enfermagem FIP · em 48 dias</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Eventos no mês</div>
+          <div class="kpi-num">3</div>
+          <div class="kpi-delta">2 colações · 1 baile</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Convidados confirmados</div>
+          <div class="kpi-num">412</div>
+          <div class="kpi-delta">de 520 esperados (79%)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Hardware reservado</div>
+          <div class="kpi-num">3 / 3</div>
+          <div class="kpi-delta">impressoras Zebra OK</div>
+        </div>
+      </div>
+
+      <div class="filtros-bar">
+        <input type="text" placeholder="Buscar por nome do evento, turma ou local..." />
+        <select>
+          <option>Todas as turmas</option>
+          <option>Enfermagem FIP 2026/2</option>
+          <option>Direito Funorte 2026/1</option>
+          <option>Fisio UNIFIPMOC 2026/2</option>
+        </select>
+        <select>
+          <option>Todos os tipos</option>
+          <option>Colação de grau</option>
+          <option>Missa</option>
+          <option>Baile</option>
+          <option>Ensaio fotográfico</option>
+        </select>
+        <select>
+          <option>Próximos 90 dias</option>
+          <option>Esta semana</option>
+          <option>Este mês</option>
+          <option>Histórico</option>
+        </select>
+      </div>
+
+      <h3 style="font-size: 13px; font-weight: 700; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Próximos eventos</h3>
+
+      <div class="evento-card destaque">
+        <div class="evento-data">
+          <div class="mes">Junho</div>
+          <div class="dia">15</div>
+          <div class="hora">19:00</div>
+        </div>
+        <div class="evento-info">
+          <h3>Colação de Grau · Enfermagem FIP 2026/2</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Auditório FIP · Montes Claros</span>
+            <span>42 formandos</span>
+            <span><span class="badge badge-info">Cerimônia</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">126<small>/168</small></div>
+          <div class="lbl">Convidados confirmados</div>
+          <div class="progress"><div class="progress-bar success" style="width:75%"></div></div>
+        </div>
+      </div>
+
+      <div class="evento-card destaque">
+        <div class="evento-data">
+          <div class="mes">Junho</div>
+          <div class="dia">16</div>
+          <div class="hora">21:00</div>
+        </div>
+        <div class="evento-info">
+          <h3>Baile de Formatura · Enfermagem FIP 2026/2</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Buffet Versalhes · Montes Claros</span>
+            <span>42 formandos · 168 convidados</span>
+            <span><span class="badge badge-warn">Festa</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">189<small>/210</small></div>
+          <div class="lbl">Convidados confirmados</div>
+          <div class="progress"><div class="progress-bar success" style="width:90%"></div></div>
+        </div>
+      </div>
+
+      <div class="evento-card">
+        <div class="evento-data">
+          <div class="mes">Junho</div>
+          <div class="dia">22</div>
+          <div class="hora">19:30</div>
+        </div>
+        <div class="evento-info">
+          <h3>Colação de Grau · Direito Funorte 2026/1</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Auditório Central Funorte</span>
+            <span>38 formandos</span>
+            <span><span class="badge badge-info">Cerimônia</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">73<small>/152</small></div>
+          <div class="lbl">Convidados confirmados</div>
+          <div class="progress"><div class="progress-bar warn" style="width:48%"></div></div>
+        </div>
+      </div>
+
+      <div class="evento-card urgente">
+        <div class="evento-data">
+          <div class="mes">Junho</div>
+          <div class="dia">23</div>
+          <div class="hora">22:00</div>
+        </div>
+        <div class="evento-info">
+          <h3>Baile · Direito Funorte 2026/1</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Espaço Tropicalle</span>
+            <span>38 formandos · 190 convidados</span>
+            <span><span class="badge badge-warn">Festa</span></span>
+            <span><span class="badge badge-error">5 atrasos no pgto</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">42<small>/190</small></div>
+          <div class="lbl">Convidados confirmados</div>
+          <div class="progress"><div class="progress-bar warn" style="width:22%"></div></div>
+        </div>
+      </div>
+
+      <div class="evento-card">
+        <div class="evento-data">
+          <div class="mes">Julho</div>
+          <div class="dia">08</div>
+          <div class="hora">19:00</div>
+        </div>
+        <div class="evento-info">
+          <h3>Colação · Fisio UNIFIPMOC 2026/2</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Auditório UNIFIPMOC</span>
+            <span>31 formandos</span>
+            <span><span class="badge badge-info">Cerimônia</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">12<small>/124</small></div>
+          <div class="lbl">Convidados confirmados</div>
+          <div class="progress"><div class="progress-bar" style="width:10%"></div></div>
+        </div>
+      </div>
+
+      <div class="evento-card">
+        <div class="evento-data">
+          <div class="mes">Maio</div>
+          <div class="dia">04</div>
+          <div class="hora">14:00</div>
+        </div>
+        <div class="evento-info">
+          <h3>Ensaio fotográfico · Estética FIP 2026/2</h3>
+          <div class="meta">
+            <span><svg class="icon icon-sm" style="stroke:var(--neutro-500);"><use href="#i-map-pin"/></svg> Estúdio Ventus</span>
+            <span>28 formandos</span>
+            <span><span class="badge">Estúdio</span></span>
+          </div>
+        </div>
+        <div class="evento-rsvp">
+          <div class="num">28<small>/28</small></div>
+          <div class="lbl">Formandos confirmados</div>
+          <div class="progress"><div class="progress-bar success" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding: 24px;">
+        <button class="btn btn-ghost">Ver mais eventos</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <symbol id="i-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+  </defs>
+</svg>
+
+<a href="dashboard.html" class="proto-tag">← Voltar ao dashboard</a>
+
+</body>
+</html>

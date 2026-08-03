@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enfermagem FIP 2026/2 · Ventus Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  .turma-hero {
+    background: var(--grad);
+    color: white;
+    padding: 32px;
+    border-radius: var(--r-lg);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .turma-hero::after {
+    content: '';
+    position: absolute; top: -40%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .turma-hero .label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: var(--r-full);
+    margin-bottom: 12px;
+  }
+  .turma-hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .turma-hero .meta { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 8px; }
+  .turma-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+  .turma-stat .num { font-size: 22px; font-weight: 800; }
+  .turma-stat .lbl { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  .tabs {
+    display: flex; gap: 4px;
+    border-bottom: 1px solid var(--neutro-200);
+    margin-bottom: 24px;
+  }
+  .tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--neutro-500);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .tab.active {
+    color: var(--azul-700);
+    border-bottom-color: var(--azul-700);
+  }
+  .tab:hover:not(.active) { color: var(--neutro-700); }
+
+  .formando-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 120px 120px 100px 80px;
+    gap: 16px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--neutro-100);
+    align-items: center;
+    font-size: 13px;
+    transition: background .15s;
+  }
+  .formando-row:hover { background: var(--neutro-50); }
+  .formando-row .nome { font-weight: 600; color: var(--neutro-900); }
+  .formando-row .info { font-size: 11px; color: var(--neutro-500); margin-top: 2px; }
+  .formando-row .pago-info { font-size: 13px; }
+  .formando-row .pago-info .v { font-weight: 700; }
+  .formando-row .pago-info .det { font-size: 11px; color: var(--neutro-500); }
+
+  @media (max-width: 1100px) {
+    .turma-hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .formando-row { grid-template-columns: 40px 1fr auto; }
+    .formando-row > *:not(:nth-child(-n+3)) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo"><span class="logo-mark">V</span> Ventus</div>
+    <div class="nav-section">Operação</div>
+    <nav class="admin-nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="turma.html" class="active">Turmas</a>
+      <a href="eventos.html">Eventos</a>
+      <a href="#">Convidados</a>
+    </nav>
+    <div class="nav-section">Produção</div>
+    <nav class="admin-nav">
+      <a href="galerias.html">Galerias</a>
+      <a href="#">Fila de edição</a>
+      <a href="#">Entregas</a>
+    </nav>
+    <div class="nav-section">Financeiro</div>
+    <nav class="admin-nav">
+      <a href="financeiro.html">Recebimentos</a>
+      <a href="#">Contratos</a>
+      <a href="#">Relatórios</a>
+    </nav>
+    <div class="nav-section">Configurações</div>
+    <nav class="admin-nav">
+      <a href="pacotes.html">Pacotes</a>
+      <a href="#">Branding</a>
+      <a href="#">Equipe</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="crumb">Turmas / <b>Enfermagem FIP — 2026/2</b></div>
+      <div class="flex gap-3 items-center">
+        <button class="btn btn-ghost text-sm">📥 Exportar</button>
+        <button class="btn btn-primary text-sm">+ Adicionar formando</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- Hero da turma -->
+      <div class="turma-hero">
+        <span class="label">Em produção fotográfica</span>
+        <h1>Enfermagem FIP — 2026/2</h1>
+        <div class="meta">📅 Colação em 15 jun · 🎉 Baile em 16 jun · 📍 Buffet Versalhes</div>
+
+        <div class="turma-hero-stats">
+          <div class="turma-stat">
+            <div class="num">42</div>
+            <div class="lbl">Formandos</div>
+          </div>
+          <div class="turma-stat">
+            <div class="num">R$ 168.000</div>
+            <div class="lbl">Total contratado</div>
+          </div>
+          <div class="turma-stat">
+            <div class="num">68%</div>
+            <div class="lbl">Recebido</div>
+          </div>
+          <div class="turma-stat">
+            <div class="num">847 fotos</div>
+            <div class="lbl">Em produção</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active">Formandos (42)</div>
+        <div class="tab">Financeiro</div>
+        <div class="tab">Eventos</div>
+        <div class="tab">Galerias</div>
+        <div class="tab">Convidados</div>
+        <div class="tab">Comunicação</div>
+        <div class="tab">Pacotes</div>
+      </div>
+
+      <!-- Filtros / busca -->
+      <div class="flex gap-3 mb-4">
+        <input type="text" placeholder="🔍 Buscar formando por nome ou CPF..." style="flex:1; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;" />
+        <select style="padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;">
+          <option>Todos status</option>
+          <option>Em dia</option>
+          <option>Atrasado</option>
+        </select>
+        <select style="padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--neutro-200); font-size: 14px;">
+          <option>Todos pacotes</option>
+          <option>Bronze</option>
+          <option>Prata</option>
+          <option>Ouro</option>
+        </select>
+      </div>
+
+      <!-- Lista de formandos -->
+      <div class="panel" style="background: white; border: 1px solid var(--neutro-200); border-radius: var(--r-md); overflow: hidden;">
+        <div style="padding: 14px 20px; background: var(--neutro-50); display: grid; grid-template-columns: 40px 1fr 120px 120px 100px 80px; gap: 16px; font-size: 11px; font-weight: 700; color: var(--neutro-600); text-transform: uppercase; letter-spacing: 0.04em;">
+          <div></div>
+          <div>Formando</div>
+          <div>Pacote</div>
+          <div>Pagamento</div>
+          <div>Fotos</div>
+          <div></div>
+        </div>
+
+        <div class="formando-row" style="background: var(--azul-50);">
+          <div class="avatar">MS</div>
+          <div>
+            <div class="nome">Marina Souza Lima ⭐</div>
+            <div class="info">Comissão · marina.lima@aluno.fip · (38) 99...</div>
+          </div>
+          <div>
+            <span class="badge badge-warn">Ouro</span>
+          </div>
+          <div class="pago-info">
+            <div class="v">R$ 1.333 / 4.000</div>
+            <div class="det">3/12 parcelas</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">12 / 50</div>
+            <div class="det">selecionadas</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">LA</div>
+          <div>
+            <div class="nome">Lucas Andrade Costa</div>
+            <div class="info">Comissão · lucas.andrade@aluno.fip</div>
+          </div>
+          <div><span class="badge badge-warn">Ouro</span></div>
+          <div class="pago-info">
+            <div class="v">R$ 4.000 / 4.000</div>
+            <div class="det" style="color:var(--sucesso); font-weight: 600;">✓ Quitado</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">50 / 50</div>
+            <div class="det">entregues</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">CR</div>
+          <div>
+            <div class="nome">Camila Rocha Mendes</div>
+            <div class="info">camila.rocha@aluno.fip</div>
+          </div>
+          <div><span class="badge badge-info">Prata</span></div>
+          <div class="pago-info">
+            <div class="v">R$ 1.875 / 2.500</div>
+            <div class="det">9/12 parcelas</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">8 / 30</div>
+            <div class="det">aguardando edição</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">PS</div>
+          <div>
+            <div class="nome">Pedro Henrique Silva</div>
+            <div class="info">pedro.henrique@aluno.fip</div>
+          </div>
+          <div><span class="badge badge-warn">Ouro</span></div>
+          <div class="pago-info">
+            <div class="v" style="color: var(--erro);">R$ 666 / 4.000</div>
+            <div class="det" style="color:var(--erro);">⚠️ 12 dias atraso</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">— / 50</div>
+            <div class="det">aguardando galeria</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">BL</div>
+          <div>
+            <div class="nome">Bruna Lopes Carneiro</div>
+            <div class="info">bruna.lopes@aluno.fip</div>
+          </div>
+          <div><span class="badge badge-info">Prata</span></div>
+          <div class="pago-info">
+            <div class="v">R$ 1.667 / 2.500</div>
+            <div class="det">8/12 parcelas</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">22 / 30</div>
+            <div class="det" style="color:var(--sucesso); font-weight: 600;">✓ entregue</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">RF</div>
+          <div>
+            <div class="nome">Rafael Ferraz Oliveira</div>
+            <div class="info">rafael.ferraz@aluno.fip</div>
+          </div>
+          <div><span class="badge">Bronze</span></div>
+          <div class="pago-info">
+            <div class="v">R$ 1.000 / 1.500</div>
+            <div class="det">8/12 parcelas</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">15 / 20</div>
+            <div class="det">em edição</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div class="formando-row">
+          <div class="avatar">JM</div>
+          <div>
+            <div class="nome">Juliana Martins Santos</div>
+            <div class="info">juliana.martins@aluno.fip</div>
+          </div>
+          <div><span class="badge badge-warn">Ouro</span></div>
+          <div class="pago-info">
+            <div class="v">R$ 2.667 / 4.000</div>
+            <div class="det">8/12 parcelas</div>
+          </div>
+          <div class="pago-info">
+            <div class="v">31 / 50</div>
+            <div class="det">selecionadas</div>
+          </div>
+          <div>→</div>
+        </div>
+
+        <div style="padding: 16px 20px; background: var(--neutro-50); text-align: center;">
+          <button class="btn btn-ghost text-sm">Ver todos os 42 formandos</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

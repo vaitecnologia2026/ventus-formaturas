@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDICINA T85 · UNIMONTES — Ventus Formaturas</title>
+<meta name="description" content="Página oficial da turma MEDICINA T85 UNIMONTES. Eventos, dress code, contagem regressiva e comissão da formatura.">
+<meta name="theme-color" content="#0A1430">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MEDICINA T85 · UNIMONTES — A formatura está chegando">
+<meta property="og:description" content="Veja a contagem regressiva, o cronograma de eventos e a comissão da turma.">
+<meta property="og:locale" content="pt_BR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --azul-900: #0A1430;
+    --azul-800: #0F1F4F;
+    --azul-700: #1E3A8A;
+    --azul-600: #2563EB;
+    --azul-100: #DBEAFE;
+    --azul-50:  #EFF6FF;
+    --bege:     #FAF7F2;
+    --neutro-200: #E2E8F0;
+    --neutro-500: #64748B;
+    --neutro-600: #475569;
+    --neutro-700: #334155;
+    --neutro-900: #0F172A;
+    --dourado: #D4AF37;
+    --dourado-claro: #F4E4A6;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --r-md: 12px;
+    --r-lg: 16px;
+    --r-xl: 24px;
+    --r-full: 100px;
+    --shadow-md: 0 4px 16px rgba(15,31,79,0.10);
+    --shadow-xl: 0 24px 60px rgba(15,31,79,0.20);
+  }
+  body {
+    font-family: var(--sans);
+    background: var(--azul-900);
+    color: white;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { text-decoration: none; color: inherit; }
+
+  /* Header transparent fixed */
+  header.top {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 22px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 10;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    color: white;
+  }
+  .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: white; color: var(--azul-700);
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 18px;
+  }
+  .brand strong { font-size: 15px; letter-spacing: -0.01em; }
+  .brand small { display: block; font-size: 11px; opacity: 0.6; letter-spacing: 0.08em; text-transform: uppercase; }
+  .header-cta {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .btn-pill {
+    padding: 9px 18px;
+    background: white; color: var(--azul-700);
+    font-weight: 700; font-size: 13px;
+    border-radius: var(--r-full);
+    transition: transform .2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-pill:hover { transform: translateY(-2px); }
+  .btn-text {
+    color: white; font-size: 13.5px; font-weight: 500;
+    opacity: 0.85; transition: opacity .15s;
+  }
+  .btn-text:hover { opacity: 1; }
+
+  /* HERO */
+  section.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center;
+    overflow: hidden;
+    padding: 100px 24px 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('../assets/img/photos/foto-3.jpg') center / cover;
+    z-index: 0;
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(212,175,55,0.18) 0%, transparent 45%),
+      linear-gradient(180deg, rgba(10,20,48,0.55) 0%, rgba(10,20,48,0.85) 100%);
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    text-align: center;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.5);
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212,175,55,0.4);
+    border-radius: var(--r-full);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dourado-claro);
+    margin-bottom: 24px;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--dourado);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--dourado);
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    background: linear-gradient(180deg, #FFFFFF 0%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: rgba(255,255,255,0.85);
+    max-width: 640px;
+    margin: 0 auto 44px;
+    line-height: 1.55;
+    font-weight: 400;
+  }
+  .hero-sub em { font-family: var(--serif); font-style: italic; color: var(--dourado-claro); }
+
+  /* COUNTDOWN */
+  .countdown {
+    display: inline-flex; gap: 0;
+    padding: 0;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .cd-cell {
+    text-align: center;
+    min-width: 96px;
+    padding: 22px 18px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .cd-cell:last-child { border-right: none; }
+  .cd-num {
+    font-family: var(--serif);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 700;
+    color: var(--dourado-claro);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .cd-lbl {
+    font-size: 10.5px;
+    opacity: 0.72;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .cd-foot {
+    font-size: 13px;
+    opacity: 0.65;
+    margin-top: 24px;
+  }
+  .cd-foot strong { color: white; font-weight: 600; }
+
+  /* SCROLL INDICATOR */
+  .scroll-ind {
+    position: absolute;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    animation: bounce 2.4s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* SECTIONS */
+  section.sec { padding: 100px 28px; }
+  .sec-bege { background: var(--bege); color: var(--neutro-900); }
+  .sec-dark { background: var(--azul-900); }
+  .sec-wrap { max-width: 1180px; margin: 0 auto; }
+  .sec-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--azul-700);
+    margin-bottom: 14px;
+    position: relative;
+    padding-left: 36px;
+  }
+  .sec-tag::before {
+    content: '';
+    position: absolute; left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 1px;
+    background: var(--dourado);
+  }
+  .sec-dark .sec-tag { color: var(--dourado-claro); }
+  .sec-title {
+    font-family: var(--serif);
+    font-size: clamp(32px, 4.5vw, 50px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--neutro-900);
+  }
+  .sec-dark .sec-title { color: white; }
+  .sec-title em { font-style: italic; color: var(--azul-700); }
+  .sec-dark .sec-title em { color: var(--dourado-claro); }
+  .sec-sub {
+    font-size: 16px;
+    color: var(--neutro-600);
+    max-width: 680px;
+    margin-bottom: 56px;
+    line-height: 1.65;
+  }
+  .sec-dark .sec-sub { color: rgba(255,255,255,0.7); }
+
+  .center { text-align: center; margin-left: auto; margin-right: auto; }
+  .center .sec-tag { padding-left: 0; }
+  .center .sec-tag::before { display: none; }
+  .center .sec-title, .center .sec-sub { margin-left: auto; margin-right: auto; }
+
+  /* EVENT CARDS */
+  .eventos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .evento {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition: transform .35s cubic-bezier(0.16,1,0.3,1), box-shadow .35s;
+    display: flex; flex-direction: column;
+  }
+  .evento:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+  }
+  .evento-foto {
+    aspect-ratio: 5/3;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .evento-foto::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(10,20,48,0.7) 100%);
+  }
+  .evento-data {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(255,255,255,0.95);
+    padding: 8px 12px;
+    border-radius: var(--r-md);
+    text-align: center;
+    z-index: 2;
+  }
+  .evento-data-mes {
+    font-size: 10px;
+    color: var(--azul-700);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+  .evento-data-dia {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--azul-900);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .evento-status {
+    position: absolute;
+    top: 16px; right: 16px;
+    padding: 5px 11px;
+    border-radius: var(--r-full);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    z-index: 2;
+  }
+  .evento-status.confirmado { background: rgba(22,163,74,0.95); color: white; }
+  .evento-status.principal  { background: rgba(212,175,55,0.95); color: var(--azul-900); }
+  .evento-status.planejado  { background: rgba(255,255,255,0.85); color: var(--neutro-700); }
+  .evento-corpo {
+    padding: 22px 22px 24px;
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+  .evento-titulo {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--neutro-900);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .evento-meta {
+    font-size: 13px;
+    color: var(--neutro-600);
+    line-height: 1.5;
+  }
+
+  /* COMISSÃO */
+  .comissao-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .pessoa {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--r-lg);
+    padding: 32px 24px 28px;
+    text-align: center;
+    transition: transform .35s cubic-bezier(0.16,1,0.3,1), background .35s;
+  }
+  .pessoa:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.06);
+  }
+  .pessoa-avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    display: grid; place-items: center;
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--azul-900);
+    background: var(--dourado-claro);
+    border: 2px solid var(--dourado);
+  }
+  .pessoa-nome {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .pessoa-cargo {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  /* CTA FINAL */
+  .cta-final {
+    padding: 100px 28px;
+    background:
+      linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(37,99,235,0.06) 100%),
+      var(--azul-900);
+    text-align: center;
+  }
+  .cta-final h2 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 4.5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    line-height: 1.1;
+  }
+  .cta-final h2 em { font-style: italic; color: var(--dourado-claro); }
+  .cta-final p {
+    font-size: 17px;
+    color: rgba(255,255,255,0.7);
+    max-width: 560px;
+    margin: 0 auto 32px;
+    line-height: 1.55;
+  }
+  .btn-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 18px 32px;
+    background: white;
+    color: var(--azul-800);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 8px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 28px 32px;
+    text-align: center;
+    background: var(--azul-900);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  footer .foot-brand {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  footer p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    .countdown { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .cd-cell:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.1); }
+    .cd-cell:nth-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,0.1); }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="../index.html">
+    <div class="brand-mark">V</div>
+    <div>
+      <strong>Ventus Formaturas</strong>
+      <small>Turma · UNIMONTES</small>
+    </div>
+  </a>
+  <div class="header-cta">
+    <a href="../aluno/login.html" class="btn-text">Sou da turma</a>
+    <a href="../aluno/login.html" class="btn-pill">
+      <i data-lucide="message-circle" style="width:14px;height:14px;"></i>
+      Entrar
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Medicina · UNIMONTES · Turma 85</div>
+    <h1>A noite mais aguardada<br>do ano <em style="font-style:italic;">vem aí.</em></h1>
+    <p class="hero-sub">Acompanhe o cronograma, o dress code e a comissão da formatura. <em>Mais detalhes</em>, peça à comissão da turma o link do app.</p>
+
+    <div class="countdown">
+      <div class="cd-cell"><div class="cd-num">76</div><div class="cd-lbl">dias</div></div>
+      <div class="cd-cell"><div class="cd-num">14</div><div class="cd-lbl">horas</div></div>
+      <div class="cd-cell"><div class="cd-num">22</div><div class="cd-lbl">min</div></div>
+      <div class="cd-cell"><div class="cd-num">07</div><div class="cd-lbl">seg</div></div>
+    </div>
+    <p class="cd-foot">até a colação oficial em <strong>15 de Julho de 2026</strong></p>
+  </div>
+
+  <div class="scroll-ind">
+    <span>role para conhecer</span>
+    <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
+  </div>
+</section>
+
+<!-- EVENTOS -->
+<section class="sec sec-bege">
+  <div class="sec-wrap">
+    <div class="center" style="max-width:760px;">
+      <div class="sec-tag">Cronograma</div>
+      <h2 class="sec-title">Os eventos que <em>vão escrever a história</em>.</h2>
+      <p class="sec-sub">Da foto de convite à colação, cada momento desta turma já tem data marcada.</p>
+    </div>
+
+    <div class="eventos-grid">
+
+      <article class="evento">
+        <div class="evento-foto" style="background-image:url('../assets/img/photos/foto-2.jpg');">
+          <div class="evento-data">
+            <div class="evento-data-mes">MAI</div>
+            <div class="evento-data-dia">03</div>
+          </div>
+          <span class="evento-status confirmado">Confirmado</span>
+        </div>
+        <div class="evento-corpo">
+          <h3 class="evento-titulo">Baile + After</h3>
+          <p class="evento-meta">Espaço Ventus · 21h · Black tie</p>
+        </div>
+      </article>
+
+      <article class="evento">
+        <div class="evento-foto" style="background-image:url('../assets/img/photos/foto-1.jpg');">
+          <div class="evento-data">
+            <div class="evento-data-mes">JUN</div>
+            <div class="evento-data-dia">10</div>
+          </div>
+          <span class="evento-status planejado">Planejado</span>
+        </div>
+        <div class="evento-corpo">
+          <h3 class="evento-titulo">Posicionamento de imagem</h3>
+          <p class="evento-meta">Estúdio Ventus · 14h · Smart casual</p>
+        </div>
+      </article>
+
+      <article class="evento">
+        <div class="evento-foto" style="background-image:url('../assets/img/photos/f-11.jpg');">
+          <div class="evento-data">
+            <div class="evento-data-mes">JUL</div>
+            <div class="evento-data-dia">15</div>
+          </div>
+          <span class="evento-status principal">Principal</span>
+        </div>
+        <div class="evento-corpo">
+          <h3 class="evento-titulo">Colação oficial</h3>
+          <p class="evento-meta">Auditório UNIMONTES · 19h · Toga e beca</p>
+        </div>
+      </article>
+
+      <article class="evento">
+        <div class="evento-foto" style="background-image:url('../assets/img/photos/f-13.jpg');">
+          <div class="evento-data">
+            <div class="evento-data-mes">JUL</div>
+            <div class="evento-data-dia">15</div>
+          </div>
+          <span class="evento-status planejado">Planejado</span>
+        </div>
+        <div class="evento-corpo">
+          <h3 class="evento-titulo">Colação simbólica</h3>
+          <p class="evento-meta">Auditório UNIMONTES · 22h · Black tie</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- COMISSÃO -->
+<section class="sec sec-dark">
+  <div class="sec-wrap">
+    <div class="center" style="max-width:720px;">
+      <div class="sec-tag">Comissão da turma</div>
+      <h2 class="sec-title">Quem está <em>fazendo acontecer</em>.</h2>
+      <p class="sec-sub">Quatro formandos representam toda a turma na organização da formatura. São eles que conduzem decisões e cobranças junto à Ventus.</p>
+    </div>
+
+    <div class="comissao-grid">
+      <div class="pessoa">
+        <div class="pessoa-avatar">CA</div>
+        <div class="pessoa-nome">Camila Almeida</div>
+        <div class="pessoa-cargo">Presidente</div>
+      </div>
+      <div class="pessoa">
+        <div class="pessoa-avatar">PH</div>
+        <div class="pessoa-nome">Pedro Henrique</div>
+        <div class="pessoa-cargo">Tesoureiro</div>
+      </div>
+      <div class="pessoa">
+        <div class="pessoa-avatar">JR</div>
+        <div class="pessoa-nome">Júlia Ribeiro</div>
+        <div class="pessoa-cargo">Secretária</div>
+      </div>
+      <div class="pessoa">
+        <div class="pessoa-avatar">RM</div>
+        <div class="pessoa-nome">Tiago Moreira Mendes</div>
+        <div class="pessoa-cargo">Comunicação</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <h2 class="serif">Você é dessa turma? <em>Entre no seu app.</em></h2>
+  <p>Acesse seu portal Ventus para ver suas fotos, gerenciar parcelas, convidar familiares e acompanhar cada evento.</p>
+  <a href="../aluno/login.html" class="btn-cta">
+    <i data-lucide="message-circle" style="width:18px;height:18px;"></i>
+    Entrar pelo WhatsApp
+  </a>
+</section>
+
+<footer>
+  <div class="foot-brand">Ventus Formaturas</div>
+  <p>Montes Claros · MG · ventusformaturas.com.br</p>
+</footer>
+
+<script>
+  if (window.lucide) lucide.createIcons();
+</script>
+<script src="../assets/js/auth.js?v=2"></script>
+<script src="../assets/js/app.js"></script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

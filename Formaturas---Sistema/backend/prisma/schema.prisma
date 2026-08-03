@@ -1,0 +1,965 @@
+// ============================================================
+// Ventus Backend — Prisma schema
+// Módulo: Google Ads Tracking (Mission 1)
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// Enums
+// ------------------------------------------------------------
+
+enum ConversionStatus {
+  pending
+  retrying
+  sent
+  failed
+  ignored
+  missing_required_data
+}
+
+enum UploadMode {
+  enhanced_conversions_for_leads
+  offline_click_conversion
+  data_manager_api
+}
+
+enum ConversionEvent {
+  lead_created
+  whatsapp_started
+  qualified_lead
+  proposal_sent
+  sale_completed
+  sale_lost
+}
+
+// ------------------------------------------------------------
+// Tracking — captura crua dos parâmetros que chegam pela URL
+// ------------------------------------------------------------
+
+model TrackingSession {
+  id           String   @id @default(uuid()) @db.Uuid
+  // Click IDs
+  gclid        String?
+  gbraid       String?
+  wbraid       String?
+  // UTMs
+  utmSource    String?  @map("utm_source")
+  utmMedium    String?  @map("utm_medium")
+  utmCampaign  String?  @map("utm_campaign")
+  utmContent   String?  @map("utm_content")
+  utmTerm      String?  @map("utm_term")
+  // Google Ads ValueTrack
+  campaignId   String?  @map("campaign_id")
+  adgroupId    String?  @map("adgroup_id")
+  creative     String?
+  keyword      String?
+  matchtype    String?
+  device       String?
+  placement    String?
+  // Contexto
+  landingPage  String?  @map("landing_page")
+  referrer     String?
+  userAgent    String?  @map("user_agent")
+  ipAddress    String?  @map("ip_address")
+  // Sessão
+  sessionToken String   @unique @map("session_token")
+  firstSeenAt  DateTime @default(now()) @map("first_seen_at")
+  lastSeenAt   DateTime @default(now()) @updatedAt @map("last_seen_at")
+
+  attributions LeadAttribution[]
+
+  @@index([gclid])
+  @@index([gbraid])
+  @@index([wbraid])
+  @@index([utmCampaign])
+  @@map("tracking_sessions")
+}
+
+// ------------------------------------------------------------
+// Lead Attribution — vincula um lead identificado a uma sessão
+// ------------------------------------------------------------
+
+model LeadAttribution {
+  id                String   @id @default(uuid()) @db.Uuid
+  leadId            String   @map("lead_id")
+  trackingSessionId String   @map("tracking_session_id") @db.Uuid
+
+  // First-party data (PII em texto puro — nunca exportada sem hashing)
+  email             String?
+  phone             String?
+  firstName         String?  @map("first_name")
+  lastName          String?  @map("last_name")
+  city              String?
+  state             String?
+  country           String?
+  postalCode        String?  @map("postal_code")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  trackingSession   TrackingSession @relation(fields: [trackingSessionId], references: [id], onDelete: Cascade)
+  conversions       GoogleAdsConversion[]
+
+  @@unique([leadId])
+  @@index([trackingSessionId])
+  @@map("lead_attribution")
+}
+
+// ------------------------------------------------------------
+// Credenciais Google Ads (single-tenant; multi-tenant via tenantId no futuro)
+// ------------------------------------------------------------
+
+model GoogleAdsCredential {
+  id                    Int       @id @default(1) // singleton
+  customerId            String    @map("customer_id")
+  loginCustomerId       String?   @map("login_customer_id")
+  developerToken        String    @map("developer_token")
+  clientId              String    @map("client_id")
+  clientSecret          String    @map("client_secret")
+  refreshToken          String    @map("refresh_token")
+  conversionActionId    String?   @map("conversion_action_id")
+  conversionActionName  String?   @map("conversion_action_name")
+  defaultCurrency       String    @default("BRL") @map("default_currency")
+  uploadMode            UploadMode @default(offline_click_conversion) @map("upload_mode")
+
+  // Mapeamento por evento -> conversion_action_id (override do conversionActionId default)
+  // Ex: { "lead_created": "1234567890", "sale_completed": "9876543210" }
+  eventActionMap        Json?     @map("event_action_map")
+
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("google_ads_credentials")
+}
+
+// ------------------------------------------------------------
+// Conversões — uma linha por evento que precisa subir pro Google
+// ------------------------------------------------------------
+
+model GoogleAdsConversion {
+  id                  String           @id @default(uuid()) @db.Uuid
+  leadAttributionId   String?          @map("lead_attribution_id") @db.Uuid
+
+  // Identificação
+  leadId              String?          @map("lead_id")
+  orderId             String?          @map("order_id")
+  conversionEvent     ConversionEvent  @map("conversion_event")
+  conversionActionId  String           @map("conversion_action_id")
+
+  // Click IDs (cópia "fria" do que tinha no momento da conversão)
+  gclid               String?
+  gbraid              String?
+  wbraid              String?
+
+  // Valor
+  conversionValue     Decimal?         @map("conversion_value") @db.Decimal(18, 4)
+  conversionCurrency  String?          @map("conversion_currency")
+  conversionTime      DateTime         @map("conversion_time")
+
+  // Estado de envio
+  status              ConversionStatus @default(pending)
+  attempts            Int              @default(0)
+  nextRetryAt         DateTime?        @map("next_retry_at")
+  sentAt              DateTime?        @map("sent_at")
+  lastError           String?          @map("last_error")
+
+  // Chave de deduplicação determinística
+  dedupKey            String           @unique @map("dedup_key")
+
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  attribution         LeadAttribution? @relation(fields: [leadAttributionId], references: [id], onDelete: SetNull)
+  logs                GoogleAdsConversionLog[]
+
+  @@index([status])
+  @@index([leadId])
+  @@index([conversionEvent])
+  @@index([nextRetryAt])
+  @@map("google_ads_conversions")
+}
+
+// ------------------------------------------------------------
+// Logs — uma linha por tentativa de envio (audit trail completo)
+// ------------------------------------------------------------
+
+model GoogleAdsConversionLog {
+  id            String              @id @default(uuid()) @db.Uuid
+  conversionId  String              @map("conversion_id") @db.Uuid
+  attempt       Int
+  status        ConversionStatus
+  rawRequest    Json?               @map("raw_request")
+  rawResponse   Json?               @map("raw_response")
+  errorMessage  String?             @map("error_message")
+  errorCode     String?             @map("error_code")
+  durationMs    Int?                @map("duration_ms")
+  createdAt     DateTime            @default(now()) @map("created_at")
+
+  conversion    GoogleAdsConversion @relation(fields: [conversionId], references: [id], onDelete: Cascade)
+
+  @@index([conversionId])
+  @@index([createdAt])
+  @@map("google_ads_conversion_logs")
+}
+
+// ============================================================
+// Módulo: RCS (Mission 2)
+// ============================================================
+
+enum RcsProviderKind {
+  generic_http
+  zenvia
+  pontaltech
+  infobip
+  takeblip
+}
+
+enum RcsAuthType {
+  none
+  api_key_header
+  api_key_query
+  bearer_token
+  basic_auth
+  oauth2_client_credentials
+  custom_headers
+}
+
+enum RcsMessageStatus {
+  pending
+  queued
+  sent
+  delivered
+  read
+  failed
+  rejected
+  expired
+  unknown
+}
+
+enum RcsMessageType {
+  text
+  rich_card
+  carousel
+  image
+  video
+  file
+  suggested_replies
+  suggested_actions
+  template
+}
+
+enum RcsWebhookEventType {
+  delivered
+  read
+  failed
+  rejected
+  clicked
+  replied
+  unknown
+}
+
+// Provider RCS — uma linha por fornecedor configurado.
+// Single-tenant por enquanto; multi-tenant via tenantId no futuro.
+model RcsProvider {
+  id                  String           @id @default(uuid()) @db.Uuid
+  providerName        String           @unique @map("provider_name")
+  providerKind        RcsProviderKind  @map("provider_kind")
+  active              Boolean          @default(true)
+
+  baseUrl             String           @map("base_url")
+  authType            RcsAuthType      @map("auth_type")
+
+  // Credenciais (texto puro por simplicidade — produção deve criptografar)
+  apiKey              String?          @map("api_key")
+  bearerToken         String?          @map("bearer_token")
+  username            String?
+  password            String?
+  clientId            String?          @map("client_id")
+  clientSecret        String?          @map("client_secret")
+  oauthTokenUrl       String?          @map("oauth_token_url")
+  oauthScope          String?          @map("oauth_scope")
+
+  accountId           String?          @map("account_id")
+  senderId            String?          @map("sender_id")
+  agentId             String?          @map("agent_id")
+  webhookSecret       String?          @map("webhook_secret")
+
+  defaultCountryCode  String           @default("55") @map("default_country_code")
+  rateLimitPerMinute  Int              @default(60) @map("rate_limit_per_minute")
+  timeoutMs           Int              @default(15000) @map("timeout_ms")
+
+  // Headers extras: { "X-Account-Id": "abc" }
+  customHeaders       Json?            @map("custom_headers")
+  // Template do body: { "to": "{{to}}", "msg": "{{message}}" }
+  payloadTemplate     Json?            @map("payload_template")
+  // Caminhos para extrair da resposta: { "messageId": "data.id", "status": "data.status", "error": "error.message" }
+  responsePaths       Json?            @map("response_paths")
+  // Método HTTP de envio (default POST)
+  httpMethod          String           @default("POST") @map("http_method")
+  // Endpoint relativo de envio (concat com baseUrl). Default "/send"
+  sendPath            String           @default("/send") @map("send_path")
+
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  messages            RcsMessage[]
+  templates           RcsTemplate[]
+  webhookEvents       RcsWebhookEvent[]
+
+  @@index([providerKind])
+  @@index([active])
+  @@map("rcs_providers")
+}
+
+// Templates RCS aprovados (rich card, carousel, etc.)
+model RcsTemplate {
+  id           String          @id @default(uuid()) @db.Uuid
+  providerId   String          @map("provider_id") @db.Uuid
+  name         String
+  messageType  RcsMessageType  @map("message_type")
+  // Definição do template (campos variáveis: {{nome}}, {{valor}})
+  definition   Json
+  approved     Boolean         @default(false)
+  externalId   String?         @map("external_id")  // ID no provider
+
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  provider     RcsProvider     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  messages     RcsMessage[]
+
+  @@unique([providerId, name])
+  @@index([providerId])
+  @@map("rcs_templates")
+}
+
+// Mensagem RCS — uma linha por envio (lifecycle: pending → queued → sent → delivered/read/failed)
+model RcsMessage {
+  id                  String           @id @default(uuid()) @db.Uuid
+  providerId          String           @map("provider_id") @db.Uuid
+  templateId          String?          @map("template_id") @db.Uuid
+
+  // Identificação do envio
+  toOriginal          String           @map("to_original")
+  toNormalized        String           @map("to_normalized")  // E.164
+  messageType         RcsMessageType   @map("message_type")
+  text                String?          // só para type=text
+  payload             Json?            // estrutura completa para tipos ricos
+
+  // Estado
+  status              RcsMessageStatus @default(pending)
+  providerMessageId   String?          @map("provider_message_id")  // ID retornado pelo provider
+  attempts            Int              @default(0)
+  nextRetryAt         DateTime?        @map("next_retry_at")
+  sentAt              DateTime?        @map("sent_at")
+  deliveredAt         DateTime?        @map("delivered_at")
+  readAt              DateTime?        @map("read_at")
+  failedAt            DateTime?        @map("failed_at")
+  lastError           String?          @map("last_error")
+
+  // Contexto
+  campaignId          String?          @map("campaign_id")
+  leadId              String?          @map("lead_id")
+  triggeredByUserId   String?          @map("triggered_by_user_id")  // sub do JWT
+
+  // Dedup determinístico — opcional, hash de (providerId+lead+campaign+payload)
+  dedupKey            String?          @unique @map("dedup_key")
+
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  provider            RcsProvider      @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  template            RcsTemplate?     @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  logs                RcsMessageLog[]
+  webhookEvents       RcsWebhookEvent[]
+
+  @@index([providerId])
+  @@index([status])
+  @@index([campaignId])
+  @@index([leadId])
+  @@index([nextRetryAt])
+  @@index([providerMessageId])
+  @@map("rcs_messages")
+}
+
+// Log técnico — uma linha por tentativa (audit + debug)
+model RcsMessageLog {
+  id            String           @id @default(uuid()) @db.Uuid
+  messageId     String           @map("message_id") @db.Uuid
+  attempt       Int
+  status        RcsMessageStatus
+  providerName  String           @map("provider_name")  // snapshot, mesmo se provider for renomeado/deletado
+  rawRequest    Json?            @map("raw_request")
+  rawResponse   Json?            @map("raw_response")
+  httpStatus    Int?             @map("http_status")
+  errorMessage  String?          @map("error_message")
+  errorCode     String?          @map("error_code")
+  durationMs    Int?             @map("duration_ms")
+  createdAt     DateTime         @default(now()) @map("created_at")
+
+  message       RcsMessage       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([createdAt])
+  @@map("rcs_message_logs")
+}
+
+// Eventos de webhook recebidos do provider — bruto + normalizado
+model RcsWebhookEvent {
+  id                  String              @id @default(uuid()) @db.Uuid
+  providerId          String              @map("provider_id") @db.Uuid
+  messageId           String?             @map("message_id") @db.Uuid
+
+  eventType           RcsWebhookEventType @map("event_type")
+  providerMessageId   String?             @map("provider_message_id")
+  rawHeaders          Json?               @map("raw_headers")
+  rawBody             Json?               @map("raw_body")
+  signatureValid      Boolean             @default(false) @map("signature_valid")
+  processed           Boolean             @default(false)
+  processingError     String?             @map("processing_error")
+
+  receivedAt          DateTime            @default(now()) @map("received_at")
+
+  provider            RcsProvider         @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  message             RcsMessage?         @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@index([providerId])
+  @@index([messageId])
+  @@index([providerMessageId])
+  @@index([eventType])
+  @@map("rcs_webhook_events")
+}
+
+// ============================================================
+// Módulo: E-mail (Mission 3)
+// ============================================================
+
+enum EmailProviderType {
+  smtp
+  sendgrid
+  amazon_ses
+  generic_http
+}
+
+enum EmailMessageStatus {
+  pending
+  queued
+  sent
+  delivered
+  opened
+  clicked
+  bounced
+  complained
+  unsubscribed
+  failed
+  rejected
+}
+
+enum EmailWebhookEventType {
+  delivered
+  opened
+  clicked
+  bounced
+  complained
+  unsubscribed
+  failed
+  unknown
+}
+
+enum EmailSuppressionReason {
+  bounce
+  complaint
+  unsubscribe
+  manual
+}
+
+model EmailProvider {
+  id                  String              @id @default(uuid()) @db.Uuid
+  providerName        String              @unique @map("provider_name")
+  providerType        EmailProviderType   @map("provider_type")
+  active              Boolean             @default(true) @map("is_active")
+
+  // Identidade do remetente
+  fromName            String              @map("from_name")
+  fromEmail           String              @map("from_email")
+  replyTo             String?             @map("reply_to")
+
+  // SMTP
+  host                String?
+  port                Int?
+  secure              Boolean?            // SSL/TLS
+  username            String?
+  password            String?
+
+  // SendGrid / SES / Generic — credenciais
+  apiKey              String?             @map("api_key")
+  region              String?             // SES
+  accessKey           String?             @map("access_key")    // SES (AWS_ACCESS_KEY_ID)
+  secretKey           String?             @map("secret_key")    // SES (AWS_SECRET_ACCESS_KEY)
+
+  // Generic HTTP
+  baseUrl             String?             @map("base_url")
+  authType            String?             @map("auth_type")     // none|api_key_header|bearer_token|basic_auth|oauth2_client_credentials|custom_headers
+  bearerToken         String?             @map("bearer_token")
+  customHeaders       Json?               @map("custom_headers")
+  payloadTemplate     Json?               @map("payload_template")
+  responsePaths       Json?               @map("response_paths")
+  httpMethod          String              @default("POST") @map("http_method")
+  sendPath            String              @default("/send") @map("send_path")
+
+  webhookSecret       String?             @map("webhook_secret")
+
+  // Limites
+  dailyLimit          Int?                @map("daily_limit")
+  hourlyLimit         Int?                @map("hourly_limit")
+  rateLimitPerMinute  Int                 @default(60) @map("rate_limit_per_minute")
+  timeoutMs           Int                 @default(15000) @map("timeout_ms")
+
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  messages            EmailMessage[]
+  templates           EmailTemplate[]
+  webhookEvents       EmailWebhookEvent[]
+
+  @@index([providerType])
+  @@index([active])
+  @@map("email_providers")
+}
+
+model EmailTemplate {
+  id              String          @id @default(uuid()) @db.Uuid
+  providerId      String?         @map("provider_id") @db.Uuid  // opcional — template pode ser global
+  name            String          @unique
+  category        String?
+  subject         String
+  htmlBody        String          @map("html_body") @db.Text
+  textBody        String?         @map("text_body") @db.Text
+  preview         String?
+  // Variáveis declaradas: ["nome", "valor", "boleto_url"]
+  allowedVariables String[]       @map("allowed_variables")
+  // Anexos do template: [{ filename, contentBase64 OR url, contentType }]
+  attachments     Json?
+  active          Boolean         @default(true)
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  provider        EmailProvider?  @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  messages        EmailMessage[]
+
+  @@index([providerId])
+  @@index([active])
+  @@index([category])
+  @@map("email_templates")
+}
+
+model EmailMessage {
+  id                  String              @id @default(uuid()) @db.Uuid
+  providerId          String              @map("provider_id") @db.Uuid
+  templateId          String?             @map("template_id") @db.Uuid
+
+  toEmail             String              @map("to_email")
+  fromEmail           String              @map("from_email")
+  fromName            String?             @map("from_name")
+  replyTo             String?             @map("reply_to")
+  subject             String
+  htmlBody            String?             @map("html_body") @db.Text
+  textBody            String?             @map("text_body") @db.Text
+  // Anexos efetivamente enviados (snapshot, não muda se template mudar)
+  attachments         Json?
+
+  status              EmailMessageStatus  @default(pending)
+  providerMessageId   String?             @map("provider_message_id")
+  attempts            Int                 @default(0)
+  nextRetryAt         DateTime?           @map("next_retry_at")
+  sentAt              DateTime?           @map("sent_at")
+  deliveredAt         DateTime?           @map("delivered_at")
+  openedAt            DateTime?           @map("opened_at")
+  clickedAt           DateTime?           @map("clicked_at")
+  bouncedAt           DateTime?           @map("bounced_at")
+  failedAt            DateTime?           @map("failed_at")
+  lastError           String?             @map("last_error")
+
+  campaignId          String?             @map("campaign_id")
+  leadId              String?             @map("lead_id")
+  triggeredByUserId   String?             @map("triggered_by_user_id")
+
+  dedupKey            String?             @unique @map("dedup_key")
+
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  provider            EmailProvider       @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  template            EmailTemplate?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  logs                EmailMessageLog[]
+  webhookEvents       EmailWebhookEvent[]
+
+  @@index([providerId])
+  @@index([status])
+  @@index([campaignId])
+  @@index([leadId])
+  @@index([nextRetryAt])
+  @@index([providerMessageId])
+  @@index([toEmail])
+  @@map("email_messages")
+}
+
+model EmailMessageLog {
+  id            String              @id @default(uuid()) @db.Uuid
+  messageId     String              @map("message_id") @db.Uuid
+  attempt       Int
+  status        EmailMessageStatus
+  providerName  String              @map("provider_name")
+  rawRequest    Json?               @map("raw_request")
+  rawResponse   Json?               @map("raw_response")
+  httpStatus    Int?                @map("http_status")
+  errorMessage  String?             @map("error_message")
+  errorCode     String?             @map("error_code")
+  durationMs    Int?                @map("duration_ms")
+  createdAt     DateTime            @default(now()) @map("created_at")
+
+  message       EmailMessage        @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([createdAt])
+  @@map("email_message_logs")
+}
+
+model EmailWebhookEvent {
+  id                  String                @id @default(uuid()) @db.Uuid
+  providerId          String                @map("provider_id") @db.Uuid
+  messageId           String?               @map("message_id") @db.Uuid
+
+  eventType           EmailWebhookEventType @map("event_type")
+  providerMessageId   String?               @map("provider_message_id")
+  recipientEmail      String?               @map("recipient_email")
+  rawHeaders          Json?                 @map("raw_headers")
+  rawBody             Json?                 @map("raw_body")
+  signatureValid      Boolean               @default(false) @map("signature_valid")
+  processed           Boolean               @default(false)
+  processingError     String?               @map("processing_error")
+
+  receivedAt          DateTime              @default(now()) @map("received_at")
+
+  provider            EmailProvider         @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  message             EmailMessage?         @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@index([providerId])
+  @@index([messageId])
+  @@index([providerMessageId])
+  @@index([eventType])
+  @@map("email_webhook_events")
+}
+
+// Lista de supressão — bloqueia novos envios para emails que deram bounce/complaint/unsub
+model EmailSuppression {
+  id          String                  @id @default(uuid()) @db.Uuid
+  emailLower  String                  @unique @map("email_lower")
+  reason      EmailSuppressionReason
+  detail      String?
+  source      String?                 // "webhook:sendgrid" | "manual:admin@x" | "import:csv"
+  createdAt   DateTime                @default(now()) @map("created_at")
+
+  @@index([reason])
+  @@map("email_suppressions")
+}
+
+// Estatísticas agregadas por dia + provider — alimenta o dashboard sem query pesada em messages
+model EmailCampaignStat {
+  id             String    @id @default(uuid()) @db.Uuid
+  providerId     String    @map("provider_id") @db.Uuid
+  campaignId     String?   @map("campaign_id")
+  day            DateTime  @db.Date
+  sent           Int       @default(0)
+  delivered      Int       @default(0)
+  opened         Int       @default(0)
+  clicked        Int       @default(0)
+  bounced        Int       @default(0)
+  complained     Int       @default(0)
+  failed         Int       @default(0)
+
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@unique([providerId, campaignId, day])
+  @@index([day])
+  @@index([campaignId])
+  @@map("email_campaign_stats")
+}
+
+// ============================================================
+// Módulo: Telefonia (Mission 4)
+// ============================================================
+
+enum TelephonyProviderType {
+  vai_voice
+  generic_http_voice
+  sip_gateway
+  asterisk
+  freeswitch
+}
+
+enum TelephonyAuthType {
+  none
+  api_key_header
+  api_key_query
+  bearer_token
+  basic_auth
+  custom_headers
+}
+
+enum TelephonyCallStatus {
+  pending
+  queued
+  dialing
+  ringing
+  answered
+  audio_playing
+  dtmf_received
+  transferred
+  completed
+  no_answer
+  busy
+  failed
+  canceled
+  expired
+}
+
+enum TelephonyWebhookEventType {
+  call_initiated
+  call_ringing
+  call_answered
+  audio_started
+  audio_finished
+  dtmf
+  call_transferred
+  call_completed
+  call_failed
+  unknown
+}
+
+model TelephonyProvider {
+  id                  String                @id @default(uuid()) @db.Uuid
+  providerName        String                @unique @map("provider_name")
+  providerType        TelephonyProviderType @map("provider_type")
+  active              Boolean               @default(true) @map("is_active")
+
+  baseUrl             String?               @map("base_url")
+  authType            TelephonyAuthType     @default(none) @map("auth_type")
+
+  apiKey              String?               @map("api_key")
+  bearerToken         String?               @map("bearer_token")
+  username            String?
+  password            String?
+
+  accountId           String?               @map("account_id")
+  trunkId             String?               @map("trunk_id")
+  callerId            String?               @map("caller_id")
+
+  // SIP / asterisk / freeswitch
+  sipHost             String?               @map("sip_host")
+  sipPort             Int?                  @map("sip_port")
+  sipUsername         String?               @map("sip_username")
+  sipPassword         String?               @map("sip_password")
+  codecs              String[]              @default([])
+  dtmfMode            String?               @map("dtmf_mode")  // rfc2833 | inband | sipinfo
+
+  webhookUrl          String?               @map("webhook_url")
+  webhookSecret       String?               @map("webhook_secret")
+
+  maxChannels         Int                   @default(10) @map("max_channels")
+  callsPerSecond      Int                   @default(2)  @map("calls_per_second")
+  timeoutSeconds      Int                   @default(60) @map("timeout_seconds")
+  retryAttempts       Int                   @default(5)  @map("retry_attempts")
+
+  defaultAudioUrl     String?               @map("default_audio_url")
+  customHeaders       Json?                 @map("custom_headers")
+  payloadTemplate     Json?                 @map("payload_template")
+  responsePaths       Json?                 @map("response_paths")  // { messageId, status, error }
+  httpMethod          String                @default("POST") @map("http_method")
+  callPath            String                @default("/calls") @map("call_path")
+
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+
+  calls               TelephonyCampaignCall[]
+  channels            TelephonyChannel[]
+  webhookEvents       TelephonyWebhookEvent[]
+  audioFiles          TelephonyAudioFile[]
+  gatewayStatuses     TelephonyGatewayStatus[]
+
+  @@index([providerType])
+  @@index([active])
+  @@map("telephony_providers")
+}
+
+// Snapshot de canais ativos por provider — atualizado por webhook ou polling
+model TelephonyChannel {
+  id          String              @id @default(uuid()) @db.Uuid
+  providerId  String              @map("provider_id") @db.Uuid
+  channelId   String              @map("channel_id")  // ID externo do canal
+  inUse       Boolean             @default(false) @map("in_use")
+  callId      String?             @map("call_id") @db.Uuid
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  provider    TelephonyProvider   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, channelId])
+  @@index([providerId, inUse])
+  @@map("telephony_channels")
+}
+
+model TelephonyAudioFile {
+  id              String            @id @default(uuid()) @db.Uuid
+  providerId      String?           @map("provider_id") @db.Uuid  // opcional — pode ser global
+  name            String
+  url             String
+  durationSeconds Int?              @map("duration_seconds")
+  mimeType        String?           @map("mime_type")
+  active          Boolean           @default(true)
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  provider        TelephonyProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  @@index([providerId])
+  @@map("telephony_audio_files")
+}
+
+model TelephonyCampaignCall {
+  id                  String              @id @default(uuid()) @db.Uuid
+  providerId          String              @map("provider_id") @db.Uuid
+
+  toOriginal          String              @map("to_original")
+  toNormalized        String              @map("to_normalized")  // E.164
+  audioUrl            String?             @map("audio_url")
+  audioDurationSeconds Int?               @map("audio_duration_seconds")
+  dtmfCapture         Boolean             @default(false) @map("dtmf_capture")
+  dtmfValidOptions    String[]            @default([]) @map("dtmf_valid_options")
+  transferOnDtmf      Boolean             @default(false) @map("transfer_on_dtmf")
+  transferTo          String?             @map("transfer_to")
+
+  status              TelephonyCallStatus @default(pending)
+  externalCallId      String?             @map("external_call_id")  // call_id retornado pelo provider
+  attempts            Int                 @default(0)
+  nextRetryAt         DateTime?           @map("next_retry_at")
+
+  initiatedAt         DateTime?           @map("initiated_at")
+  answeredAt          DateTime?           @map("answered_at")
+  completedAt         DateTime?           @map("completed_at")
+  durationSeconds     Int?                @map("duration_seconds")
+
+  pressedKey          String?             @map("pressed_key")
+  interested          Boolean             @default(false)  // true se DTMF == "1" (ou outro válido)
+  lastError           String?             @map("last_error")
+
+  campaignId          String?             @map("campaign_id")
+  leadId              String?             @map("lead_id")
+  triggeredByUserId   String?             @map("triggered_by_user_id")
+
+  dedupKey            String?             @unique @map("dedup_key")
+
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  provider            TelephonyProvider   @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  logs                TelephonyCallLog[]
+  webhookEvents       TelephonyWebhookEvent[]
+  dtmfEvents          TelephonyDtmfEvent[]
+
+  @@index([providerId])
+  @@index([status])
+  @@index([campaignId])
+  @@index([leadId])
+  @@index([nextRetryAt])
+  @@index([externalCallId])
+  @@index([interested])
+  @@map("telephony_campaign_calls")
+}
+
+model TelephonyCallLog {
+  id            String                @id @default(uuid()) @db.Uuid
+  callId        String                @map("call_id") @db.Uuid
+  attempt       Int
+  status        TelephonyCallStatus
+  providerName  String                @map("provider_name")
+  rawRequest    Json?                 @map("raw_request")
+  rawResponse   Json?                 @map("raw_response")
+  httpStatus    Int?                  @map("http_status")
+  errorMessage  String?               @map("error_message")
+  errorCode     String?               @map("error_code")
+  durationMs    Int?                  @map("duration_ms")
+  createdAt     DateTime              @default(now()) @map("created_at")
+
+  call          TelephonyCampaignCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([callId])
+  @@index([createdAt])
+  @@map("telephony_call_logs")
+}
+
+model TelephonyWebhookEvent {
+  id                String                    @id @default(uuid()) @db.Uuid
+  providerId        String                    @map("provider_id") @db.Uuid
+  callId            String?                   @map("call_id") @db.Uuid
+
+  eventType         TelephonyWebhookEventType @map("event_type")
+  externalCallId    String?                   @map("external_call_id")
+  rawHeaders        Json?                     @map("raw_headers")
+  rawBody           Json?                     @map("raw_body")
+  signatureValid    Boolean                   @default(false) @map("signature_valid")
+  processed         Boolean                   @default(false)
+  processingError   String?                   @map("processing_error")
+
+  receivedAt        DateTime                  @default(now()) @map("received_at")
+
+  provider          TelephonyProvider         @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  call              TelephonyCampaignCall?    @relation(fields: [callId], references: [id], onDelete: SetNull)
+
+  @@index([providerId])
+  @@index([callId])
+  @@index([externalCallId])
+  @@index([eventType])
+  @@map("telephony_webhook_events")
+}
+
+model TelephonyDtmfEvent {
+  id            String                @id @default(uuid()) @db.Uuid
+  callId        String                @map("call_id") @db.Uuid
+  pressedKey    String                @map("pressed_key")
+  isInterested  Boolean               @default(false) @map("is_interested")  // true se key é "1" ou opção válida configurada
+  receivedAt    DateTime              @default(now()) @map("received_at")
+  rawEvent      Json?                 @map("raw_event")
+
+  call          TelephonyCampaignCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([callId])
+  @@index([pressedKey])
+  @@index([isInterested])
+  @@map("telephony_dtmf_events")
+}
+
+// Snapshot do estado do gateway/trunk (CPS atual, canais usados, last seen)
+model TelephonyGatewayStatus {
+  id              String            @id @default(uuid()) @db.Uuid
+  providerId      String            @map("provider_id") @db.Uuid
+  channelsInUse   Int               @default(0) @map("channels_in_use")
+  channelsTotal   Int?              @map("channels_total")
+  cpsCurrent      Int               @default(0) @map("cps_current")
+  registered      Boolean           @default(false)  // SIP REGISTER ok?
+  lastError       String?           @map("last_error")
+  lastSeenAt      DateTime          @default(now()) @map("last_seen_at")
+  rawSnapshot     Json?             @map("raw_snapshot")
+
+  provider        TelephonyProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([lastSeenAt])
+  @@map("telephony_gateway_status")
+}

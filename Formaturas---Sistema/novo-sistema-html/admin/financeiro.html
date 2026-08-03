@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Financeiro — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <div class="sidebar-section">Geral</div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
+  <a href="financeiro.html" class="sidebar-link active"><i data-lucide="banknote"></i>Financeiro</a>
+  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar contrato, aluno, NFe…"></div>
+    <div class="flex gap-2">
+      <div style="position:relative;" data-no-toast>
+        <button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.classList.toggle('hidden')"><i data-lucide="download" class="w-4 h-4"></i> Exportar <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+        <div class="hidden" style="position:absolute;top:calc(100% + 4px);right:0;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-lg);min-width:160px;z-index:10;">
+          <a href="#" style="display:block;padding:10px 14px;font-size:13px;color:var(--gray-700);text-decoration:none;">📊 CSV (.csv)</a>
+          <a href="#" style="display:block;padding:10px 14px;font-size:13px;color:var(--gray-700);text-decoration:none;border-top:1px solid var(--gray-100);">📈 Excel (.xlsx)</a>
+          <a href="#" style="display:block;padding:10px 14px;font-size:13px;color:var(--gray-700);text-decoration:none;border-top:1px solid var(--gray-100);">📄 PDF</a>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="file-text" class="w-4 h-4"></i> Emitir NFe</button>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="check-circle" class="w-4 h-4"></i> Baixa manual</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Disparar VAI WhatsApp</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Financeiro</div>
+    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Financeiro</h1>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-label">Contratado</div><div class="kpi-value">R$ 2,4M</div><div class="kpi-trend" style="color:var(--gray-500);">123 contratos</div></div>
+      <div class="kpi"><div class="kpi-label">Recebido</div><div class="kpi-value" style="color:var(--success);">R$ 1,38M</div><div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> 78,4% do total</div></div>
+      <div class="kpi"><div class="kpi-label">A receber</div><div class="kpi-value">R$ 297K</div><div class="kpi-trend" style="color:var(--gray-500);">parcelas vincendas</div></div>
+      <div class="kpi"><div class="kpi-label">Inadimplência</div><div class="kpi-value" style="color:var(--danger);">R$ 87K</div><div class="kpi-trend down">23 alunos · 4,9%</div></div>
+    </div>
+
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="card-title">Cobranças (últimos 30 dias)</div>
+        <div class="flex gap-2">
+          <select class="select" style="width:160px;font-size:13px;padding:6px 10px;"><option>Todos os status</option><option>Pendente</option><option>Atrasada</option><option>Paga</option></select>
+          <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todas as turmas</option></select>
+        </div>
+      </div>
+      <table class="table">
+        <thead><tr><th>Aluno</th><th>Turma</th><th>Parcela</th><th class="num">Valor</th><th>Vencimento</th><th>Método</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Camila Almeida</strong><div style="font-size:12px;color:var(--gray-500);">camila@email.com</div></td>
+            <td>MEDICINA T85 - UNIMONTES</td>
+            <td>05/21</td>
+            <td class="num">R$ 145,82</td>
+            <td>02/05/2026</td>
+            <td><span class="badge"><i data-lucide="qr-code" class="w-3 h-3"></i> PIX</span></td>
+            <td><span class="badge badge-success">Paga</span></td>
+            <td class="text-right"><a href="#" class="btn btn-ghost btn-icon"><i data-lucide="more-horizontal" class="w-4 h-4"></i></a></td>
+          </tr>
+          <tr>
+            <td><strong>Pedro Henrique</strong><div style="font-size:12px;color:var(--gray-500);">pedro@email.com</div></td>
+            <td>MEDICINA T85 - UNIMONTES</td>
+            <td>05/21</td>
+            <td class="num">R$ 145,82</td>
+            <td>02/05/2026</td>
+            <td><span class="badge">Boleto</span></td>
+            <td><span class="badge badge-warning">Pendente</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Júlia Ribeiro</strong></td>
+            <td>MEDICINA T85 - UNIMONTES</td>
+            <td>04/21</td>
+            <td class="num">R$ 145,82</td>
+            <td>15/04/2026</td>
+            <td><span class="badge">Boleto</span></td>
+            <td><span class="badge badge-danger">15 dias atrasada</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Ana Carolina Souza</strong></td>
+            <td>UNIFICADA - IPATINGA</td>
+            <td>06/21</td>
+            <td class="num">R$ 422,27</td>
+            <td>05/05/2026</td>
+            <td><span class="badge"><i data-lucide="credit-card" class="w-3 h-3"></i> Cartão 21x</span></td>
+            <td><span class="badge badge-info">Em processamento</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>João Vinícius</strong></td>
+            <td>ENG. FLORESTAL - UFMG</td>
+            <td>03/21</td>
+            <td class="num">R$ 525,00</td>
+            <td>20/03/2026</td>
+            <td><span class="badge">Boleto</span></td>
+            <td><span class="badge badge-danger">42 dias atrasada</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Fernanda Alves Lopes</strong></td>
+            <td>LETRAS - UNIMONTES</td>
+            <td>08/21</td>
+            <td class="num">R$ 232,93</td>
+            <td>30/04/2026</td>
+            <td><span class="badge"><i data-lucide="qr-code" class="w-3 h-3"></i> PIX</span></td>
+            <td><span class="badge badge-success">Paga</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Igor Martins Rocha</strong></td>
+            <td>DIREITO - UNIMONTES</td>
+            <td>06/21</td>
+            <td class="num">R$ 325,16</td>
+            <td>10/05/2026</td>
+            <td><span class="badge"><i data-lucide="qr-code" class="w-3 h-3"></i> PIX</span></td>
+            <td><span class="badge badge-warning">Pendente</span></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid gap-6" style="grid-template-columns: 1fr 1fr;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Distribuição por método de pagamento</div></div>
+        <div class="card-body">
+          <div style="padding:6px 0;font-size:14px;">
+            <div class="flex justify-between mb-1"><span>PIX</span><strong>52%</strong></div>
+            <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;"><div style="width:52%;height:100%;background:var(--primary-600);"></div></div>
+          </div>
+          <div style="padding:6px 0;font-size:14px;">
+            <div class="flex justify-between mb-1"><span>Cartão de crédito (21x)</span><strong>31%</strong></div>
+            <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;"><div style="width:31%;height:100%;background:#A855F7;"></div></div>
+          </div>
+          <div style="padding:6px 0;font-size:14px;">
+            <div class="flex justify-between mb-1"><span>Boleto</span><strong>15%</strong></div>
+            <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;"><div style="width:15%;height:100%;background:#F59E0B;"></div></div>
+          </div>
+          <div style="padding:6px 0;font-size:14px;">
+            <div class="flex justify-between mb-1"><span>Outros</span><strong>2%</strong></div>
+            <div style="height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;"><div style="width:2%;height:100%;background:var(--gray-400);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Notas Fiscais (NFe)</div><a href="#" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver todas →</a></div>
+        <table class="table">
+          <thead><tr><th>NFe</th><th>Aluno</th><th class="num">Valor</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span style="font-family:var(--font-mono);">000412</span></td><td>Camila Almeida</td><td class="num">R$ 145,82</td><td><span class="badge badge-success">Autorizada</span></td></tr>
+            <tr><td><span style="font-family:var(--font-mono);">000411</span></td><td>Pedro Henrique</td><td class="num">R$ 145,82</td><td><span class="badge badge-info">Em proc.</span></td></tr>
+            <tr><td><span style="font-family:var(--font-mono);">000410</span></td><td>Júlia Ribeiro</td><td class="num">R$ 145,82</td><td><span class="badge badge-success">Autorizada</span></td></tr>
+            <tr><td><span style="font-family:var(--font-mono);">000409</span></td><td>Igor Martins Rocha</td><td class="num">R$ 325,16</td><td><span class="badge badge-success">Autorizada</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Check-in ao vivo — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
+  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
+  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
+  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
+  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
+  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
+  <a href="checkin-ao-vivo.html" class="sidebar-link active"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
+  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="flex items-center gap-3" style="flex:1;">
+      <strong>BAILE + AFTER · MEDICINA T84 - UNIMONTES</strong>
+      <span class="badge badge-info">Em andamento</span>
+    </div>
+    <div class="flex gap-2 items-center">
+      <span class="live-dot"></span>
+      <span class="text-sm" style="color:var(--success);font-weight:600;">AO VIVO</span>
+    </div>
+  </header>
+
+  <main class="app-content" style="background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%); margin:-28px -32px 0; padding: 28px 32px; min-height:calc(100vh - 64px); color:white;">
+
+    <div class="grid gap-6 mb-6" style="grid-template-columns: 2fr 1fr;">
+      <div>
+        <div class="text-sm" style="opacity:.6;">Espaço Ventus · 22/04/2026 · 21:30</div>
+        <h1 class="text-3xl font-bold mt-1">Check-in ao vivo</h1>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);"><i data-lucide="printer" class="w-4 h-4"></i> Status impressora</button>
+        <button class="btn" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+      </div>
+    </div>
+
+    <!-- KPIs ao vivo -->
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:24px;backdrop-filter:blur(20px);">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;">Convidados</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;">418</div>
+      </div>
+      <div style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:14px;padding:24px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#6EE7B7;">Já entraram</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#A7F3D0;">317</div>
+        <div style="font-size:11px;opacity:.7;margin-top:4px;">76% do total</div>
+      </div>
+      <div style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:14px;padding:24px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#FCD34D;">Confirmados pendentes</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#FDE68A;">68</div>
+      </div>
+      <div style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:14px;padding:24px;">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#FCA5A5;">Negados</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#FECACA;">3</div>
+        <div style="font-size:11px;opacity:.7;margin-top:4px;">QR já usado</div>
+      </div>
+    </div>
+
+    <div class="grid gap-6" style="grid-template-columns: 2fr 1fr;">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:0;backdrop-filter:blur(20px);overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.08);" class="flex justify-between items-center">
+          <strong style="font-size:15px;">Últimos check-ins</strong>
+          <span class="live-dot"></span>
+        </div>
+        <table style="width:100%;">
+          <tbody style="font-size:14px;">
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Marcos Silva</strong><div style="font-size:12px;opacity:.5;">convidado · Camila Almeida</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 2s</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Ana Paula Mendes</strong><div style="font-size:12px;opacity:.5;">familiar · Pedro Henrique</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-vip" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">VIP</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 14s</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Luis Augusto</strong><div style="font-size:12px;opacity:.5;">imprensa</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-imprensa" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">IMPRENSA</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 32s</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Júlia Ribeiro</strong><div style="font-size:12px;opacity:.5;">comissão · representante</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comissao" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMISSÃO</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 1min</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Fernanda Costa</strong><div style="font-size:12px;opacity:.5;">familiar · Júlia Ribeiro</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 1min</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Roberto Almeida</strong><div style="font-size:12px;opacity:.5;">familiar · Camila Almeida</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 2min</td></tr>
+            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Tentativa não autorizada</strong><div style="font-size:12px;opacity:.5;">QR já usado · 10:23</div></td><td style="padding:14px 22px;text-align:right;"></td><td style="padding:14px 22px;text-align:right;color:#FCA5A5;font-size:13px;">há 3min</td></tr>
+            <tr><td style="padding:14px 22px;"><strong>Carlos Eduardo Lima</strong><div style="font-size:12px;opacity:.5;">funcionário · Ventus</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-funcionario" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">FUNC.</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 4min</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;backdrop-filter:blur(20px);margin-bottom:16px;">
+          <strong>Distribuição por categoria</strong>
+          <div style="margin-top:16px;">
+            <div class="flex justify-between mb-1" style="font-size:13px;"><span>VIP</span><strong>42</strong></div>
+            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:50%;height:100%;background:#FBBF24;"></div></div>
+            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Comum</span><strong>248</strong></div>
+            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:78%;height:100%;background:#2563EB;"></div></div>
+            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Comissão</span><strong>14</strong></div>
+            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:60%;height:100%;background:#DC2626;"></div></div>
+            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Imprensa</span><strong>8</strong></div>
+            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:80%;height:100%;background:#6B7280;"></div></div>
+            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Funcionário</span><strong>5</strong></div>
+            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:90%;height:100%;background:#10B981;"></div></div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;backdrop-filter:blur(20px);">
+          <strong>Pontos de acesso</strong>
+          <div style="margin-top:16px;">
+            <div class="flex justify-between" style="padding:8px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);">
+              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Portaria principal</span>
+              <strong style="color:#86EFAC;">218 entradas</strong>
+            </div>
+            <div class="flex justify-between" style="padding:8px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);">
+              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Portaria lateral</span>
+              <strong style="color:#86EFAC;">88 entradas</strong>
+            </div>
+            <div class="flex justify-between" style="padding:8px 0;font-size:13px;">
+              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Acesso VIP</span>
+              <strong style="color:#86EFAC;">11 entradas</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

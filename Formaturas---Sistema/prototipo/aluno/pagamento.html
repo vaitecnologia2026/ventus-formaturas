@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pagamentos · Ventus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  body { background: #FAFBFC; }
+  .pag-hero {
+    background: var(--grad);
+    color: white;
+    padding: 24px 20px 60px;
+    border-radius: 0 0 24px 24px;
+  }
+  .pag-hero h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .pag-hero .sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .resumo-card {
+    background: white;
+    margin: -40px 20px 24px;
+    padding: 22px;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 2;
+  }
+  .resumo-card .pacote {
+    font-size: 12px;
+    color: var(--neutro-500);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .resumo-card h2 { font-size: 18px; font-weight: 700; margin: 4px 0 16px; }
+  .totais-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--neutro-100);
+  }
+  .total-item .lbl { font-size: 11px; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .total-item .val { font-size: 20px; font-weight: 800; margin-top: 2px; color: var(--neutro-900); }
+  .total-item .val.success { color: var(--sucesso); }
+  .total-item .val.warn { color: var(--aviso); }
+
+  .secao-titulo {
+    padding: 0 20px;
+    font-size: 13px;
+    color: var(--neutro-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .parcela {
+    background: white;
+    margin: 0 20px 8px;
+    padding: 16px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--neutro-200);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .parcela.atrasada { border-color: var(--erro); background: #FFFBFB; }
+  .parcela.proxima { border-color: var(--azul-400); background: var(--azul-50); }
+  .parcela .num { font-size: 12px; color: var(--neutro-500); font-weight: 600; }
+  .parcela .data { font-size: 14px; font-weight: 700; color: var(--neutro-900); margin-top: 2px; }
+  .parcela .valor { font-size: 16px; font-weight: 800; color: var(--neutro-900); }
+  .parcela.atrasada .valor { color: var(--erro); }
+  .parcela.atrasada .data { color: var(--erro); }
+  .parcela-cta {
+    display: block;
+    margin: 20px;
+    padding: 16px;
+    background: var(--azul-700);
+    color: white;
+    border-radius: var(--r-md);
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .metodos-pagto {
+    background: white;
+    margin: 0 20px 24px;
+    padding: 20px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--neutro-200);
+  }
+  .metodos-pagto h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+  .metodo {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--neutro-200);
+    border-radius: var(--r-sm);
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .metodo.ativo { border-color: var(--azul-600); background: var(--azul-50); }
+  .metodo .ico-method { font-size: 20px; }
+  .metodo strong { font-weight: 700; }
+  .metodo small { color: var(--neutro-500); font-size: 12px; }
+  .metodo .check {
+    margin-left: auto;
+    width: 20px; height: 20px;
+    border: 2px solid var(--neutro-300);
+    border-radius: 50%;
+  }
+  .metodo.ativo .check {
+    border-color: var(--azul-600);
+    background: var(--azul-600);
+    position: relative;
+  }
+  .metodo.ativo .check::after {
+    content: '';
+    position: absolute;
+    top: 4px; left: 5px;
+    width: 5px; height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <header class="h-mobile">
+    <a href="galeria.html" class="h-back">← Voltar</a>
+    <h1>Pagamentos</h1>
+    <div></div>
+  </header>
+
+  <div class="pag-hero">
+    <h1>Olá, Marina!</h1>
+    <div class="sub">Pacote Ouro · Enfermagem FIP 2026/2</div>
+  </div>
+
+  <div class="resumo-card">
+    <div class="pacote">Resumo do contrato</div>
+    <h2>Pacote Ouro</h2>
+    <div class="text-sm text-muted">12 parcelas · Vencimento dia 10</div>
+
+    <div class="totais-grid">
+      <div class="total-item">
+        <div class="lbl">Valor total</div>
+        <div class="val">R$ 4.000</div>
+      </div>
+      <div class="total-item">
+        <div class="lbl">Restante</div>
+        <div class="val warn">R$ 2.667</div>
+      </div>
+      <div class="total-item">
+        <div class="lbl">Pago</div>
+        <div class="val success">R$ 1.333</div>
+      </div>
+      <div class="total-item">
+        <div class="lbl">Próximo venc.</div>
+        <div class="val" style="font-size: 14px; line-height: 1.4;">10 maio<br><span style="font-size:12px; color:var(--azul-700); font-weight:600;">em 7 dias</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="secao-titulo">Próxima parcela</div>
+
+  <div class="parcela proxima">
+    <div>
+      <div class="num">Parcela 4 de 12</div>
+      <div class="data">Vence em 10 maio · em 7 dias</div>
+    </div>
+    <div class="valor">R$ 333,33</div>
+  </div>
+
+  <a href="#" class="parcela-cta">Pagar agora · Pix · Boleto · Cartão</a>
+
+  <div class="metodos-pagto">
+    <h3>Forma de pagamento preferida</h3>
+    <div class="metodo ativo">
+      <span class="ico-method">⚡</span>
+      <div>
+        <strong>Pix</strong>
+        <br/><small>Aprovação imediata · sem taxas</small>
+      </div>
+      <div class="check"></div>
+    </div>
+    <div class="metodo">
+      <span class="ico-method">💳</span>
+      <div>
+        <strong>Cartão de crédito</strong>
+        <br/><small>Em até 12x sem juros</small>
+      </div>
+      <div class="check"></div>
+    </div>
+    <div class="metodo">
+      <span class="ico-method">📄</span>
+      <div>
+        <strong>Boleto bancário</strong>
+        <br/><small>1-2 dias úteis</small>
+      </div>
+      <div class="check"></div>
+    </div>
+  </div>
+
+  <div class="secao-titulo">Histórico de parcelas</div>
+
+  <div class="parcela">
+    <div>
+      <div class="num">Parcela 3 de 12</div>
+      <div class="data">Pago em 09 abr</div>
+    </div>
+    <div style="display:flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+      <span class="badge badge-success">✓ Pago</span>
+      <span class="text-sm font-bold">R$ 333,33</span>
+    </div>
+  </div>
+
+  <div class="parcela">
+    <div>
+      <div class="num">Parcela 2 de 12</div>
+      <div class="data">Pago em 10 mar</div>
+    </div>
+    <div style="display:flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+      <span class="badge badge-success">✓ Pago</span>
+      <span class="text-sm font-bold">R$ 333,33</span>
+    </div>
+  </div>
+
+  <div class="parcela">
+    <div>
+      <div class="num">Parcela 1 de 12</div>
+      <div class="data">Pago em 10 fev</div>
+    </div>
+    <div style="display:flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+      <span class="badge badge-success">✓ Entrada</span>
+      <span class="text-sm font-bold">R$ 333,33</span>
+    </div>
+  </div>
+
+  <div style="padding: 0 20px 24px;">
+    <button class="btn btn-ghost btn-block">Ver todas as 12 parcelas</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="galeria.html">
+      <span class="ico">📸</span><span>Fotos</span>
+    </a>
+    <a href="pagamento.html" class="active">
+      <span class="ico">💳</span><span>Pagamentos</span>
+    </a>
+    <a href="#">
+      <span class="ico">👥</span><span>Convidados</span>
+    </a>
+    <a href="#">
+      <span class="ico">📅</span><span>Eventos</span>
+    </a>
+    <a href="#">
+      <span class="ico">⚙️</span><span>Conta</span>
+    </a>
+  </nav>
+
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

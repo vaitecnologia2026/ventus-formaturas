@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fila de edição · Ventus Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  body { background: var(--neutro-50); }
+  .editor-shell { min-height: 100vh; }
+  .editor-top {
+    background: white;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--neutro-200);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .editor-content { padding: 32px; max-width: 1300px; margin: 0 auto; }
+
+  .editor-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--neutro-200); margin-bottom: 24px; }
+  .editor-tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--neutro-500);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .editor-tab.active { color: var(--azul-700); border-bottom-color: var(--azul-700); }
+  .editor-tab .count {
+    background: var(--neutro-100);
+    color: var(--neutro-700);
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .editor-tab.active .count { background: var(--azul-100); color: var(--azul-700); }
+
+  .pacote-card {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .pacote-card:hover { box-shadow: var(--shadow-md); border-color: var(--azul-200, var(--azul-100)); }
+  .pacote-card.urgente { border-left: 4px solid var(--erro); }
+  .pacote-card.em-edicao { background: var(--azul-50); border-color: var(--azul-200, var(--azul-100)); }
+
+  .pacote-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .pacote-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .pacote-info .meta { font-size: 13px; color: var(--neutro-500); }
+  .pacote-actions { display: flex; gap: 8px; }
+
+  .pacote-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 16px;
+    background: var(--neutro-50);
+    border-radius: var(--r-md);
+    margin-bottom: 16px;
+  }
+  .pacote-card.em-edicao .pacote-stats { background: rgba(255,255,255,0.6); }
+  .ps-item .lbl { font-size: 11px; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .ps-item .val { font-size: 18px; font-weight: 800; margin-top: 2px; color: var(--neutro-900); }
+  .ps-item .val.warn { color: var(--aviso); }
+  .ps-item .val.error { color: var(--erro); }
+
+  .preview-strip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .preview-strip::-webkit-scrollbar { height: 6px; }
+  .preview-strip::-webkit-scrollbar-thumb { background: var(--neutro-300); border-radius: 3px; }
+  .preview-strip img {
+    height: 80px;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: var(--r-sm);
+    flex-shrink: 0;
+  }
+  .preview-more {
+    height: 80px;
+    aspect-ratio: 4/5;
+    background: var(--neutro-100);
+    border-radius: var(--r-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--neutro-500);
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .editor-sidebar-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .toast-section {
+    background: linear-gradient(90deg, var(--azul-50), white);
+    border-left: 4px solid var(--azul-600);
+    padding: 16px 20px;
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    margin-bottom: 24px;
+    font-size: 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="editor-shell">
+
+  <header class="editor-top">
+    <div class="logo">
+      <span class="logo-mark">V</span>
+      <span>Ventus · Editor</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="text-sm text-muted">Logado como <b>Ana Paula (Editora freelancer)</b></div>
+      <span class="avatar">AP</span>
+    </div>
+  </header>
+
+  <main class="editor-content">
+
+    <h1 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em;">Fila de edição</h1>
+    <p class="text-muted mt-2">Pegue um pacote, edite no Lightroom/Photoshop e faça upload das versões finais. O sistema entrega automaticamente para o aluno.</p>
+
+    <div class="editor-sidebar-stats mt-6">
+      <div class="kpi">
+        <div class="kpi-label">Aguardando edição</div>
+        <div class="kpi-num">9</div>
+        <div class="kpi-delta">pacotes · 347 fotos</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Em edição (você)</div>
+        <div class="kpi-num">2</div>
+        <div class="kpi-delta">81 fotos restantes</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Concluídas (mês)</div>
+        <div class="kpi-num">23</div>
+        <div class="kpi-delta">812 fotos entregues</div>
+      </div>
+      <div class="kpi highlight">
+        <div class="kpi-label">Tempo médio</div>
+        <div class="kpi-num">2.4 dias</div>
+        <div class="kpi-delta" style="color: rgba(255,255,255,0.85);">do "pegou" ao "finalizou"</div>
+      </div>
+    </div>
+
+    <div class="toast-section">
+      <span style="font-size: 22px;">💡</span>
+      <div>
+        <strong>Dica:</strong> ao baixar o pacote ZIP, o Lightroom abre e cria a coleção automaticamente.
+        Quando terminar, arraste a pasta de versões finais para a área "Upload finalizado" do pacote.
+      </div>
+    </div>
+
+    <div class="editor-tabs">
+      <div class="editor-tab active">Aguardando <span class="count">9</span></div>
+      <div class="editor-tab">Em edição (suas) <span class="count">2</span></div>
+      <div class="editor-tab">Finalizadas <span class="count">23</span></div>
+    </div>
+
+    <!-- Pacote 1 - URGENTE -->
+    <div class="pacote-card urgente">
+      <div class="pacote-head">
+        <div class="pacote-info">
+          <h3>Pedro Henrique Silva · Enfermagem FIP 2026/2 <span class="badge badge-error">⏱ Urgente · D+5</span></h3>
+          <div class="meta">50 fotos selecionadas · Pacote Ouro · Selecionado há 5 dias</div>
+        </div>
+        <div class="pacote-actions">
+          <button class="btn btn-primary">Pegar pacote →</button>
+        </div>
+      </div>
+
+      <div class="pacote-stats">
+        <div class="ps-item">
+          <div class="lbl">Fotos</div>
+          <div class="val">50</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Tamanho</div>
+          <div class="val">214 MB</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Eventos</div>
+          <div class="val">3</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Aguardando há</div>
+          <div class="val error">5 dias ⚠️</div>
+        </div>
+      </div>
+
+      <div class="preview-strip">
+        <img src="https://picsum.photos/seed/q1/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q2/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q3/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q4/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q5/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q6/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q7/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q8/200/250" alt="" />
+        <div class="preview-more">+42</div>
+      </div>
+    </div>
+
+    <!-- Pacote 2 -->
+    <div class="pacote-card">
+      <div class="pacote-head">
+        <div class="pacote-info">
+          <h3>Camila Rocha Mendes · Enfermagem FIP 2026/2</h3>
+          <div class="meta">30 fotos selecionadas · Pacote Prata · Selecionado há 2 dias</div>
+        </div>
+        <div class="pacote-actions">
+          <button class="btn btn-ghost">👁 Visualizar</button>
+          <button class="btn btn-primary">Pegar pacote →</button>
+        </div>
+      </div>
+
+      <div class="pacote-stats">
+        <div class="ps-item">
+          <div class="lbl">Fotos</div>
+          <div class="val">30</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Tamanho</div>
+          <div class="val">132 MB</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Eventos</div>
+          <div class="val">2</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Aguardando há</div>
+          <div class="val">2 dias</div>
+        </div>
+      </div>
+
+      <div class="preview-strip">
+        <img src="https://picsum.photos/seed/q9/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q10/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q11/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q12/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q13/200/250" alt="" />
+        <img src="https://picsum.photos/seed/q14/200/250" alt="" />
+        <div class="preview-more">+24</div>
+      </div>
+    </div>
+
+    <!-- Pacote 3 - EM EDIÇÃO (mostrar como está sendo trabalhado) -->
+    <div class="pacote-card em-edicao">
+      <div class="pacote-head">
+        <div class="pacote-info">
+          <h3>Marina Souza Lima · Enfermagem FIP 2026/2 <span class="badge badge-info">🎨 Em edição (você)</span></h3>
+          <div class="meta">12 fotos · Pacote Ouro · Pegou há 3 horas · Progresso: 4/12</div>
+        </div>
+        <div class="pacote-actions">
+          <button class="btn btn-ghost">📥 Baixar ZIP</button>
+          <button class="btn btn-primary">📤 Upload finalizado</button>
+        </div>
+      </div>
+
+      <div class="pacote-stats">
+        <div class="ps-item">
+          <div class="lbl">Editadas</div>
+          <div class="val" style="color: var(--azul-700);">4 / 12</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Restantes</div>
+          <div class="val warn">8</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Tempo decorrido</div>
+          <div class="val">3h</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Tempo médio/foto</div>
+          <div class="val">~12 min</div>
+        </div>
+      </div>
+
+      <div class="progress" style="margin-bottom: 12px;"><div class="progress-bar" style="width:33%"></div></div>
+
+      <div class="preview-strip">
+        <img src="https://picsum.photos/seed/m1/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m2/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m3/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m4/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m5/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m6/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m7/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m8/200/250" alt="" />
+        <img src="https://picsum.photos/seed/m9/200/250" alt="" />
+        <div class="preview-more">+3</div>
+      </div>
+    </div>
+
+    <!-- Pacote 4 -->
+    <div class="pacote-card">
+      <div class="pacote-head">
+        <div class="pacote-info">
+          <h3>Juliana Martins Santos · Enfermagem FIP 2026/2</h3>
+          <div class="meta">31 fotos selecionadas · Pacote Ouro · Selecionado há 1 dia</div>
+        </div>
+        <div class="pacote-actions">
+          <button class="btn btn-ghost">👁 Visualizar</button>
+          <button class="btn btn-primary">Pegar pacote →</button>
+        </div>
+      </div>
+
+      <div class="pacote-stats">
+        <div class="ps-item">
+          <div class="lbl">Fotos</div>
+          <div class="val">31</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Tamanho</div>
+          <div class="val">138 MB</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Eventos</div>
+          <div class="val">3</div>
+        </div>
+        <div class="ps-item">
+          <div class="lbl">Aguardando há</div>
+          <div class="val">1 dia</div>
+        </div>
+      </div>
+
+      <div class="preview-strip">
+        <img src="https://picsum.photos/seed/j1/200/250" alt="" />
+        <img src="https://picsum.photos/seed/j2/200/250" alt="" />
+        <img src="https://picsum.photos/seed/j3/200/250" alt="" />
+        <img src="https://picsum.photos/seed/j4/200/250" alt="" />
+        <img src="https://picsum.photos/seed/j5/200/250" alt="" />
+        <img src="https://picsum.photos/seed/j6/200/250" alt="" />
+        <div class="preview-more">+25</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 24px;">
+      <button class="btn btn-ghost">Carregar mais 5 pacotes pendentes</button>
+    </div>
+
+  </main>
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

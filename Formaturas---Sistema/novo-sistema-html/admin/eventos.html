@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Eventos — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
+.cal-day-head { background:var(--gray-50); padding:10px; text-align:center; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-500); }
+.cal-cell { background:white; min-height:108px; padding:8px; position:relative; transition:background .15s; cursor:pointer; }
+.cal-cell:hover { background:var(--gray-50); }
+.cal-cell.other { background:#FAFBFC; color:var(--gray-400); }
+.cal-cell.today { background:#EFF6FF; }
+.cal-num { font-size:13px; font-weight:600; }
+.cal-today-mark { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--primary-600); color:white; font-size:12px; font-weight:700; }
+.cal-evt { display:block; font-size:11px; padding:3px 6px; border-radius:4px; margin-top:4px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+.cal-evt.cer { background:#DBEAFE; color:#1E40AF; }
+.cal-evt.fes { background:#FCE7F3; color:#9D174D; }
+.cal-evt.fot { background:#EDE9FE; color:#5B21B6; }
+.cal-evt.ens { background:#DCFCE7; color:#166534; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar evento, turma, local…"></div>
+    <div class="flex gap-2 items-center">
+      <button class="btn btn-secondary btn-sm"><i data-lucide="calendar-sync" class="w-4 h-4"></i> Sincronizar Google Agenda</button>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar ICS</button>
+      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Eventos</div>
+    <div class="flex justify-between items-center mt-1 mb-6">
+      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Calendário de eventos</h1>
+      <div class="flex gap-2">
+        <button class="btn btn-secondary btn-sm" style="background:var(--primary-50);color:var(--primary-700);border-color:var(--primary-200);">Mês</button>
+        <button class="btn btn-secondary btn-sm">Semana</button>
+        <button class="btn btn-secondary btn-sm">Lista</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="calendar" class="w-5 h-5"></i></div><div class="kpi-label">Eventos no mês</div><div class="kpi-value">17</div><div class="kpi-trend" style="color:var(--gray-500);">+ 5 vs abr</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Confirmados</div><div class="kpi-value">12</div><div class="kpi-trend up">71%</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Hoje</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">2 fotografias · 1 baile</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Conflitos detectados</div><div class="kpi-value">1</div><div class="kpi-trend down">15/07 · 2 turmas</div></div>
+    </div>
+
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="flex items-center gap-3">
+          <button class="btn btn-ghost btn-icon"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+          <h2 style="font-size:18px;font-weight:700;">Maio · 2026</h2>
+          <button class="btn btn-ghost btn-icon"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+          <button class="btn btn-secondary btn-sm" style="margin-left:8px;">Hoje</button>
+        </div>
+        <div class="flex gap-2 items-center" style="font-size:12px;color:var(--gray-600);">
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#DBEAFE;border-radius:3px;"></span> Cerimônia</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#FCE7F3;border-radius:3px;"></span> Festa</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#EDE9FE;border-radius:3px;"></span> Fotografia</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#DCFCE7;border-radius:3px;"></span> Ensaio</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="cal-grid">
+          <div class="cal-day-head">Dom</div><div class="cal-day-head">Seg</div><div class="cal-day-head">Ter</div><div class="cal-day-head">Qua</div><div class="cal-day-head">Qui</div><div class="cal-day-head">Sex</div><div class="cal-day-head">Sáb</div>
+
+          <div class="cal-cell other"><div class="cal-num">26</div></div>
+          <div class="cal-cell other"><div class="cal-num">27</div><span class="cal-evt fot">FOTO CONVITE · Med T85</span></div>
+          <div class="cal-cell other"><div class="cal-num">28</div></div>
+          <div class="cal-cell other"><div class="cal-num">29</div></div>
+          <div class="cal-cell today"><div class="cal-today-mark">30</div><span class="cal-evt fot">14h Foto Convite Externo</span><span class="cal-evt cer">19h Ensaio Beca</span><span class="cal-evt fes">21h Festa 365 dias · DIR</span></div>
+          <div class="cal-cell"><div class="cal-num">1</div></div>
+          <div class="cal-cell"><div class="cal-num">2</div></div>
+
+          <div class="cal-cell"><div class="cal-num">3</div><span class="cal-evt fes">21h BAILE+AFTER · Med T84</span></div>
+          <div class="cal-cell"><div class="cal-num">4</div></div>
+          <div class="cal-cell"><div class="cal-num">5</div><span class="cal-evt fot">FOTO CONVITE · ODONTO FUN</span></div>
+          <div class="cal-cell"><div class="cal-num">6</div></div>
+          <div class="cal-cell"><div class="cal-num">7</div></div>
+          <div class="cal-cell"><div class="cal-num">8</div></div>
+          <div class="cal-cell"><div class="cal-num">9</div><span class="cal-evt cer">CULTO ECUMÊNICO · Enf FUN</span></div>
+
+          <div class="cal-cell"><div class="cal-num">10</div><span class="cal-evt fes">FAMILY DAY · DIREITO UNI</span></div>
+          <div class="cal-cell"><div class="cal-num">11</div></div>
+          <div class="cal-cell"><div class="cal-num">12</div><span class="cal-evt ens">ENSAIO IND · Letras</span></div>
+          <div class="cal-cell"><div class="cal-num">13</div></div>
+          <div class="cal-cell"><div class="cal-num">14</div></div>
+          <div class="cal-cell"><div class="cal-num">15</div><span class="cal-evt cer">COLAÇÃO OFICIAL · Med Vet IFNMG</span></div>
+          <div class="cal-cell"><div class="cal-num">16</div><span class="cal-evt cer">COLAÇÃO SIMBÓLICA · Med Vet IFNMG</span></div>
+
+          <div class="cal-cell"><div class="cal-num">17</div></div>
+          <div class="cal-cell"><div class="cal-num">18</div></div>
+          <div class="cal-cell"><div class="cal-num">19</div><span class="cal-evt fes">100 DIAS · Direito FUN</span></div>
+          <div class="cal-cell"><div class="cal-num">20</div></div>
+          <div class="cal-cell"><div class="cal-num">21</div></div>
+          <div class="cal-cell"><div class="cal-num">22</div><span class="cal-evt cer">CULTO · Enf UNIMONTES</span></div>
+          <div class="cal-cell"><div class="cal-num">23</div></div>
+
+          <div class="cal-cell"><div class="cal-num">24</div></div>
+          <div class="cal-cell"><div class="cal-num">25</div></div>
+          <div class="cal-cell"><div class="cal-num">26</div><span class="cal-evt fot">POSICIONAMENTO · Eng UFMG</span></div>
+          <div class="cal-cell"><div class="cal-num">27</div></div>
+          <div class="cal-cell"><div class="cal-num">28</div></div>
+          <div class="cal-cell"><div class="cal-num">29</div><span class="cal-evt fes">FESTA EXTRA · Odontologia</span></div>
+          <div class="cal-cell"><div class="cal-num">30</div></div>
+
+          <div class="cal-cell"><div class="cal-num">31</div></div>
+          <div class="cal-cell other"><div class="cal-num">1</div></div>
+          <div class="cal-cell other"><div class="cal-num">2</div></div>
+          <div class="cal-cell other"><div class="cal-num">3</div></div>
+          <div class="cal-cell other"><div class="cal-num">4</div></div>
+          <div class="cal-cell other"><div class="cal-num">5</div></div>
+          <div class="cal-cell other"><div class="cal-num">6</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Próximos eventos detalhados</div><a href="#" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver todos →</a></div>
+      <table class="table">
+        <thead><tr><th>Data</th><th>Evento</th><th>Turma</th><th>Local</th><th>Convidados</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><strong>03/05</strong> 21h</td><td>BAILE + AFTER (40 fotos)</td><td>MEDICINA T84 - UNIMONTES</td><td>Espaço Ventus</td><td>89/160</td><td><span class="badge badge-success">Confirmado</span></td><td class="text-right"><button class="btn btn-ghost btn-icon"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button></td></tr>
+          <tr><td><strong>05/05</strong> 14h</td><td>FOTO CONVITE INTERNO</td><td>ODONTOLOGIA - FUNORTE</td><td>Estúdio Ventus</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
+          <tr><td><strong>09/05</strong> 19h</td><td>CULTO ECUMÊNICO (20 fotos)</td><td>ENFERMAGEM - FUNORTE</td><td>Igreja Matriz</td><td>—</td><td><span class="badge badge-warning">Aguardando</span></td><td></td></tr>
+          <tr><td><strong>10/05</strong> 14h</td><td>FAMILY DAY (você + 4)</td><td>DIREITO - UNIMONTES</td><td>Salão Ipiranga</td><td>62/124</td><td><span class="badge badge-success">Confirmado</span></td><td></td></tr>
+          <tr><td><strong>15/05</strong> 19h</td><td>COLAÇÃO OFICIAL</td><td>MEDICINA VETERINÁRIA - IFNMG</td><td>Auditório UNIMONTES</td><td>180/240</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
+          <tr><td><strong>15/05</strong> 22h</td><td>COLAÇÃO SIMBÓLICA</td><td>MEDICINA VETERINÁRIA - IFNMG</td><td>Auditório UNIMONTES</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
+          <tr><td><strong>22/05</strong> 19h</td><td>CULTO</td><td>ENFERMAGEM UNIMONTES</td><td>Igreja Bom Pastor</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

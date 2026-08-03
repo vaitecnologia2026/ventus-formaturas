@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Entrar — Ventus Formaturas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: linear-gradient(135deg, #1E3A8A 0%, #172554 100%); display: grid; place-items: center; min-height: 100vh; padding:40px 16px;">
+
+<div style="background: white; padding: 40px; border-radius: 20px; max-width: 440px; width: 100%; box-shadow: 0 24px 48px rgba(0,0,0,.3);">
+  <div class="flex items-center gap-3 mb-8">
+    <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-900);color:white;display:grid;place-items:center;font-weight:800;font-size:18px;">V</div>
+    <div>
+      <div style="font-weight:700;font-size:18px;color:var(--gray-900);">Ventus Formaturas</div>
+      <div style="font-size:12px;color:var(--gray-500);">Painel administrativo</div>
+    </div>
+  </div>
+
+  <h1 class="text-2xl font-bold mb-1" style="color: var(--gray-900);">Bem-vindo de volta</h1>
+  <p class="text-sm mb-6" style="color: var(--gray-600);">Selecione sua empresa e acesse com suas credenciais.</p>
+
+  <form id="login-form" onsubmit="event.preventDefault(); doLogin();">
+    <div class="mb-4">
+      <label class="label" for="empresa">Empresa</label>
+      <div style="position:relative;">
+        <i data-lucide="building-2" class="w-4 h-4" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none;"></i>
+        <select id="empresa" class="select" required style="padding-left:38px;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;">
+          <option value="">Selecione sua empresa…</option>
+          <option value="ventus">Ventus Formaturas — Montes Claros</option>
+          <option value="ventus-bh">Ventus BH — filial Belo Horizonte</option>
+          <option value="formatura-plus">Formatura+ Eventos</option>
+          <option value="memoria-viva">Memória Viva Produções</option>
+          <option value="momentum">Momentum Cerimonial</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="label" for="email">Email do administrador</label>
+      <div style="position:relative;">
+        <i data-lucide="mail" class="w-4 h-4" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none;"></i>
+        <input type="email" id="email" class="input" required placeholder="admin@empresa.com" autocomplete="username" style="padding-left:38px;">
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <div class="flex items-center justify-between" style="margin-bottom:6px;">
+        <label class="label" for="senha" style="margin-bottom:0;">Senha</label>
+        <a href="#" class="help" data-no-toast onclick="event.preventDefault(); alert('Em produção: enviaria link de recuperação ao e-mail cadastrado.');" style="color:var(--primary-600);text-decoration:none;">Esqueci minha senha</a>
+      </div>
+      <div style="position:relative;">
+        <i data-lucide="lock" class="w-4 h-4" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none;"></i>
+        <input type="password" id="senha" class="input" required placeholder="••••••••" autocomplete="current-password" style="padding-left:38px;padding-right:42px;">
+        <button type="button" data-no-toast onclick="togglePwd()" aria-label="Mostrar senha" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-500);padding:6px;border-radius:6px;display:grid;place-items:center;">
+          <i data-lucide="eye" id="pwd-icon" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="login-error" hidden style="background:#FEE2E2;color:#991B1B;border-left:3px solid #DC2626;padding:10px 12px;border-radius:6px;font-size:13px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start;">
+      <i data-lucide="alert-circle" class="w-4 h-4" style="flex-shrink:0;margin-top:1px;"></i>
+      <span id="login-error-msg"></span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-6">
+      <input type="checkbox" id="remember" style="width:16px;height:16px;accent-color:var(--primary-600);">
+      <label for="remember" style="font-size:13px;color:var(--gray-600);">Lembrar deste dispositivo (30 dias)</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+      Entrar
+      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </button>
+  </form>
+
+  <details style="margin-top:18px;font-size:13px;">
+    <summary style="cursor:pointer;color:var(--gray-500);user-select:none;list-style:none;display:flex;align-items:center;gap:6px;">
+      <i data-lucide="key-round" class="w-3 h-3"></i> Ver credenciais de teste por empresa
+    </summary>
+    <div style="margin-top:10px;background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-700);line-height:1.7;font-family:var(--font-mono);">
+      <div><strong>Ventus MOC:</strong> admin@ventus.com / ventus2026</div>
+      <div><strong>Ventus BH:</strong> admin@ventusbh.com / belo2026</div>
+      <div><strong>Formatura+:</strong> admin@formaturaplus.com / fp@dmin</div>
+      <div><strong>Memória Viva:</strong> admin@memoriaviva.com / mv-2026</div>
+      <div><strong>Momentum:</strong> admin@momentum.com / mom-cerim</div>
+    </div>
+  </details>
+
+  <div class="text-center mt-6 pt-6" style="border-top:1px solid var(--gray-200);">
+    <p style="font-size:13px;color:var(--gray-500);">É formando ou comissão? <a href="../aluno/login.html" style="color:var(--primary-600);font-weight:600;text-decoration:none;">Acesse pelo WhatsApp</a></p>
+  </div>
+</div>
+
+<a href="../index.html" style="position:fixed;top:24px;left:24px;color:rgba(255,255,255,.7);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;">
+  <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao hub
+</a>
+
+<script>
+  const credentials = {
+    'ventus':         { email:'admin@ventus.com',         senha:'ventus2026' },
+    'ventus-bh':      { email:'admin@ventusbh.com',       senha:'belo2026' },
+    'formatura-plus': { email:'admin@formaturaplus.com',  senha:'fp@dmin' },
+    'memoria-viva':   { email:'admin@memoriaviva.com',    senha:'mv-2026' },
+    'momentum':       { email:'admin@momentum.com',       senha:'mom-cerim' },
+  };
+  function showError(msg) {
+    const el = document.getElementById('login-error');
+    document.getElementById('login-error-msg').textContent = msg;
+    el.hidden = false;
+  }
+  function clearError() { document.getElementById('login-error').hidden = true; }
+  function togglePwd() {
+    const i = document.getElementById('senha');
+    const icon = document.getElementById('pwd-icon');
+    const showing = i.type === 'text';
+    i.type = showing ? 'password' : 'text';
+    icon.setAttribute('data-lucide', showing ? 'eye' : 'eye-off');
+    if (window.lucide) lucide.createIcons();
+  }
+  function doLogin() {
+    clearError();
+    const empresa = document.getElementById('empresa').value;
+    const email   = document.getElementById('email').value.trim().toLowerCase();
+    const senha   = document.getElementById('senha').value;
+    if (!empresa) return showError('Escolha sua empresa antes de entrar.');
+    const c = credentials[empresa];
+    if (!c) return showError('Empresa não reconhecida.');
+    if (email !== c.email || senha !== c.senha) {
+      return showError('Email ou senha incorretos para esta empresa.');
+    }
+    sessionStorage.setItem('ventus.empresa', empresa);
+    sessionStorage.setItem('ventus.email', email);
+    location.href = 'dashboard.html';
+  }
+  // Auto-preenchimento ao escolher empresa (acelera o teste do protótipo)
+  document.getElementById('empresa').addEventListener('change', (e) => {
+    const c = credentials[e.target.value];
+    if (c) {
+      document.getElementById('email').value = c.email;
+      document.getElementById('senha').value = c.senha;
+      clearError();
+    }
+  });
+</script>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

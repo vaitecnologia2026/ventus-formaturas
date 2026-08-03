@@ -1,0 +1,32 @@
+# ─── Sistema / build ───
+.DS_Store
+node_modules/
+dist/
+build/
+.vercel/
+*.log
+
+# ─── Segredos ───
+.env
+.env.*
+!.env.example
+
+# ─── COMERCIAL — nunca versionar ───
+# Termos, propostas, orçamentos e qualquer documento com valores de contrato
+Termo-*.html
+Termo-*.pdf
+Proposta-*
+Orcamento-*
+*-comercial.*
+
+# ─── DADOS FINANCEIROS DO CLIENTE — nunca versionar ───
+# Estes documentos contêm faturamento real da Ventus, tickets médios e
+# ranking de contratos com NOMES DE PESSOAS vinculados a valores (LGPD).
+Formaturas---Sistema/ETAPA-1-RELATORIO-ANALISE.md
+Formaturas---Sistema/ETAPA-4-MAPA-FUNCIONALIDADES.md
+Formaturas---Sistema/ETAPA-5-AUDITORIA-19-MODULOS.md
+Formaturas---Sistema/ETAPA-6-UX-FLOW-DESIGN.md
+Formaturas---Sistema/docs/01-visao-projeto.md
+Formaturas---Sistema/docs/modulos/01-vendas-pagamento.md
+Formaturas---Sistema/README.md
+Formaturas---Sistema/Sistema Ventus/

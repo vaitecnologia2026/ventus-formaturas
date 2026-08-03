@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>IA Interna — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+.ia-card { background:white; border:1px solid var(--gray-200); border-radius:14px; padding:24px; transition:all .2s; cursor:pointer; }
+.ia-card:hover { border-color:#A855F7; box-shadow:0 8px 24px rgba(168,85,247,.15); transform:translateY(-2px); }
+.ia-card-icon { width:48px; height:48px; border-radius:12px; display:grid; place-items:center; margin-bottom:14px; }
+.diff-line.add { background:#DCFCE7; padding:2px 6px; border-radius:3px; color:#166534; }
+.diff-line.del { background:#FEE2E2; padding:2px 6px; border-radius:3px; color:#991B1B; text-decoration:line-through; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar histórico de uso de IA…"></div>
+    <div class="flex gap-2">
+      <select class="select" style="width:160px;font-size:13px;padding:6px 10px;"><option>Claude Opus 4.7</option><option>Claude Sonnet 4.6</option><option>GPT-4 (fallback)</option></select>
+      <button class="btn btn-secondary btn-sm"><i data-lucide="settings" class="w-4 h-4"></i> Configurar</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comunicação / IA Interna</div>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Central de IA</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Use IA para revisar textos, gerar copy de campanha, sugerir mensagens e atender alunos. Tudo via Claude Opus 4.7 com prompt caching.</p>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="sparkles" class="w-5 h-5"></i></div><div class="kpi-label">Usos hoje</div><div class="kpi-value">44</div><div class="kpi-trend up">corretor + copy</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="zap" class="w-5 h-5"></i></div><div class="kpi-label">Tokens consumidos (mês)</div><div class="kpi-value">2,1M</div><div class="kpi-trend" style="color:var(--gray-500);">~ R$ 32</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Latência média</div><div class="kpi-value">2,4s</div><div class="kpi-trend" style="color:var(--gray-500);">streaming on</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Aceitação</div><div class="kpi-value">87%</div><div class="kpi-trend up">+ 4pp vs mês ant.</div></div>
+    </div>
+
+    <div class="grid gap-4 mb-6" style="grid-template-columns:repeat(4,1fr);">
+      <div class="ia-card">
+        <div class="ia-card-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="spell-check" class="w-6 h-6"></i></div>
+        <strong>Corretor de Texto</strong>
+        <p style="font-size:13px;color:var(--gray-600);margin-top:4px;line-height:1.5;">Revisa português, gramática, encartes, descrições. Mantém tom Ventus.</p>
+        <div style="margin-top:14px;font-size:12px;color:var(--gray-500);">24 usos hoje</div>
+      </div>
+      <div class="ia-card">
+        <div class="ia-card-icon" style="background:#FCE7F3;color:#9D174D;"><i data-lucide="megaphone" class="w-6 h-6"></i></div>
+        <strong>Copy de Campanha</strong>
+        <p style="font-size:13px;color:var(--gray-600);margin-top:4px;line-height:1.5;">Gera mensagens VAI WhatsApp com variáveis dinâmicas e tom da marca.</p>
+        <div style="margin-top:14px;font-size:12px;color:var(--gray-500);">8 usos hoje</div>
+      </div>
+      <div class="ia-card">
+        <div class="ia-card-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="message-square-quote" class="w-6 h-6"></i></div>
+        <strong>Sugestor de Mensagens</strong>
+        <p style="font-size:13px;color:var(--gray-600);margin-top:4px;line-height:1.5;">Sugere respostas pra dúvidas comuns: cobrança, fotos, eventos, convidados.</p>
+        <div style="margin-top:14px;font-size:12px;color:var(--gray-500);">12 usos hoje</div>
+      </div>
+      <div class="ia-card" style="opacity:.7;">
+        <div class="ia-card-icon" style="background:var(--gray-100);color:var(--gray-500);"><i data-lucide="bot" class="w-6 h-6"></i></div>
+        <strong>Atendimento (chatbot)</strong>
+        <p style="font-size:13px;color:var(--gray-600);margin-top:4px;line-height:1.5;">Bot que responde alunos via VAI WhatsApp 24/7. Em desenvolvimento.</p>
+        <div style="margin-top:14px;font-size:11px;color:var(--warning);font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Beta · Q3/2026</div>
+      </div>
+    </div>
+
+    <div class="grid gap-4" style="grid-template-columns:1fr 1fr;">
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Corretor — testar agora</div><span class="badge badge-info">claude-opus-4-7</span></div>
+        <div class="card-body">
+          <label class="label">Texto original</label>
+          <textarea class="textarea" rows="6" style="margin-bottom:14px;font-family:inherit;">Querido formando, este encarte foi feita especialmente pra você que está prestes a viver a melhor noite das sua vida. A turma de medicina T85 te convida a participar do nosso baile que vai acontecer no espaço ventus.</textarea>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;"><i data-lucide="sparkles" class="w-4 h-4"></i> Corrigir com IA</button>
+
+          <div style="margin-top:16px;padding:14px;background:var(--gray-50);border-radius:10px;border-left:3px solid #A855F7;">
+            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:8px;">Sugestão da IA</div>
+            <p style="font-size:14px;color:var(--gray-800);line-height:1.7;">
+              Querido formando, este encarte foi <span class="diff-line del">feita</span> <span class="diff-line add">feito</span> especialmente para você que está prestes a viver a melhor noite <span class="diff-line del">das sua</span> <span class="diff-line add">da sua</span> vida. A turma de <span class="diff-line del">medicina</span> <span class="diff-line add">Medicina</span> T85 <span class="diff-line del">te</span> <span class="diff-line add">o</span> convida a participar do nosso baile<span class="diff-line add">,</span> que vai acontecer no <span class="diff-line del">espaço ventus</span> <span class="diff-line add">Espaço Ventus</span>.
+            </p>
+            <div class="flex gap-2 mt-3">
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;">✓ Aceitar</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;">✗ Recusar</button>
+              <button class="btn btn-ghost btn-sm">Refazer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Histórico de usos (24h)</div></div>
+        <table class="table">
+          <thead><tr><th>Quando</th><th>Função</th><th>Por</th><th>Tokens</th></tr></thead>
+          <tbody>
+            <tr><td>há 14min</td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Corretor</span></td><td>Bruno Sena</td><td class="num">412</td></tr>
+            <tr><td>há 32min</td><td><span class="badge" style="background:#FCE7F3;color:#9D174D;">Copy campanha</span></td><td>Elison Perini</td><td class="num">2.1k</td></tr>
+            <tr><td>há 1h</td><td><span class="badge" style="background:#DBEAFE;color:#1E40AF;">Sugestor msg</span></td><td>Debora Damasceno</td><td class="num">740</td></tr>
+            <tr><td>há 2h</td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Corretor</span></td><td>Renato Soares</td><td class="num">198</td></tr>
+            <tr><td>há 3h</td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Corretor</span></td><td>Bruno Sena</td><td class="num">624</td></tr>
+            <tr><td>há 4h</td><td><span class="badge" style="background:#FCE7F3;color:#9D174D;">Copy campanha</span></td><td>Marcos Vieira Andrade</td><td class="num">1.8k</td></tr>
+            <tr><td>há 6h</td><td><span class="badge" style="background:#DBEAFE;color:#1E40AF;">Sugestor msg</span></td><td>Fernando Gontijo</td><td class="num">512</td></tr>
+            <tr><td>há 8h</td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Corretor</span></td><td>Elison Perini</td><td class="num">324</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

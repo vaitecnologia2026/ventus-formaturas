@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comissão — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: var(--gray-100); padding-bottom:80px;">
+
+<div class="phone-frame">
+  <div class="mobile-header">
+    <div>
+      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Comissão · Presidente</div>
+      <strong style="font-size:18px;">Camila Almeida</strong>
+    </div>
+    <div class="avatar" style="background:rgba(255,255,255,.18);">CA</div>
+  </div>
+
+  <!-- Stats da turma -->
+  <div style="background:linear-gradient(135deg,#1E3A8A,#7C3AED);color:white;padding:20px 16px;">
+    <strong style="font-size:18px;">MEDICINA T85 - UNIMONTES</strong>
+    <p style="font-size:13px;opacity:.85;margin-top:2px;">Você representa 19 colegas</p>
+    <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Adesões</div>
+        <div style="font-size:20px;font-weight:800;">20/20</div>
+        <div style="font-size:10px;opacity:.7;">100%</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Em dia</div>
+        <div style="font-size:20px;font-weight:800;">17/20</div>
+        <div style="font-size:10px;opacity:.7;">3 atrasados</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.04em;">Eventos</div>
+        <div style="font-size:20px;font-weight:800;">3/13</div>
+        <div style="font-size:10px;opacity:.7;">realizados</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pendências -->
+  <div style="padding:20px 16px;">
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;">Suas pendências</strong>
+    <div style="background:white;border-radius:14px;border:1px solid var(--gray-200);margin-top:10px;overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--gray-100);background:#FEF3C7;">
+        <div class="flex justify-between items-start mb-1">
+          <strong style="font-size:14px;color:#92400E;">Liberar pacote para seleção</strong>
+          <span style="font-size:11px;color:#92400E;font-weight:700;">URGENTE</span>
+        </div>
+        <p style="font-size:13px;color:#92400E;">Editor está aguardando sua aprovação para começar a edição. Vence em 2 dias.</p>
+        <button class="btn btn-primary btn-sm mt-2"><i data-lucide="check" class="w-4 h-4"></i> Aprovar agora</button>
+      </div>
+      <div style="padding:14px 16px;border-bottom:1px solid var(--gray-100);">
+        <div class="flex justify-between items-start mb-1">
+          <strong style="font-size:14px;">Conferir lista do BAILE</strong>
+          <span style="font-size:11px;color:var(--gray-500);">vence em 5d</span>
+        </div>
+        <p style="font-size:13px;color:var(--gray-600);">17/20 alunos cadastraram convidados. Faltam 3.</p>
+      </div>
+      <div style="padding:14px 16px;">
+        <div class="flex justify-between items-start mb-1">
+          <strong style="font-size:14px;">Aprovar comunicado de mês</strong>
+          <span style="font-size:11px;color:var(--gray-500);">vence em 12d</span>
+        </div>
+        <p style="font-size:13px;color:var(--gray-600);">Texto do "D-90" preparado pela Ventus, aguardando seu OK.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo financeiro da turma -->
+  <div style="padding:0 16px 20px;">
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;">Saúde financeira</strong>
+    <div style="background:white;border-radius:14px;border:1px solid var(--gray-200);margin-top:10px;padding:18px;">
+      <div class="grid grid-cols-2 gap-3 text-center mb-3">
+        <div>
+          <div style="font-size:11px;color:var(--gray-500);">Recebido</div>
+          <div style="font-size:18px;font-weight:700;color:var(--success);">R$ 42.870</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--gray-500);">Inadimplência</div>
+          <div style="font-size:18px;font-weight:700;color:var(--danger);">R$ 4.137</div>
+        </div>
+      </div>
+      <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:70%;height:100%;background:var(--success);"></div></div>
+      <p style="font-size:12px;color:var(--gray-500);margin-top:8px;">70% pago · 3 alunos com parcelas atrasadas</p>
+      <a href="#" class="btn btn-secondary btn-sm mt-3" style="width:100%;justify-content:center;">Disparar lembrete a inadimplentes</a>
+    </div>
+  </div>
+
+  <!-- Comunicar turma -->
+  <div style="padding:0 16px;">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
+      <i data-lucide="message-circle" class="w-5 h-5"></i> Mensagem para a turma
+    </button>
+    <p style="font-size:12px;color:var(--gray-500);text-align:center;margin-top:8px;">Mensagens passam por revisão da Ventus antes do disparo.</p>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="painel.html" class="bottom-nav-item active"><i data-lucide="home"></i>Painel</a>
+  <a href="#" class="bottom-nav-item"><i data-lucide="users"></i>Turma</a>
+  <a href="#" class="bottom-nav-item"><i data-lucide="message-circle"></i>Mensagens</a>
+  <a href="#" class="bottom-nav-item"><i data-lucide="user"></i>Perfil</a>
+</nav>
+
+<script>lucide.createIcons();</script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>

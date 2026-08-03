@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="page-title">Medicina T85 · Ventus Formaturas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/padrao-lp.css">
+<style>
+.aluno-shell { min-height: 100vh; background: var(--neutro-50); }
+
+.aluno-top {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--neutro-200);
+  padding: 16px 0;
+  position: sticky; top: 0; z-index: 50;
+}
+.aluno-top .wrap { display: flex; justify-content: space-between; align-items: center; }
+.aluno-back { color: var(--neutro-600); font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-sm); }
+.aluno-back:hover { background: var(--neutro-100); color: var(--azul-700); }
+
+/* Hero personalizado da turma */
+.turma-hero {
+  background: var(--grad-hero);
+  color: white;
+  padding: 80px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+.turma-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 80% 20%, rgba(212,175,55,0.18) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, rgba(37,99,235,0.3) 0%, transparent 50%);
+  pointer-events: none;
+}
+.turma-hero-content { position: relative; z-index: 2; text-align: center; max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+.turma-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212,175,55,0.4);
+  border-radius: var(--r-full);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--dourado-claro);
+  margin-bottom: 24px;
+}
+.turma-eyebrow::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--dourado); border-radius: 50%;
+  box-shadow: 0 0 12px var(--dourado);
+}
+
+.turma-name {
+  font-family: var(--serif);
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  background: linear-gradient(180deg, #FFFFFF 0%, #93C5FD 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+.turma-instituicao {
+  font-size: 18px;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 32px;
+  letter-spacing: 0.02em;
+}
+
+.countdown {
+  display: inline-grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 12px;
+  padding: 20px 28px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r-lg);
+  margin-bottom: 40px;
+}
+.countdown-item { text-align: center; min-width: 64px; }
+.countdown-num { font-family: var(--serif); font-size: 32px; font-weight: 700; color: var(--dourado-claro); line-height: 1; }
+.countdown-label { font-size: 11px; opacity: .7; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+.countdown-sep { color: rgba(255,255,255,0.3); font-size: 22px; align-self: center; }
+
+.comissao-row {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-top: 16px;
+}
+.comissao-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 8px 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r-full);
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+}
+.comissao-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--grad-gold); color: var(--azul-900); display: grid; place-items: center; font-family: var(--serif); font-weight: 700; font-size: 13px; }
+
+/* Grid das 2 ações */
+.acoes {
+  margin-top: -64px;
+  position: relative; z-index: 5;
+}
+.acoes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (max-width: 800px) { .acoes-grid { grid-template-columns: 1fr; } }
+
+.acao-card {
+  background: white;
+  border-radius: var(--r-xl);
+  padding: 40px 36px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--neutro-200);
+  position: relative;
+  overflow: hidden;
+}
+.acao-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--grad-gold);
+}
+.acao-card.solicitar::before { background: linear-gradient(135deg, #2563EB, #7C3AED); }
+
+.acao-tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  margin-bottom: 16px;
+}
+.acao-tag.entrar { background: var(--dourado); color: var(--azul-900); }
+.acao-tag.solicitar { background: var(--azul-50); color: var(--azul-700); }
+
+.acao-card h2 { font-family: var(--serif); font-size: 28px; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 8px; line-height: 1.15; }
+.acao-card .acao-sub { font-size: 14px; color: var(--neutro-500); margin-bottom: 28px; line-height: 1.6; }
+
+.form-field { margin-bottom: 16px; }
+.form-field label {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  color: var(--neutro-700);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.form-field input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  border: 1.5px solid var(--neutro-200);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-field input:focus {
+  border-color: var(--azul-600);
+  box-shadow: 0 0 0 4px var(--azul-100);
+}
+
+.acao-submit {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: 15px;
+  margin-top: 8px;
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  border: none;
+}
+.acao-submit:hover { transform: translateY(-2px); }
+.acao-submit.entrar { background: var(--grad-hero); color: white; box-shadow: var(--shadow-cta); }
+.acao-submit.entrar:hover { box-shadow: 0 14px 38px rgba(37,99,235,0.45); }
+.acao-submit.solicitar { background: var(--neutro-900); color: white; }
+.acao-submit.solicitar:hover { box-shadow: 0 14px 38px rgba(15,23,42,0.45); }
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 12px; color: var(--neutro-400);
+  position: relative;
+}
+.divider::before, .divider::after {
+  content: '';
+  position: absolute; top: 50%;
+  width: 38%; height: 1px;
+  background: var(--neutro-200);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.help-box {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--azul-50) 0%, white 100%);
+  border-left: 3px solid var(--dourado);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  font-size: 13px;
+  color: var(--neutro-700);
+  line-height: 1.5;
+}
+.help-box strong { display: block; color: var(--azul-800); margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Info da turma (pacote, eventos, etc) */
+.turma-info {
+  background: white;
+  padding: 80px 0 100px;
+  margin-top: 80px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.info-card {
+  padding: 28px 24px;
+  background: var(--neutro-50);
+  border-radius: var(--r-lg);
+  border-left: 3px solid var(--dourado);
+}
+.info-card h4 { font-family: var(--serif); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--azul-700); margin-bottom: 12px; }
+.info-card .big { font-family: var(--serif); font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; color: var(--neutro-900); }
+.info-card p { font-size: 13px; color: var(--neutro-600); line-height: 1.5; }
+
+/* Footer link */
+.aluno-foot {
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--neutro-100);
+  font-size: 13px;
+  color: var(--neutro-600);
+}
+.aluno-foot a { color: var(--azul-700); font-weight: 600; }
+
+/* Modal sucesso */
+.modal-success {
+  position: fixed; inset: 0;
+  background: rgba(15,31,79,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  animation: fadeIn .25s;
+}
+.modal-success.open { display: flex; }
+.modal-card {
+  background: white;
+  border-radius: var(--r-xl);
+  max-width: 460px; width: 100%;
+  padding: 48px 40px;
+  text-align: center;
+  animation: slideUp .35s;
+}
+.modal-icon-success {
+  width: 88px; height: 88px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  color: white;
+  box-shadow: 0 12px 32px rgba(16,185,129,0.35);
+  animation: pop .5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-card h3 { font-family: var(--serif); font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+.modal-card p { font-size: 15px; color: var(--neutro-600); margin-bottom: 24px; line-height: 1.6; }
+.modal-card button { padding: 14px 32px; background: var(--azul-700); color: white; border-radius: var(--r-sm); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<svg class="icon-svg-sprite" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-user-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+  </defs>
+</svg>
+
+<div class="aluno-shell">
+
+  <header class="aluno-top">
+    <div class="wrap">
+      <a href="../lp.html" class="logo" style="font-family:var(--serif);font-weight:800;font-size:22px;color:var(--azul-700);">
+        <span style="display:inline-flex;align-items:center;gap:10px;">
+          <span style="width:40px;height:40px;background:var(--grad-hero);color:white;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:20px;">V</span>
+          Ventus
+        </span>
+      </a>
+      <a href="../acesso.html" class="aluno-back">
+        <svg class="icon icon-sm"><use href="#i-arrow-left"/></svg> Outro perfil
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero personalizado da turma -->
+  <section class="turma-hero">
+    <div class="turma-hero-content">
+      <div class="turma-eyebrow" id="turma-eyebrow">TURMA · UNIMONTES</div>
+      <h1 class="turma-name" id="turma-name">MEDICINA T85</h1>
+      <p class="turma-instituicao" id="turma-sub">Sua formatura em <strong>15 de Julho de 2026</strong></p>
+
+      <div class="countdown" id="countdown">
+        <div class="countdown-item"><div class="countdown-num" id="cd-d">76</div><div class="countdown-label">Dias</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item"><div class="countdown-num" id="cd-h">14</div><div class="countdown-label">Horas</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item"><div class="countdown-num" id="cd-m">22</div><div class="countdown-label">Min</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item"><div class="countdown-num" id="cd-s">00</div><div class="countdown-label">Seg</div></div>
+      </div>
+
+      <div class="comissao-row">
+        <div class="comissao-item"><div class="comissao-avatar">CA</div>Camila Almeida · Presidente</div>
+        <div class="comissao-item"><div class="comissao-avatar">PH</div>Pedro Henrique · Tesoureiro</div>
+        <div class="comissao-item"><div class="comissao-avatar">JR</div>Júlia Ribeiro · Secretária</div>
+        <div class="comissao-item"><div class="comissao-avatar">RM</div>Tiago Moreira Mendes · Comunicação</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ações: login + solicitar acesso -->
+  <section class="acoes">
+    <div class="acoes-grid">
+
+      <div class="acao-card entrar">
+        <span class="acao-tag entrar">Já tenho acesso</span>
+        <h2>Entrar com meu WhatsApp</h2>
+        <p class="acao-sub">Vamos enviar um link único pro seu WhatsApp. Sem senha, sem complicação.</p>
+
+        <form id="form-login" onsubmit="entrarLogin(event)">
+          <div class="form-field">
+            <label>Seu WhatsApp</label>
+            <input type="tel" id="login-wa" placeholder="(38) 99999-9999" value="(38) 99863-1234" required>
+          </div>
+          <button type="submit" class="acao-submit entrar">
+            <svg class="icon icon-sm"><use href="#i-message"/></svg>
+            Receber link no WhatsApp
+          </button>
+        </form>
+
+        <div class="help-box">
+          <strong>Como funciona</strong>
+          Em até 30 segundos você recebe uma mensagem da Ventus com o link de acesso. Toque no link e pronto — sua formatura na palma da mão.
+        </div>
+      </div>
+
+      <div class="acao-card solicitar">
+        <span class="acao-tag solicitar">Ainda não fui cadastrado</span>
+        <h2>Solicitar acesso à turma</h2>
+        <p class="acao-sub">Você se forma com a Medicina T85 mas ainda não tem cadastro? A comissão recebe e libera em até 24h.</p>
+
+        <form id="form-solicitar" onsubmit="solicitarAcesso(event)">
+          <div class="form-field">
+            <label>Nome completo</label>
+            <input type="text" id="sol-nome" placeholder="Seu nome" required>
+          </div>
+          <div class="form-field">
+            <label>CPF</label>
+            <input type="text" id="sol-cpf" placeholder="000.000.000-00" required>
+          </div>
+          <div class="form-field">
+            <label>WhatsApp</label>
+            <input type="tel" id="sol-wa" placeholder="(38) 99999-9999" required>
+          </div>
+          <button type="submit" class="acao-submit solicitar">
+            <svg class="icon icon-sm"><use href="#i-user-plus"/></svg>
+            Enviar para a comissão
+          </button>
+        </form>
+
+        <div class="help-box">
+          <strong>O que acontece depois</strong>
+          A comissão (Camila Almeida e equipe) recebe sua solicitação e confirma se você é mesmo da turma. Você é avisado por WhatsApp assim que aprovado.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Info da turma -->
+  <section class="turma-info">
+    <div class="wrap">
+      <div class="section-head-center" style="margin-bottom: 48px;">
+        <span class="section-tag">A sua turma em números</span>
+        <h2 class="section-title" style="font-size: 32px;">Medicina T85 — UNIMONTES</h2>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>Formandos</h4>
+          <div class="big">20</div>
+          <p>colegas formando juntos</p>
+        </div>
+        <div class="info-card">
+          <h4>Eventos contratados</h4>
+          <div class="big">13</div>
+          <p>do FOTO CONVITE à COLAÇÃO</p>
+        </div>
+        <div class="info-card">
+          <h4>Cor da beca</h4>
+          <div class="big" style="display:flex;align-items:center;gap:12px;"><span style="width:32px;height:32px;background:#1E3A8A;border-radius:6px;border:1px solid var(--neutro-200);"></span>AZUL</div>
+          <p>tradicional do curso</p>
+        </div>
+        <div class="info-card">
+          <h4>Pacote popular</h4>
+          <div class="big" style="font-size:24px;">OURO</div>
+          <p>R$ 145,82 × 21 — 67% de adesão</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="aluno-foot">
+    Você não é desta turma? <a href="../lp.html">Encontre a sua turma →</a>
+  </div>
+
+</div>
+
+<!-- Modal sucesso -->
+<div class="modal-success" id="modal-sucesso" onclick="if(event.target.id==='modal-sucesso') fecharSucesso()">
+  <div class="modal-card">
+    <div class="modal-icon-success">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h3 id="modal-titulo">Tudo certo!</h3>
+    <p id="modal-msg">Sua mensagem foi enviada.</p>
+    <button onclick="fecharSucesso()">Fechar</button>
+  </div>
+</div>
+
+<script>
+// Personalização da turma via URL ?turma=...
+const turmas = {
+  'medicina-t85': {
+    name: 'MEDICINA T85',
+    inst: 'UNIMONTES',
+    sub: 'Sua formatura em <strong>15 de Julho de 2026</strong>',
+    formatura: new Date('2026-07-15T19:00:00'),
+  },
+  'direito-funorte': {
+    name: 'DIREITO',
+    inst: 'FUNORTE',
+    sub: 'Sua formatura em <strong>10 de Outubro de 2026</strong>',
+    formatura: new Date('2026-10-10T19:00:00'),
+  },
+};
+const params = new URLSearchParams(location.search);
+const slug = params.get('turma') || 'medicina-t85';
+const turma = turmas[slug] || turmas['medicina-t85'];
+
+document.getElementById('turma-name').textContent = turma.name;
+document.getElementById('turma-eyebrow').textContent = `TURMA · ${turma.inst}`;
+document.getElementById('turma-sub').innerHTML = turma.sub;
+document.getElementById('page-title').textContent = `${turma.name} · Ventus Formaturas`;
+
+// Countdown ao vivo
+function updateCountdown() {
+  const now = new Date();
+  const diff = turma.formatura - now;
+  if (diff <= 0) return;
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const secs = Math.floor((diff % (1000*60)) / 1000);
+  document.getElementById('cd-d').textContent = days;
+  document.getElementById('cd-h').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// Forms
+function entrarLogin(e) {
+  e.preventDefault();
+  document.getElementById('modal-titulo').textContent = 'Link enviado!';
+  document.getElementById('modal-msg').innerHTML = `Verifique seu WhatsApp em <strong>${document.getElementById('login-wa').value}</strong>. Toque no link da Ventus para entrar na sua formatura.`;
+  document.getElementById('modal-sucesso').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Demo: depois de 2.5s, redireciona pra área do aluno
+  setTimeout(() => { location.href = '../aluno/inicio.html'; }, 2500);
+}
+function solicitarAcesso(e) {
+  e.preventDefault();
+  const nome = document.getElementById('sol-nome').value;
+  document.getElementById('modal-titulo').textContent = `Recebemos, ${nome.split(' ')[0]}!`;
+  document.getElementById('modal-msg').innerHTML = `Sua solicitação foi enviada para a comissão da <strong>${turma.name}</strong>. Em até <strong>24h</strong> você recebe um WhatsApp com a confirmação.`;
+  document.getElementById('modal-sucesso').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function fecharSucesso() {
+  document.getElementById('modal-sucesso').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharSucesso(); });
+</script>
+</body>
+</html>

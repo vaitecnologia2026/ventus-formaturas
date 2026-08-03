@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Minhas fotos · Ventus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/styles.css" />
+<style>
+  body { background: #FAFBFC; }
+  .galeria-hero {
+    background: var(--grad);
+    color: white;
+    padding: 24px 20px 28px;
+    border-radius: 0 0 24px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .galeria-hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(255,255,255,0.12), transparent 60%);
+    pointer-events: none;
+  }
+  .greeting { font-size: 13px; color: rgba(255,255,255,0.75); }
+  .galeria-title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 16px; line-height: 1.2; }
+  .credits-card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .credits-card .label { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .credits-card .num { font-size: 22px; font-weight: 800; }
+  .credits-card .num span { color: rgba(255,255,255,0.7); font-weight: 600; }
+  .credits-bar { background: rgba(255,255,255,0.2); height: 4px; border-radius: var(--r-full); margin-top: 8px; overflow: hidden; }
+  .credits-bar-fill { background: white; height: 100%; width: 24%; border-radius: var(--r-full); }
+
+  .filters {
+    display: flex; gap: 8px;
+    padding: 16px 20px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: var(--r-full);
+    background: white;
+    border: 1px solid var(--neutro-200);
+    font-size: 13px; font-weight: 600;
+    color: var(--neutro-700);
+    transition: all .2s;
+  }
+  .filter-chip.active { background: var(--azul-700); color: white; border-color: var(--azul-700); }
+
+  .galeria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 8px;
+  }
+  .photo-item {
+    aspect-ratio: 4/5;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    position: relative;
+    background: var(--neutro-200);
+  }
+  .photo-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .3s;
+  }
+  .photo-item:hover img { transform: scale(1.04); }
+  .photo-fav {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px;
+    background: rgba(0,0,0,0.45);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    backdrop-filter: blur(8px);
+    transition: background .2s;
+  }
+  .photo-fav.selected { background: var(--azul-600); }
+  .photo-fav.selected::before { content: '❤'; color: white; font-size: 16px; }
+  .photo-fav:not(.selected)::before { content: '♡'; color: white; font-weight: 700; }
+
+  .photo-evento-tag {
+    position: absolute; bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 3px 8px;
+    border-radius: var(--r-full);
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .face-match-banner {
+    margin: 16px 20px 0;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, var(--azul-50), var(--azul-100));
+    border-left: 3px solid var(--azul-600);
+    border-radius: var(--r-sm);
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px;
+    color: var(--azul-800);
+  }
+  .face-match-banner strong { color: var(--azul-900); }
+
+  .floating-cta {
+    position: fixed;
+    bottom: 80px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--azul-700);
+    color: white;
+    padding: 14px 24px;
+    border-radius: var(--r-full);
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: var(--shadow-xl);
+    display: inline-flex; align-items: center; gap: 8px;
+    max-width: calc(100% - 40px);
+    z-index: 40;
+  }
+  .floating-cta .count {
+    background: white;
+    color: var(--azul-700);
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    font-size: 12px;
+    font-weight: 800;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <header class="galeria-hero">
+    <div class="greeting">Olá, Marina ✨</div>
+    <h1 class="galeria-title">Suas fotos da<br/>formatura chegaram!</h1>
+
+    <div class="credits-card">
+      <div>
+        <div class="label">Créditos usados</div>
+        <div class="num">12 <span>/ 50</span></div>
+        <div class="credits-bar"><div class="credits-bar-fill"></div></div>
+      </div>
+      <div style="text-align: right;">
+        <div class="label">Disponíveis</div>
+        <div class="num" style="font-size: 18px; font-weight: 700;">38 fotos</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="face-match-banner">
+    <span style="font-size: 20px;">🎯</span>
+    <div>
+      <strong>47 fotos suas detectadas</strong> · separadas automaticamente pelo seu rosto.
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active">Todas (47)</button>
+    <button class="filter-chip">Cerimônia (18)</button>
+    <button class="filter-chip">Mesas (12)</button>
+    <button class="filter-chip">Pista (15)</button>
+    <button class="filter-chip">Bastidores (2)</button>
+  </div>
+
+  <div class="galeria-grid">
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad1/400/500" alt="Foto 1" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Cerimônia</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad2/400/500" alt="Foto 2" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Cerimônia</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad3/400/500" alt="Foto 3" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Mesas</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad4/400/500" alt="Foto 4" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Pista</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad5/400/500" alt="Foto 5" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Pista</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad6/400/500" alt="Foto 6" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Cerimônia</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad7/400/500" alt="Foto 7" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Mesas</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad8/400/500" alt="Foto 8" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Pista</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad9/400/500" alt="Foto 9" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Cerimônia</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad10/400/500" alt="Foto 10" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Bastidores</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad11/400/500" alt="Foto 11" />
+      <div class="photo-fav"></div>
+      <div class="photo-evento-tag">Pista</div>
+    </a>
+    <a href="#" class="photo-item">
+      <img src="https://picsum.photos/seed/grad12/400/500" alt="Foto 12" />
+      <div class="photo-fav selected"></div>
+      <div class="photo-evento-tag">Mesas</div>
+    </a>
+  </div>
+
+  <a href="galeria-final.html" class="floating-cta">
+    <span class="count">12</span> Finalizar seleção →
+  </a>
+
+  <nav class="bottom-nav">
+    <a href="galeria.html" class="active">
+      <span class="ico">📸</span><span>Fotos</span>
+    </a>
+    <a href="pagamento.html">
+      <span class="ico">💳</span><span>Pagamentos</span>
+    </a>
+    <a href="#">
+      <span class="ico">👥</span><span>Convidados</span>
+    </a>
+    <a href="#">
+      <span class="ico">📅</span><span>Eventos</span>
+    </a>
+    <a href="#">
+      <span class="ico">⚙️</span><span>Conta</span>
+    </a>
+  </nav>
+
+</div>
+
+<a href="../index.html" class="proto-tag">← Trocar persona</a>
+
+</body>
+</html>

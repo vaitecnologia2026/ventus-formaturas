@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Plataforma Ventus Formaturas — Da venda à entrega das fotos editadas. Tudo num só lugar." />
+<title>Plataforma Ventus Formaturas — Proposta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --azul-900: #0F1F4F;
+    --azul-800: #1E3A8A;
+    --azul-700: #1D4ED8;
+    --azul-600: #2563EB;
+    --azul-500: #3B82F6;
+    --azul-100: #DBEAFE;
+    --azul-50: #EFF6FF;
+    --branco: #FFFFFF;
+    --neutro-50: #F8FAFC;
+    --neutro-100: #F1F5F9;
+    --neutro-200: #E2E8F0;
+    --neutro-400: #94A3B8;
+    --neutro-600: #475569;
+    --neutro-800: #1E293B;
+    --neutro-900: #0F172A;
+    --sucesso: #10B981;
+    --aviso: #F59E0B;
+    --grad-hero: linear-gradient(135deg, #0F1F4F 0%, #1E3A8A 50%, #2563EB 100%);
+    --grad-card: linear-gradient(135deg, rgba(30,58,138,0.05) 0%, rgba(37,99,235,0.05) 100%);
+    --shadow-sm: 0 1px 2px rgba(15,31,79,0.06);
+    --shadow-md: 0 4px 12px rgba(15,31,79,0.08);
+    --shadow-lg: 0 10px 30px rgba(15,31,79,0.12);
+    --shadow-xl: 0 20px 50px rgba(15,31,79,0.18);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--neutro-900);
+    background: var(--branco);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ==================== NAVBAR ==================== */
+  nav.top {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--neutro-200);
+    padding: 16px 24px;
+  }
+  nav.top .wrap { display: flex; align-items: center; justify-content: space-between; padding: 0; }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 18px; color: var(--azul-800);
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--grad-hero);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 900; font-size: 18px;
+    box-shadow: var(--shadow-md);
+  }
+  .nav-links { display: none; gap: 32px; font-size: 14px; font-weight: 500; }
+  .nav-links a { color: var(--neutro-600); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--azul-700); }
+  @media (min-width: 768px) {
+    .nav-links { display: flex; }
+  }
+
+  /* ==================== HERO ==================== */
+  header.hero {
+    background: var(--grad-hero);
+    color: white;
+    padding: 140px 24px 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  header.hero::before {
+    content: '';
+    position: absolute; top: -50%; right: -10%;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header.hero::after {
+    content: '';
+    position: absolute; bottom: -30%; left: -10%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; text-align: center; }
+  .hero-tag {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 32px;
+    letter-spacing: 0.02em;
+  }
+  .hero-title {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .hero-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: rgba(255,255,255,0.85);
+    max-width: 700px;
+    margin: 0 auto 40px;
+    font-weight: 400;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 16px 32px;
+    background: white;
+    color: var(--azul-800);
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--shadow-xl);
+    transition: transform .2s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 80px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-stat-num {
+    font-size: clamp(24px, 5vw, 40px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+  }
+  .hero-stat-lbl {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 8px;
+  }
+
+  /* ==================== SEÇÕES ==================== */
+  section { padding: 100px 24px; }
+  .sec-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--azul-50);
+    color: var(--azul-700);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .sec-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--neutro-900);
+    margin-bottom: 16px;
+    max-width: 800px;
+  }
+  .sec-sub {
+    font-size: 17px;
+    color: var(--neutro-600);
+    max-width: 700px;
+    margin-bottom: 56px;
+  }
+  .center { text-align: center; margin-left: auto; margin-right: auto; }
+
+  /* ==================== PROBLEMA (HOJE) ==================== */
+  .problema { background: var(--neutro-50); }
+  .problema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .problema-item {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--neutro-200);
+    text-align: center;
+  }
+  .problema-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  .problema-titulo {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--neutro-800);
+    margin-bottom: 4px;
+  }
+  .problema-desc {
+    font-size: 12px;
+    color: var(--neutro-600);
+  }
+  .problema-conclusao {
+    background: white;
+    border-left: 4px solid var(--azul-600);
+    padding: 24px 28px;
+    border-radius: 8px;
+    font-size: 17px;
+    color: var(--neutro-800);
+    max-width: 800px;
+  }
+  .problema-conclusao strong { color: var(--azul-700); }
+
+  /* ==================== MÓDULOS ==================== */
+  .modulos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 720px) {
+    .modulos-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1100px) {
+    .modulos-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  .modulo {
+    padding: 36px 28px;
+    border-radius: 20px;
+    background: white;
+    border: 1px solid var(--neutro-200);
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .modulo:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .modulo.destaque {
+    background: var(--grad-hero);
+    color: white;
+    border: none;
+  }
+  .modulo-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--azul-600);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+  .modulo.destaque .modulo-num { color: rgba(255,255,255,0.7); }
+  .modulo-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: var(--azul-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  .modulo.destaque .modulo-icon {
+    background: rgba(255,255,255,0.15);
+  }
+  .modulo-nome {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .modulo-desc {
+    font-size: 14px;
+    color: var(--neutro-600);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .modulo.destaque .modulo-desc { color: rgba(255,255,255,0.85); }
+  .modulo-features {
+    list-style: none;
+    font-size: 13px;
+  }
+  .modulo-features li {
+    padding: 6px 0;
+    color: var(--neutro-700);
+    display: flex; align-items: start; gap: 8px;
+  }
+  .modulo.destaque .modulo-features li { color: rgba(255,255,255,0.9); }
+  .modulo-features li::before {
+    content: '→';
+    color: var(--azul-600);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .modulo.destaque .modulo-features li::before { color: white; }
+  .modulo-badge {
+    position: absolute;
+    top: 24px; right: 24px;
+    background: var(--aviso);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  /* ==================== JORNADA ==================== */
+  .jornada { background: var(--neutro-50); }
+  .jornada-timeline {
+    position: relative;
+    padding-left: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .jornada-timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: 12px; bottom: 12px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--azul-600), var(--azul-100));
+  }
+  .jornada-item {
+    position: relative;
+    padding: 0 0 32px 24px;
+  }
+  .jornada-item::before {
+    content: '';
+    position: absolute;
+    left: -28px; top: 4px;
+    width: 16px; height: 16px;
+    background: var(--azul-600);
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--azul-200, var(--azul-100));
+  }
+  .jornada-item.destaque::before {
+    background: var(--aviso);
+    box-shadow: 0 0 0 4px rgba(245,158,11,0.2);
+  }
+  .jornada-quando {
+    display: inline-block;
+    background: var(--azul-700);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+  }
+  .jornada-item.destaque .jornada-quando { background: var(--aviso); }
+  .jornada-titulo {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--neutro-900);
+    margin-bottom: 4px;
+  }
+  .jornada-desc {
+    font-size: 14px;
+    color: var(--neutro-600);
+  }
+
+  /* ==================== DIFERENCIAIS ==================== */
+  .diferenciais-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  .dif-card {
+    background: var(--grad-card);
+    border: 1px solid var(--neutro-200);
+    padding: 28px;
+    border-radius: 16px;
+  }
+  .dif-icon {
+    width: 48px; height: 48px;
+    background: var(--azul-600);
+    color: white;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .dif-titulo {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--neutro-900);
+  }
+  .dif-desc {
+    font-size: 14px;
+    color: var(--neutro-600);
+    line-height: 1.6;
+  }
+
+  /* ==================== STACK ==================== */
+  .stack { background: var(--neutro-50); }
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .stack-item {
+    background: white;
+    padding: 24px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--neutro-200);
+    text-align: center;
+  }
+  .stack-nome {
+    font-weight: 700;
+    color: var(--azul-800);
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .stack-papel {
+    font-size: 12px;
+    color: var(--neutro-600);
+  }
+
+  /* ==================== ROADMAP ==================== */
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .roadmap-fase {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    padding: 24px;
+    border-radius: 14px;
+    position: relative;
+  }
+  .roadmap-fase-num {
+    width: 32px; height: 32px;
+    background: var(--azul-600);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .roadmap-fase-tempo {
+    font-size: 12px;
+    color: var(--neutro-500, var(--neutro-400));
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .roadmap-fase-nome {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--neutro-900);
+    margin-bottom: 8px;
+  }
+  .roadmap-fase-desc {
+    font-size: 13px;
+    color: var(--neutro-600);
+    line-height: 1.5;
+  }
+
+  /* ==================== MÉTRICAS ==================== */
+  .metricas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .metrica {
+    background: var(--grad-hero);
+    color: white;
+    padding: 32px 24px;
+    border-radius: 16px;
+    text-align: center;
+  }
+  .metrica-num {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .metrica-lbl {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+  }
+
+  /* ==================== DECISÕES PENDENTES ==================== */
+  .decisoes ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .decisoes li {
+    background: white;
+    border: 1px solid var(--neutro-200);
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--neutro-800);
+    display: flex; align-items: start; gap: 12px;
+  }
+  .decisoes li::before {
+    content: '?';
+    width: 24px; height: 24px;
+    background: var(--azul-50);
+    color: var(--azul-700);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ==================== CTA FINAL ==================== */
+  .cta-final {
+    background: var(--grad-hero);
+    color: white;
+    text-align: center;
+    padding: 100px 24px;
+  }
+  .cta-final h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 16px;
+  }
+  .cta-final p {
+    font-size: 17px;
+    color: rgba(255,255,255,0.85);
+    max-width: 600px;
+    margin: 0 auto 32px;
+  }
+
+  /* ==================== FOOTER ==================== */
+  footer {
+    background: var(--neutro-900);
+    color: rgba(255,255,255,0.7);
+    padding: 48px 24px 32px;
+    font-size: 13px;
+  }
+  footer .wrap {
+    display: flex; flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    footer .wrap { flex-direction: row; justify-content: space-between; align-items: center; text-align: left; }
+  }
+  footer a { color: rgba(255,255,255,0.9); text-decoration: none; }
+  footer .footer-logo { color: white; font-weight: 800; font-size: 16px; }
+
+  /* ==================== ANIMAÇÕES ==================== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="top">
+  <div class="wrap">
+    <div class="logo">
+      <span class="logo-mark">V</span>
+      <span>Ventus <span style="color:var(--neutro-600);font-weight:500;">· Plataforma</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#problema">Hoje</a>
+      <a href="#modulos">Módulos</a>
+      <a href="#jornada">Jornada</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#proximos">Próximos passos</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">Proposta de plataforma · Ventus Formaturas</div>
+    <h1 class="hero-title">A plataforma que faltava na <em>Ventus Formaturas</em></h1>
+    <p class="hero-sub">Da venda do contrato à entrega das fotos editadas no WhatsApp do formando. Tudo num só lugar — com a sua marca.</p>
+    <a href="#problema" class="hero-cta">
+      Conhecer a proposta
+      <span style="font-size:18px;">↓</span>
+    </a>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">4</div>
+        <div class="hero-stat-lbl">módulos integrados</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">~5 meses</div>
+        <div class="hero-stat-lbl">do kick-off à entrega</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">15+</div>
+        <div class="hero-stat-lbl">turmas atendíveis no piloto</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== PROBLEMA ==================== -->
+<section id="problema" class="problema">
+  <div class="wrap">
+    <span class="sec-tag">O cenário hoje</span>
+    <h2 class="sec-title">A operação roda em ferramentas que não conversam entre si</h2>
+    <p class="sec-sub">A Ventus já é referência em Montes Claros — mas a tecnologia atual cria fricção em cada transição. Isso significa retrabalho, atrasos e oportunidades perdidas de encantar o formando.</p>
+
+    <div class="problema-grid reveal">
+      <div class="problema-item">
+        <div class="problema-icon">📊</div>
+        <div class="problema-titulo">Planilha financeira</div>
+        <div class="problema-desc">Cobranças manuais, controle disperso</div>
+      </div>
+      <div class="problema-item">
+        <div class="problema-icon">💬</div>
+        <div class="problema-titulo">WhatsApp manual</div>
+        <div class="problema-desc">Mensagens individuais, sem rastreamento</div>
+      </div>
+      <div class="problema-item">
+        <div class="problema-icon">📁</div>
+        <div class="problema-titulo">Drive de fotos</div>
+        <div class="problema-desc">Pasta única, formando vê tudo</div>
+      </div>
+      <div class="problema-item">
+        <div class="problema-icon">📋</div>
+        <div class="problema-titulo">Lista de convidados</div>
+        <div class="problema-desc">Planilhas trocadas por email</div>
+      </div>
+      <div class="problema-item">
+        <div class="problema-icon">🚪</div>
+        <div class="problema-titulo">Recepção no papel</div>
+        <div class="problema-desc">Filas, conferência manual</div>
+      </div>
+    </div>
+
+    <div class="problema-conclusao reveal">
+      <strong>O resultado:</strong> equipe sobrecarregada, formando inseguro, comissão sem visibilidade e diferenciação reduzida frente a concorrentes que já estão automatizando.
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MÓDULOS ==================== -->
+<section id="modulos">
+  <div class="wrap">
+    <span class="sec-tag">A solução</span>
+    <h2 class="sec-title">Uma plataforma única. Sua marca. Quatro módulos que se conversam.</h2>
+    <p class="sec-sub">Construída com a identidade da Ventus desde o primeiro pixel. Branca, white-label, integrada — e pronta para escalar conforme você cresce.</p>
+
+    <div class="modulos-grid">
+      <!-- MÓDULO 1 -->
+      <div class="modulo reveal">
+        <div class="modulo-num">MÓDULO 01</div>
+        <div class="modulo-icon">💰</div>
+        <h3 class="modulo-nome">Vendas e Pagamento</h3>
+        <p class="modulo-desc">Do contrato digital à última parcela. Sem boleto solto, sem planilha.</p>
+        <ul class="modulo-features">
+          <li>Contrato digital com assinatura simples</li>
+          <li>Parcelamento em até 21x sem juros</li>
+          <li>Pix, boleto, cartão</li>
+          <li>Cobrança automática + lembretes</li>
+          <li>Painel financeiro em tempo real</li>
+        </ul>
+      </div>
+
+      <!-- MÓDULO 2 -->
+      <div class="modulo reveal">
+        <div class="modulo-num">MÓDULO 02</div>
+        <div class="modulo-icon">📣</div>
+        <h3 class="modulo-nome">Divulgação e Convidados</h3>
+        <p class="modulo-desc">Engajamento timed para criar expectativa. Cadastro de convidado em segundos.</p>
+        <ul class="modulo-features">
+          <li>Campanhas D-90, D-30, D-7, D-1</li>
+          <li>Aluno cadastra convidado pelo celular</li>
+          <li>QR Code único enviado via WhatsApp</li>
+          <li>RSVP web sem login</li>
+          <li>Painel de comissão em tempo real</li>
+        </ul>
+      </div>
+
+      <!-- MÓDULO 3 -->
+      <div class="modulo reveal">
+        <div class="modulo-num">MÓDULO 03</div>
+        <div class="modulo-icon">🎫</div>
+        <h3 class="modulo-nome">Controle de Acesso</h3>
+        <p class="modulo-desc">Convidado mostra QR. Pulseira impressa com nome em 3 segundos. Sem fila.</p>
+        <ul class="modulo-features">
+          <li>Check-in por QR ou busca por nome</li>
+          <li>Pulseira térmica com nome + QR + cor por categoria</li>
+          <li>Múltiplos pontos simultâneos</li>
+          <li>Modo offline: imune a queda de internet</li>
+          <li>Painel ao vivo de chegadas</li>
+        </ul>
+      </div>
+
+      <!-- MÓDULO 4 — DESTAQUE -->
+      <div class="modulo destaque reveal">
+        <div class="modulo-badge">★ Maior diferencial</div>
+        <div class="modulo-num">MÓDULO 04</div>
+        <div class="modulo-icon">📸</div>
+        <h3 class="modulo-nome">Fotografia + WhatsApp</h3>
+        <p class="modulo-desc">A "experiência perfeita" do formando. O que ninguém entrega de ponta a ponta.</p>
+        <ul class="modulo-features">
+          <li>Reconhecimento facial automático</li>
+          <li>Cada aluno vê só onde aparece</li>
+          <li>Sistema de créditos para escolher favoritas</li>
+          <li>Fila de edição com auto-deploy</li>
+          <li>Link das fotos editadas no WhatsApp</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== JORNADA ==================== -->
+<section id="jornada" class="jornada">
+  <div class="wrap">
+    <span class="sec-tag">Experiência do formando</span>
+    <h2 class="sec-title">Do "sim, quero o pacote" ao "minhas fotos chegaram!" 🎉</h2>
+    <p class="sec-sub">Cada toque com o aluno virou uma experiência fluida e automática. Sem ele precisar perguntar, sem ninguém ter que correr atrás.</p>
+
+    <div class="jornada-timeline">
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D-180</div>
+        <div class="jornada-titulo">Aluno escolhe pacote pelo celular</div>
+        <div class="jornada-desc">Recebe link no WhatsApp, escolhe pacote, assina contrato digital, paga 1ª parcela em até 21x.</div>
+      </div>
+
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D-90</div>
+        <div class="jornada-titulo">"Faltam 90 dias!"</div>
+        <div class="jornada-desc">Campanha automática cria expectativa. Aluno engaja, comissão acompanha conversões.</div>
+      </div>
+
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D-30</div>
+        <div class="jornada-titulo">Cadastro de convidados</div>
+        <div class="jornada-desc">Aluno adiciona convidados respeitando cota do pacote. Cada convidado recebe QR no WhatsApp.</div>
+      </div>
+
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D-1</div>
+        <div class="jornada-titulo">Lembrete final</div>
+        <div class="jornada-desc">Aluno e convidado recebem dress code, horário, mapa do salão.</div>
+      </div>
+
+      <div class="jornada-item destaque reveal">
+        <div class="jornada-quando">DIA D</div>
+        <div class="jornada-titulo">Check-in em 3 segundos</div>
+        <div class="jornada-desc">Convidado chega, mostra QR, pulseira com nome impressa imediatamente. Zero fila.</div>
+      </div>
+
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D+1</div>
+        <div class="jornada-titulo">Galeria personalizada</div>
+        <div class="jornada-desc">Fotógrafo faz upload em massa. IA separa por aluno. Cada um recebe WhatsApp: "Suas fotos chegaram!"</div>
+      </div>
+
+      <div class="jornada-item reveal">
+        <div class="jornada-quando">D+2</div>
+        <div class="jornada-titulo">Aluno escolhe favoritas</div>
+        <div class="jornada-desc">Sistema de créditos: aluno seleciona N fotos. Vai direto para fila de edição.</div>
+      </div>
+
+      <div class="jornada-item destaque reveal">
+        <div class="jornada-quando">D+5</div>
+        <div class="jornada-titulo">"Suas fotos editadas estão prontas! ✨"</div>
+        <div class="jornada-desc">Editor finaliza, sistema sobe versões prontas, dispara WhatsApp com link da galeria final. Aluno baixa, compartilha, vibra.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DIFERENCIAIS ==================== -->
+<section>
+  <div class="wrap">
+    <span class="sec-tag">O que ninguém entrega assim</span>
+    <h2 class="sec-title">Quatro coisas que vão posicionar a Ventus à frente do mercado</h2>
+    <p class="sec-sub">Os concorrentes brasileiros fazem 1 ou 2 desses pontos isoladamente. Esta plataforma os integra de forma única.</p>
+
+    <div class="diferenciais-grid">
+      <div class="dif-card reveal">
+        <div class="dif-icon">🎯</div>
+        <h4 class="dif-titulo">Reconhecimento facial</h4>
+        <p class="dif-desc">Cada aluno vê apenas as fotos onde aparece. Fim do "fica horas procurando suas próprias fotos no Drive".</p>
+      </div>
+
+      <div class="dif-card reveal">
+        <div class="dif-icon">⚡</div>
+        <h4 class="dif-titulo">Pulseira em 3 segundos</h4>
+        <p class="dif-desc">Impressora térmica com nome + QR + cor da categoria. Funciona até offline. Mil convidados sem fila.</p>
+      </div>
+
+      <div class="dif-card reveal">
+        <div class="dif-icon">💬</div>
+        <h4 class="dif-titulo">WhatsApp automático</h4>
+        <p class="dif-desc">O aluno recebe o link das fotos editadas no canal que ele já usa. Sem app pra baixar, sem email pra abrir.</p>
+      </div>
+
+      <div class="dif-card reveal">
+        <div class="dif-icon">🎨</div>
+        <h4 class="dif-titulo">Branca, com a sua marca</h4>
+        <p class="dif-desc">A plataforma é Ventus. Cores, logo, domínio. O formando vê apenas a Ventus — não uma plataforma de terceiros.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STACK ==================== -->
+<section class="stack">
+  <div class="wrap">
+    <span class="sec-tag">Tecnologia</span>
+    <h2 class="sec-title">Construída com tecnologias modernas, seguras e escaláveis</h2>
+    <p class="sec-sub">Stack escolhida para casar com a metodologia do time: front-end gerado por IA, backend executado pela célula técnica do SENAI. LGPD by design.</p>
+
+    <div class="stack-grid">
+      <div class="stack-item reveal">
+        <div class="stack-nome">React + Next.js</div>
+        <div class="stack-papel">Front-end web e mobile</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">Node.js + Postgres</div>
+        <div class="stack-papel">Backend e banco de dados</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">Asaas</div>
+        <div class="stack-papel">Pagamento e parcelamento</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">AWS Rekognition</div>
+        <div class="stack-papel">Reconhecimento facial</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">Z-API</div>
+        <div class="stack-papel">WhatsApp Business</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">Cloudflare R2</div>
+        <div class="stack-papel">Storage de fotos</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">Zebra ZD510</div>
+        <div class="stack-papel">Impressão de pulseira</div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-nome">LGPD compliant</div>
+        <div class="stack-papel">Consentimento + auditoria</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ROADMAP ==================== -->
+<section id="roadmap">
+  <div class="wrap">
+    <span class="sec-tag">Roadmap</span>
+    <h2 class="sec-title">Cinco fases. Cinco meses. Entregando valor desde o dia um.</h2>
+    <p class="sec-sub">Começamos pelo módulo de fotografia — o maior diferencial competitivo da Ventus. Cada fase entrega um pedaço completo, testável e funcionando em produção.</p>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-fase reveal">
+        <div class="roadmap-fase-num">0</div>
+        <div class="roadmap-fase-tempo">Sem 1-2</div>
+        <div class="roadmap-fase-nome">Setup</div>
+        <div class="roadmap-fase-desc">Repositório, infra, design tokens, "Hello Ventus" online.</div>
+      </div>
+      <div class="roadmap-fase reveal" style="border-color:var(--azul-600);">
+        <div class="roadmap-fase-num">1</div>
+        <div class="roadmap-fase-tempo">Sem 3-8</div>
+        <div class="roadmap-fase-nome">Foto + WhatsApp ★</div>
+        <div class="roadmap-fase-desc">Maior diferencial. Esteira completa: upload → IA → seleção → edição → entrega.</div>
+      </div>
+      <div class="roadmap-fase reveal">
+        <div class="roadmap-fase-num">2</div>
+        <div class="roadmap-fase-tempo">Sem 9-12</div>
+        <div class="roadmap-fase-nome">Vendas</div>
+        <div class="roadmap-fase-desc">Contrato, parcelamento, cobrança automática.</div>
+      </div>
+      <div class="roadmap-fase reveal">
+        <div class="roadmap-fase-num">3</div>
+        <div class="roadmap-fase-tempo">Sem 13-15</div>
+        <div class="roadmap-fase-nome">Acesso</div>
+        <div class="roadmap-fase-desc">QR, impressão de pulseira, modo offline.</div>
+      </div>
+      <div class="roadmap-fase reveal">
+        <div class="roadmap-fase-num">4</div>
+        <div class="roadmap-fase-tempo">Sem 16-18</div>
+        <div class="roadmap-fase-nome">Divulgação</div>
+        <div class="roadmap-fase-desc">Cadastro de convidados, RSVP, campanhas.</div>
+      </div>
+      <div class="roadmap-fase reveal">
+        <div class="roadmap-fase-num">5</div>
+        <div class="roadmap-fase-tempo">Sem 19-21</div>
+        <div class="roadmap-fase-nome">Polimento</div>
+        <div class="roadmap-fase-desc">Testes E2E, treinamento, piloto na próxima formatura real.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MÉTRICAS ==================== -->
+<section style="background: var(--neutro-50);">
+  <div class="wrap">
+    <span class="sec-tag">Como vamos medir sucesso</span>
+    <h2 class="sec-title">Métricas claras desde o dia um</h2>
+    <p class="sec-sub">Cada número aqui é mensurável e estará num painel disponível para a direção da Ventus.</p>
+
+    <div class="metricas-grid">
+      <div class="metrica reveal">
+        <div class="metrica-num">&lt; 24h</div>
+        <div class="metrica-lbl">Tempo entre upload do fotógrafo e WhatsApp ao aluno</div>
+      </div>
+      <div class="metrica reveal">
+        <div class="metrica-num">&lt; 5s</div>
+        <div class="metrica-lbl">Tempo de check-in por convidado no evento</div>
+      </div>
+      <div class="metrica reveal">
+        <div class="metrica-num">&gt; 80%</div>
+        <div class="metrica-lbl">Pagamentos em dia (vs. inadimplência atual)</div>
+      </div>
+      <div class="metrica reveal">
+        <div class="metrica-num">&gt; 60</div>
+        <div class="metrica-lbl">NPS do formando após receber as fotos editadas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DECISÕES PENDENTES ==================== -->
+<section id="proximos" class="decisoes">
+  <div class="wrap">
+    <span class="sec-tag">Para destravar o kick-off</span>
+    <h2 class="sec-title">8 decisões que precisamos alinhar com você</h2>
+    <p class="sec-sub">Para arrancar com tudo, precisamos da sua palavra final em alguns pontos. Nada técnico — só direcionamento estratégico.</p>
+
+    <ul>
+      <li>Domínio definitivo (subdomínio de ventusformaturas.com.br ou um novo?)</li>
+      <li>Nome oficial do produto (Ventus Connect? Portal Ventus? Outro?)</li>
+      <li>Quantas turmas estão previstas para 2026?</li>
+      <li>Quem será o ponto focal técnico do lado Ventus?</li>
+      <li>Compra ou aluguel da impressora Zebra para o piloto?</li>
+      <li>Já tem conta Asaas ou criamos juntos?</li>
+      <li>Já tem conta Z-API (WhatsApp Business) ou criamos juntos?</li>
+      <li>Pessoa jurídica responsável pelos contratos LGPD com formandos?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ==================== CTA FINAL ==================== -->
+<section class="cta-final">
+  <div class="wrap">
+    <h2>Pronto para sair do papel?</h2>
+    <p>O próximo passo é uma reunião de kick-off para alinhar essas 8 decisões e iniciar a Fase 0.<br>De lá em diante, é execução.</p>
+    <a href="mailto:sonheconosco@ventusformaturas.com.br?subject=Kick-off%20Plataforma%20Ventus" class="hero-cta">
+      Vamos marcar o kick-off
+      <span style="font-size:18px;">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="footer-logo">Ventus Formaturas</div>
+      <div style="margin-top:6px;">Especialista em Formaturas e Eventos Universitários · Montes Claros/MG</div>
+    </div>
+    <div>
+      <a href="https://ventusformaturas.com.br/" target="_blank">ventusformaturas.com.br</a>
+      <span style="margin:0 12px;color:rgba(255,255,255,0.3);">·</span>
+      <a href="tel:+5538998639570">(38) 99863-9570</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Animação on-scroll: simples e leve
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Smooth scroll já vem do CSS html { scroll-behavior: smooth }
+</script>
+
+</body>
+</html>

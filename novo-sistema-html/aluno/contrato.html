@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body style="background: var(--gray-100); padding-bottom:80px;">
+
+<div class="phone-frame">
+  <div class="mobile-header">
+    <a href="inicio.html" style="color:white;text-decoration:none;"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+    <strong style="font-size:16px;">Contrato</strong>
+    <i data-lucide="download" class="w-5 h-5"></i>
+  </div>
+
+  <div style="padding:20px 16px;">
+    <div style="background:white;border-radius:16px;padding:20px;border:1px solid var(--gray-200);">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="badge badge-success">Assinado em 04/03/2026</span>
+          <h2 style="font-size:20px;font-weight:700;margin-top:8px;letter-spacing:-0.01em;">Contrato 0085/2026</h2>
+          <p style="font-size:13px;color:var(--gray-500);margin-top:2px;">Pacote OURO · MEDICINA T85 - UNIMONTES</p>
+        </div>
+        <i data-lucide="check-circle" class="w-8 h-8" style="color:var(--success);"></i>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:13px;color:var(--gray-600);line-height:1.6;">
+        <strong style="color:var(--gray-900);">Modalidade de assinatura:</strong> Aceite digital simples<br>
+        <strong style="color:var(--gray-900);">IP do aceite:</strong> 200.123.45.67 · Montes Claros/MG<br>
+        <strong style="color:var(--gray-900);">Dispositivo:</strong> iPhone · Safari Mobile<br>
+        <strong style="color:var(--gray-900);">Hash do documento:</strong> <code style="font-size:11px;">a3f2…91cb</code>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <a href="#" class="btn btn-secondary" style="flex:1;justify-content:center;font-size:13px;"><i data-lucide="file-text" class="w-4 h-4"></i> Ver PDF</a>
+        <a href="#" class="btn btn-secondary" style="flex:1;justify-content:center;font-size:13px;"><i data-lucide="share-2" class="w-4 h-4"></i> Compartilhar</a>
+      </div>
+    </div>
+
+    <strong style="font-size:14px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;display:block;margin-top:24px;">O que está incluso</strong>
+
+    <div style="background:white;border-radius:14px;border:1px solid var(--gray-200);margin-top:10px;padding:16px;">
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);" class="flex justify-between">
+        <span style="font-size:14px;">13 eventos completos</span>
+        <i data-lucide="check" class="w-4 h-4" style="color:var(--success);"></i>
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);" class="flex justify-between">
+        <span style="font-size:14px;">30 fotos editadas</span>
+        <i data-lucide="check" class="w-4 h-4" style="color:var(--success);"></i>
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);" class="flex justify-between">
+        <span style="font-size:14px;">Álbum "Memórias" 21x30cm</span>
+        <i data-lucide="check" class="w-4 h-4" style="color:var(--success);"></i>
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);" class="flex justify-between">
+        <span style="font-size:14px;">Cota: 8 convidados</span>
+        <i data-lucide="check" class="w-4 h-4" style="color:var(--success);"></i>
+      </div>
+      <div style="padding:8px 0;" class="flex justify-between">
+        <span style="font-size:14px;">Family Day (você + 4 familiares)</span>
+        <i data-lucide="check" class="w-4 h-4" style="color:var(--success);"></i>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;background:#FEF3C7;border-radius:12px;padding:14px;font-size:13px;color:#92400E;">
+      <strong>Trocar de pacote?</strong> Possível em até 30 dias após adesão. Diferença é parcelada nas próximas mensalidades.
+      <a href="pacotes.html" style="color:var(--primary-700);font-weight:600;text-decoration:none;display:block;margin-top:8px;">Ver opções →</a>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="inicio.html" class="bottom-nav-item active"><i data-lucide="home"></i>Início</a>
+  <a href="galeria.html" class="bottom-nav-item"><i data-lucide="image"></i>Fotos</a>
+  <a href="pagamento.html" class="bottom-nav-item"><i data-lucide="credit-card"></i>Pagar</a>
+  <a href="convidados.html" class="bottom-nav-item"><i data-lucide="users"></i>Convidados</a>
+  <a href="#" class="bottom-nav-item"><i data-lucide="user"></i>Perfil</a>
+</nav>
+
+<script>lucide.createIcons();</script>
+
+<!-- ventus-demo-back -->
+<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+Voltar &agrave; demo</a>
+</body>
+</html>
