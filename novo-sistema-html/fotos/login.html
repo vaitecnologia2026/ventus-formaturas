@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body style="background:var(--gray-50);">
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo"><img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas"></a>
+  <div class="ft-nav-actions">
+    <a href="index.html" class="ft-btn ft-btn-ghost"><i data-lucide="arrow-left"></i> Voltar</a>
+  </div>
+</header>
+
+<div class="vt-auth-wrap">
+  <div class="vt-card">
+    <div class="vt-tabs">
+      <button class="vt-tab on" data-modo="login">Entrar</button>
+      <button class="vt-tab" data-modo="registro">Criar conta</button>
+    </div>
+
+    <div class="ft-form">
+      <label class="ft-field" id="campo-nome" hidden><span>Nome completo</span>
+        <input id="nome" type="text" placeholder="Seu nome" autocomplete="name"></label>
+      <label class="ft-field"><span>E-mail</span>
+        <input id="email" type="email" placeholder="voce@email.com" autocomplete="email"></label>
+      <label class="ft-field"><span>Senha</span>
+        <input id="senha" type="password" placeholder="mínimo 6 caracteres" autocomplete="current-password"></label>
+      <p class="ft-form-erro" id="erro" hidden></p>
+    </div>
+    <button class="ft-btn ft-btn-primary" style="width:100%;" id="btn"><i data-lucide="log-in"></i> Entrar</button>
+    <p style="font-size:13px;text-align:center;margin:16px 0 0;color:var(--gray-500);">
+      Suas fotos compradas ficam salvas na sua conta.
+    </p>
+  </div>
+</div>
+
+<script src="app-cliente.js"></script>
+<script>
+lucide.createIcons();
+let modo = new URLSearchParams(location.search).get('modo') === 'registro' ? 'registro' : 'login';
+const proximo = new URLSearchParams(location.search).get('next') || 'perfil.html';
+
+function render() {
+  document.querySelectorAll('.vt-tab').forEach(t => t.classList.toggle('on', t.dataset.modo === modo));
+  document.getElementById('campo-nome').hidden = modo === 'login';
+  document.getElementById('btn').innerHTML = modo === 'login'
+    ? '<i data-lucide="log-in"></i> Entrar' : '<i data-lucide="user-plus"></i> Criar conta';
+  document.getElementById('erro').hidden = true;
+  lucide.createIcons();
+}
+document.querySelectorAll('.vt-tab').forEach(t => t.addEventListener('click', () => { modo = t.dataset.modo; render(); }));
+render();
+
+document.getElementById('btn').addEventListener('click', async () => {
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const erro = document.getElementById('erro');
+  try {
+    if (modo === 'login') await Ventus.Auth.login(email, senha);
+    else await Ventus.Auth.registrar(nome, email, senha);
+    location.href = proximo;
+  } catch (e) { erro.textContent = e.message; erro.hidden = false; }
+});
+document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn').click(); });
+</script>
+</body>
+</html>

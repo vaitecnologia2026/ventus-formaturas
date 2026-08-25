@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aluno — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .crumb { font-size:13px; color:var(--gray-500); margin-bottom:10px; } .crumb a{color:var(--gray-500);text-decoration:none;} .crumb a:hover{color:var(--gray-700);}
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); font-weight:800; font-size:20px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+  .segmented { display:inline-flex; background:var(--gray-100); border-radius:12px; padding:4px; gap:2px; margin-bottom:22px; flex-wrap:wrap; }
+  .segmented .tab { border:none; background:transparent; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--gray-500); padding:8px 16px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:.15s; }
+  .segmented .tab.on { background:var(--surface); color:var(--primary-700); box-shadow:var(--shadow-sm); }
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:18px; }
+  .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 22px; border-bottom:1px solid var(--gray-100); }
+  .panel-head h2 { font-size:14.5px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:9px; }
+  .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
+  .panel-body { padding:22px; }
+  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:170px;}
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
+  .add-bar input, .add-bar select, .add-bar textarea { padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar input:focus, .add-bar select:focus, .add-bar textarea:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .switch { position:relative; display:inline-block; width:46px; height:27px; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
+  .switch .track::after { content:''; position:absolute; width:21px; height:21px; left:3px; top:3px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+  .switch input:checked + .track { background:var(--success); } .switch input:checked + .track::after { transform:translateX(19px); }
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:13px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+  table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.num, table.tbl th.num { text-align:right; font-variant-numeric:tabular-nums; } table.tbl td.nome{font-weight:600;color:var(--gray-900);}
+  .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .b-pago{background:#DCFCE7;color:#166534;} .b-pend{background:#FEF3C7;color:#92400E;} .b-ok{background:var(--primary-50);color:var(--primary-700);}
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); } .icon-btn.danger:hover{border-color:#FCA5A5;color:#DC2626;background:#FEF2F2;}
+  .empty { text-align:center; color:var(--gray-500); padding:44px 20px; } .empty svg{width:34px;height:34px;color:var(--gray-300);margin:0 auto 10px;display:block;}
+  .dados-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
+  .dado { padding:16px 22px; border-bottom:1px solid var(--gray-100); } .dado .l{font-size:12px;font-weight:600;color:var(--gray-500);} .dado .v{font-size:15px;font-weight:600;color:var(--gray-900);margin-top:3px;}
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; }
+  .kpi { background:var(--surface); border:1px solid var(--gray-200); border-radius:14px; padding:16px 18px; }
+  .kpi .l{font-size:12px;color:var(--gray-500);font-weight:600;} .kpi .v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:3px;}
+  .kpi.verde .v{color:#16A34A;} .kpi.laranja .v{color:#D97706;}
+  /* medidas grid */
+  .med-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;}
+  .med-fld{display:flex;flex-direction:column;gap:6px;} .med-fld label{font-size:13px;font-weight:600;color:var(--gray-700);}
+  .med-fld input,.med-fld select,.med-fld textarea{padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;font-size:14px;font-family:inherit;outline:none;}
+  .med-fld input:focus,.med-fld select:focus,.med-fld textarea:focus{border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100);}
+  /* timeline */
+  .tl{position:relative;padding-left:26px;}
+  .tl::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--gray-200);}
+  .tl-item{position:relative;margin-bottom:16px;}
+  .tl-item::before{content:'';position:absolute;left:-22px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--primary-500);border:2px solid var(--surface);box-shadow:0 0 0 2px var(--primary-100);}
+  .tl-item .meta{font-size:12px;color:var(--gray-400);} .tl-item .txt{font-size:14px;color:var(--gray-800);margin-top:2px;}
+  @media (max-width:640px){ .panel-body{padding:16px;} }
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3">
+      <button class="btn btn-secondary btn-sm" onclick="gerarContrato()"><i data-lucide="file-text" class="w-4 h-4"></i> Gerar contrato</button>
+      <a href="turmas.html" class="btn btn-secondary btn-sm" id="voltar-turma"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar</a>
+    </div>
+  </header>
+  <main class="app-content">
+    <div class="crumb" id="crumb"></div>
+    <div class="page-head">
+      <div class="chip" id="chip">AL</div>
+      <div><h1 id="nome">Carregando…</h1><p id="sub"></p></div>
+    </div>
+
+    <div class="segmented">
+      <button class="tab on" data-tab="dados"><i data-lucide="info" style="width:15px;height:15px;"></i> Dados</button>
+      <button class="tab" data-tab="pagamentos"><i data-lucide="banknote" style="width:15px;height:15px;"></i> Pagamentos</button>
+      <button class="tab" data-tab="medidas"><i data-lucide="ruler" style="width:15px;height:15px;"></i> Medidas</button>
+      <button class="tab" data-tab="evolucao"><i data-lucide="activity" style="width:15px;height:15px;"></i> Evolução</button>
+      <button class="tab" data-tab="eventos"><i data-lucide="calendar-days" style="width:15px;height:15px;"></i> Eventos</button>
+      <button class="tab" data-tab="brindes"><i data-lucide="gift" style="width:15px;height:15px;"></i> Brindes</button>
+      <button class="tab" data-tab="adicionais"><i data-lucide="shopping-bag" style="width:15px;height:15px;"></i> Adicionais</button>
+      <button class="tab" data-tab="fotos"><i data-lucide="images" style="width:15px;height:15px;"></i> Contrato de fotos</button>
+      <button class="tab" data-tab="contratos"><i data-lucide="file-signature" style="width:15px;height:15px;"></i> Contratos</button>
+      <button class="tab" data-tab="encartes"><i data-lucide="book-image" style="width:15px;height:15px;"></i> Encartes</button>
+    </div>
+
+    <section id="pane-dados">
+      <div class="kpis" style="margin-bottom:18px;">
+        <div class="kpi"><div class="l">Plano</div><div class="v" id="k-plano" style="font-size:17px;">—</div></div>
+        <div class="kpi"><div class="l">Total do plano</div><div class="v" id="k-total">R$ 0,00</div></div>
+        <div class="kpi verde"><div class="l">Pago</div><div class="v" id="k-pago">R$ 0,00</div></div>
+        <div class="kpi laranja"><div class="l">Restante</div><div class="v" id="k-rest">R$ 0,00</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Dados do aluno</h2><button class="btn btn-primary btn-sm" onclick="salvarDados()"><i data-lucide="check" class="w-4 h-4"></i> Salvar dados</button></div>
+        <div class="panel-body"><div class="med-grid" id="dados-form"></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2><i data-lucide="calculator" style="width:16px;height:16px;color:var(--primary-600);"></i> Detalhamento financeiro (contrato)</h2></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Item</th><th class="num">Contrato</th><th class="num">Desconto</th><th class="num">Líquido</th></tr></thead>
+          <tbody id="fin-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-pagamentos" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="wand-2" style="width:16px;height:16px;color:var(--primary-600);"></i> Gerar parcelas do plano</h2></div>
+        <div class="add-bar" id="pg-gerar"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo pagamento avulso</h2></div>
+        <div class="add-bar" id="pg-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Pagamentos</h2><span class="count" id="pg-resumo">—</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Descrição</th><th class="num">Valor</th><th>Vencimento</th><th>Forma</th><th>Status</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="pg-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-medidas" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="ruler" style="width:16px;height:16px;color:var(--primary-600);"></i> Medidas (beca / capelo)</h2></div>
+        <div class="panel-body"><div class="med-grid" id="med-grid"></div>
+          <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--gray-100);"><button class="btn btn-primary" id="med-salvar"><i data-lucide="check" class="w-4 h-4"></i> Salvar medidas</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pane-evolucao" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="pencil" style="width:16px;height:16px;color:var(--primary-600);"></i> Nova observação</h2></div>
+        <div class="panel-body">
+          <textarea id="lg-texto" style="width:100%;min-height:80px;padding:12px 14px;border:1px solid var(--gray-300);border-radius:11px;font-family:inherit;font-size:14px;outline:none;resize:vertical;" placeholder="Anote uma evolução, contato, negociação…"></textarea>
+          <div style="margin-top:12px;"><button class="btn btn-primary" id="lg-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar à evolução</button></div>
+        </div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2>Evolução</h2><span class="count" id="lg-count">0</span></div>
+        <div class="panel-body"><div class="tl" id="lg-tl"></div></div>
+      </div>
+    </section>
+
+    <section id="pane-eventos" hidden>
+      <div class="panel"><div class="panel-head"><h2><i data-lucide="calendar-days" style="width:16px;height:16px;color:var(--primary-600);"></i> Eventos do aluno</h2><span class="count" id="ev-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Evento</th><th>Previsão</th><th>Situação</th><th class="num">Familiares</th><th class="num">Convidados</th><th>Realização (cliente)</th></tr></thead>
+          <tbody id="ev-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-brindes" hidden>
+      <div class="panel"><div class="panel-head"><h2><i data-lucide="gift" style="width:16px;height:16px;color:var(--primary-600);"></i> Brindes do aluno</h2><span class="count" id="br-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Brinde</th><th>Escopo</th><th>Observação</th><th>Entrega</th></tr></thead>
+          <tbody id="br-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-adicionais" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Comprar produto/serviço (tabela da turma)</h2></div>
+        <div class="add-bar" id="ad-form"></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2><i data-lucide="shopping-bag" style="width:16px;height:16px;color:var(--primary-600);"></i> Produtos e serviços comprados</h2><span class="count" id="ad-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Item</th><th class="num">Qtd.</th><th class="num">Valor</th><th class="num">Subtotal</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="ad-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-fotos" hidden>
+      <div class="kpis" style="margin-bottom:18px;" id="fs-kpis"></div>
+      <div class="panel" style="margin-bottom:18px;"><div class="panel-head"><h2><i data-lucide="images" style="width:16px;height:16px;color:var(--primary-600);"></i> Contrato de fotos</h2><span class="count" id="fs-tipo">—</span></div>
+        <div class="panel-body" id="fs-body"></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2><i data-lucide="check-square" style="width:16px;height:16px;color:var(--primary-600);"></i> Fotos por galeria — selecionadas × não selecionadas</h2></div>
+        <div class="panel-body" id="galeria-body"><div class="empty"><i data-lucide="images"></i>Sem galerias vinculadas aos eventos.</div></div>
+      </div>
+    </section>
+
+    <section id="pane-contratos" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo contrato</h2></div>
+        <div class="add-bar" id="ct-form"></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2>Contratos</h2><span class="count" id="ct-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Título</th><th>Status</th><th>Data</th><th>Documento</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="ct-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pane-encartes" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo encarte</h2></div>
+        <div class="add-bar" id="en-form"></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2>Encartes do álbum</h2><span class="count" id="en-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Encarte</th><th>Status</th><th>Observação</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="en-tbody"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+const id = new URLSearchParams(location.search).get('id');
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const dtBR = s => s ? s.split('-').reverse().join('/') : '—';
+let FORMAS = [], TAMS = [], planoValor = 0;
+
+if (!id) location.href = 'turmas.html'; else init();
+
+async function init(){
+  const r = await fetch(apiUrl('/api/aluno/'+id));
+  if(!r.ok){ $('#nome').textContent='Aluno não encontrado'; return; }
+  const a = await r.json(); planoValor = a.plano_valor||0;
+  $('#chip').textContent = (a.nome||'AL').split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+  $('#nome').textContent = a.nome;
+  $('#sub').textContent = [a.turma, a.plano].filter(Boolean).join(' · ') || 'Aluno';
+  $('#crumb').innerHTML = `<a href="turmas.html">Turmas</a> › <a href="turma-detalhe.html?id=${a.turma_id}">${a.turma||'Turma'}</a> › ${a.nome}`;
+  $('#voltar-turma').href = 'turma-detalhe.html?id='+a.turma_id;
+  // KPIs + dados
+  $('#k-plano').textContent = a.plano||'—';
+  $('#k-total').textContent = brl(a.resumo_pagamento.total);
+  $('#k-pago').textContent = brl(a.resumo_pagamento.pago);
+  $('#k-rest').textContent = brl(a.resumo_pagamento.restante);
+  montarDadosForm(a);
+  // detalhamento financeiro
+  const fin=a.financeiro||{};
+  const linhaF=(nome,o)=>o?`<tr><td class="nome">${nome}</td><td class="num">${brl(o.contrato)}</td><td class="num">${o.desconto?('- '+brl(o.desconto)):'—'}</td><td class="num">${brl(o.liquido)}</td></tr>`:'';
+  $('#fin-tbody').innerHTML = linhaF('Fotografia',fin.fotografia)+linhaF('Cerimonial',fin.cerimonial)+linhaF('Produto/Serviço',fin.produto_servico)
+    + `<tr style="font-weight:800;"><td class="nome">Total</td><td class="num">${brl(fin.total)}</td><td class="num">${fin.desconto_total?('- '+brl(fin.desconto_total)):'—'}</td><td class="num" style="color:var(--primary-700);">${brl(fin.valor_final)}</td></tr>`;
+
+  document.querySelectorAll('.tab').forEach(x => x.onclick = () => trocar(x.dataset.tab));
+  montarPgForms(); montarCtForm(); montarEnForm();
+  carregarPagamentos(); carregarMedidas(); carregarLogs(); carregarContratos(); carregarEncartes();
+  carregarEventos(); carregarBrindes(); carregarAdicionais(); carregarFotosStatus(); carregarGaleria();
+  $('#lg-add').onclick = addLog; $('#med-salvar').onclick = salvarMedidas;
+}
+function trocar(aba){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab===aba));
+  ['dados','pagamentos','medidas','evolucao','eventos','brindes','adicionais','fotos','contratos','encartes'].forEach(p=>$('#pane-'+p).hidden=p!==aba);
+}
+
+/* -------- Etapa E: dados pessoais editáveis -------- */
+function montarDadosForm(a){
+  const fld=(id,lab,val,tipo='text',w='')=>`<div class="med-fld" ${w}><label>${lab}</label><input type="${tipo}" id="d-${id}" value="${(val??'').toString().replace(/"/g,'&quot;')}"></div>`;
+  const ro=(lab,val)=>`<div class="med-fld"><label>${lab}</label><input value="${(val??'—').toString().replace(/"/g,'&quot;')}" disabled style="background:var(--gray-50);"></div>`;
+  $('#dados-form').innerHTML =
+    fld('nome','Nome',a.nome)+fld('cpf','CPF',a.cpf)+fld('rg','RG',a.rg)+fld('data_nascimento','Nascimento',a.data_nascimento,'date')
+    +fld('celular','WhatsApp',a.celular)+fld('telefone2','Telefone 2',a.telefone2)+fld('email','E-mail',a.email)
+    +fld('curso','Curso',a.curso)+fld('ano_formatura','Ano formatura',a.ano_formatura,'number')
+    +fld('nome_fotografia','Foto do encarte',a.nome_fotografia)+fld('nome_mae','Nome da mãe',a.nome_mae)+fld('nome_pai','Nome do pai',a.nome_pai)
+    +ro('Data do encarte',a.data_encarte?a.data_encarte.split('-').reverse().join('/'):'—')
+    +fld('cep','CEP',a.cep)+fld('rua','Rua',a.rua)+fld('numero','Número',a.numero)+fld('complemento','Complemento',a.complemento)
+    +fld('bairro','Bairro',a.bairro)+fld('cidade','Cidade',a.cidade)+fld('uf','UF',a.uf)
+    +`<div class="med-fld" style="grid-column:1/-1;"><label>Mensagem</label><textarea id="d-mensagem" style="min-height:60px;">${(a.mensagem||'').replace(/</g,'&lt;')}</textarea></div>`
+    +ro('Comissão',a.cargo_comissao)+ro('Vendedor',a.vendedor)+ro('Plano',a.plano)+ro('Forma de pagamento',a.forma_pagamento)+ro('Cadastro',a.status==='preenchido'?'Preenchido':'Pendente');
+  lucide.createIcons();
+}
+window.salvarDados=async function(){
+  const g=id=>{const el=$('#d-'+id);return el?el.value:undefined;};
+  const body={};['nome','cpf','rg','data_nascimento','celular','telefone2','email','curso','ano_formatura','nome_fotografia','nome_mae','nome_pai','cep','rua','numero','complemento','bairro','cidade','uf','mensagem'].forEach(k=>body[k]=g(k));
+  const r=await fetch(apiUrl(`/api/aluno/${id}/dados`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok) toast('Dados salvos.'); else alert('Erro ao salvar.');
+};
+
+/* -------- Fase 5: contrato de fotos (limite/uso/excedente) -------- */
+async function carregarGaleria(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/galeria`)); const {galerias}=await r.json();
+  if(!galerias || !galerias.length){ $('#galeria-body').innerHTML=`<div class="empty"><i data-lucide="images"></i>Sem galerias vinculadas aos eventos desta turma.</div>`; lucide.createIcons(); return; }
+  $('#galeria-body').innerHTML = galerias.map(g=>`
+    <div style="border:1px solid var(--gray-200);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <b style="color:var(--gray-900);">${g.evento}</b>
+        <span style="font-size:13px;"><span class="badge b-pago">${g.selecionadas} selecionadas</span> <span class="badge b-pend">${g.nao_selecionadas} não selecionadas</span> <span style="color:var(--gray-400);">de ${g.total}</span></span>
+      </div>
+      ${g.total? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${g.fotos.map(f=>`<span title="${f.arquivo}" style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid ${f.selecionada?'#86EFAC':'var(--gray-200)'};background:${f.selecionada?'#DCFCE7':'var(--gray-50)'};color:${f.selecionada?'#166534':'var(--gray-500)'};">${f.selecionada?'✓ ':''}${f.arquivo.length>22?f.arquivo.slice(0,20)+'…':f.arquivo}</span>`).join('')}</div>`
+        : `<div style="font-size:13px;color:var(--gray-500);">Álbum ainda sem fotos.</div>`}
+    </div>`).join('');
+  lucide.createIcons();
+}
+async function carregarFotosStatus(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/fotos-status`)); const s=await r.json();
+  $('#fs-tipo').textContent = s.tipo_contrato_label || (s.tem_plano?'Sem tipo de contrato':'Sem plano');
+  if(!s.tem_plano || !s.tipo_contrato){
+    $('#fs-kpis').innerHTML=''; $('#fs-body').innerHTML=`<div class="empty"><i data-lucide="images"></i>Defina um plano com tipo de contrato para o aluno.</div>`; lucide.createIcons(); return;
+  }
+  if(s.ilimitado){
+    $('#fs-kpis').innerHTML=`<div class="kpi verde"><div class="l">Fotos selecionadas</div><div class="v">${s.selecionadas}</div></div>
+      <div class="kpi"><div class="l">Limite</div><div class="v">Ilimitado</div></div>`;
+    $('#fs-body').innerHTML=`<p style="color:var(--gray-600);font-size:14px;margin:0;">Contrato de fotos ilimitadas — todas as fotos liberadas para o formando.</p>`; lucide.createIcons(); return;
+  }
+  const exc = s.excedente||0;
+  $('#fs-kpis').innerHTML=`
+    <div class="kpi"><div class="l">Limite ${s.tipo_contrato==='fotos_por_evento'?'por evento':'do contrato'}</div><div class="v">${s.limite}</div></div>
+    <div class="kpi verde"><div class="l">Selecionadas</div><div class="v">${s.selecionadas}</div></div>
+    ${s.restante!=null?`<div class="kpi"><div class="l">Restante</div><div class="v">${s.restante}</div></div>`:''}
+    <div class="kpi ${exc?'laranja':''}"><div class="l">Excedente</div><div class="v">${exc}${exc?` · ${brl(s.valor_excedente_total)}`:''}</div></div>`;
+  if(s.tipo_contrato==='fotos_por_evento'){
+    const rows = (s.por_evento||[]);
+    $('#fs-body').innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>Evento/Galeria</th><th class="num">Limite</th><th class="num">Selecionadas</th><th class="num">Excedente</th></tr></thead>
+      <tbody>${rows.map(e=>`<tr><td class="nome">${e.evento}</td><td class="num">${e.limite}</td><td class="num">${e.usado}</td><td class="num" style="${e.excedente?'color:#D97706;font-weight:700;':''}">${e.excedente||'—'}</td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty"><i data-lucide="images"></i>Nenhuma foto selecionada ainda.</div>`;
+  } else {
+    $('#fs-body').innerHTML=`<p style="color:var(--gray-600);font-size:14px;margin:0;">Saldo global de <b>${s.limite}</b> fotos para todo o contrato. ${exc?`<span style="color:#D97706;font-weight:600;">${exc} foto(s) excedente(s) = ${brl(s.valor_excedente_total)} (a ${brl(s.valor_foto_excedente)}/foto).</span>`:'Dentro do limite.'}</p>`;
+  }
+  lucide.createIcons();
+}
+
+/* -------- Fase 6: gerar contrato (imprimir) -------- */
+window.gerarContrato=async function(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/contrato`)); const c=await r.json();
+  if(!c.tem_contrato){ alert(c.motivo||'Sem contrato configurado no plano.'); return; }
+  const w=window.open('','_blank');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${c.modelo}</title>
+    <style>body{font-family:Georgia,serif;max-width:800px;margin:32px auto;padding:0 24px;color:#111;line-height:1.6;}
+    .aceite{margin-top:32px;padding-top:16px;border-top:1px solid #ccc;color:#555;font-size:13px;}@media print{.noprint{display:none;}}</style></head>
+    <body><div>${c.html}</div>
+    ${c.aceite?`<div class="aceite">Contrato aceito digitalmente pelo formando${c.aceite_em?` em ${new Date(c.aceite_em).toLocaleString('pt-BR')}`:''}.</div>`:''}
+    <button class="noprint" onclick="window.print()" style="margin-top:24px;padding:10px 18px;font-size:15px;cursor:pointer;">Imprimir / Salvar PDF</button>
+    </body></html>`);
+  w.document.close();
+};
+
+/* -------- Eventos / Brindes / Adicionais do aluno -------- */
+let REALIZ=[['pendente','Pendente'],['compareceu','Compareceu'],['faltou','Faltou']];
+async function carregarEventos(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/eventos`)); const {itens,situacoes_realizacao}=await r.json();
+  if(situacoes_realizacao) REALIZ=situacoes_realizacao;
+  $('#ev-count').textContent = itens.length;
+  if(!itens.length){ $('#ev-tbody').innerHTML=`<tr><td colspan="6"><div class="empty"><i data-lucide="calendar-days"></i>A turma ainda não tem eventos fotográficos.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#ev-tbody').innerHTML = itens.map(e=>{
+    const sel = e.confirmado_evento
+      ? `<select onchange="salvarRealizacao(${e.id},this.value)" style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);">${REALIZ.map(([v,l])=>`<option value="${v}" ${e.situacao_realizacao===v?'selected':''}>${l}</option>`).join('')}</select>`
+      : `<span style="color:var(--gray-400);font-size:12px;">evento não confirmado</span>`;
+    return `<tr>
+    <td class="nome">${e.nome}</td><td>${dtBR(e.data_prevista)}</td><td>${e.situacao||'—'}</td>
+    <td class="num">${e.pede_familiares?e.qtd_familiares:'—'}</td>
+    <td class="num">${e.pede_convidados?e.qtd_convidados:'—'}</td>
+    <td>${sel}</td></tr>`;}).join('');
+  lucide.createIcons();
+}
+window.salvarRealizacao=async function(eid,situacao){ const r=await fetch(apiUrl(`/api/aluno/${id}/eventos/${eid}/realizacao`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({situacao})}); if(r.ok)toast('Situação salva.'); else alert('Erro'); };
+async function carregarBrindes(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/brindes`)); const {itens}=await r.json();
+  $('#br-count').textContent = itens.length;
+  if(!itens.length){ $('#br-tbody').innerHTML=`<tr><td colspan="4"><div class="empty"><i data-lucide="gift"></i>Nenhum brinde para este aluno.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#br-tbody').innerHTML = itens.map(b=>`<tr>
+    <td class="nome">${b.nome}</td>
+    <td>${b.escopo==='comissao'?'<span class="badge b-ok">Comissão</span>':'<span class="badge b-pago">Todos</span>'}</td>
+    <td>${b.observacao||'—'}</td>
+    <td><label class="switch"><input type="checkbox" ${b.entregue?'checked':''} onchange="toggleEntrega(${b.id},this.checked)"><span class="track"></span></label>
+        ${b.entregue&&b.entregue_em?`<span style="font-size:11px;color:var(--gray-500);margin-left:8px;">entregue ${dtBR(b.entregue_em)}</span>`:''}</td></tr>`).join('');
+  lucide.createIcons();
+}
+window.toggleEntrega=async function(turmaBrindeId,entregue){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/brindes/${turmaBrindeId}/entrega`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue})});
+  if(r.ok)carregarBrindes(); else alert('Erro');
+};
+let AD_CAT=[];
+async function carregarAdicionais(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/adicionais`)); const {itens,total,catalogo}=await r.json();
+  AD_CAT=catalogo||[];
+  // form de compra a partir do catálogo da turma
+  const opts = AD_CAT.length ? `<option value="">Selecione…</option>`+AD_CAT.map((c,i)=>`<option value="${i}" data-v="${c.valor}">${c.descricao} · ${brl(c.valor)}</option>`).join('') : `<option value="">Nenhuma tabela vinculada à turma</option>`;
+  $('#ad-form').innerHTML = `
+    <div class="fld grow"><label>Produto / Serviço</label><select id="ad-sel" onchange="adPrefill()">${opts}</select></div>
+    <div class="fld"><label>Valor (R$)</label><input type="number" step="0.01" id="ad-valor" style="width:130px;"></div>
+    <div class="fld"><label>Qtd</label><input type="number" id="ad-qtd" value="1" style="width:80px;"></div>
+    <div class="fld"><button class="btn btn-primary" onclick="comprarAdicional()"><i data-lucide="plus" class="w-4 h-4"></i> Comprar</button></div>`;
+  lucide.createIcons();
+  $('#ad-count').textContent = itens.length;
+  if(!itens.length){ $('#ad-tbody').innerHTML=`<tr><td colspan="5"><div class="empty"><i data-lucide="shopping-bag"></i>Nenhum produto/serviço comprado.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#ad-tbody').innerHTML = itens.map(a=>`<tr>
+    <td class="nome">${a.descricao}</td><td class="num">${a.quantidade}</td><td class="num">${brl(a.valor)}</td><td class="num">${brl(a.subtotal)}</td>
+    <td><div class="row-actions"><button class="icon-btn danger" title="Remover" onclick="removerAdicional(${a.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td></tr>`).join('')
+    + `<tr><td class="nome" colspan="3" style="text-align:right;">Total</td><td class="num" style="font-weight:800;">${brl(total)}</td><td></td></tr>`;
+  lucide.createIcons();
+}
+window.adPrefill=function(){ const s=$('#ad-sel'); const o=s.options[s.selectedIndex]; if(o&&o.dataset.v!=null) $('#ad-valor').value=o.dataset.v; };
+window.comprarAdicional=async function(){ const s=$('#ad-sel'); const i=s.value; if(i===''){alert('Escolha o produto/serviço.');return;}
+  const cat=AD_CAT[+i]; const body={descricao:cat.descricao, valor:$('#ad-valor').value||cat.valor, quantidade:$('#ad-qtd').value||1};
+  const r=await fetch(apiUrl(`/api/aluno/${id}/adicionais`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok){ toast('Adicionado.'); carregarAdicionais(); } else alert('Erro'); };
+window.removerAdicional=async function(adid){ if(!confirm('Remover este item?'))return; const r=await fetch(apiUrl('/api/aluno/adicionais/'+adid),{method:'DELETE'}); if(r.ok)carregarAdicionais(); };
+
+/* -------- Pagamentos -------- */
+function montarPgForms(){
+  $('#pg-gerar').innerHTML = `
+    <div class="fld"><label>Parcelas</label><input type="number" id="g-parc" value="12" style="width:100px;"></div>
+    <div class="fld"><label>Valor total (R$)</label><input type="number" step="0.01" id="g-total" value="${planoValor||''}" style="width:150px;"></div>
+    <div class="fld"><label>1º vencimento</label><input type="date" id="g-venc"></div>
+    <div class="fld"><button class="btn btn-primary" id="g-gerar"><i data-lucide="wand-2" class="w-4 h-4"></i> Gerar (manual)</button></div>
+    <div class="fld" style="border-left:1px solid var(--gray-200);padding-left:14px;"><label>Ou pela config do plano</label><button class="btn btn-secondary" id="g-plano" title="Aplica desconto por CPF, nº de parcelas do checkout, taxa de boleto e vencimentos da config"><i data-lucide="file-cog" class="w-4 h-4"></i> Emitir carnê do plano</button></div>`;
+  $('#g-gerar').onclick = gerarParcelas;
+  $('#g-plano').onclick = gerarCarneDoPlano;
+  $('#pg-form').innerHTML = `
+    <div class="fld grow"><label>Descrição</label><input type="text" id="p-desc" placeholder="Ex.: Entrada"></div>
+    <div class="fld"><label>Valor (R$)</label><input type="number" step="0.01" id="p-valor" style="width:130px;"></div>
+    <div class="fld"><label>Vencimento</label><input type="date" id="p-venc"></div>
+    <div class="fld"><button class="btn btn-secondary" id="p-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>`;
+  $('#p-add').onclick = addPagamento;
+  lucide.createIcons();
+}
+window.gerarCarneDoPlano=async function(){
+  if(!confirm('Emitir o carnê a partir da config do plano? Isso substitui as parcelas atuais deste aluno.'))return;
+  const r = await fetch(apiUrl(`/api/aluno/${id}/pagamentos/gerar-do-plano`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  let msg = `${d.geradas} parcelas de ${brl(d.valor_parcela)}`;
+  if(d.desconto_cpf) msg += ` · desconto CPF ${brl(d.desconto_cpf)}`;
+  if(d.taxa_boleto) msg += ` · taxa boleto ${brl(d.taxa_boleto)}/parcela`;
+  toast(msg);
+  carregarPagamentos(); refreshKPIs();
+};
+async function gerarParcelas(){
+  const body = { parcelas:$('#g-parc').value||1, valor_total:$('#g-total').value||planoValor, primeiro_vencimento:$('#g-venc').value||null };
+  const r = await fetch(apiUrl(`/api/aluno/${id}/pagamentos/gerar-parcelas`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  carregarPagamentos(); refreshKPIs();
+}
+async function addPagamento(){
+  const body={ descricao:$('#p-desc').value||'Pagamento', valor:$('#p-valor').value||0, vencimento:$('#p-venc').value||null };
+  const r=await fetch(apiUrl(`/api/aluno/${id}/pagamentos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok){ $('#p-desc').value='';$('#p-valor').value='';$('#p-venc').value=''; carregarPagamentos(); refreshKPIs(); } else alert('Erro');
+}
+async function carregarPagamentos(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/pagamentos`)); const {itens,resumo,formas}=await r.json(); FORMAS=formas;
+  $('#pg-resumo').textContent = `${brl(resumo.pago)} de ${brl(resumo.total)}`;
+  if(!itens.length){ $('#pg-tbody').innerHTML=`<tr><td colspan="6"><div class="empty"><i data-lucide="banknote"></i>Nenhum pagamento. Gere as parcelas do plano acima.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#pg-tbody').innerHTML = itens.map(p=>`<tr>
+    <td class="nome">${p.descricao}</td><td class="num">${brl(p.valor)}</td><td>${dtBR(p.vencimento)}</td><td>${p.forma||'—'}</td>
+    <td>${p.pago?'<span class="badge b-pago">Pago</span>':'<span class="badge b-pend">Pendente</span>'}</td>
+    <td><div class="row-actions">
+      <button class="icon-btn" title="${p.pago?'Marcar pendente':'Marcar pago'}" onclick='togglePago(${JSON.stringify(p)})'><i data-lucide="${p.pago?'rotate-ccw':'check'}" style="width:15px;height:15px;color:${p.pago?'var(--gray-500)':'#16A34A'};"></i></button>
+      <button class="icon-btn danger" title="Excluir" onclick="excluirPag(${p.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+    </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+window.togglePago=async function(p){ const body={descricao:p.descricao,valor:p.valor,vencimento:p.vencimento,forma:p.forma,pago:!p.pago}; const r=await fetch(apiUrl('/api/aluno/pagamentos/'+p.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); if(r.ok){carregarPagamentos();refreshKPIs();} };
+window.excluirPag=async function(pid){ if(!confirm('Excluir este pagamento?'))return; const r=await fetch(apiUrl('/api/aluno/pagamentos/'+pid),{method:'DELETE'}); if(r.ok){carregarPagamentos();refreshKPIs();} };
+async function refreshKPIs(){ const r=await fetch(apiUrl('/api/aluno/'+id)); const a=await r.json(); $('#k-total').textContent=brl(a.resumo_pagamento.total); $('#k-pago').textContent=brl(a.resumo_pagamento.pago); $('#k-rest').textContent=brl(a.resumo_pagamento.restante); }
+
+/* -------- Medidas -------- */
+async function carregarMedidas(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/medidas`)); const {medidas:m,tamanhos}=await r.json(); TAMS=tamanhos;
+  const optT=(cur)=>`<option value="">—</option>`+TAMS.map(t=>`<option ${cur===t?'selected':''}>${t}</option>`).join('');
+  $('#med-grid').innerHTML = `
+    <div class="med-fld"><label>Altura</label><input type="text" id="m-altura" value="${m.altura||''}" placeholder="Ex.: 1,72"></div>
+    <div class="med-fld"><label>Peso</label><input type="text" id="m-peso" value="${m.peso||''}" placeholder="Ex.: 68 kg"></div>
+    <div class="med-fld"><label>Tam. da beca</label><select id="m-beca">${optT(m.tam_beca)}</select></div>
+    <div class="med-fld"><label>Tam. do capelo</label><select id="m-capelo">${optT(m.tam_capelo)}</select></div>
+    <div class="med-fld"><label>Tam. do anel</label><input type="text" id="m-anel" value="${m.tam_anel||''}" placeholder="Ex.: 20"></div>
+    <div class="med-fld"><label>Calçado</label><input type="text" id="m-calcado" value="${m.calcado||''}" placeholder="Ex.: 40"></div>
+    <div class="med-fld"><label>Nº calça (sem elastano)</label><input type="text" id="m-numcalca" value="${m.num_calca||''}" placeholder="Ex.: 42"></div>
+    <div class="med-fld"><label>Plus Size</label><label class="switch"><input type="checkbox" id="m-plussize" ${m.plus_size?'checked':''}><span class="track"></span></label></div>
+    <div class="med-fld" style="grid-column:1/-1;"><label>Observações</label><textarea id="m-obs" style="min-height:70px;resize:vertical;">${m.observacoes||''}</textarea></div>`;
+  lucide.createIcons();
+}
+async function salvarMedidas(){
+  const body={ altura:$('#m-altura').value, peso:$('#m-peso').value, tam_beca:$('#m-beca').value, tam_capelo:$('#m-capelo').value, tam_anel:$('#m-anel').value, calcado:$('#m-calcado').value, num_calca:$('#m-numcalca').value, plus_size:$('#m-plussize').checked, observacoes:$('#m-obs').value };
+  const r=await fetch(apiUrl(`/api/aluno/${id}/medidas`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok) toast('Medidas salvas.'); else alert('Erro');
+}
+
+/* -------- Evolução -------- */
+async function addLog(){
+  const texto=$('#lg-texto').value.trim(); if(!texto){alert('Escreva a observação.');return;}
+  const r=await fetch(apiUrl(`/api/aluno/${id}/logs`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto})});
+  if(r.ok){ $('#lg-texto').value=''; carregarLogs(); } else alert('Erro');
+}
+async function carregarLogs(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/logs`)); const {itens}=await r.json();
+  $('#lg-count').textContent = itens.length;
+  if(!itens.length){ $('#lg-tl').innerHTML=`<div class="empty"><i data-lucide="activity"></i>Sem registros de evolução ainda.</div>`; lucide.createIcons(); return; }
+  $('#lg-tl').innerHTML = itens.map(l=>{
+    const dt = new Date(l.criado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    return `<div class="tl-item"><div class="meta">${dt} · ${l.autor||'Admin'} <a href="#" onclick="excluirLog(${l.id});return false;" style="color:#DC2626;margin-left:6px;font-size:11px;">excluir</a></div><div class="txt">${l.texto}</div></div>`;
+  }).join('');
+  lucide.createIcons();
+}
+window.excluirLog=async function(lid){ const r=await fetch(apiUrl('/api/aluno/logs/'+lid),{method:'DELETE'}); if(r.ok)carregarLogs(); };
+
+/* -------- Contratos -------- */
+function montarCtForm(){
+  $('#ct-form').innerHTML = `
+    <div class="fld grow"><label>Título *</label><input type="text" id="c-tit" placeholder="Ex.: Contrato de adesão"></div>
+    <div class="fld"><label>Status</label><select id="c-status"><option value="pendente">Pendente</option><option value="assinado">Assinado</option></select></div>
+    <div class="fld"><label>Data</label><input type="date" id="c-data"></div>
+    <div class="fld grow"><label>Link do documento</label><input type="text" id="c-url" placeholder="https://…"></div>
+    <div class="fld"><button class="btn btn-primary" id="c-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>`;
+  $('#c-add').onclick = addContrato; lucide.createIcons();
+}
+async function addContrato(){
+  const body={ titulo:$('#c-tit').value, status:$('#c-status').value, data:$('#c-data').value||null, url:$('#c-url').value };
+  if(!body.titulo.trim()){alert('Informe o título.');return;}
+  const r=await fetch(apiUrl(`/api/aluno/${id}/contratos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok){ $('#c-tit').value='';$('#c-url').value='';$('#c-data').value=''; carregarContratos(); } else alert('Erro');
+}
+async function carregarContratos(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/contratos`)); const {itens}=await r.json();
+  $('#ct-count').textContent = itens.length;
+  if(!itens.length){ $('#ct-tbody').innerHTML=`<tr><td colspan="5"><div class="empty"><i data-lucide="file-signature"></i>Nenhum contrato.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#ct-tbody').innerHTML = itens.map(c=>`<tr>
+    <td class="nome">${c.titulo}</td>
+    <td>${c.status==='assinado'?'<span class="badge b-pago">Assinado</span>':'<span class="badge b-pend">Pendente</span>'}</td>
+    <td>${dtBR(c.data)}</td>
+    <td>${c.url?`<a href="${c.url}" target="_blank" style="color:var(--primary-600);">abrir</a>`:'—'}</td>
+    <td><div class="row-actions">
+      <button class="icon-btn" title="${c.status==='assinado'?'Marcar pendente':'Marcar assinado'}" onclick='toggleContrato(${JSON.stringify(c)})'><i data-lucide="check" style="width:15px;height:15px;"></i></button>
+      <button class="icon-btn danger" title="Excluir" onclick="excluirContrato(${c.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+    </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+window.toggleContrato=async function(c){ const body={titulo:c.titulo,status:c.status==='assinado'?'pendente':'assinado',data:c.data,url:c.url}; const r=await fetch(apiUrl('/api/aluno/contratos/'+c.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); if(r.ok)carregarContratos(); };
+window.excluirContrato=async function(cid){ if(!confirm('Excluir este contrato?'))return; const r=await fetch(apiUrl('/api/aluno/contratos/'+cid),{method:'DELETE'}); if(r.ok)carregarContratos(); };
+
+/* -------- Encartes -------- */
+let ENST = [];
+function montarEnForm(){
+  $('#en-form').innerHTML = `
+    <div class="fld grow"><label>Descrição *</label><input type="text" id="en-desc" placeholder="Ex.: Encarte capa, Encarte 1…"></div>
+    <div class="fld"><label>Status</label><select id="en-status"></select></div>
+    <div class="fld grow"><label>Observação</label><input type="text" id="en-obs" placeholder="Opcional"></div>
+    <div class="fld"><button class="btn btn-primary" id="en-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>`;
+  $('#en-add').onclick = addEncarte; lucide.createIcons();
+}
+async function carregarEncartes(){
+  const r=await fetch(apiUrl(`/api/aluno/${id}/encartes`)); const {itens,status}=await r.json(); ENST=status;
+  if($('#en-status')) $('#en-status').innerHTML = ENST.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  $('#en-count').textContent = itens.length;
+  if(!itens.length){ $('#en-tbody').innerHTML=`<tr><td colspan="4"><div class="empty"><i data-lucide="book-image"></i>Nenhum encarte ainda.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#en-tbody').innerHTML = itens.map(e=>`<tr><td class="nome">${e.descricao}</td>
+      <td><select onchange='mudarEncStatus(${JSON.stringify(e)},this.value)' style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);">${ENST.map(([v,l])=>`<option value="${v}" ${e.status===v?'selected':''}>${l}</option>`).join('')}</select></td>
+      <td>${e.observacao||'—'}</td>
+      <td><div class="row-actions"><button class="icon-btn danger" title="Excluir" onclick="excluirEncarte(${e.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td></tr>`).join('');
+  lucide.createIcons();
+}
+async function addEncarte(){
+  const desc=$('#en-desc').value.trim(); if(!desc){alert('Informe a descrição.');return;}
+  const r=await fetch(apiUrl(`/api/aluno/${id}/encartes`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:desc,status:$('#en-status').value,observacao:$('#en-obs').value})});
+  if(r.ok){ $('#en-desc').value='';$('#en-obs').value=''; carregarEncartes(); } else alert('Erro');
+}
+window.mudarEncStatus=async function(e,st){ const r=await fetch(apiUrl('/api/aluno/encartes/'+e.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:e.descricao,status:st,observacao:e.observacao})}); if(r.ok)carregarEncartes(); };
+window.excluirEncarte=async function(eid){ if(!confirm('Excluir este encarte?'))return; const r=await fetch(apiUrl('/api/aluno/encartes/'+eid),{method:'DELETE'}); if(r.ok)carregarEncartes(); };
+
+function toast(msg){ let t=document.getElementById('vt-toast'); if(!t){t=document.createElement('div');t.id='vt-toast';t.style.cssText='position:fixed;bottom:22px;left:22px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s;';document.body.appendChild(t);} t.textContent=msg;t.style.opacity='1';clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity='0',2000); }
+</script>
+</body>
+</html>

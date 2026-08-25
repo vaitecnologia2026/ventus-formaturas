@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas fotos — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body style="background:var(--gray-50);">
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo"><img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas"></a>
+  <nav class="ft-nav-links"><a href="index.html">Álbuns</a><a href="selfie.html">Buscar por selfie</a></nav>
+  <div class="ft-nav-actions">
+    <a href="resultados.html" class="ft-cart" title="Carrinho"><i data-lucide="shopping-cart"></i><span class="ft-cart-badge" data-cart-count hidden>0</span></a>
+    <button class="ft-btn ft-btn-ghost" id="btn-sair"><i data-lucide="log-out"></i> Sair</button>
+  </div>
+</header>
+
+<div class="vt-page">
+  <div class="vt-turma-hero">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="ft-selfie-thumb-fallback" style="width:56px;height:56px;"><i data-lucide="user-round"></i></div>
+      <div>
+        <h1 style="margin:0;font-size:24px;" id="ola">Olá</h1>
+        <p style="margin:2px 0 0;color:var(--gray-500);font-size:14px;" id="sub">suas fotos compradas</p>
+      </div>
+    </div>
+    <a href="index.html" class="ft-btn ft-btn-secondary"><i data-lucide="search"></i> Encontrar mais fotos</a>
+  </div>
+
+  <div id="conteudo"><p class="vt-empty"><span class="ft-spinner ft-spinner-lg"></span></p></div>
+</div>
+
+<script src="app-cliente.js"></script>
+<script>
+lucide.createIcons();
+
+if (!Ventus.Auth.logado()) location.href = 'login.html?next=perfil.html';
+document.getElementById('btn-sair').addEventListener('click', () => { Ventus.Auth.sair(); location.href = 'index.html'; });
+
+const u = Ventus.Auth.user() || {};
+document.getElementById('ola').textContent = 'Olá, ' + (u.nome || '').split(' ')[0];
+
+fetch(apiUrl('/api/minhas-compras'), { headers: Ventus.Auth.headers() })
+  .then(r => r.ok ? r.json() : Promise.reject(r))
+  .then(({ fotos }) => {
+    const box = document.getElementById('conteudo');
+    if (!fotos.length) {
+      box.innerHTML = `<div class="vt-empty">
+        <i data-lucide="image-off" style="width:40px;height:40px;color:var(--gray-300);"></i>
+        <p style="margin-top:12px;">Você ainda não comprou nenhuma foto.</p>
+        <a href="index.html" class="ft-btn ft-btn-primary" style="margin-top:8px;"><i data-lucide="search"></i> Procurar minhas fotos</a>
+      </div>`;
+      lucide.createIcons(); return;
+    }
+    document.getElementById('sub').textContent = `${fotos.length} foto(s) compradas`;
+    box.innerHTML = '<div class="ft-photo-grid">' + fotos.map(f => `
+      <div class="ft-photo">
+        <div class="ft-photo-img real"><img src="${apiUrl(f.url)}" alt="${f.arquivo}" loading="lazy"><span class="ft-match" style="background:var(--success);">comprada</span></div>
+        <div class="ft-photo-bar">
+          <div><strong>${f.album_nome}</strong><span>${f.arquivo}</span></div>
+          <a class="ft-photo-add" href="${apiUrl('/api/minha-foto?foto=' + encodeURIComponent(f.foto_id))}" data-baixar><i data-lucide="download"></i></a>
+        </div>
+      </div>`).join('') + '</div>';
+    lucide.createIcons();
+  })
+  .catch(() => { location.href = 'login.html?next=perfil.html'; });
+
+// download autenticado (fetch com Bearer -> blob), já que <a href> não manda header
+document.getElementById('conteudo').addEventListener('click', async (e) => {
+  const a = e.target.closest('[data-baixar]');
+  if (!a) return;
+  e.preventDefault();
+  const r = await fetch(a.getAttribute('href'), { headers: Ventus.Auth.headers() });
+  if (!r.ok) { alert('Não foi possível baixar.'); return; }
+  const blob = await r.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = (r.headers.get('Content-Disposition') || '').match(/filename="?([^"]+)"?/)?.[1] || 'foto.jpg';
+  link.click(); URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>

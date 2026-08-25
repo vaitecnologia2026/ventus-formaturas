@@ -1,121 +1,268 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Galerias — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turmas e Fotos — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .gal-toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:20px; }
+  .gal-filter { flex:1; min-width:200px; position:relative; }
+  .gal-filter input { width:100%; padding:11px 14px 11px 40px; border:1px solid var(--gray-300); border-radius:12px; background:var(--surface); color:var(--gray-900); font-size:14px; outline:none; }
+  .gal-filter svg { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--gray-400); width:17px; height:17px; }
+  .gal-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:18px; }
+  .gal-card { text-align:left; font-family:inherit; cursor:pointer; padding:0; background:var(--surface); border:1px solid var(--gray-200); border-radius:16px; overflow:hidden; transition:.18s; display:flex; flex-direction:column; }
+  .gal-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:var(--gray-300); }
+  .gal-cover { aspect-ratio:16/10; background:var(--gray-100); position:relative; display:grid; place-items:center; color:var(--gray-400); }
+  .gal-cover img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .gal-cover .status { position:absolute; top:10px; left:10px; }
+  .gal-cover .count { position:absolute; bottom:10px; right:10px; background:rgba(15,23,42,.7); color:#fff; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:600; backdrop-filter:blur(4px); }
+  .gal-info { padding:14px 16px; }
+  .gal-info strong { display:block; font-size:15px; color:var(--gray-900); }
+  .gal-info .sub { font-size:12.5px; color:var(--gray-500); margin-top:2px; }
+  .gal-stats { display:flex; gap:14px; margin-top:10px; padding-top:10px; border-top:1px solid var(--gray-100); font-size:12px; }
+  .gal-stats b { color:var(--gray-900); font-weight:700; display:block; font-size:14px; }
+  .gal-stats span { color:var(--gray-500); }
+  .gal-novo { border:2px dashed var(--gray-300); background:transparent; display:grid; place-items:center; min-height:220px; }
+
+  .drop { border:2px dashed var(--gray-300); border-radius:16px; padding:36px 24px; text-align:center; color:var(--gray-500); cursor:pointer; transition:.15s; font-size:14px; background:var(--surface); }
+  .drop.on { border-color:var(--primary-600); background:var(--primary-50); color:var(--primary-800); }
+  .drop svg { width:30px; height:30px; margin:0 auto 10px; display:block; }
+  .fotos { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+  .foto { border:1px solid var(--gray-200); border-radius:12px; overflow:hidden; background:var(--surface); position:relative; }
+  .foto.capa { outline:2.5px solid var(--primary-600); outline-offset:-2px; }
+  .foto img { width:100%; aspect-ratio:3/4; object-fit:cover; display:block; }
+  .foto-bar { padding:8px 10px; font-size:11.5px; color:var(--gray-600); display:flex; justify-content:space-between; gap:6px; align-items:center; }
+  .foto-bar .ok { color:var(--success); font-weight:700; } .foto-bar .zero { color:var(--warning); font-weight:700; }
+  .foto-capa-btn { position:absolute; top:8px; right:8px; width:30px; height:30px; border:none; border-radius:8px; background:rgba(15,23,42,.65); color:#fff; display:grid; place-items:center; cursor:pointer; opacity:0; transition:.15s; }
+  .foto:hover .foto-capa-btn { opacity:1; }
+  .foto.capa .foto-capa-btn { opacity:1; background:var(--primary-600); }
+  .foto-capa-tag { position:absolute; top:8px; left:8px; background:var(--primary-600); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; }
+
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600; border:1px solid var(--gray-300); background:var(--surface); color:var(--gray-700); cursor:pointer; }
+  .pill.on { background:var(--success); border-color:var(--success); color:#fff; }
+  .detalhe-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:18px 0 22px; }
+  .mini { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:14px 16px; }
+  .mini .l { font-size:12px; color:var(--gray-500); font-weight:600; }
+  .mini .v { font-size:22px; font-weight:800; color:var(--gray-900); letter-spacing:-.02em; margin-top:2px; }
+</style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
-  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-  <a href="galerias.html" class="sidebar-link active"><i data-lucide="images"></i>Galerias</a>
-  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
-  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
-</aside>
+<aside id="admin-sidebar" class="sidebar"></aside>
 
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar galeria, evento, turma…"></div>
-    <button class="btn btn-primary btn-sm"><i data-lucide="upload" class="w-4 h-4"></i> Nova galeria</button>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3">
+      <a href="../fotos/" target="_blank" class="btn btn-secondary btn-sm"><i data-lucide="external-link" class="w-4 h-4"></i> Ver site</a>
+      <button class="btn btn-primary btn-sm" id="btn-nova"><i data-lucide="plus" class="w-4 h-4"></i> Nova turma</button>
+    </div>
   </header>
 
   <main class="app-content">
-    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Galerias e Fotos</div>
-    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Galerias e fotos</h1>
+    <!-- LISTA -->
+    <section id="view-lista">
+      <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Turmas e Fotos</div>
+      <h1 class="text-2xl font-bold mt-1 mb-1" style="color:var(--gray-900);">Turmas e fotos</h1>
+      <p class="text-sm mb-6" style="color:var(--gray-500);">Crie a turma, suba as fotos (indexadas por rosto na hora) e <strong>publique</strong> quando estiver pronta — só turmas publicadas aparecem no site do cliente.</p>
 
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="folder" class="w-5 h-5"></i></div><div class="kpi-label">Galerias ativas</div><div class="kpi-value">42</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="image" class="w-5 h-5"></i></div><div class="kpi-label">Fotos no R2</div><div class="kpi-value">18.412</div><div class="kpi-trend" style="color:var(--gray-500);">~75 GB</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="scan-face" class="w-5 h-5"></i></div><div class="kpi-label">Indexadas (Rekognition)</div><div class="kpi-value">17.890</div><div class="kpi-trend" style="color:var(--success);">97%</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Sem face detectada</div><div class="kpi-value">522</div><div class="kpi-trend" style="color:var(--gray-500);">galeria "Geral"</div></div>
-    </div>
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="folder" class="w-5 h-5"></i></div><div class="kpi-label">Turmas</div><div class="kpi-value" id="k-turmas">—</div></div>
+        <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="eye" class="w-5 h-5"></i></div><div class="kpi-label">Publicadas</div><div class="kpi-value" id="k-pub">—</div></div>
+        <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="image" class="w-5 h-5"></i></div><div class="kpi-label">Fotos</div><div class="kpi-value" id="k-fotos">—</div></div>
+        <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="badge-dollar-sign" class="w-5 h-5"></i></div><div class="kpi-label">Receita</div><div class="kpi-value" id="k-receita">—</div></div>
+      </div>
 
-    <div class="grid gap-4" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="card">
-        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#1E3A8A,#A855F7);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">BAILE + AFTER</div>
-        <div class="card-body">
-          <div class="flex justify-between mb-2"><strong>MEDICINA T84 - UNIMONTES</strong><span class="badge badge-info">240 fotos</span></div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 12/04/2026 · Foto. Bruno Sena</div>
-          <div class="flex justify-between" style="font-size:13px;">
-            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> Processadas: 240</span>
-            <span><i data-lucide="palette" class="inline w-3 h-3" style="color:#EC4899;"></i> Selecionadas: 187</span>
-          </div>
-          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Ver fotos</button><button class="btn btn-primary btn-sm" style="flex:1;">Publicar</button></div>
+      <div class="gal-toolbar">
+        <div class="gal-filter"><i data-lucide="search"></i><input id="filtro" placeholder="Filtrar turmas pelo nome…"></div>
+        <form id="form-nova" style="display:flex;gap:8px;">
+          <input class="input" id="nome-turma" placeholder="Nome da nova turma (ex.: Escola Regional 2026)" style="min-width:240px;">
+          <button class="btn btn-primary" type="submit"><i data-lucide="plus" class="w-4 h-4"></i> Criar</button>
+        </form>
+      </div>
+
+      <div class="gal-grid" id="lista"></div>
+    </section>
+
+    <!-- DETALHE -->
+    <section id="view-turma" hidden>
+      <button class="btn btn-ghost btn-sm mb-3" id="btn-voltar"><i data-lucide="arrow-left" class="w-4 h-4"></i> Todas as turmas</button>
+      <div class="flex justify-between items-center mb-2" style="flex-wrap:wrap;gap:12px;">
+        <div><h1 class="text-2xl font-bold" style="color:var(--gray-900);" id="t-nome"></h1><p class="text-sm" id="t-sub" style="color:var(--gray-500);"></p></div>
+        <div class="flex items-center gap-3" style="flex-wrap:wrap;">
+          <button class="pill" id="t-pub"><i data-lucide="eye-off"></i> <span>Oculta</span></button>
+          <a class="btn btn-secondary btn-sm" id="t-versite" target="_blank"><i data-lucide="external-link" class="w-4 h-4"></i> Ver no site</a>
+          <button class="btn btn-ghost btn-sm" id="t-excluir" style="color:var(--danger);"><i data-lucide="trash-2" class="w-4 h-4"></i> Excluir</button>
         </div>
       </div>
 
-      <div class="card">
-        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#16A34A,#1E3A8A);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">COLAÇÃO OFICIAL</div>
-        <div class="card-body">
-          <div class="flex justify-between mb-2"><strong>ENG. FLORESTAL - UFMG</strong><span class="badge badge-info">1.430 fotos</span></div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 18/04/2026 · Foto. Renato R.</div>
-          <div class="flex justify-between" style="font-size:13px;">
-            <span><i data-lucide="loader-2" class="inline w-3 h-3" style="color:var(--warning);"></i> Processando: 1.412 / 1.430</span>
-          </div>
-          <div style="height:6px;background:var(--gray-100);border-radius:3px;margin-top:8px;overflow:hidden;"><div style="width:98.7%;height:100%;background:var(--primary-600);"></div></div>
-          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;opacity:.6;" disabled>Aguardando…</button></div>
-        </div>
-      </div>
+      <div class="detalhe-stats" id="t-stats"></div>
 
-      <div class="card">
-        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#F59E0B,#DC2626);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">FAMILY DAY</div>
-        <div class="card-body">
-          <div class="flex justify-between mb-2"><strong>DIREITO - UNIMONTES</strong><span class="badge badge-success">Entregue</span></div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 02/04/2026</div>
-          <div class="flex justify-between" style="font-size:13px;">
-            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> 89 fotos</span>
-            <span style="color:var(--gray-500);">31 alunos · 100% entregues</span>
-          </div>
-          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Ver galeria</button></div>
-        </div>
+      <div class="drop mb-2" id="drop">
+        <i data-lucide="upload-cloud"></i>
+        <strong>Arraste as fotos aqui</strong> ou clique para escolher<br>
+        <span style="font-size:12px;">JPG, PNG ou WebP · passe o mouse numa foto pra definir a capa</span>
+        <input type="file" id="inp" accept="image/jpeg,image/png,image/webp" multiple hidden>
       </div>
+      <div class="text-sm mb-4" id="status" style="color:var(--gray-500);min-height:18px;"></div>
 
-      <div class="card">
-        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">FOTO CONVITE</div>
-        <div class="card-body">
-          <div class="flex justify-between mb-2"><strong>ODONTOLOGIA - FUNORTE</strong><span class="badge badge-warning">Aguardando seleção</span></div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 20/04/2026</div>
-          <div class="flex justify-between" style="font-size:13px;">
-            <span><i data-lucide="palette" class="inline w-3 h-3" style="color:#EC4899;"></i> 28/39 selecionaram</span>
-          </div>
-          <div class="flex gap-2 mt-3"><button class="btn btn-secondary btn-sm" style="flex:1;">Lembrar comissão</button></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#0EA5E9,#1E3A8A);border-radius:12px 12px 0 0;display:grid;place-items:center;color:white;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">CULTO ECUMÊNICO</div>
-        <div class="card-body">
-          <div class="flex justify-between mb-2"><strong>ENFERMAGEM - FUNORTE</strong><span class="badge badge-info">412 fotos</span></div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px;">Capturadas em 19/04/2026</div>
-          <div class="flex justify-between" style="font-size:13px;">
-            <span><i data-lucide="check-circle" class="inline w-3 h-3" style="color:var(--success);"></i> Indexada</span>
-            <span style="color:var(--gray-500);">Pronto para publicar</span>
-          </div>
-          <div class="flex gap-2 mt-3"><button class="btn btn-primary btn-sm" style="flex:1;">Publicar para alunos</button></div>
-        </div>
-      </div>
-
-      <div class="card" style="border:2px dashed var(--gray-300);background:transparent;display:grid;place-items:center;min-height:280px;cursor:pointer;">
-        <div class="text-center">
-          <div style="width:48px;height:48px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:grid;place-items:center;margin:0 auto 12px;"><i data-lucide="upload" class="w-6 h-6"></i></div>
-          <div style="font-weight:600;color:var(--gray-700);">Nova galeria</div>
-          <div style="font-size:13px;color:var(--gray-500);margin-top:4px;">Upload em massa via fotógrafo</div>
-        </div>
-      </div>
-    </div>
+      <div class="fotos" id="grade"></div>
+    </section>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
+<script src="../assets/js/app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const brl = n => 'R$ ' + Number(n||0).toLocaleString('pt-BR', {maximumFractionDigits:0});
+let ALBUNS = [], VENDAS = {por_turma:{}}, turmaAtual = null, capaAtual = null;
+
+async function carregar() {
+  const [rA, rV] = await Promise.all([fetch(apiUrl('/api/albuns')), fetch(apiUrl('/api/vendas')).catch(()=>null)]);
+  ALBUNS = (await rA.json()).albuns;
+  VENDAS = rV && rV.ok ? await rV.json() : {por_turma:{}};
+  const totFotos = ALBUNS.reduce((s,a)=>s+a.total_fotos,0);
+  const pub = ALBUNS.filter(a=>a.visivel).length;
+  $('k-turmas').textContent = ALBUNS.length;
+  $('k-pub').textContent = pub;
+  $('k-fotos').textContent = totFotos.toLocaleString('pt-BR');
+  $('k-receita').textContent = brl(VENDAS.receita);
+  renderLista();
+}
+
+function renderLista() {
+  const filtro = ($('filtro').value||'').toLowerCase();
+  const items = ALBUNS.filter(a => a.nome.toLowerCase().includes(filtro));
+  $('lista').innerHTML = items.map(a => {
+    const st = VENDAS.por_turma?.[a.id] || {vendas:0, receita:0};
+    const badge = a.visivel ? '<span class="badge badge-success status">Publicada</span>' : '<span class="badge status">Oculta</span>';
+    return `<button class="gal-card" data-id="${a.id}">
+      <div class="gal-cover">${a.capa?`<img src="${apiUrl(a.capa)}" alt="">`:'<i data-lucide="image"></i>'}${badge}<span class="count">${a.total_fotos} foto(s)</span></div>
+      <div class="gal-info">
+        <strong>${a.nome}</strong><div class="sub">criada em ${a.criado_em}</div>
+        <div class="gal-stats"><div><b>${brl(st.receita)}</b><span>receita</span></div><div><b>${st.vendas}</b><span>vendas</span></div><div><b>${st.fotos||0}</b><span>fotos vendidas</span></div></div>
+      </div></button>`;
+  }).join('') +
+    `<button class="gal-card gal-novo" id="card-novo"><div class="text-center"><div style="width:46px;height:46px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:grid;place-items:center;margin:0 auto 10px;"><i data-lucide="plus" class="w-6 h-6"></i></div><div style="font-weight:600;color:var(--gray-700);">Nova turma</div></div></button>`;
+  lucide.createIcons();
+}
+$('filtro').addEventListener('input', renderLista);
+
+$('form-nova').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nome = $('nome-turma').value.trim(); if (!nome) return;
+  const r = await fetch(apiUrl('/api/albuns'), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome})});
+  const d = await r.json(); if (!r.ok){alert(d.erro);return;}
+  $('nome-turma').value=''; await carregar(); abrir(d.id);
+});
+$('btn-nova').addEventListener('click', () => { $('nome-turma').focus(); $('nome-turma').scrollIntoView({behavior:'smooth',block:'center'}); });
+$('lista').addEventListener('click', e => { if(e.target.closest('#card-novo')){$('nome-turma').focus();return;} const c=e.target.closest('.gal-card'); if(c&&c.dataset.id) abrir(c.dataset.id); });
+
+async function abrir(id) {
+  turmaAtual = id;
+  const r = await fetch(apiUrl('/api/albuns/'+id)); const t = await r.json();
+  if(!r.ok){alert(t.erro);return;}
+  capaAtual = t.capa;
+  const st = VENDAS.por_turma?.[id] || {vendas:0,receita:0,fotos:0};
+  const rostos = t.fotos.reduce((s,f)=>s+(f.rostos||0),0);
+  $('view-lista').hidden = true; $('view-turma').hidden = false;
+  $('t-nome').textContent = t.nome;
+  $('t-sub').textContent = `${t.fotos.length} foto(s) · criada em ${t.criado_em}`;
+  $('t-versite').href = '../fotos/turma.html?id='+encodeURIComponent(t.id);
+  $('t-versite').style.display = t.visivel ? '' : 'none';
+  $('t-stats').innerHTML = `
+    <div class="mini"><div class="l">Fotos</div><div class="v">${t.fotos.length}</div></div>
+    <div class="mini"><div class="l">Rostos indexados</div><div class="v">${rostos}</div></div>
+    <div class="mini"><div class="l">Vendas</div><div class="v">${st.vendas}</div></div>
+    <div class="mini"><div class="l">Receita</div><div class="v">${brl(st.receita)}</div></div>
+    <div class="mini"><div class="l">Fotos vendidas</div><div class="v">${st.fotos||0}</div></div>`;
+  pintarPublicar(t.visivel);
+  $('grade').innerHTML = t.fotos.map(cartao).join('');
+  $('status').textContent=''; lucide.createIcons();
+}
+
+function pintarPublicar(vis) {
+  const b = $('t-pub');
+  b.classList.toggle('on', vis);
+  b.innerHTML = vis ? '<i data-lucide="eye"></i> <span>Publicada</span>' : '<i data-lucide="eye-off"></i> <span>Oculta</span>';
+  b.dataset.vis = vis ? '1':'0';
+  lucide.createIcons();
+}
+$('t-pub').addEventListener('click', async () => {
+  const novo = $('t-pub').dataset.vis !== '1';
+  const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/config`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({visivel:novo})});
+  const d = await r.json();
+  if(!r.ok){ alert(d.erro); return; }
+  pintarPublicar(d.visivel);
+  $('t-versite').style.display = d.visivel ? '' : 'none';
+});
+
+function cartao(f, i) {
+  const r = f.rostos>0 ? `<span class="ok">✓ ${f.rostos} rosto(s)</span>` : '<span class="zero">nenhum rosto</span>';
+  const ehCapa = f.arquivo === capaAtual;
+  return `<div class="foto ${ehCapa?'capa':''}" data-arquivo="${f.arquivo}">
+    ${ehCapa?'<span class="foto-capa-tag">CAPA</span>':''}
+    <button class="foto-capa-btn" title="Definir como capa" data-capa="${f.arquivo}"><i data-lucide="star"></i></button>
+    <img src="${apiUrl(f.url)}" alt="Foto ${i+1}" loading="lazy">
+    <div class="foto-bar"><span>Foto ${i+1}</span>${r}</div></div>`;
+}
+$('grade').addEventListener('click', async e => {
+  const b = e.target.closest('.foto-capa-btn'); if(!b) return;
+  const arquivo = b.dataset.capa;
+  const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/config`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({capa:arquivo})});
+  const d = await r.json(); if(!r.ok){alert(d.erro);return;}
+  capaAtual = d.capa;
+  document.querySelectorAll('#grade .foto').forEach(el => {
+    const on = el.dataset.arquivo === capaAtual;
+    el.classList.toggle('capa', on);
+    el.querySelector('.foto-capa-tag')?.remove();
+    if(on) el.insertAdjacentHTML('afterbegin','<span class="foto-capa-tag">CAPA</span>');
+  });
+});
+
+$('t-excluir').addEventListener('click', async () => {
+  if (!confirm('Excluir esta turma e todas as suas fotos? Esta ação não pode ser desfeita.')) return;
+  const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/excluir`), {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const d = await r.json(); if(!r.ok){alert(d.erro);return;}
+  $('view-turma').hidden=true; $('view-lista').hidden=false; carregar();
+});
+$('btn-voltar').addEventListener('click', () => { $('view-turma').hidden=true; $('view-lista').hidden=false; carregar(); });
+
+// upload
+const drop = $('drop');
+drop.addEventListener('click', ()=>$('inp').click());
+drop.addEventListener('dragover', e=>{e.preventDefault();drop.classList.add('on');});
+drop.addEventListener('dragleave', ()=>drop.classList.remove('on'));
+drop.addEventListener('drop', e=>{e.preventDefault();drop.classList.remove('on');enviar([...e.dataTransfer.files]);});
+$('inp').addEventListener('change', e=>{enviar([...e.target.files]);e.target.value='';});
+const dataURL = f => new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f);});
+async function enviar(arquivos) {
+  const imgs = arquivos.filter(f=>/image\/(jpeg|png|webp)/.test(f.type)); if(!imgs.length) return;
+  let n=0;
+  for(const a of imgs){
+    $('status').textContent = `Enviando e indexando ${n+1}/${imgs.length} — ${a.name}…`;
+    try{
+      const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/fotos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:a.name,dados:await dataURL(a)})});
+      const d = await r.json(); if(!r.ok) throw new Error(d.erro);
+    }catch(err){$('status').textContent=`Erro em ${a.name}: ${err.message}`; await new Promise(k=>setTimeout(k,1500));}
+    n++;
+  }
+  $('status').textContent = `${n} foto(s) enviadas e indexadas.`;
+  abrir(turmaAtual);
+}
+
+carregar();
+</script>
 </body>
 </html>

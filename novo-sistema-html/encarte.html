@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<title>Meu Encarte — Ventus</title>
+<script src="/assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --azul:#2563EB; --azul-esc:#1E3A8A; --ink:#0F172A; --cinza:#64748B; --linha:#E2E8F0; --bg:#F1F5F9; }
+  *{box-sizing:border-box;} body{margin:0;font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);}
+  .top{background:linear-gradient(135deg,var(--azul-esc),var(--azul));color:#fff;padding:26px 20px;text-align:center;}
+  .top img{height:30px;display:block;margin:0 auto 10px;}
+  .top .marca{font-size:13px;opacity:.85;}
+  .wrap{max-width:560px;margin:-30px auto 40px;padding:0 16px;}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -18px rgba(15,23,42,.25);padding:28px 26px;}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;}
+  .sub{color:var(--cinza);font-size:14px;margin:0 0 22px;}
+  label{display:block;font-size:13px;font-weight:600;color:#334155;margin:0 0 6px;}
+  .fld{margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;} @media(max-width:440px){.grid2{grid-template-columns:1fr;}}
+  input,textarea{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:.15s;}
+  input:focus,textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  textarea{min-height:80px;resize:vertical;}
+  .btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--azul);color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;margin-top:6px;}
+  .btn:hover{background:var(--azul-esc);}
+  .ok{text-align:center;padding:20px 0;}
+  .ok .ic{width:72px;height:72px;border-radius:50%;background:#DCFCE7;color:#16A34A;display:grid;place-items:center;margin:0 auto 14px;}
+  .ok .ic svg{width:38px;height:38px;}
+  .muted{color:var(--cinza);font-size:13px;text-align:center;margin-top:14px;}
+  .erro{color:#B91C1C;font-size:13px;font-weight:600;margin:0 0 12px;display:none;}
+</style>
+</head>
+<body>
+<div class="top">
+  <img src="/assets/img/logo.png" alt="Ventus" onerror="this.style.display='none'">
+  <div class="marca">Meu Encarte</div>
+</div>
+<div class="wrap"><div class="card" id="card"><p class="muted">Carregando…</p></div></div>
+
+<script>
+const token = new URLSearchParams(location.search).get('t');
+const card = document.getElementById('card');
+const esc = s => String(s??'').replace(/"/g,'&quot;');
+if(!token) card.innerHTML = '<h1>Link inválido</h1><p class="sub">Peça um novo link à comissão.</p>';
+else carregar();
+
+async function carregar(){
+  const r = await fetch(apiUrl('/api/encarte/'+token));
+  if(!r.ok){ card.innerHTML='<h1>Link inválido</h1><p class="sub">Este link não é válido. Peça um novo à comissão.</p>'; return; }
+  const d = await r.json(); const a = d.aluno;
+  card.innerHTML = `
+    <h1>Olá, ${(a.nome||'').split(' ')[0]}! 📸</h1>
+    <p class="sub">Preencha os dados do seu encarte para a turma <b>${d.turma.nome}</b>.</p>
+    <p class="erro" id="erro"></p>
+    ${a.data_encarte?`<p class="muted">Encarte preenchido em ${a.data_encarte.split('-').reverse().join('/')}.</p>`:''}
+    <div class="fld"><label>Foto do encarte</label><input id="e-nomefot" value="${esc(a.nome_fotografia)}" placeholder="Nº ou nome da foto escolhida p/ o encarte"></div>
+    <div class="fld"><label>Data de nascimento</label><input type="date" id="e-nasc" value="${esc(a.data_nascimento)}"></div>
+    <div class="grid2">
+      <div class="fld"><label>Nome da mãe</label><input id="e-mae" value="${esc(a.nome_mae)}"></div>
+      <div class="fld"><label>Nome do pai</label><input id="e-pai" value="${esc(a.nome_pai)}"></div>
+    </div>
+    <div class="fld"><label>Mensagem / dedicatória</label><textarea id="e-msg" placeholder="Uma mensagem que vai no seu encarte…">${esc(a.mensagem)}</textarea></div>
+    <button class="btn" id="enviar">Salvar meu encarte</button>
+    <p class="muted">Você pode voltar e editar quando quiser.</p>`;
+  document.getElementById('enviar').onclick = enviar;
+}
+async function enviar(){
+  const erro = document.getElementById('erro');
+  const body = {
+    nome_fotografia: document.getElementById('e-nomefot').value,
+    data_nascimento: document.getElementById('e-nasc').value || null,
+    nome_mae: document.getElementById('e-mae').value,
+    nome_pai: document.getElementById('e-pai').value,
+    mensagem: document.getElementById('e-msg').value,
+  };
+  const btn = document.getElementById('enviar'); btn.textContent='Salvando…'; btn.disabled=true;
+  const r = await fetch(apiUrl('/api/encarte/'+token),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok){ erro.textContent='Erro ao salvar. Tente de novo.'; erro.style.display='block'; btn.textContent='Salvar meu encarte'; btn.disabled=false; return; }
+  card.innerHTML = `<div class="ok">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h1>Encarte salvo!</h1>
+    <p class="sub">Prontinho. A Ventus já recebeu os dados do seu encarte.</p>
+  </div>`;
+}
+</script>
+</body>
+</html>

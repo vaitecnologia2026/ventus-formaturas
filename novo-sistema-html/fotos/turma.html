@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turma — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body style="background:var(--gray-50);">
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo"><img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas"></a>
+  <nav class="ft-nav-links"><a href="index.html">Álbuns</a><a href="selfie.html">Buscar por selfie</a></nav>
+  <div class="ft-nav-actions">
+    <a href="login.html" class="ft-btn ft-btn-ghost" data-auth-link><i data-lucide="log-in"></i> Entrar</a>
+    <a href="#" class="ft-cart" id="ir-carrinho" title="Carrinho"><i data-lucide="shopping-cart"></i><span class="ft-cart-badge" data-cart-count hidden>0</span></a>
+  </div>
+</header>
+
+<div class="vt-page">
+  <a href="index.html" style="color:var(--gray-500);text-decoration:none;font-size:14px;"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Todos os álbuns</a>
+  <div class="vt-turma-hero" style="margin-top:12px;">
+    <div>
+      <h1 style="margin:0;font-size:26px;" id="turma-nome">Carregando…</h1>
+      <p style="margin:4px 0 0;color:var(--gray-500);font-size:14px;" id="turma-sub"></p>
+    </div>
+    <a href="selfie.html" class="ft-btn ft-btn-primary"><i data-lucide="scan-face"></i> Achar minhas fotos com selfie</a>
+  </div>
+
+  <div id="grid-wrap"><p class="vt-empty"><span class="ft-spinner ft-spinner-lg"></span></p></div>
+</div>
+
+<!-- Barra do carrinho -->
+<div class="ft-cart-bar" id="cart-bar">
+  <div class="ft-cart-bar-inner">
+    <div class="ft-cart-bar-info"><strong id="cart-total">R$ 0,00</strong><span id="cart-qtd">0 fotos selecionadas</span></div>
+    <button class="ft-btn ft-btn-primary" id="btn-checkout">Comprar fotos <i data-lucide="arrow-right"></i></button>
+  </div>
+</div>
+
+<script src="app-cliente.js"></script>
+<script>
+lucide.createIcons();
+const id = new URLSearchParams(location.search).get('id');
+const brl = Ventus.brl;
+
+if (!id) location.href = 'index.html';
+
+fetch(apiUrl('/api/turmas/' + encodeURIComponent(id)))
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(t => {
+    document.getElementById('turma-nome').textContent = t.nome;
+    document.getElementById('turma-sub').textContent = `${t.fotos.length} foto(s) · criado em ${t.criado_em}`;
+    const wrap = document.getElementById('grid-wrap');
+    if (!t.fotos.length) { wrap.innerHTML = '<p class="vt-empty">Esta turma ainda não tem fotos publicadas.</p>'; return; }
+    wrap.innerHTML = '<div class="ft-photo-grid" id="grid">' + t.fotos.map((f, i) => {
+      const foto_id = t.id + '/' + f.arquivo;
+      return `<div class="ft-photo" data-id="${foto_id}" data-arquivo="${f.arquivo}">
+        <div class="ft-photo-img real"><img src="${apiUrl(f.url)}" alt="Foto ${i + 1}" loading="lazy"></div>
+        <div class="ft-photo-bar"><div><strong>${brl(Ventus.PRECO)}</strong><span>Foto ${i + 1}</span></div>
+          <button class="ft-photo-add">Adicionar</button></div>
+      </div>`;
+    }).join('') + '</div>';
+    lucide.createIcons();
+    marcarCarrinho();
+
+    document.getElementById('grid').addEventListener('click', (e) => {
+      const card = e.target.closest('.ft-photo'); if (!card) return;
+      Ventus.Cart.toggle({ foto_id: card.dataset.id, arquivo: card.dataset.arquivo, album_nome: t.nome, preco: Ventus.PRECO, url: apiUrl('/acervo/' + card.dataset.id) });
+      marcarCarrinho();
+    });
+  })
+  .catch(() => { document.getElementById('grid-wrap').innerHTML = '<p class="vt-empty">Turma não encontrada. <a href="index.html">Ver álbuns</a></p>'; });
+
+function marcarCarrinho() {
+  document.querySelectorAll('.ft-photo').forEach(c => {
+    const dentro = Ventus.Cart.tem(c.dataset.id);
+    c.classList.toggle('in-cart', dentro);
+    c.querySelector('.ft-photo-add').textContent = dentro ? 'No carrinho' : 'Adicionar';
+  });
+}
+
+Ventus.onCart(() => {
+  document.getElementById('cart-total').textContent = brl(Ventus.Cart.total());
+  const n = Ventus.Cart.count();
+  document.getElementById('cart-qtd').textContent = n === 1 ? '1 foto selecionada' : n + ' fotos selecionadas';
+  document.getElementById('cart-bar').classList.toggle('on', n > 0);
+});
+document.getElementById('btn-checkout').addEventListener('click', () => Ventus.iniciarCheckout());
+document.getElementById('ir-carrinho').addEventListener('click', (e) => { e.preventDefault(); if (Ventus.Cart.count()) Ventus.iniciarCheckout(); });
+</script>
+</body>
+</html>

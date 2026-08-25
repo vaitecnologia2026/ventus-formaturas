@@ -1,0 +1,13 @@
+{
+  "name": "Ventus Fotos",
+  "short_name": "Ventus",
+  "description": "Encontre e compre suas fotos da formatura por reconhecimento facial.",
+  "start_url": "/fotos/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0A2540",
+  "icons": [
+    { "src": "/assets/img/icon-app.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/icon-app.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

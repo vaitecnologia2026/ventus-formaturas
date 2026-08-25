@@ -1,150 +1,224 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Ordens de Serviço — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordens de Serviço — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+  .segmented { display:inline-flex; background:var(--gray-100); border-radius:12px; padding:4px; gap:2px; margin-bottom:20px; flex-wrap:wrap; }
+  .segmented .tab { border:none; background:transparent; font-family:inherit; font-size:13px; font-weight:600; color:var(--gray-500); padding:8px 14px; border-radius:9px; cursor:pointer; transition:.15s; }
+  .segmented .tab.on { background:var(--surface); color:var(--primary-700); box-shadow:var(--shadow-sm); }
+  .segmented .tab b { margin-left:6px; opacity:.7; }
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:18px; }
+  .panel-head { padding:15px 22px; border-bottom:1px solid var(--gray-100); font-size:14.5px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; justify-content:space-between; gap:9px; }
+  .panel-head .count{font-size:12px;font-weight:700;color:var(--primary-700);background:var(--primary-50);padding:3px 11px;border-radius:999px;}
+  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:180px;}
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
+  .add-bar input, .add-bar select { padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar input:focus, .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:13px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); } table.tbl tr:last-child td{border-bottom:none;} table.tbl tbody tr:hover td{background:var(--gray-50);}
+  table.tbl td.nome{font-weight:600;color:var(--gray-900);}
+  .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .b-aberta{background:#FEF3C7;color:#92400E;} .b-em_andamento{background:var(--primary-50);color:var(--primary-700);} .b-concluida{background:#DCFCE7;color:#166534;} .b-entregue{background:#EDE9FE;color:#5B21B6;}
+  .b-tipo{background:var(--gray-100);color:var(--gray-600);}
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); } .icon-btn.danger:hover{border-color:#FCA5A5;color:#DC2626;background:#FEF2F2;}
+  .empty { text-align:center; color:var(--gray-500); padding:48px 20px; } .empty svg{width:34px;height:34px;color:var(--gray-300);margin:0 auto 10px;display:block;}
+  .adv{padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;background:var(--surface);}
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
-  <div class="sidebar-section">Geral</div>
-  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link active"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
-  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
-  <div class="sidebar-section">Sistema</div>
-  <a href="usuarios.html" class="sidebar-link"><i data-lucide="shield-check"></i>Usuários</a>
-  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
-  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
-</aside>
-
+<aside id="admin-sidebar" class="sidebar"></aside>
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar OS por número, turma, solicitante…"></div>
-    <div class="flex gap-2"><button class="btn btn-secondary btn-sm"><i data-lucide="layout-list" class="w-4 h-4"></i> Lista</button><button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Nova OS</button></div>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3"></div>
   </header>
-
   <main class="app-content">
-    <div class="flex justify-between items-center mb-4">
-      <div>
-        <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Ordens de Serviço</div>
-        <h1 class="text-2xl font-bold mt-1" style="color:var(--gray-900);">Ordens de Serviço</h1>
-      </div>
+    <div class="page-head">
+      <div class="chip"><i data-lucide="clipboard-list"></i></div>
+      <div><h1>Ordens de Serviço</h1><p>Edição, álbuns, impressão e tratamento — acompanhe cada serviço.</p></div>
     </div>
 
-    <!-- KPI cards (espelha o legado) -->
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi" style="border-left:4px solid var(--os-aberto);"><div class="kpi-label">Em Aberto</div><div class="kpi-value">14</div></div>
-      <div class="kpi" style="border-left:4px solid var(--os-prazo);"><div class="kpi-label">Dentro do Prazo</div><div class="kpi-value">0</div></div>
-      <div class="kpi" style="border-left:4px solid var(--os-fora-prazo);"><div class="kpi-label">Fora do Prazo</div><div class="kpi-value" style="color:var(--os-fora-prazo);">14</div></div>
-      <div class="kpi" style="border-left:4px solid var(--os-alta);"><div class="kpi-label">Alta Prioridade</div><div class="kpi-value" style="color:var(--os-alta);">11</div></div>
+    <div class="panel">
+      <div class="panel-head"><span style="display:flex;align-items:center;gap:9px;"><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Nova ordem de serviço</span></div>
+      <div class="add-bar" id="os-form"></div>
     </div>
 
-    <!-- Filtros -->
-    <div class="card mb-4">
-      <div class="card-body" style="padding:14px;">
-        <div class="grid grid-cols-4 gap-3">
-          <div><label class="label">Turma</label><select class="select"><option>Todas</option></select></div>
-          <div><label class="label">Área responsável</label><select class="select"><option>Todas</option><option>EDIÇÃO</option><option>ADMINISTRATIVO</option><option>FINANCEIRO</option><option>CERIMONIAL</option><option>QUALIDADE</option></select></div>
-          <div><label class="label">Tipo de OS</label><select class="select"><option>Todos</option><option>TRATAMENTO DE IMAGEM</option><option>SUBIR FOTOS PARA EDIÇÃO</option><option>FAZER PENDRIVE</option></select></div>
-          <div><label class="label">Prioridade</label><select class="select"><option>Todas</option><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
-        </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 12px;flex-wrap:wrap;">
+      <div class="segmented" style="margin:0;">
+        <button class="tab on" id="vw-kanban" onclick="setView('kanban')"><i data-lucide="trello" style="width:15px;height:15px;"></i> Kanban</button>
+        <button class="tab" id="vw-lista" onclick="setView('lista')"><i data-lucide="list" style="width:15px;height:15px;"></i> Lista</button>
       </div>
+      <span class="count" id="os-count">0</span>
     </div>
 
-    <!-- Kanban -->
-    <div class="kanban">
-      <div class="kanban-col">
-        <div class="kanban-col-header"><span>📥 Aberta</span><span class="badge">8</span></div>
+    <!-- KANBAN -->
+    <div id="kanban" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;align-items:start;"></div>
 
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0142</span><span class="badge badge-danger" style="font-size:11px;">Alta</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Tratamento de imagem — BAILE T85</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">MEDICINA T85 · 240 fotos</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-EDICAO">EDIÇÃO</span><div class="flex items-center gap-1" style="font-size:11px;color:var(--danger);"><i data-lucide="alert-circle" class="w-3 h-3"></i> 2d atrasada</div></div>
-        </div>
-
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0143</span><span class="badge" style="font-size:11px;">Média</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Fazer encartes — DIREITO UNIFIPMOC</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">DIREITO - UNIFIPMOC · 13 alunos</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-ADMINISTRATIVO">ADMIN</span><div style="font-size:11px;color:var(--gray-500);">venc. 03/05</div></div>
-        </div>
-
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0144</span><span class="badge badge-danger" style="font-size:11px;">Alta</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Subir fotos para edição — COLAÇÃO UFMG</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">ENG. FLORESTAL - UFMG · 1.430 fotos</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-EDICAO">EDIÇÃO</span><div style="font-size:11px;color:var(--gray-500);">venc. hoje</div></div>
-        </div>
-
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0145</span><span class="badge" style="font-size:11px;">Média</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Realizar backup — turmas semana</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">3 turmas afetadas</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-EDICAO">EDIÇÃO</span><div style="font-size:11px;color:var(--gray-500);">venc. 04/05</div></div>
-        </div>
-
-      </div>
-
-      <div class="kanban-col">
-        <div class="kanban-col-header"><span>🚧 Em andamento</span><span class="badge">4</span></div>
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0138</span><span class="badge badge-danger" style="font-size:11px;">Alta</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Tratamento de fotos — Medicina T84</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">MEDICINA T84 · 23 alunos</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-EDICAO">EDIÇÃO</span><div class="flex items-center gap-1" style="font-size:11px;"><span class="avatar" style="width:20px;height:20px;font-size:9px;">RB</span> R. Beto</div></div>
-        </div>
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0139</span><span class="badge" style="font-size:11px;">Média</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Fazer pendrive — DIREITO FUNORTE</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">24 unidades</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-ADMINISTRATIVO">ADMIN</span><div style="font-size:11px;">DEBORA</div></div>
-        </div>
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0140</span><span class="badge" style="font-size:11px;">Média</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Cliente realizar seleção (TURMA)</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">PSICOLOGIA - UNIFIPMOC</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-EDICAO">EDIÇÃO</span><div style="font-size:11px;color:var(--gray-500);">aguardando comissão</div></div>
-        </div>
-      </div>
-
-      <div class="kanban-col">
-        <div class="kanban-col-header"><span>🔍 Em revisão</span><span class="badge">2</span></div>
-        <div class="kanban-card">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0135</span><span class="badge" style="font-size:11px;">Média</span></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px;">Conferir fotos pós tratamento</div>
-          <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">ODONTOLOGIA - FUNORTE · 39 fotos</div>
-          <div class="flex justify-between items-center"><span class="tag-os-area tag-QUALIDADE">QUALIDADE</span><div style="font-size:11px;">FILLIPE</div></div>
-        </div>
-      </div>
-
-      <div class="kanban-col">
-        <div class="kanban-col-header"><span>✅ Fechada</span><span class="badge">11</span></div>
-        <div class="kanban-card" style="opacity:.7;">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0128</span><i data-lucide="check-circle" class="w-4 h-4" style="color:var(--success);"></i></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:4px;">Tratamento de imagem</div>
-          <div style="font-size:12px;color:var(--gray-500);">MEDICINA T84 · finalizada 28/04</div>
-        </div>
-        <div class="kanban-card" style="opacity:.7;">
-          <div class="flex justify-between items-start mb-2"><span style="font-family:var(--font-mono);font-size:12px;color:var(--gray-500);">#0125</span><i data-lucide="check-circle" class="w-4 h-4" style="color:var(--success);"></i></div>
-          <div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:4px;">Fazer brindes</div>
-          <div style="font-size:12px;color:var(--gray-500);">DIREITO - FUNORTE · finalizada 27/04</div>
-        </div>
-      </div>
+    <!-- LISTA -->
+    <div id="lista-view" class="panel" hidden>
+      <div class="panel-head"><span id="lista-titulo">Todas as ordens</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>OS</th><th>Tipo</th><th>Turma</th><th>Aluno</th><th>Responsável</th><th>Prazo</th><th>Status</th><th style="text-align:right;">Ações</th></tr></thead>
+        <tbody id="os-tbody"></tbody></table></div>
     </div>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+const dtBR = s => s ? s.split('-').reverse().join('/') : '—';
+let OPC = { tipos:[], status:[], turmas:[], alunos:[], eventos:[] }, editId = null, ITENS = [], VIEW = 'kanban';
+const esc = s => String(s??'').replace(/</g,'&lt;');
+
+init();
+async function init(){
+  const r = await fetch(apiUrl('/api/os/opcoes')); OPC = await r.json();
+  montarForm();
+  carregar();
+}
+const optArr=(arr,cur,vazio)=>(vazio?`<option value="">${vazio}</option>`:'')+arr.map(o=>{const[v,l]=Array.isArray(o)?o:[o.id,o.nome];return `<option value="${v}" ${cur==v?'selected':''}>${l}</option>`}).join('');
+const optFiltrado=(arr,turmaId,cur)=>`<option value="">—</option>`+(arr||[]).filter(x=>!turmaId||x.turma_id==turmaId).map(x=>`<option value="${x.id}" ${cur==x.id?'selected':''}>${x.nome}</option>`).join('');
+window.refiltrarTurma=function(alunoCur,eventoCur){ const tid=$('#o-turma').value; $('#o-aluno').innerHTML=optFiltrado(OPC.alunos,tid,alunoCur); $('#o-evento').innerHTML=optFiltrado(OPC.eventos,tid,eventoCur); };
+
+function montarForm(){
+  $('#os-form').innerHTML = `
+    <div class="fld grow"><label>Título *</label><input type="text" id="o-tit" placeholder="Ex.: Edição do álbum do Baile"></div>
+    <div class="fld"><label>Turma</label><select id="o-turma" onchange="refiltrarTurma()">${optArr(OPC.turmas,'','—')}</select></div>
+    <div class="fld"><label>Aluno (cliente)</label><select id="o-aluno">${optFiltrado(OPC.alunos,'')}</select></div>
+    <div class="fld"><label>Evento</label><select id="o-evento">${optFiltrado(OPC.eventos,'')}</select></div>
+    <div class="fld"><label>Setor solicitante</label><select id="o-setor">${optArr(OPC.setores||[],'','—')}</select></div>
+    <div class="fld"><label>Tipo de O.S.</label><select id="o-tipoos">${optArr(OPC.tipos_os||[],'','—')}</select></div>
+    <div class="fld"><label>Situação O.S.</label><select id="o-situacao">${optArr(OPC.situacoes||[],'','—')}</select></div>
+    <div class="fld"><label>Solicitante</label><input type="text" id="o-solic" placeholder="Nome"></div>
+    <div class="fld"><label>Prioridade</label><select id="o-prio">${optArr(OPC.prioridades||[],'','—')}</select></div>
+    <div class="fld"><label>Tipo (interno)</label><select id="o-tipo">${optArr(OPC.tipos,'edicao')}</select></div>
+    <div class="fld"><label>Responsável</label><input type="text" id="o-resp" placeholder="Nome"></div>
+    <div class="fld"><label>Data inicial</label><input type="date" id="o-dini"></div>
+    <div class="fld"><label>Data final</label><input type="date" id="o-dfim"></div>
+    <div class="fld"><label>Prazo</label><input type="date" id="o-prazo"></div>
+    <div class="fld"><label>Status</label><select id="o-status">${optArr(OPC.status,'aberta')}</select></div>
+    <div class="fld grow"><label>Chamado / Observação</label><input type="text" id="o-chamado" placeholder="Descrição do chamado"></div>
+    <div class="fld"><button class="btn btn-primary" id="o-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="o-btn">Criar OS</span></button></div>`;
+  lucide.createIcons(); $('#o-salvar').onclick = salvar;
+}
+function limpar(){ editId=null;
+  ['o-tit','o-turma','o-aluno','o-evento','o-setor','o-tipoos','o-situacao','o-solic','o-prio','o-resp','o-dini','o-dfim','o-prazo','o-chamado'].forEach(k=>{const el=$('#'+k);if(el)el.value='';});
+  $('#o-tipo').value='edicao'; $('#o-status').value='aberta'; $('#o-btn').textContent='Criar OS'; }
+async function salvar(){
+  const body={ titulo:$('#o-tit').value, tipo:$('#o-tipo').value, turma_id:$('#o-turma').value||null, aluno_id:$('#o-aluno').value||null, evento_id:$('#o-evento').value||null,
+    responsavel:$('#o-resp').value, prazo:$('#o-prazo').value||null, status:$('#o-status').value,
+    setor_id:$('#o-setor').value||null, tipo_os_id:$('#o-tipoos').value||null, situacao_id:$('#o-situacao').value||null,
+    solicitante:$('#o-solic').value||null, prioridade:$('#o-prio').value||null,
+    data_inicial:$('#o-dini').value||null, data_final:$('#o-dfim').value||null, chamado:$('#o-chamado').value||null };
+  if(!body.titulo.trim()){alert('Informe o título.');return;}
+  const url = editId ? apiUrl('/api/os/'+editId) : apiUrl('/api/os');
+  const r=await fetch(url,{method:editId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  limpar(); carregar();
+}
+window.setView=function(v){ VIEW=v; $('#vw-kanban').classList.toggle('on',v==='kanban'); $('#vw-lista').classList.toggle('on',v==='lista');
+  $('#kanban').hidden=v!=='kanban'; $('#lista-view').hidden=v!=='lista'; render(); };
+async function carregar(){
+  const r = await fetch(apiUrl('/api/os')); const {itens}=await r.json(); ITENS=itens;
+  $('#os-count').textContent = itens.length; render();
+}
+function render(){ if(VIEW==='kanban') renderKanban(); else renderLista(); }
+
+const PRIO_COR={alta:'#DC2626',media:'#D97706',baixa:'#16A34A'};
+function cardOS(o){
+  const prio=o.prioridade?`<span style="font-size:11px;font-weight:700;color:${PRIO_COR[o.prioridade]||'#64748B'};">● ${o.prioridade}</span>`:'';
+  const linha=(ic,txt)=>txt?`<div style="font-size:12px;color:var(--gray-600);display:flex;gap:6px;align-items:center;"><i data-lucide="${ic}" style="width:13px;height:13px;"></i>${esc(txt)}</div>`:'';
+  const tipo=(OPC.tipos.find(t=>t[0]===o.tipo)||[])[1]||o.tipo;
+  return `<div class="os-card" draggable="true" ondragstart="dragStart(event,${o.id})" style="background:var(--surface);border:1px solid var(--gray-200);border-radius:12px;padding:12px 13px;margin-bottom:10px;box-shadow:var(--shadow-sm);cursor:grab;">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
+      <div style="font-weight:700;font-size:13.5px;color:var(--gray-900);">${esc(o.titulo)}</div>${prio}
+    </div>
+    <div style="margin:8px 0 6px;"><span class="badge b-tipo">${tipo}</span>${o.situacao_os?` <span class="badge b-todos">${esc(o.situacao_os)}</span>`:''}</div>
+    ${linha('users-round',o.turma)}${linha('user',o.aluno)}${linha('calendar-days',o.evento)}${linha('user-check',o.responsavel)}
+    ${o.chamado?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;">${esc(o.chamado)}</div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:8px;border-top:1px solid var(--gray-100);">
+      <span style="font-size:11px;color:var(--gray-400);">${o.dias_na_etapa!=null?`há ${o.dias_na_etapa}d nesta etapa`:''}</span>
+      <span style="display:flex;gap:4px;">
+        <button class="icon-btn" title="Editar" onclick='editar(${JSON.stringify(o)})'><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluir(${o.id})"><i data-lucide="trash-2" style="width:13px;height:13px;"></i></button>
+      </span>
+    </div></div>`;
+}
+function renderKanban(){
+  $('#kanban').innerHTML = OPC.status.map(([v,l])=>{
+    const cards=ITENS.filter(o=>o.status===v);
+    return `<div class="kb-col" ondragover="event.preventDefault();this.style.background='var(--primary-50)'" ondragleave="this.style.background=''" ondrop="dropCol(event,'${v}',this)" style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:14px;padding:12px;min-height:120px;transition:.15s;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:800;font-size:13px;color:var(--gray-700);">${l}<span class="count">${cards.length}</span></div>
+      ${cards.map(cardOS).join('')||'<div style="font-size:12px;color:var(--gray-400);text-align:center;padding:10px 0;">—</div>'}
+    </div>`;}).join('');
+  lucide.createIcons();
+}
+function renderLista(){
+  if(!ITENS.length){ $('#os-tbody').innerHTML=`<tr><td colspan="8"><div class="empty"><i data-lucide="clipboard-list"></i>Nenhuma ordem de serviço.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#os-tbody').innerHTML = ITENS.map(o=>{
+    const tipo=(OPC.tipos.find(t=>t[0]===o.tipo)||[])[1]||o.tipo;
+    const stt=(OPC.status.find(s=>s[0]===o.status)||[])[1]||o.status;
+    return `<tr><td class="nome">${esc(o.titulo)}</td><td><span class="badge b-tipo">${tipo}</span></td>
+      <td>${o.turma||'—'}</td><td>${o.aluno||'—'}</td><td>${o.responsavel||'—'}</td><td>${dtBR(o.prazo)}</td>
+      <td><select class="adv" onchange="mover(${o.id},this.value)">${OPC.status.map(([v,l])=>`<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('')}</select></td>
+      <td><div class="row-actions"><button class="icon-btn" title="Editar" onclick='editar(${JSON.stringify(o)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluir(${o.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td></tr>`;}).join('');
+  lucide.createIcons();
+}
+let dragId=null;
+window.dragStart=function(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; };
+window.dropCol=async function(e,status,col){ e.preventDefault(); col.style.background=''; if(dragId==null)return; await mover(dragId,status); dragId=null; };
+window.mover=async function(id,status){ const r=await fetch(apiUrl('/api/os/'+id+'/status'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}); if(r.ok)carregar(); else alert('Erro ao mover.'); };
+window.editar=function(o){ editId=o.id; $('#o-tit').value=o.titulo; $('#o-tipo').value=o.tipo; $('#o-turma').value=o.turma_id||''; refiltrarTurma(o.aluno_id,o.evento_id);
+  $('#o-resp').value=o.responsavel||''; $('#o-prazo').value=o.prazo||''; $('#o-status').value=o.status;
+  $('#o-setor').value=o.setor_id||''; $('#o-tipoos').value=o.tipo_os_id||''; $('#o-situacao').value=o.situacao_id||'';
+  $('#o-solic').value=o.solicitante||''; $('#o-prio').value=o.prioridade||''; $('#o-dini').value=o.data_inicial||''; $('#o-dfim').value=o.data_final||''; $('#o-chamado').value=o.chamado||'';
+  $('#o-btn').textContent='Atualizar OS'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluir=async function(oid){ if(!confirm('Excluir esta OS?'))return; const r=await fetch(apiUrl('/api/os/'+oid),{method:'DELETE'}); if(r.ok)carregar(); };
+</script>
 </body>
 </html>

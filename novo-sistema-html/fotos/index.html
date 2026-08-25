@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontre suas fotos — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body>
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo">
+    <img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas">
+  </a>
+  <nav class="ft-nav-links">
+    <a href="#albuns">Álbuns</a>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#faq">Dúvidas</a>
+  </nav>
+  <div class="ft-nav-actions">
+    <a href="login.html" class="ft-btn ft-btn-ghost" data-auth-link><i data-lucide="log-in"></i> Entrar</a>
+    <a href="resultados.html" class="ft-cart" title="Carrinho">
+      <i data-lucide="shopping-cart"></i>
+      <span class="ft-cart-badge" data-cart-count hidden>0</span>
+    </a>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="ft-hero">
+  <h1>Encontre e compre as suas<br>fotos da formatura</h1>
+  <p>Tire uma selfie e a nossa inteligência artificial procura o seu rosto<br class="ft-br-desk">em todos os álbuns do seu evento. Simples assim.</p>
+
+  <div class="ft-hero-search">
+    <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
+      <i data-lucide="scan-face"></i> Buscar com minha selfie
+    </a>
+    <div class="ft-search-box">
+      <i data-lucide="search"></i>
+      <input type="text" placeholder="Ou busque pelo evento, turma ou instituição…" onkeydown="if(event.key==='Enter')location.href='#albuns'">
+    </div>
+  </div>
+
+  <div class="ft-hero-trust">
+    <span><i data-lucide="lock"></i> Sua selfie não é armazenada</span>
+    <span><i data-lucide="zap"></i> Resultado em segundos</span>
+    <span><i data-lucide="image"></i> +12.000 fotos indexadas</span>
+  </div>
+</section>
+
+<!-- Como funciona -->
+<section class="ft-section" id="como-funciona">
+  <h2 class="ft-h2">Como funciona</h2>
+  <p class="ft-sub">Procuramos seu rosto em todos os álbuns automaticamente.</p>
+  <div class="ft-steps">
+    <div class="ft-step">
+      <div class="ft-step-icon"><i data-lucide="camera"></i></div>
+      <span class="ft-step-num">1</span>
+      <h3>Tire uma selfie</h3>
+      <p>Direto pela câmera do celular ou do computador. Boa luz ajuda!</p>
+    </div>
+    <div class="ft-step">
+      <div class="ft-step-icon"><i data-lucide="scan-face"></i></div>
+      <span class="ft-step-num">2</span>
+      <h3>A IA encontra você</h3>
+      <p>Reconhecimento facial varre todos os álbuns do evento e separa só as fotos em que você aparece.</p>
+    </div>
+    <div class="ft-step">
+      <div class="ft-step-icon"><i data-lucide="download"></i></div>
+      <span class="ft-step-num">3</span>
+      <h3>Compre sem marca d'água</h3>
+      <p>Escolha as fotos, pague por Pix ou cartão e baixe em alta resolução na hora.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Álbuns -->
+<section class="ft-section ft-section-gray" id="albuns">
+  <h2 class="ft-h2">Álbuns disponíveis</h2>
+  <p class="ft-sub">Eventos com fotos prontas para busca.</p>
+  <div class="ft-albums" id="albuns-grid"></div>
+  <p class="ft-sub" id="albuns-vazio" hidden>Nenhum álbum publicado ainda. Assim que o fotógrafo publicar uma turma, ela aparece aqui.</p>
+</section>
+
+<!-- FAQ -->
+<section class="ft-section ft-section-narrow" id="faq">
+  <h2 class="ft-h2">Dúvidas frequentes</h2>
+  <details class="ft-faq">
+    <summary>Minha selfie fica salva em algum lugar?</summary>
+    <p>Não. A selfie é usada só para gerar a busca e é descartada em seguida. Guardamos apenas o resultado — quais fotos são suas. Você pode pedir a exclusão a qualquer momento (LGPD).</p>
+  </details>
+  <details class="ft-faq">
+    <summary>E se a busca não encontrar todas as minhas fotos?</summary>
+    <p>Tire uma nova selfie com boa iluminação, sem óculos escuros ou boné. Você também pode enviar 2 ou 3 selfies em ângulos diferentes — isso melhora bastante o resultado.</p>
+  </details>
+  <details class="ft-faq">
+    <summary>Como recebo as fotos depois de pagar?</summary>
+    <p>O download em alta resolução, sem marca d'água, é liberado na hora, e o link também vai para o seu WhatsApp e e-mail.</p>
+  </details>
+  <details class="ft-faq">
+    <summary>Apareceu uma foto que não sou eu. E agora?</summary>
+    <p>Basta desmarcá-la — você só paga pelo que escolher. Se quiser, use o botão "não sou eu" para nos ajudar a melhorar a busca.</p>
+  </details>
+</section>
+
+<!-- CTA final -->
+<section class="ft-cta-final">
+  <h2>Suas fotos estão te esperando</h2>
+  <p>Leva menos de um minuto para encontrá-las.</p>
+  <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
+    <i data-lucide="scan-face"></i> Buscar com minha selfie
+  </a>
+</section>
+
+<footer class="ft-footer">
+  <div>
+    <strong>Ventus Formaturas</strong>
+    <span>Fotografia de formaturas · Montes Claros/MG</span>
+  </div>
+  <div class="ft-footer-links">
+    <a href="admin.html">Área do fotógrafo</a>
+    <a href="/privacidade/">Privacidade</a>
+    <a href="/excluir-conta/">Excluir conta</a>
+    <a href="/excluir-dados/">Excluir dados</a>
+    <a href="https://wa.me/5538998639570" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</footer>
+
+<script src="fotos.js"></script>
+<script>
+lucide.createIcons();
+
+// Álbuns reais criados pelo fotógrafo no painel. Sem turma publicada → estado vazio.
+const albunsGrid = document.getElementById('albuns-grid');
+const albunsVazio = document.getElementById('albuns-vazio');
+const mostrarVazio = () => { albunsGrid.innerHTML = ''; albunsVazio.hidden = false; };
+fetch(apiUrl('/api/turmas'))
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(({ albuns }) => {
+    if (!albuns || !albuns.length) { mostrarVazio(); return; }
+    albunsVazio.hidden = true;
+    const cores = ['ac1', 'ac2', 'ac3', 'ac4'];
+    albunsGrid.innerHTML = albuns.map((a, i) => `
+      <a href="turma.html?id=${encodeURIComponent(a.id)}" class="ft-album">
+        <div class="ft-album-cover ${cores[i % 4]}">
+          ${a.capa ? `<img src="${apiUrl(a.capa)}" alt="" loading="lazy">` : ''}
+          <span class="ft-album-count"><i data-lucide="image"></i> ${a.total_fotos} foto(s)</span>
+        </div>
+        <div class="ft-album-info">
+          <strong>${a.nome}</strong>
+          <span>criado em ${a.criado_em}</span>
+        </div>
+      </a>`).join('');
+    lucide.createIcons();
+  })
+  .catch(mostrarVazio);
+</script>
+<script src="app-cliente.js"></script>
+
+</body>
+</html>

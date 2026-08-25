@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<title>Cadastro da Formatura — Ventus</title>
+<script src="/assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --azul:#2563EB; --azul-esc:#1E3A8A; --ink:#0F172A; --cinza:#64748B; --linha:#E2E8F0; --bg:#F1F5F9; }
+  *{box-sizing:border-box;} body{margin:0;font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);}
+  .top{background:linear-gradient(135deg,var(--azul-esc),var(--azul));color:#fff;padding:26px 20px;text-align:center;}
+  .top img{height:30px;display:block;margin:0 auto 10px;}
+  .top .marca{font-size:13px;opacity:.85;letter-spacing:.02em;}
+  .wrap{max-width:560px;margin:-30px auto 40px;padding:0 16px;}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -18px rgba(15,23,42,.25);padding:28px 26px;}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;}
+  .sub{color:var(--cinza);font-size:14px;margin:0 0 22px;}
+  label{display:block;font-size:13px;font-weight:600;color:#334155;margin:0 0 6px;}
+  .fld{margin-bottom:16px;}
+  input{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:.15s;}
+  input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  .planos{display:grid;gap:12px;margin:6px 0 22px;}
+  .plano{border:1.5px solid var(--linha);border-radius:14px;padding:16px;cursor:pointer;transition:.15s;position:relative;}
+  .plano:hover{border-color:#CBD5E1;}
+  .plano.on{border-color:var(--azul);background:#EFF6FF;}
+  .plano input{position:absolute;opacity:0;}
+  .plano .nome{font-weight:700;font-size:16px;}
+  .plano .desc{font-size:13px;color:var(--cinza);margin-top:3px;}
+  .plano .valor{font-size:20px;font-weight:800;color:var(--azul-esc);margin-top:8px;}
+  .plano .pag{font-size:12px;color:var(--cinza);}
+  .btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--azul);color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;}
+  .btn:hover{background:var(--azul-esc);}
+  .ok{text-align:center;padding:20px 0;}
+  .ok .ic{width:72px;height:72px;border-radius:50%;background:#DCFCE7;color:#16A34A;display:grid;place-items:center;margin:0 auto 14px;}
+  .ok .ic svg{width:38px;height:38px;}
+  .muted{color:var(--cinza);font-size:13px;text-align:center;margin-top:14px;}
+  .erro{color:#B91C1C;font-size:13px;font-weight:600;margin:0 0 12px;display:none;}
+  .sec{margin:22px 0 6px;padding-top:18px;border-top:1px solid var(--linha);}
+  .sec h2{font-size:15px;font-weight:800;margin:0 0 3px;}
+  .sec .hint{font-size:12.5px;color:var(--cinza);margin:0 0 12px;}
+  .ev{border:1px solid var(--linha);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+  .ev .nome{font-weight:700;font-size:14px;margin-bottom:8px;}
+  .qtd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:420px){.qtd-grid{grid-template-columns:1fr;}}
+  .qtd-grid .mini label{font-size:12px;margin-bottom:4px;}
+  .qtd-grid input{padding:9px 11px;}
+  .add{display:flex;align-items:center;gap:12px;border:1px solid var(--linha);border-radius:12px;padding:10px 14px;margin-bottom:8px;}
+  .add .info{flex:1;min-width:0;}
+  .add .info .n{font-weight:600;font-size:14px;}
+  .add .info .v{font-size:12.5px;color:var(--azul-esc);font-weight:700;}
+  .add input{width:64px;text-align:center;padding:8px;}
+  select{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;outline:none;}
+  select:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+</style>
+</head>
+<body>
+<div class="top">
+  <img src="/assets/img/logo.png" alt="Ventus" onerror="this.style.display='none'">
+  <div class="marca">Cadastro da sua Formatura</div>
+</div>
+<div class="wrap"><div class="card" id="card">
+  <p class="muted">Carregando…</p>
+</div></div>
+
+<script>
+const token = new URLSearchParams(location.search).get('t');
+const card = document.getElementById('card');
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+if (!token) card.innerHTML = '<h1>Link inválido</h1><p class="sub">Peça um novo link de cadastro à comissão.</p>';
+else carregar();
+
+let DADOS = null;
+const esc = s => String(s||'').replace(/"/g,'&quot;');
+const maskCpf = v => { const x=String(v||'').replace(/\D/g,'').slice(0,11); return x.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
+const planoSel = () => DADOS.planos.find(p => p.id == (document.querySelector('.plano input:checked')||{}).value);
+
+async function carregar(){
+  const r = await fetch(apiUrl('/api/inscricao/'+token));
+  if(!r.ok){ card.innerHTML = '<h1>Link inválido</h1><p class="sub">Este link de cadastro não é válido. Peça um novo à comissão.</p>'; return; }
+  DADOS = await r.json(); const d = DADOS; const a = d.aluno;
+
+  const planosHtml = d.planos.length ? `
+    <div class="sec"><h2>Escolha seu plano</h2>
+    <div class="planos">${d.planos.map(p=>{
+      const bloq = p.lotado && a.plano_id!=p.id;
+      return `
+      <label class="plano" data-id="${p.id}" style="${bloq?'opacity:.55;pointer-events:none;':''}">
+        <input type="radio" name="plano" value="${p.id}" ${a.plano_id==p.id?'checked':''} ${bloq?'disabled':''}>
+        <div class="nome">${p.nome}${p.vagas!=null?(bloq?' — <span style="color:#B91C1C;">Esgotado</span>':` <span style="font-size:12px;color:#16A34A;font-weight:600;">(${p.vagas_restantes} vaga(s))</span>`):''}</div>
+        ${p.tipo_contrato_label?`<div class="desc">${p.tipo_contrato_label}${p.qt_fotos?` · ${p.qt_fotos} fotos`:''}${p.forma_entrega?` · ${p.forma_entrega}`:''}</div>`:''}
+        ${p.descricao?`<div class="desc">${p.descricao}</div>`:''}
+        <div class="valor">${brl(p.valor)}</div>
+        ${(p.valor_fotografia||p.valor_cerimonial)?`<div class="pag">Fotografia ${brl(p.valor_fotografia)}${p.valor_cerimonial?` · Cerimonial ${brl(p.valor_cerimonial)}`:''}</div>`:''}
+      </label>`;}).join('')}</div></div>` : '';
+
+  const eventos = d.eventos || [];
+  const eventosHtml = eventos.length ? `
+    <div class="sec"><h2>Familiares e convidados</h2>
+    <p class="hint">Informe quantas pessoas você levará em cada evento.</p>
+    ${eventos.map(e=>`
+      <div class="ev" data-ev="${e.id}">
+        <div class="nome">${e.nome}</div>
+        <div class="qtd-grid">
+          ${e.pede_familiares?`<div class="mini"><label>Familiares</label><input type="number" min="0" class="q-fam" value="${e.qtd_familiares||0}"></div>`:''}
+          ${e.pede_convidados?`<div class="mini"><label>Convidados</label><input type="number" min="0" class="q-conv" value="${e.qtd_convidados||0}"></div>`:''}
+        </div>
+      </div>`).join('')}</div>` : '';
+
+  const cat = d.adicionais_catalogo || [];
+  const jaEsc = {}; (d.adicionais||[]).forEach(x=>{ jaEsc[x.descricao.toLowerCase()] = x.quantidade; });
+  const addHtml = cat.length ? `
+    <div class="sec"><h2>Produtos e serviços adicionais</h2>
+    <p class="hint">Opcional — o que você quiser além do plano.</p>
+    ${cat.map((it)=>`
+      <div class="add" data-desc="${esc(it.descricao)}" data-valor="${it.valor}">
+        <div class="info"><div class="n">${it.descricao}</div><div class="v">${brl(it.valor)}</div></div>
+        <input type="number" min="0" class="q-add" value="${jaEsc[it.descricao.toLowerCase()]||0}">
+      </div>`).join('')}</div>` : '';
+
+  card.innerHTML = `
+    <h1>Olá, ${a.nome.split(' ')[0]}! 👋</h1>
+    <p class="sub">Confirme seus dados para a turma <b>${d.turma.nome}</b>${d.turma.instituicao?` · ${d.turma.instituicao}`:''}.</p>
+    <p class="erro" id="erro"></p>
+    <div class="sec" style="border-top:none;padding-top:0;"><h2>Seus dados</h2>
+      <div class="fld"><label>Nome completo</label><input id="i-nome" value="${esc(a.nome)}"></div>
+      <div class="qtd-grid">
+        <div class="mini"><label>CPF</label><input id="i-cpf" value="${esc(a.cpf?maskCpf(a.cpf):'')}" placeholder="000.000.000-00"></div>
+        <div class="mini"><label>WhatsApp</label><input id="i-cel" value="${esc(a.celular)}" placeholder="(38) 99999-0000"></div>
+      </div>
+      <div class="fld"><label>E-mail</label><input id="i-email" value="${esc(a.email)}" placeholder="voce@email.com"></div>
+      <div class="qtd-grid">
+        <div class="mini"><label>Curso</label><input id="i-curso" value="${esc(a.curso)}" placeholder="Ex.: Medicina"></div>
+        <div class="mini"><label>Ano de formatura</label><input id="i-ano" type="number" value="${a.ano_formatura||''}" placeholder="2026"></div>
+      </div>
+    </div>
+    <div class="sec"><h2>Medidas</h2>
+      <p class="hint">Para a beca/produtos.</p>
+      <div class="qtd-grid">
+        <div class="mini"><label>Altura</label><input id="i-altura" value="${esc(a.altura)}" placeholder="1,72"></div>
+        <div class="mini"><label>Peso</label><input id="i-peso" value="${esc(a.peso)}" placeholder="68 kg"></div>
+        <div class="mini"><label>Calçado</label><input id="i-calcado" value="${esc(a.calcado)}" placeholder="40"></div>
+      </div>
+    </div>
+    <div class="sec"><h2>Encarte</h2>
+      <p class="hint">Dados que vão no seu encarte (página de fotos).</p>
+      <div class="qtd-grid">
+        <div class="mini"><label>Data de nascimento</label><input type="date" id="i-nasc" value="${esc(a.data_nascimento)}"></div>
+        <div class="mini"><label>Foto do encarte</label><input id="i-nomefot" value="${esc(a.nome_fotografia)}" placeholder="Nº ou nome da foto"></div>
+        <div class="mini"><label>Nome da mãe</label><input id="i-mae" value="${esc(a.nome_mae)}"></div>
+        <div class="mini"><label>Nome do pai</label><input id="i-pai" value="${esc(a.nome_pai)}"></div>
+      </div>
+      <div class="fld"><label>Mensagem do encarte</label><textarea id="i-msg" style="width:100%;min-height:64px;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-family:inherit;font-size:15px;outline:none;resize:vertical;" placeholder="Uma mensagem/dedicatória…">${esc(a.mensagem)}</textarea></div>
+    </div>
+    ${planosHtml}
+    <div id="pag-sec"></div>
+    ${eventosHtml}
+    ${addHtml}
+    <button class="btn" id="enviar">Confirmar meu cadastro</button>
+    <p class="muted">Seus dados ficam disponíveis para a comissão e a Ventus.</p>`;
+
+  document.querySelectorAll('.plano').forEach(el => el.onclick = () => {
+    document.querySelectorAll('.plano').forEach(x=>x.classList.remove('on'));
+    el.classList.add('on'); el.querySelector('input').checked = true;
+    renderPagamento();
+  });
+  document.querySelectorAll('.plano input:checked').forEach(i=>i.closest('.plano').classList.add('on'));
+  const cpfEl = document.getElementById('i-cpf');
+  cpfEl.oninput = () => { cpfEl.value = maskCpf(cpfEl.value); checarDesconto(); };
+  renderPagamento();
+  document.getElementById('enviar').onclick = enviar;
+}
+
+function renderPagamento(){
+  const sec = document.getElementById('pag-sec'); if(!sec) return;
+  const p = planoSel();
+  if(!p){ sec.innerHTML = ''; return; }
+  const a = DADOS.aluno;
+  let meiosHtml;
+  if(p.meios_pagamento && p.meios_pagamento.length){
+    meiosHtml = p.meios_pagamento.map(m=>`
+      <label class="plano" data-meio="${m.meio}" style="padding:12px 14px;">
+        <input type="radio" name="meio" value="${m.meio}" data-qt="${m.qt_parcela}" ${a.meio_pagamento===m.meio?'checked':''}>
+        <div class="nome" style="font-size:14px;">${m.label}${m.qt_parcela>1?` · até ${m.qt_parcela}x`:''}</div>
+        ${m.descricao?`<div class="desc">${m.descricao}</div>`:''}
+      </label>`).join('');
+  } else {
+    const formas = DADOS.formas_pagamento || [];
+    meiosHtml = `<div class="fld"><select id="i-forma"><option value="">Selecione…</option>${formas.map(f=>`<option value="${f[0]}" ${a.forma_pagamento===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>`;
+  }
+  const contratoHtml = p.contrato ? `
+    <div class="sec"><h2>Contrato</h2>
+      <div style="border:1px solid var(--linha);border-radius:12px;padding:12px 14px;font-size:13px;color:#334155;max-height:180px;overflow:auto;white-space:pre-wrap;">${esc(p.contrato.conteudo)||('Contrato: '+esc(p.contrato.nome))}</div>
+      <label class="chip-aceite" style="display:flex;gap:10px;align-items:center;margin-top:12px;font-size:14px;cursor:pointer;">
+        <input type="checkbox" id="i-aceite" ${a.aceite_contrato?'checked':''}> Li e aceito o contrato <b>${esc(p.contrato.nome)}</b>.</label>
+    </div>` : '';
+  sec.innerHTML = `
+    <div class="sec"><h2>Forma de pagamento</h2>
+      <div class="planos">${meiosHtml}</div>
+      <div id="desc-note" style="margin-top:10px;font-size:13px;"></div>
+      <div id="parc-box" style="margin-top:12px;"></div>
+    </div>${contratoHtml}`;
+  document.querySelectorAll('#pag-sec .plano').forEach(el=>el.onclick=()=>{
+    document.querySelectorAll('#pag-sec .plano').forEach(x=>x.classList.remove('on'));
+    el.classList.add('on'); el.querySelector('input').checked=true; renderParcelas();
+  });
+  document.querySelectorAll('#pag-sec .plano input:checked').forEach(i=>{i.closest('.plano').classList.add('on');});
+  renderParcelas(); checarDesconto();
+}
+
+function renderParcelas(){
+  const box = document.getElementById('parc-box'); if(!box) return;
+  const sel = document.querySelector('#pag-sec input[name="meio"]:checked');
+  const qt = sel ? +sel.dataset.qt : 0;
+  if(qt > 1){
+    box.innerHTML = `<div class="fld"><label>Parcelas</label><select id="i-parc">${Array.from({length:qt},(_,i)=>`<option value="${i+1}">${i+1}x</option>`).join('')}</select></div>`;
+  } else { box.innerHTML = ''; }
+}
+
+async function checarDesconto(){
+  const note = document.getElementById('desc-note'); if(!note) return;
+  const p = planoSel(); const cpf = (document.getElementById('i-cpf')||{}).value || '';
+  const cpfNum = cpf.replace(/\D/g,'');
+  if(!p || cpfNum.length !== 11){ note.innerHTML=''; return; }
+  try{
+    const r = await fetch(apiUrl(`/api/inscricao/${token}/desconto?plano_id=${p.id}&cpf=${cpfNum}`));
+    const dd = await r.json();
+    if(dd.tem_desconto && (dd.desconto_fotografia || dd.desconto_cerimonial)){
+      const totalDesc = (dd.desconto_fotografia||0)+(dd.desconto_cerimonial||0);
+      const final = Math.max(0, (p.valor||0) - totalDesc);
+      note.innerHTML = `<div style="background:#DCFCE7;color:#166534;border-radius:10px;padding:10px 12px;font-weight:600;">✓ Desconto aplicado${dd.nome?` (${dd.nome})`:''}: ${dd.desconto_fotografia?`fotografia ${brl(dd.desconto_fotografia)}`:''}${dd.desconto_cerimonial?`${dd.desconto_fotografia?' · ':''}cerimonial ${brl(dd.desconto_cerimonial)}`:''}. Total: <b>${brl(final)}</b></div>`;
+    } else { note.innerHTML=''; }
+  }catch(e){ note.innerHTML=''; }
+}
+
+async function enviar(){
+  const nome = document.getElementById('i-nome').value.trim();
+  const erro = document.getElementById('erro');
+  if(!nome){ erro.textContent='Informe seu nome.'; erro.style.display='block'; return; }
+  const p = planoSel();
+  const meioRadio = document.querySelector('#pag-sec input[name="meio"]:checked');
+  const formaSel = document.getElementById('i-forma');
+  const aceiteEl = document.getElementById('i-aceite');
+  if(p && p.contrato && aceiteEl && !aceiteEl.checked){ erro.textContent='É necessário aceitar o contrato.'; erro.style.display='block'; window.scrollTo(0,document.body.scrollHeight); return; }
+  const parcEl = document.getElementById('i-parc');
+  const participacoes = [...document.querySelectorAll('.ev')].map(el=>({
+    evento_fotografico_id: +el.dataset.ev,
+    qtd_familiares: +(el.querySelector('.q-fam')?.value || 0),
+    qtd_convidados: +(el.querySelector('.q-conv')?.value || 0),
+  })).filter(x=>x.qtd_familiares>0 || x.qtd_convidados>0);
+  const adicionais = [...document.querySelectorAll('.add')].map(el=>({
+    descricao: el.dataset.desc, valor: +el.dataset.valor,
+    quantidade: +(el.querySelector('.q-add')?.value || 0),
+  })).filter(x=>x.quantidade>0);
+  const body = {
+    nome, celular: document.getElementById('i-cel').value, email: document.getElementById('i-email').value,
+    cpf: document.getElementById('i-cpf').value, curso: document.getElementById('i-curso').value,
+    ano_formatura: document.getElementById('i-ano').value || null,
+    altura: document.getElementById('i-altura').value, peso: document.getElementById('i-peso').value, calcado: document.getElementById('i-calcado').value,
+    plano_id: p ? p.id : null,
+    meio_pagamento: meioRadio ? meioRadio.value : null,
+    forma_pagamento: formaSel ? formaSel.value : (meioRadio ? meioRadio.value : null),
+    parcelas: parcEl ? +parcEl.value : null,
+    aceite_contrato: aceiteEl ? aceiteEl.checked : false,
+    data_nascimento: document.getElementById('i-nasc').value || null,
+    nome_fotografia: document.getElementById('i-nomefot').value,
+    nome_mae: document.getElementById('i-mae').value,
+    nome_pai: document.getElementById('i-pai').value,
+    mensagem: document.getElementById('i-msg').value,
+    participacoes, adicionais,
+  };
+  const btn = document.getElementById('enviar'); btn.textContent='Enviando…'; btn.disabled=true;
+  const r = await fetch(apiUrl('/api/inscricao/'+token), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok){ erro.textContent='Erro ao enviar. Tente de novo.'; erro.style.display='block'; btn.textContent='Confirmar meu cadastro'; btn.disabled=false; return; }
+  card.innerHTML = `<div class="ok">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h1>Cadastro confirmado!</h1>
+    <p class="sub">Prontinho, ${nome.split(' ')[0]}. ${p&&p.contrato&&body.aceite_contrato?'Contrato aceito. ':''}A comissão já vê seu cadastro. Em breve enviamos o pagamento no seu WhatsApp.</p>
+  </div>`;
+}
+</script>
+</body>
+</html>

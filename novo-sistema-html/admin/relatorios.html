@@ -1,118 +1,123 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Relatórios — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatórios — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:18px; }
+  .panel-head { padding:15px 22px; border-bottom:1px solid var(--gray-100); font-size:14.5px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; justify-content:space-between; gap:9px; }
+  .panel-head .count{font-size:12px;font-weight:700;color:var(--primary-700);background:var(--primary-50);padding:3px 11px;border-radius:999px;}
+  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:200px;}
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
+  .add-bar select { padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; }
+  .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.tbl th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:12px 18px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:11px 18px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); white-space:nowrap; } table.tbl tr:last-child td{border-bottom:none;} table.tbl tbody tr:hover td{background:var(--gray-50);}
+  table.tbl td:first-child{font-weight:600;color:var(--gray-900);}
+  .empty { text-align:center; color:var(--gray-500); padding:48px 20px; } .empty svg{width:34px;height:34px;color:var(--gray-300);margin:0 auto 10px;display:block;}
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
-  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>OS</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
-  <div class="sidebar-section">Sistema</div>
-  <a href="usuarios.html" class="sidebar-link"><i data-lucide="shield-check"></i>Usuários</a>
-  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
-  <a href="relatorios.html" class="sidebar-link active"><i data-lucide="file-text"></i>Relatórios</a>
-  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
-</aside>
-
+<aside id="admin-sidebar" class="sidebar"></aside>
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar relatório…"></div>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3"></div>
   </header>
-
   <main class="app-content">
-    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Relatórios</div>
-    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Relatórios</h1>
+    <div class="page-head">
+      <div class="chip"><i data-lucide="file-text"></i></div>
+      <div><h1>Relatórios</h1><p>Gere e exporte relatórios de alunos, financeiro e pagamentos.</p></div>
+    </div>
 
-    <div class="grid gap-4" style="grid-template-columns: repeat(3, 1fr);">
-
-      <div class="card">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;display:grid;place-items:center;"><i data-lucide="users" class="w-5 h-5"></i></div><strong>Alunos por período</strong></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Lista de alunos cadastrados ou com contrato assinado em uma janela de tempo.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span><span class="badge">por turma</span><span class="badge">por período</span></div>
-          <button class="btn btn-secondary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
+    <div class="panel">
+      <div class="add-bar">
+        <div class="fld grow"><label>Relatório</label><select id="r-tipo"></select></div>
+        <div class="fld grow"><label>Turma (filtro)</label><select id="r-turma"></select></div>
+        <div class="fld"><button class="btn btn-primary" id="r-gerar"><i data-lucide="play" class="w-4 h-4"></i> Gerar</button></div>
+        <div class="fld"><button class="btn btn-secondary" id="r-csv"><i data-lucide="download" class="w-4 h-4"></i> Exportar CSV</button></div>
       </div>
+    </div>
 
-      <div class="card">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:#FEF3C7;color:#92400E;display:grid;place-items:center;"><i data-lucide="gift" class="w-5 h-5"></i></div><strong>Alunos × Brindes</strong></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Cruzamento aluno-brinde com previsão e realização de entrega.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span><span class="badge">controle</span></div>
-          <button class="btn btn-secondary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:#DCFCE7;color:#166534;display:grid;place-items:center;"><i data-lucide="calendar" class="w-5 h-5"></i></div><strong>Alunos × Eventos</strong></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Quem tem direito a quais eventos contratados, por turma.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span><span class="badge">por turma</span></div>
-          <button class="btn btn-secondary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:#EDE9FE;color:#5B21B6;display:grid;place-items:center;"><i data-lucide="shirt" class="w-5 h-5"></i></div><strong>Controle de Beca</strong></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Lista de medidas, cores e padrinhos para aluguel de becas.</p>
-          <div class="flex gap-2"><span class="badge">PDF</span><span class="badge">cerimonial</span></div>
-          <button class="btn btn-secondary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:#FCE7F3;color:#9D174D;display:grid;place-items:center;"><i data-lucide="layout" class="w-5 h-5"></i></div><strong>Encartes</strong></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Encartes personalizados por aluno para impressão.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span><span class="badge">edição</span></div>
-          <button class="btn btn-secondary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card" style="border:1px solid var(--primary-200);background:var(--primary-50);">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:white;color:var(--primary-700);display:grid;place-items:center;"><i data-lucide="banknote" class="w-5 h-5"></i></div><strong>Financeiro consolidado</strong> <span class="badge badge-info">Novo</span></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Receita por turma/período/vendedor + inadimplência + projeção de caixa.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span><span class="badge">PDF</span></div>
-          <button class="btn btn-primary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card" style="border:1px solid var(--primary-200);background:var(--primary-50);">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:white;color:var(--primary-700);display:grid;place-items:center;"><i data-lucide="image" class="w-5 h-5"></i></div><strong>Funil de fotografia</strong> <span class="badge badge-info">Novo</span></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Lead-time por etapa (upload → processamento → seleção → edição → entrega).</p>
-          <div class="flex gap-2"><span class="badge">XLS</span></div>
-          <button class="btn btn-primary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
-      <div class="card" style="border:1px solid var(--primary-200);background:var(--primary-50);">
-        <div class="card-body">
-          <div class="flex items-center gap-3 mb-3"><div style="width:44px;height:44px;border-radius:10px;background:white;color:var(--primary-700);display:grid;place-items:center;"><i data-lucide="user-check" class="w-5 h-5"></i></div><strong>RSVP por evento</strong> <span class="badge badge-info">Novo</span></div>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Taxa de confirmação de convidados, por evento e categoria.</p>
-          <div class="flex gap-2"><span class="badge">XLS</span></div>
-          <button class="btn btn-primary btn-sm mt-4" style="width:100%;justify-content:center;"><i data-lucide="download" class="w-4 h-4"></i> Gerar relatório</button>
-        </div>
-      </div>
-
+    <div class="panel">
+      <div class="panel-head"><span id="r-nome">Relatório</span><span class="count" id="r-count">0 linhas</span></div>
+      <div class="tbl-wrap"><table class="tbl"><thead id="r-thead"></thead><tbody id="r-tbody"></tbody></table></div>
     </div>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+let atual = null;
+
+init();
+async function init(){
+  const r = await fetch(apiUrl('/api/relatorios/opcoes')); const d = await r.json();
+  $('#r-tipo').innerHTML = d.relatorios.map(x=>`<option value="${x.tipo}">${x.nome}</option>`).join('');
+  $('#r-turma').innerHTML = `<option value="">Todas as turmas</option>` + d.turmas.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  $('#r-gerar').onclick = gerar;
+  $('#r-csv').onclick = exportarCSV;
+  gerar();
+}
+async function gerar(){
+  const tipo = $('#r-tipo').value; const turma = $('#r-turma').value;
+  const r = await fetch(apiUrl(`/api/relatorios/${tipo}`+(turma?`?turma_id=${turma}`:''))); atual = await r.json();
+  $('#r-nome').textContent = atual.nome;
+  $('#r-count').textContent = atual.linhas.length + ' linha(s)';
+  $('#r-thead').innerHTML = '<tr>' + atual.colunas.map(c=>`<th>${c}</th>`).join('') + '</tr>';
+  if(!atual.linhas.length){ $('#r-tbody').innerHTML = `<tr><td colspan="${atual.colunas.length||1}"><div class="empty"><i data-lucide="file-search"></i>Sem dados para este relatório.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#r-tbody').innerHTML = atual.linhas.map(l=>'<tr>'+l.map(c=>`<td>${c===''?'—':c}</td>`).join('')+'</tr>').join('');
+}
+function exportarCSV(){
+  if(!atual || !atual.linhas.length){ alert('Gere um relatório primeiro.'); return; }
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const linhas = [atual.colunas.map(esc).join(';'), ...atual.linhas.map(l=>l.map(esc).join(';'))];
+  const blob = new Blob(['﻿'+linhas.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = (atual.nome||'relatorio').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.csv';
+  a.click();
+}
+</script>
 </body>
 </html>

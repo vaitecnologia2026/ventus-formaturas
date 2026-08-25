@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabelas — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .crumb { font-size:13px; color:var(--gray-500); margin-bottom:10px; }
+  .crumb a { color:var(--gray-500); text-decoration:none; } .crumb a:hover { color:var(--gray-700); }
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center;
+    background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:18px; }
+  .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 22px; border-bottom:1px solid var(--gray-100); }
+  .panel-head h2 { font-size:14.5px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:9px; }
+  .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
+
+  /* Barra de adicionar (form inline) */
+  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar .fld { display:flex; flex-direction:column; gap:6px; }
+  .add-bar .fld.grow { flex:1; min-width:200px; }
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
+  .add-bar input, .add-bar select { padding:10px 13px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar input:focus, .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+
+  /* Toggle corrigido */
+  .switch { position:relative; display:inline-block; width:46px; height:27px; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
+  .switch .track::after { content:''; position:absolute; width:21px; height:21px; left:3px; top:3px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+  .switch input:checked + .track { background:var(--success); }
+  .switch input:checked + .track::after { transform:translateX(19px); }
+
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:14px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+  table.tbl tr:last-child td { border-bottom:none; }
+  table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.num, table.tbl th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  table.tbl td.nome { font-weight:600; color:var(--gray-900); }
+  .badge-ativo { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .badge-ativo.sim { background:#DCFCE7; color:#166534; } .badge-ativo.nao { background:var(--gray-200); color:var(--gray-600); }
+  .badge-base { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--primary-50); color:var(--primary-700); }
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); }
+  .icon-btn.danger:hover { border-color:#FCA5A5; color:#DC2626; background:#FEF2F2; }
+  .empty { text-align:center; color:var(--gray-500); padding:48px 20px; }
+  .empty svg { width:34px; height:34px; color:var(--gray-300); margin:0 auto 10px; display:block; }
+  @media (max-width:640px){ .add-bar{padding:16px;} }
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3">
+      <a href="cadastro.html" class="btn btn-secondary btn-sm"><i data-lucide="database" class="w-4 h-4"></i> Todos os cadastros</a>
+    </div>
+  </header>
+  <main class="app-content">
+    <div class="crumb" id="crumb"></div>
+    <div class="page-head">
+      <div class="chip" id="head-chip"><i data-lucide="table-2"></i></div>
+      <div><h1 id="titulo">Tabelas</h1><p id="subtitulo"></p></div>
+    </div>
+
+    <!-- LISTA (master) -->
+    <section id="view-lista" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="m-form-title">Nova tabela</span></h2></div>
+        <div class="add-bar" id="master-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 id="m-list-title">Tabelas</h2><span class="count" id="m-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl"><thead id="m-thead"></thead><tbody id="m-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ITENS (detail) -->
+    <section id="view-detalhe" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="i-form-title">Adicionar item</span></h2></div>
+        <div class="add-bar" id="item-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Itens da tabela</h2><span class="count" id="i-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl"><thead id="i-thead"></thead><tbody id="i-tbody"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const tipo = params.get('tipo') || 'tabela-preco';
+const CHIP = { 'tabela-preco':'table-2', 'tabela-cerimonial':'utensils' };
+let SCHEMA = null, masterAtual = null, editMasterId = null, editItemId = null;
+let PRODUTOS = [];  // cadastro de Produtos/Serviços, para os campos "buscar do cadastro"
+
+init();
+async function init() {
+  const r = await fetch(apiUrl(`/api/tabela/${tipo}/schema`));
+  if (!r.ok) { $('#titulo').textContent = 'Tabela não encontrada'; return; }
+  SCHEMA = await r.json();
+  // se algum campo busca do cadastro de produto, carrega a lista uma vez
+  if ([...SCHEMA.campos_item, ...SCHEMA.campos_master].some(c=>c.fonte==='produto')) {
+    try { const rp = await fetch(apiUrl('/api/cadastro/produto')); PRODUTOS = (await rp.json()).itens || []; } catch(e){ PRODUTOS = []; }
+  }
+  $('#head-chip').innerHTML = `<i data-lucide="${CHIP[tipo]||'table-2'}"></i>`; lucide.createIcons();
+  const idParam = params.get('id');
+  if (idParam) abrirDetalhe(+idParam); else mostrarLista();
+}
+
+/* ---------------- LISTA (master) ---------------- */
+function mostrarLista() {
+  $('#view-lista').hidden = false; $('#view-detalhe').hidden = true;
+  $('#crumb').innerHTML = `<a href="cadastro.html">Cadastros</a> › ${SCHEMA.plural}`;
+  $('#titulo').textContent = SCHEMA.plural;
+  $('#subtitulo').textContent = `Crie tabelas e gerencie os itens de cada uma.`;
+  $('#m-list-title').textContent = SCHEMA.plural;
+  montarMasterForm(); carregarMaster();
+}
+
+function opcoesCadastro(c) {
+  if (c.fonte === 'produto') {
+    const f = c.filtro || null;
+    return PRODUTOS.filter(p => p.ativo && (!f || f.includes(p.tipo))).map(p => p.nome);
+  }
+  return [];
+}
+function controle(c, pref) {
+  if (c.tipo === 'bool') return `<label class="switch"><input type="checkbox" id="${pref}-${c.nome}" ${c.default?'checked':''}><span class="track"></span></label>`;
+  if (c.tipo === 'select') return `<select id="${pref}-${c.nome}">${(c.opcoes||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`;
+  if (c.tipo === 'select-cadastro') {
+    const nomes = opcoesCadastro(c);
+    const ops = `<option value="">Selecione…</option>` + nomes.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">${n}</option>`).join('');
+    const vazio = nomes.length ? '' : `<option value="" disabled>Nenhum item no cadastro — cadastre em Produtos/Serviços</option>`;
+    return `<select id="${pref}-${c.nome}">${ops}${vazio}</select>`;
+  }
+  const t = (c.tipo==='number'||c.tipo==='int') ? 'number' : 'text';
+  const step = c.tipo==='number' ? ' step="0.01"' : '';
+  return `<input type="${t}"${step} id="${pref}-${c.nome}" placeholder="${c.label}">`;
+}
+
+function montarMasterForm() {
+  $('#master-form').innerHTML = SCHEMA.campos_master.map(c =>
+    `<div class="fld ${c.tipo==='text'?'grow':''}"><label>${c.label}${c.obrigatorio?' *':''}</label>${controle(c,'m')}</div>`).join('')
+    + `<div class="fld"><button class="btn btn-primary" id="m-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="m-btn-txt">Nova tabela</span></button></div>`;
+  lucide.createIcons();
+  $('#m-salvar').onclick = salvarMaster;
+}
+
+function lerCampos(campos, pref) {
+  const b = {};
+  for (const c of campos) { const el = $(`#${pref}-${c.nome}`); if (el) b[c.nome] = c.tipo==='bool' ? el.checked : el.value; }
+  return b;
+}
+function limparCampos(campos, pref) {
+  for (const c of campos) { const el = $(`#${pref}-${c.nome}`); if (!el) continue; if (c.tipo==='bool') el.checked = !!c.default; else el.value=''; }
+}
+
+async function salvarMaster() {
+  const body = lerCampos(SCHEMA.campos_master, 'm');
+  const url = editMasterId ? apiUrl(`/api/tabela/${tipo}/${editMasterId}`) : apiUrl(`/api/tabela/${tipo}`);
+  const r = await fetch(url, { method: editMasterId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro'); return; }
+  editMasterId=null; $('#m-btn-txt').textContent='Nova tabela'; $('#m-form-title').textContent='Nova tabela'; limparCampos(SCHEMA.campos_master,'m'); carregarMaster();
+}
+
+async function carregarMaster() {
+  const r = await fetch(apiUrl(`/api/tabela/${tipo}`)); const { itens } = await r.json();
+  $('#m-count').textContent = itens.length;
+  const cols = SCHEMA.campos_master;
+  $('#m-thead').innerHTML = '<tr>' + cols.map(c=>`<th>${c.label}</th>`).join('') + '<th>Itens</th><th style="text-align:right;">Ações</th></tr>';
+  if(!itens.length){ $('#m-tbody').innerHTML = `<tr><td colspan="${cols.length+2}"><div class="empty"><i data-lucide="inbox"></i>Nenhuma tabela ainda. Crie a primeira acima.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#m-tbody').innerHTML = itens.map(it => '<tr>' + cols.map((c,idx)=>`<td class="${idx===0?'nome':''}">${celula(c,it[c.nome])}</td>`).join('')
+    + `<td><b style="color:var(--gray-900);">${it.qtd_itens}</b> <span style="color:var(--gray-400);">item(ns)</span></td>`
+    + `<td><div class="row-actions">
+        <button class="icon-btn" title="Abrir itens" onclick="abrirDetalhe(${it.id})"><i data-lucide="folder-open" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn" title="Editar" onclick='editarMaster(${JSON.stringify(it)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluirMaster(${it.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+
+window.editarMaster = function(it){ editMasterId=it.id; for(const c of SCHEMA.campos_master){const el=$(`#m-${c.nome}`);if(!el)continue;if(c.tipo==='bool')el.checked=!!it[c.nome];else el.value=it[c.nome]??'';} $('#m-btn-txt').textContent='Atualizar'; $('#m-form-title').textContent='Editar tabela'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluirMaster = async function(id){ if(!confirm('Excluir esta tabela e todos os itens?'))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/${id}`),{method:'DELETE'}); if(r.ok)carregarMaster(); else alert('Erro'); };
+
+/* ---------------- DETALHE (itens) ---------------- */
+async function abrirDetalhe(masterId) {
+  masterAtual = masterId; editItemId=null;
+  $('#view-lista').hidden = true; $('#view-detalhe').hidden = false;
+  const r = await fetch(apiUrl(`/api/tabela/${tipo}/${masterId}/itens`));
+  const data = await r.json();
+  const nomeTab = data.tabela?.nome || 'Tabela';
+  $('#crumb').innerHTML = `<a href="cadastro.html">Cadastros</a> › <a href="tabela.html?tipo=${tipo}">${SCHEMA.plural}</a> › ${nomeTab}`;
+  $('#titulo').textContent = nomeTab;
+  $('#subtitulo').textContent = `Itens da tabela.`;
+  montarItemForm();
+  pintarItens(data.itens);
+}
+
+function montarItemForm() {
+  $('#item-form').innerHTML = SCHEMA.campos_item.map(c =>
+    `<div class="fld ${c.tipo==='text'?'grow':''}"><label>${c.label}${c.obrigatorio?' *':''}</label>${controle(c,'i')}</div>`).join('')
+    + `<div class="fld"><button class="btn btn-primary" id="i-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="i-btn-txt">Adicionar item</span></button></div>`;
+  lucide.createIcons();
+  $('#i-salvar').onclick = salvarItem;
+}
+
+async function salvarItem() {
+  const body = lerCampos(SCHEMA.campos_item, 'i');
+  const url = editItemId ? apiUrl(`/api/tabela/${tipo}/itens/${editItemId}`) : apiUrl(`/api/tabela/${tipo}/${masterAtual}/itens`);
+  const r = await fetch(url, { method: editItemId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro'); return; }
+  editItemId=null; $('#i-btn-txt').textContent='Adicionar item'; $('#i-form-title').textContent='Adicionar item'; limparCampos(SCHEMA.campos_item,'i'); recarregarItens();
+}
+
+async function recarregarItens() {
+  const r = await fetch(apiUrl(`/api/tabela/${tipo}/${masterAtual}/itens`)); const data = await r.json(); pintarItens(data.itens);
+}
+
+function pintarItens(itens) {
+  const cols = SCHEMA.campos_item;
+  const isNum = c => c.tipo==='number';
+  $('#i-count').textContent = itens.length;
+  $('#i-thead').innerHTML = '<tr>' + cols.map(c=>`<th class="${isNum(c)?'num':''}">${c.label}</th>`).join('') + '<th style="text-align:right;">Ações</th></tr>';
+  if(!itens.length){ $('#i-tbody').innerHTML = `<tr><td colspan="${cols.length+1}"><div class="empty"><i data-lucide="inbox"></i>Nenhum item. Adicione acima.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#i-tbody').innerHTML = itens.map(it => '<tr>' + cols.map((c,idx)=>`<td class="${isNum(c)?'num':(idx===0?'nome':'')}">${celula(c,it[c.nome])}</td>`).join('')
+    + `<td><div class="row-actions">
+        <button class="icon-btn" title="Editar" onclick='editarItem(${JSON.stringify(it)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluirItem(${it.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+
+window.editarItem = function(it){ editItemId=it.id; for(const c of SCHEMA.campos_item){const el=$(`#i-${c.nome}`);if(!el)continue;
+    if(c.tipo==='bool'){el.checked=!!it[c.nome];continue;}
+    const val=it[c.nome]??'';
+    // valor legado que não está mais no cadastro: injeta como opção pra não perder
+    if(c.tipo==='select-cadastro' && val && !Array.from(el.options).some(o=>o.value===val)){ el.insertAdjacentHTML('beforeend',`<option value="${String(val).replace(/"/g,'&quot;')}">${val} (fora do cadastro)</option>`); }
+    el.value=val;
+  } $('#i-btn-txt').textContent='Atualizar item'; $('#i-form-title').textContent='Editar item'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluirItem = async function(id){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/itens/${id}`),{method:'DELETE'}); if(r.ok)recarregarItens(); else alert('Erro'); };
+
+/* util */
+function celula(c, v) {
+  if (c.tipo==='bool') return v?'<span class="badge-ativo sim">Ativo</span>':'<span class="badge-ativo nao">Inativo</span>';
+  if (c.tipo==='select'){ const o=(c.opcoes||[]).find(([val])=>val===v); return `<span class="badge-base">${o?o[1]:(v??'—')}</span>`; }
+  if (c.tipo==='select-cadastro') return (v===''||v==null)?'—':v;
+  if (c.tipo==='number') return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return (v===''||v==null)?'—':v;
+}
+window.abrirDetalhe = abrirDetalhe;
+</script>
+</body>
+</html>

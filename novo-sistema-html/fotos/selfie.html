@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscar com selfie — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body>
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo">
+    <img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas">
+  </a>
+  <div class="ft-nav-actions">
+    <a href="index.html" class="ft-btn ft-btn-ghost"><i data-lucide="arrow-left"></i> Voltar</a>
+  </div>
+</header>
+
+<main class="ft-selfie-wrap">
+  <h1>Tire a sua selfie</h1>
+  <p>Encaixe o rosto na moldura, com boa luz e sem óculos escuros.<br>Vamos procurar você em todos os álbuns.</p>
+
+  <div class="ft-camera">
+    <video id="video" autoplay playsinline muted></video>
+    <img id="foto-capturada" hidden alt="Selfie capturada">
+    <div class="ft-face-guide" id="guia"></div>
+
+    <div class="ft-camera-msg" id="msg-camera">
+      <i data-lucide="camera-off"></i>
+      <span>Não conseguimos acessar sua câmera.<br>Permita o acesso no navegador ou envie uma foto:</span>
+      <label class="ft-btn ft-btn-secondary" style="cursor:pointer;">
+        Enviar uma selfie
+        <input type="file" accept="image/*" capture="user" id="upload" hidden>
+      </label>
+    </div>
+
+    <div class="ft-scanning" id="scanning">
+      <div class="ft-scan-ring"></div>
+      <span>Procurando seu rosto em todos os álbuns…</span>
+    </div>
+  </div>
+
+  <label class="ft-consent">
+    <input type="checkbox" id="consent">
+    <span>Autorizo o uso da minha selfie <strong>apenas para localizar minhas fotos</strong> por reconhecimento facial. A imagem é descartada após a busca e não fica armazenada. <a href="index.html#faq">Saiba mais (LGPD)</a>.</span>
+  </label>
+
+  <div class="ft-selfie-actions">
+    <button class="ft-btn ft-btn-primary ft-btn-lg" id="btn-capturar" disabled>
+      <i data-lucide="camera"></i> Capturar
+    </button>
+    <button class="ft-btn ft-btn-secondary" id="btn-refazer" hidden>
+      <i data-lucide="refresh-ccw"></i> Tirar outra
+    </button>
+    <button class="ft-btn ft-btn-primary ft-btn-lg" id="btn-buscar" hidden>
+      <i data-lucide="scan-face"></i> Buscar minhas fotos
+    </button>
+  </div>
+</main>
+
+<canvas id="canvas" hidden></canvas>
+
+<script src="fotos.js"></script>
+<script>
+lucide.createIcons();
+
+const video    = document.getElementById('video');
+const foto     = document.getElementById('foto-capturada');
+const canvas   = document.getElementById('canvas');
+const guia     = document.getElementById('guia');
+const msgCam   = document.getElementById('msg-camera');
+const scanning = document.getElementById('scanning');
+const consent  = document.getElementById('consent');
+const btnCapturar = document.getElementById('btn-capturar');
+const btnRefazer  = document.getElementById('btn-refazer');
+const btnBuscar   = document.getElementById('btn-buscar');
+
+let stream = null;
+
+async function abrirCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 1280 } }, audio: false
+    });
+    video.srcObject = stream;
+  } catch (e) {
+    msgCam.style.display = 'flex';
+    guia.hidden = true;
+    lucide.createIcons();
+  }
+}
+abrirCamera();
+
+consent.addEventListener('change', () => {
+  btnCapturar.disabled = !consent.checked;
+});
+
+function mostrarCaptura(dataUrl) {
+  sessionStorage.setItem('ventus_selfie', dataUrl);
+  foto.src = dataUrl;
+  foto.hidden = false;
+  video.hidden = true;
+  guia.hidden = true;
+  btnCapturar.hidden = true;
+  btnRefazer.hidden = false;
+  btnBuscar.hidden = false;
+  lucide.createIcons();
+}
+
+btnCapturar.addEventListener('click', () => {
+  canvas.width = video.videoWidth || 720;
+  canvas.height = video.videoHeight || 960;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  mostrarCaptura(canvas.toDataURL('image/jpeg', 0.85));
+});
+
+// Fallback: upload quando a câmera não está disponível
+document.getElementById('upload').addEventListener('change', (ev) => {
+  const arquivo = ev.target.files[0];
+  if (!arquivo) return;
+  const leitor = new FileReader();
+  leitor.onload = () => {
+    msgCam.style.display = 'none';
+    if (!consent.checked) { consent.checked = true; }
+    mostrarCaptura(leitor.result);
+  };
+  leitor.readAsDataURL(arquivo);
+});
+
+btnRefazer.addEventListener('click', () => {
+  foto.hidden = true;
+  video.hidden = false;
+  guia.hidden = false;
+  btnCapturar.hidden = false;
+  btnRefazer.hidden = true;
+  btnBuscar.hidden = true;
+  sessionStorage.removeItem('ventus_selfie');
+  if (!stream) abrirCamera();
+  lucide.createIcons();
+});
+
+btnBuscar.addEventListener('click', async () => {
+  scanning.classList.add('on');
+  scanning.querySelector('span').textContent = 'Procurando seu rosto em todos os álbuns…';
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+
+  try {
+    const resposta = await fetch(apiUrl('/api/buscar'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imagem: sessionStorage.getItem('ventus_selfie') })
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro || 'Falha na busca.');
+
+    sessionStorage.setItem('ventus_resultados', JSON.stringify(dados.resultados));
+    location.href = 'resultados.html';
+  } catch (e) {
+    scanning.querySelector('span').textContent = e.message;
+    setTimeout(() => {
+      scanning.classList.remove('on');
+      btnRefazer.click();   // volta para a câmera para tentar de novo
+    }, 2600);
+  }
+});
+</script>
+
+</body>
+</html>

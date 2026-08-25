@@ -56,6 +56,30 @@
   /* Type */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Superfícies (claro) */
+  --surface:   #ffffff;
+  --surface-2: #F8FAFC;
+  --sidebar-1: #1B316E;
+  --sidebar-2: #101B3D;
+}
+
+/* ===================== TEMA ESCURO ===================== */
+[data-theme="dark"] {
+  --gray-50:  #0B1220;  /* fundo da app */
+  --gray-100: #141E33;
+  --gray-200: #24314B;  /* bordas */
+  --gray-300: #33425F;
+  --gray-400: #5A6B85;
+  --gray-500: #94A3B8;  /* texto secundário */
+  --gray-600: #B6C2D4;
+  --gray-700: #D2DBE8;
+  --gray-800: #E9EEF5;
+  --gray-900: #F5F8FC;  /* texto principal */
+  --surface:   #131D33; /* cards, topbar */
+  --surface-2: #0E1728;
+  --primary-50:  #16233F;
+  --primary-100: #1D2E4F;
 }
 
 /* Tailwind extension via CDN config */

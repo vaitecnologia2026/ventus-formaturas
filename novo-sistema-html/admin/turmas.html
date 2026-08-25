@@ -1,113 +1,331 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Turmas — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turmas — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center;
+    background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+
+  .segmented { display:inline-flex; background:var(--gray-100); border-radius:12px; padding:4px; gap:2px; margin-bottom:22px; }
+  .segmented .tab { border:none; background:transparent; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--gray-500);
+    padding:8px 18px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:.15s; }
+  .segmented .tab.on { background:var(--surface); color:var(--primary-700); box-shadow:var(--shadow-sm); }
+
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 22px; border-bottom:1px solid var(--gray-100); }
+  .panel-head h2 { font-size:15px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:9px; }
+  .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
+  .panel-body { padding:24px 22px; }
+
+  .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 24px; }
+  .fld { display:flex; flex-direction:column; gap:7px; } .fld.full { grid-column:1/-1; }
+  .fld > label { font-size:13px; font-weight:600; color:var(--gray-700); } .fld > label .req { color:#DC2626; margin-left:2px; }
+  .fld input[type=text], .fld input[type=number], .fld select, .fld textarea {
+    width:100%; padding:11px 13px; border:1px solid var(--gray-300); border-radius:11px; background:var(--surface); color:var(--gray-900);
+    font-size:14px; font-family:inherit; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .fld input:focus, .fld select:focus, .fld textarea:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .fld textarea { min-height:80px; resize:vertical; }
+
+  /* multi-seleção de cursos (chips com checkbox) */
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip-check { display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border:1px solid var(--gray-300); border-radius:999px;
+    font-size:13px; font-weight:600; color:var(--gray-600); cursor:pointer; user-select:none; transition:.15s; background:var(--surface); }
+  .chip-check input { accent-color:var(--primary-600); }
+  .chip-check.on { border-color:var(--primary-500); background:var(--primary-50); color:var(--primary-700); }
+  .chips-empty { font-size:13px; color:var(--gray-400); }
+
+  .switch { position:relative; display:inline-block; width:46px; height:27px; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
+  .switch .track::after { content:''; position:absolute; width:21px; height:21px; left:3px; top:3px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+  .switch input:checked + .track { background:var(--success); }
+  .switch input:checked + .track::after { transform:translateX(19px); }
+  .form-actions { display:flex; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--gray-100); }
+
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:14px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+  table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.nome { font-weight:600; color:var(--gray-900); }
+  .badge-ativo { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .badge-ativo.sim { background:#DCFCE7; color:#166534; } .badge-ativo.nao { background:var(--gray-200); color:var(--gray-600); }
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); }
+  .icon-btn.danger:hover { border-color:#FCA5A5; color:#DC2626; background:#FEF2F2; }
+  .empty { text-align:center; color:var(--gray-500); padding:52px 20px; } .empty svg { width:34px; height:34px; color:var(--gray-300); margin:0 auto 10px; display:block; }
+  @media (max-width:640px){ .form-grid{grid-template-columns:1fr;} .panel-body{padding:18px 16px;} }
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
-  <div class="sidebar-section">Geral</div>
-  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link active"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-  <div class="sidebar-section">Produção</div>
-  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias e Fotos</a>
-  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
-  <div class="sidebar-section">Sistema</div>
-  <a href="usuarios.html" class="sidebar-link"><i data-lucide="shield-check"></i>Usuários</a>
-  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
-  <a href="relatorios.html" class="sidebar-link"><i data-lucide="file-text"></i>Relatórios</a>
-  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div><div style="font-size:11px;opacity:.6;">Admin</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
-</aside>
-
+<aside id="admin-sidebar" class="sidebar"></aside>
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar turma…"></div>
-    <div class="flex gap-3 items-center">
-      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
-      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Nova turma</button>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3">
+      <a href="cadastro.html" class="btn btn-secondary btn-sm"><i data-lucide="database" class="w-4 h-4"></i> Cadastros</a>
     </div>
   </header>
-
   <main class="app-content">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <div style="font-size:13px;color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Turmas</div>
-        <h1 class="text-2xl font-bold mt-1" style="color:var(--gray-900);">Turmas</h1>
-      </div>
-      <div class="flex gap-2">
-        <span class="badge badge-info">123 cadastradas</span>
-        <span class="badge badge-success">38 ativas</span>
-        <span class="badge">85 arquivadas</span>
-      </div>
+    <div class="page-head">
+      <div class="chip"><i data-lucide="users-round"></i></div>
+      <div><h1>Turmas</h1><p>Cadastre as turmas de formatura, com instituição, cursos e vendedor.</p></div>
     </div>
 
-    <!-- Filtros -->
-    <div class="card mb-4">
-      <div class="card-body" style="padding:16px;">
-        <div class="grid grid-cols-4 gap-3">
-          <div><label class="label">Faculdade</label><select class="select"><option>Todas</option><option>UNIMONTES</option><option>FUNORTE</option><option>IFNMG</option><option>FIPMOC</option><option>GRAU</option></select></div>
-          <div><label class="label">Curso</label><select class="select"><option>Todos</option><option>MEDICINA</option><option>DIREITO</option><option>ENFERMAGEM</option><option>PSICOLOGIA</option></select></div>
-          <div><label class="label">Status</label><select class="select"><option>Todos</option><option selected>Ativa</option><option>Arquivada</option></select></div>
-          <div><label class="label">Vendedor</label><select class="select"><option>Todos</option><option>RAFAEL CARVALHO</option><option>ANA CLARA CELESTINO</option><option>GEOVANNA ANDRADE</option></select></div>
+    <div class="segmented">
+      <button class="tab on" data-tab="cadastrar"><i data-lucide="pencil" style="width:15px;height:15px;"></i> Nova turma</button>
+      <button class="tab" data-tab="consultar"><i data-lucide="list" style="width:15px;height:15px;"></i> Turmas cadastradas</button>
+    </div>
+
+    <div id="pane-cadastrar">
+      <div class="panel">
+        <div class="panel-head"><h2 id="form-title"><i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Nova turma</h2></div>
+        <div class="panel-body">
+          <form id="form">
+            <div class="form-grid">
+              <div class="fld full"><label>Nome da Turma <span class="req">*</span></label><div><input type="text" id="f-nome" placeholder="Ex.: Medicina T85 — UNIMONTES 2026"></div></div>
+              <div class="fld"><label>Instituição</label><div><select id="f-instituicao_id"></select></div></div>
+              <div class="fld"><label>Vendedor</label><div><select id="f-vendedor_id"></select></div></div>
+              <div class="fld"><label>Responsável</label><div><input type="text" id="f-responsavel" placeholder="Nome do representante"></div></div>
+              <div class="fld"><label>WhatsApp/SMS</label><div><input type="text" id="f-whatsapp" placeholder="(38) 99999-0000"></div></div>
+              <div class="fld"><label>E-mail (responsável)</label><div><input type="text" id="f-email" placeholder="responsavel@email.com"></div></div>
+              <div class="fld"><label>Situação</label><div><input type="text" id="f-situacao" placeholder="Ex.: Em contrato / Ativa"></div></div>
+              <div class="fld"><label>Ano</label><div><input type="number" id="f-ano" min="2000" max="2100" placeholder="2026"></div></div>
+              <div class="fld"><label>Período (semestre)</label><div><select id="f-semestre">
+                <option value="">— semestre —</option>
+                <option value="01">1º semestre (01)</option>
+                <option value="02">2º semestre (02)</option>
+              </select></div></div>
+              <div class="fld"><label>Turno</label><div><select id="f-turno"></select></div></div>
+              <div class="fld"><label>Previsão de formatura</label><div><input type="date" id="f-previsao_formatura"></div></div>
+              <div class="fld"><label>Data de assinatura</label><div><input type="date" id="f-data_assinatura"></div></div>
+              <div class="fld"><label>Nr. Contrato</label><div><input type="text" id="f-nr_contrato" placeholder="0000/AAAA"></div></div>
+              <div class="fld"><label>Valor previsto (R$)</label><div><input type="number" step="0.01" id="f-valor_previsto" placeholder="0,00"></div></div>
+              <div class="fld"><label>Nr. Parcelas</label><div><input type="number" id="f-nr_parcelas"></div></div>
+              <div class="fld"><label>Tabela de Produto</label><div><select id="f-tabela_produto_id"></select></div></div>
+              <div class="fld"><label>Tabela de Serviço</label><div><select id="f-tabela_servico_id"></select></div></div>
+              <div class="fld"><label>Cor da beca</label><div><input type="text" id="f-cor_beca"></div></div>
+              <div class="fld"><label>Beca para padrinhos</label><div><input type="text" id="f-beca_padrinhos"></div></div>
+              <div class="fld"><label>Solicitar medidas</label><div><label class="switch"><input type="checkbox" id="f-solicitar_medidas"><span class="track"></span></label></div></div>
+              <div class="fld full"><label>Anexo do contrato (link PDF/ZIP/RAR)</label><div><input type="text" id="f-anexo_contrato" placeholder="https://…"></div></div>
+              <div class="fld full"><label>Cursos vinculados</label><div class="chips" id="f-cursos"></div></div>
+              <div class="fld"><label>Contrato de cerimonial vinculado</label><div><label class="switch"><input type="checkbox" id="f-cerimonial_vinculado" onchange="toggleCerim()"><span class="track"></span></label></div></div>
+              <div class="fld full" id="cerim-bloco" style="display:none;">
+                <div style="border:1px dashed var(--gray-300);border-radius:12px;padding:16px;background:var(--gray-50);">
+                  <div style="font-weight:700;font-size:13px;color:var(--gray-700);margin-bottom:12px;">Dados do cerimonial vinculado</div>
+                  <div class="form-grid">
+                    <div class="fld"><label>Tabela de Cerimonial</label><div><select id="f-tabela_cerimonial_id"></select></div></div>
+                    <div class="fld"><label>Nr. Contrato cerimonial</label><div><input type="text" id="f-nr_contrato_cerimonial"></div></div>
+                    <div class="fld"><label>Previsão início pagamento</label><div><input type="date" id="f-previsao_inicio_pagamento"></div></div>
+                    <div class="fld"><label>Previsão fim pagamento</label><div><input type="date" id="f-previsao_fim_pagamento"></div></div>
+                    <div class="fld"><label>Meses</label><div><input type="number" id="f-meses"></div></div>
+                    <div class="fld"><label>Qt. Alunos</label><div><input type="number" id="f-qt_alunos"></div></div>
+                    <div class="fld"><label>Valor assessoria (R$)</label><div><input type="number" step="0.01" id="f-valor_acessoria" placeholder="0,00"></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="fld full"><label>Observações</label><div><textarea id="f-observacoes" placeholder="Anotações da turma…"></textarea></div></div>
+              <div class="fld"><label>Ativo</label><div><label class="switch"><input type="checkbox" id="f-ativo" checked><span class="track"></span></label></div></div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i> <span id="btn-txt">Salvar turma</span></button>
+              <button type="button" class="btn btn-secondary" id="btn-limpar">Limpar</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
 
-    <!-- Tabela -->
-    <div class="card">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Turma</th>
-            <th>Faculdade</th>
-            <th>Curso</th>
-            <th class="num">Alunos</th>
-            <th class="num">Vl. Contrato</th>
-            <th>Previsão</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">UNIFICADA - IPATINGA</a><div style="font-size:12px;color:var(--gray-500);">Resp. Beatriz Lima · Vd. Tiago Moreira</div></td><td>IPATINGA</td><td>Várias</td><td class="num">100</td><td class="num">R$ 94.200,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td class="text-right"><a href="turma-detalhe.html" class="btn btn-ghost btn-icon"><i data-lucide="chevron-right" class="w-4 h-4"></i></a></td></tr>
-          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">ENGENHARIA FLORESTAL - UFMG</a><div style="font-size:12px;color:var(--gray-500);">Resp. Carolina Reis · Vd. Marcos Vieira</div></td><td>UFMG</td><td>Eng. Florestal</td><td class="num">72</td><td class="num">R$ 81.500,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><a href="turma-detalhe.html" style="font-weight:600;color:var(--primary-700);text-decoration:none;">MEDICINA T84 - UNIMONTES</a><div style="font-size:12px;color:var(--gray-500);">Sem responsável atribuído · Vd. Tiago Moreira</div></td><td>UNIMONTES</td><td>Medicina</td><td class="num">23</td><td class="num">R$ 76.300,00</td><td>Jul/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">MEDICINA - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Daniela Souza · Vd. Tiago Moreira</div></td><td>UNIMONTES</td><td>Medicina</td><td class="num">25</td><td class="num">R$ 68.900,00</td><td>Set/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">LETRAS-INGLÊS/.../ENFERMAGEM - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Fernanda Alves · Vd. Marcos Vieira · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>UNIMONTES</td><td>5 cursos</td><td class="num">73</td><td class="num">R$ 65.400,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">ODONTOLOGIA - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Gabriela Nunes · Vd. Ana Clara</div></td><td>FUNORTE</td><td>Odontologia</td><td class="num">39</td><td class="num">R$ 67.016,00</td><td>Ago/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">MEDICINA T85 - UNIMONTES</strong></td><td>UNIMONTES</td><td>Medicina</td><td class="num">20</td><td class="num">R$ 61.252,99</td><td>Jul/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">ODONTOLOGIA - FASI</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Mariana Rocha · Vd. Camila Prado</div></td><td>FASI</td><td>Odontologia</td><td class="num">32</td><td class="num">R$ 57.197,58</td><td>Nov/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">UNIFICADA - IFNMG</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Larissa Dias · Vd. Tiago Moreira · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>IFNMG</td><td>Várias</td><td class="num">110</td><td class="num">R$ 46.625,00</td><td>Dez/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">NUTRIÇÃO/BIOMEDICINA - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Helena Costa · Vd. Ana Clara · <span class="badge" style="font-size:10px;">UNIFICADA</span></div></td><td>FUNORTE</td><td>2 cursos</td><td class="num">27</td><td class="num">R$ 45.630,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">DIREITO - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Igor Martins · Vd. Marcos Vieira</div></td><td>UNIMONTES</td><td>Direito</td><td class="num">31</td><td class="num">R$ 42.371,00</td><td>Jan/2027</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">PUBLICIDADE - UNIFIPMOC</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Rodrigo Teixeira · Vd. Camila Prado</div></td><td>FIPMOC</td><td>Publicidade</td><td class="num">20</td><td class="num">R$ 39.040,00</td><td>Set/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-          <tr><td><strong style="color:var(--primary-700);">DIREITO - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp. Renata Campos · Vd. Marcos Vieira</div></td><td>FUNORTE</td><td>Direito</td><td class="num">24</td><td class="num">R$ 38.023,00</td><td>Out/2026</td><td><span class="badge badge-success">Ativa</span></td><td></td></tr>
-        </tbody>
-      </table>
-      <div style="padding:16px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--gray-600);">
-        <span>Mostrando 13 de 38 turmas ativas</span>
-        <div class="flex gap-2">
-          <button class="btn btn-ghost btn-sm" disabled style="opacity:.5;"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-          <button class="btn btn-ghost btn-sm">1</button>
-          <button class="btn btn-secondary btn-sm">2</button>
-          <button class="btn btn-ghost btn-sm">3</button>
-          <button class="btn btn-ghost btn-sm"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-        </div>
+    <div id="pane-consultar" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2>Turmas cadastradas</h2><span class="count" id="list-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl"><thead>
+          <tr><th>Turma</th><th>Instituição</th><th>Período</th><th>Ano</th><th>Cursos</th><th>Vendedor</th><th>Status</th><th style="text-align:right;">Ações</th></tr>
+        </thead><tbody id="tbody"></tbody></table></div>
       </div>
     </div>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+let OPCOES = { instituicoes:[], vendedores:[], cursos:[] }, editId = null;
+
+init();
+async function init() {
+  const r = await fetch(apiUrl('/api/turma-formatura/opcoes'));
+  OPCOES = await r.json();
+  const optHtml = (arr) => `<option value="">—</option>` + arr.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('');
+  $('#f-instituicao_id').innerHTML = optHtml(OPCOES.instituicoes);
+  $('#f-vendedor_id').innerHTML = optHtml(OPCOES.vendedores);
+  $('#f-tabela_produto_id').innerHTML = optHtml(OPCOES.tabelas_produto||[]);
+  $('#f-tabela_servico_id').innerHTML = optHtml(OPCOES.tabelas_produto||[]);
+  $('#f-tabela_cerimonial_id').innerHTML = optHtml(OPCOES.tabelas_cerimonial||[]);
+  $('#f-turno').innerHTML = `<option value="">—</option>` + (OPCOES.turnos||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  montarCursos([]);
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => trocarAba(t.dataset.tab));
+  $('#form').onsubmit = salvar;
+  $('#btn-limpar').onclick = limpar;
+  carregar();
+}
+
+function montarCursos(sel) {
+  if (!OPCOES.cursos.length) { $('#f-cursos').innerHTML = '<span class="chips-empty">Nenhum curso cadastrado. Crie em Cadastros › Cursos.</span>'; return; }
+  $('#f-cursos').innerHTML = OPCOES.cursos.map(c => {
+    const on = sel.includes(c.id) ? 'on' : '';
+    return `<label class="chip-check ${on}"><input type="checkbox" value="${c.id}" ${sel.includes(c.id)?'checked':''}> ${c.nome}</label>`;
+  }).join('');
+  $('#f-cursos').querySelectorAll('input').forEach(i => i.onchange = () => i.closest('.chip-check').classList.toggle('on', i.checked));
+}
+function cursosSelecionados() { return [...$('#f-cursos').querySelectorAll('input:checked')].map(i => +i.value); }
+
+function trocarAba(aba) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === aba));
+  $('#pane-cadastrar').hidden = aba !== 'cadastrar';
+  $('#pane-consultar').hidden = aba !== 'consultar';
+  if (aba === 'consultar') carregar();
+}
+
+function montarPeriodo(){
+  const ano = $('#f-ano').value.trim(); const sem = $('#f-semestre').value;
+  if(!sem) return ano || '';
+  return (ano ? ano + '/' : '') + sem;   // ex.: "2026/01"
+}
+const V = id => $('#f-'+id).value;
+const CK = id => $('#f-'+id).checked;
+window.toggleCerim = () => { $('#cerim-bloco').style.display = $('#f-cerimonial_vinculado').checked ? '' : 'none'; };
+function lerForm() {
+  return {
+    nome: V('nome'), instituicao_id: V('instituicao_id') || null,
+    vendedor_id: V('vendedor_id') || null, periodo: montarPeriodo(),
+    responsavel: V('responsavel')||null, whatsapp: V('whatsapp')||null, email: V('email')||null, situacao: V('situacao')||null,
+    ano: V('ano'), observacoes: V('observacoes'),
+    ativo: CK('ativo'), curso_ids: cursosSelecionados(),
+    turno: V('turno')||null, previsao_formatura: V('previsao_formatura')||null,
+    data_assinatura: V('data_assinatura')||null, nr_contrato: V('nr_contrato')||null,
+    valor_previsto: V('valor_previsto')||0, nr_parcelas: V('nr_parcelas')||null,
+    tabela_produto_id: V('tabela_produto_id')||null, tabela_servico_id: V('tabela_servico_id')||null,
+    cor_beca: V('cor_beca')||null, beca_padrinhos: V('beca_padrinhos')||null,
+    solicitar_medidas: CK('solicitar_medidas'), anexo_contrato: V('anexo_contrato')||null,
+    cerimonial_vinculado: CK('cerimonial_vinculado'), tabela_cerimonial_id: V('tabela_cerimonial_id')||null,
+    nr_contrato_cerimonial: V('nr_contrato_cerimonial')||null,
+    previsao_inicio_pagamento: V('previsao_inicio_pagamento')||null, previsao_fim_pagamento: V('previsao_fim_pagamento')||null,
+    meses: V('meses')||null, qt_alunos: V('qt_alunos')||null, valor_acessoria: V('valor_acessoria')||0,
+  };
+}
+function limpar() {
+  editId = null;
+  ['nome','ano','observacoes','responsavel','whatsapp','email','situacao','previsao_formatura','data_assinatura','nr_contrato','valor_previsto','nr_parcelas',
+   'cor_beca','beca_padrinhos','anexo_contrato','nr_contrato_cerimonial','previsao_inicio_pagamento',
+   'previsao_fim_pagamento','meses','qt_alunos','valor_acessoria'].forEach(k => $('#f-'+k).value = '');
+  ['semestre','turno','tabela_produto_id','tabela_servico_id','tabela_cerimonial_id'].forEach(k=>$('#f-'+k).value='');
+  $('#f-solicitar_medidas').checked = false; $('#f-cerimonial_vinculado').checked = false; toggleCerim();
+  $('#f-instituicao_id').value = ''; $('#f-vendedor_id').value = ''; $('#f-ativo').checked = true;
+  montarCursos([]); $('#btn-txt').textContent = 'Salvar turma';
+  $('#form-title').innerHTML = '<i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Nova turma'; lucide.createIcons();
+}
+
+async function salvar(e) {
+  e.preventDefault();
+  const body = lerForm();
+  if (!body.nome.trim()) { alert('Informe o nome da turma.'); return; }
+  const url = editId ? apiUrl('/api/turma-formatura/'+editId) : apiUrl('/api/turma-formatura');
+  const r = await fetch(url, { method: editId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro ao salvar.'); return; }
+  toast('Turma salva com sucesso.'); limpar(); trocarAba('consultar');
+}
+
+async function carregar() {
+  const r = await fetch(apiUrl('/api/turma-formatura')); const { itens } = await r.json();
+  $('#list-count').textContent = itens.length;
+  if (!itens.length) { $('#tbody').innerHTML = `<tr><td colspan="8"><div class="empty"><i data-lucide="inbox"></i>Nenhuma turma ainda. Use a aba <b>Nova turma</b>.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#tbody').innerHTML = itens.map(t => `<tr>
+    <td class="nome">${t.nome}</td>
+    <td>${t.instituicao || '—'}</td>
+    <td>${t.periodo || '—'}</td>
+    <td>${t.ano || '—'}</td>
+    <td>${t.qtd_cursos} curso(s)</td>
+    <td>${t.vendedor || '—'}</td>
+    <td>${t.ativo ? '<span class="badge-ativo sim">Ativa</span>' : '<span class="badge-ativo nao">Inativa</span>'}</td>
+    <td><div class="row-actions">
+      <a class="icon-btn" title="Abrir turma" href="turma-detalhe.html?id=${t.id}"><i data-lucide="folder-open" style="width:15px;height:15px;"></i></a>
+      <button class="icon-btn" title="Editar" onclick="editar(${t.id})"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+      <button class="icon-btn danger" title="Excluir" onclick="excluir(${t.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+    </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+
+window.editar = async function(id) {
+  const r = await fetch(apiUrl('/api/turma-formatura/'+id)); const t = await r.json();
+  editId = id;
+  $('#f-nome').value = t.nome || ''; $('#f-instituicao_id').value = t.instituicao_id || '';
+  $('#f-vendedor_id').value = t.vendedor_id || '';
+  const msem = (t.periodo || '').match(/(0?[12])\s*$/);   // extrai 1 ou 2 do fim do período
+  $('#f-semestre').value = msem ? ('0' + msem[1]).slice(-2) : '';
+  $('#f-ano').value = t.ano || ''; $('#f-observacoes').value = t.observacoes || ''; $('#f-ativo').checked = !!t.ativo;
+  const S = (id,v) => $('#f-'+id).value = (v ?? '') === null ? '' : (v ?? '');
+  ['responsavel','whatsapp','email','situacao','turno','previsao_formatura','data_assinatura','nr_contrato','valor_previsto','nr_parcelas','tabela_produto_id',
+   'tabela_servico_id','cor_beca','beca_padrinhos','anexo_contrato','tabela_cerimonial_id','nr_contrato_cerimonial',
+   'previsao_inicio_pagamento','previsao_fim_pagamento','meses','qt_alunos','valor_acessoria'].forEach(k=>S(k, t[k]));
+  $('#f-solicitar_medidas').checked = !!t.solicitar_medidas;
+  $('#f-cerimonial_vinculado').checked = !!t.cerimonial_vinculado; toggleCerim();
+  montarCursos(t.curso_ids || []);
+  $('#btn-txt').textContent = 'Atualizar turma';
+  $('#form-title').innerHTML = '<i data-lucide="pencil" style="width:17px;height:17px;color:var(--primary-600);"></i> Editar turma';
+  trocarAba('cadastrar'); lucide.createIcons(); window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.excluir = async function(id) {
+  if (!confirm('Excluir esta turma?')) return;
+  const r = await fetch(apiUrl('/api/turma-formatura/'+id), { method:'DELETE' });
+  if (r.ok) { toast('Turma excluída.'); carregar(); } else alert('Erro ao excluir.');
+};
+
+function toast(msg) {
+  let t = document.getElementById('vt-toast');
+  if (!t) { t = document.createElement('div'); t.id='vt-toast'; t.style.cssText='position:fixed;bottom:22px;left:22px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity='1'; clearTimeout(t._h); t._h = setTimeout(()=>t.style.opacity='0', 2200);
+}
+</script>
 </body>
 </html>

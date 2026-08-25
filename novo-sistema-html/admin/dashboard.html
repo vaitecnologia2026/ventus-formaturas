@@ -1,302 +1,250 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel — Ventus Formaturas</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:20px; }
+  .kpi { background:var(--surface); border:1px solid var(--gray-200); border-radius:16px; padding:18px 20px; box-shadow:var(--shadow-sm); }
+  .kpi .top { display:flex; align-items:center; justify-content:space-between; }
+  .kpi .ic { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:var(--primary-50); color:var(--primary-700); }
+  .kpi .l { font-size:12.5px; color:var(--gray-500); font-weight:600; margin-top:12px; }
+  .kpi .v { font-size:26px; font-weight:800; letter-spacing:-.02em; color:var(--gray-900); margin-top:2px; }
+  .kpi .s { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .kpi.verde .ic{background:#DCFCE7;color:#16A34A;} .kpi.verde .v{color:#16A34A;}
+  .kpi.laranja .ic{background:#FEF3C7;color:#D97706;} .kpi.laranja .v{color:#D97706;}
+  .cols { display:grid; grid-template-columns:1.6fr 1fr; gap:18px; align-items:start; }
+  .col { display:flex; flex-direction:column; gap:18px; min-width:0; }
+  @media (max-width:900px){ .cols{grid-template-columns:1fr;} }
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:16px; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .panel-head { padding:15px 20px; border-bottom:1px solid var(--gray-100); font-size:14.5px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; gap:9px; }
+  .panel-body { padding:20px; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:12px 20px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:13px 20px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+  table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.num, table.tbl th.num { text-align:right; font-variant-numeric:tabular-nums; } table.tbl td.nome{font-weight:600;color:var(--gray-900);}
+  .prog { height:7px; background:var(--gray-100); border-radius:999px; overflow:hidden; min-width:70px; }
+  .prog > div { height:100%; background:linear-gradient(90deg,var(--primary-500),var(--success)); border-radius:999px; }
+  .evt { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--gray-100); }
+  .evt:last-child{border-bottom:none;} .evt .d{width:46px;height:46px;border-radius:12px;background:var(--primary-50);color:var(--primary-700);display:grid;place-items:center;flex:none;text-align:center;line-height:1;}
+  .evt .d b{font-size:16px;font-weight:800;display:block;} .evt .d span{font-size:10px;text-transform:uppercase;}
+  .evt .info strong{font-size:14px;color:var(--gray-900);display:block;} .evt .info span{font-size:12.5px;color:var(--gray-500);}
+  .pop { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--gray-100); font-size:14px;} .pop:last-child{border-bottom:none;}
+  .pop .n{font-weight:600;color:var(--gray-900);} .pop .b{font-size:12px;font-weight:700;color:var(--primary-700);background:var(--primary-50);padding:3px 10px;border-radius:999px;}
+  .empty{text-align:center;color:var(--gray-400);padding:26px 0;font-size:13px;}
+  /* Financeiro — barra clara em vez de rosca */
+  .fin-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .fin-l{font-size:12.5px;color:var(--gray-500);font-weight:600;}
+  .fin-big{font-size:28px;font-weight:800;letter-spacing:-.02em;color:#16A34A;}
+  .fin-pct{font-size:14px;font-weight:800;color:var(--primary-700);background:var(--primary-50);padding:5px 12px;border-radius:999px;flex:none;}
+  .fin-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--gray-100);margin-bottom:16px;}
+  .fin-seg{height:100%;transition:width .4s;} .fin-seg.verde{background:#16A34A;} .fin-seg.laranja{background:#F59E0B;}
+  .fin-rows{display:flex;flex-direction:column;}
+  .fin-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;font-size:14px;border-bottom:1px solid var(--gray-100);}
+  .fin-row span{color:var(--gray-600);display:flex;align-items:center;gap:8px;} .fin-row b{color:var(--gray-900);}
+  .fin-row.tot{margin-top:4px;padding-top:12px;border-top:1px solid var(--gray-200);border-bottom:none;} .fin-row.tot b{font-size:16px;}
+  .fdot{width:10px;height:10px;border-radius:3px;display:inline-block;} .fdot.verde{background:#16A34A;} .fdot.laranja{background:#F59E0B;}
+  /* Responsivo */
+  @media (max-width:900px){ .grid2{grid-template-columns:1fr;} }
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;} .page-head .chip{width:44px;height:44px;border-radius:13px;} .page-head .chip svg{width:22px;height:22px;} .page-head h1{font-size:20px;}
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+    .kpi{padding:14px 16px;} .kpi .v{font-size:22px;}
+    .fin-big{font-size:24px;}
+    .panel-head{padding:14px 16px;} .panel-body{padding:16px;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+  }
+  /* Barra de filtros compacta (campos modestos, botões agrupados à direita e iguais) */
+  .filtros{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; padding:16px 20px; }
+  .filtros .f{ display:flex; flex-direction:column; gap:6px; }
+  .filtros .f label{ font-size:12px; font-weight:600; color:var(--gray-600); }
+  .filtros .f input, .filtros .f select{ padding:9px 11px; border:1px solid var(--gray-300); border-radius:9px; font-size:13.5px; font-family:inherit; background:var(--surface); color:var(--gray-900); outline:none; transition:.15s; }
+  .filtros .f input:focus, .filtros .f select:focus{ border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .filtros .f input[type=date]{ width:158px; }
+  .filtros .f select{ min-width:158px; }
+  .filtros .acoes{ display:flex; gap:8px; margin-left:auto; }
+  .filtros .acoes .btn{ min-width:112px; justify-content:center; }
+  @media (max-width:640px){
+    .filtros .f{ flex:1 1 45%; } .filtros .f input, .filtros .f select{ width:100%; min-width:0; }
+    .filtros .acoes{ margin-left:0; width:100%; } .filtros .acoes .btn{ flex:1; }
+  }
+</style>
 </head>
 <body>
-
-<!-- Sidebar -->
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-brand-mark">V</div>
-    <div>
-      <div>Ventus</div>
-      <div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div>
-    </div>
-  </div>
-
-  <div class="sidebar-section">Geral</div>
-  <a href="dashboard.html" class="sidebar-link active"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-
-  <div class="sidebar-section">Produção</div>
-  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias e Fotos</a>
-  <a href="checkin-ao-vivo.html" class="sidebar-link"><i data-lucide="qr-code"></i>Check-in ao vivo</a>
-  <a href="#" class="sidebar-link"><i data-lucide="megaphone"></i>Campanhas</a>
-
-  <div class="sidebar-section">Cadastros</div>
-  <a href="#" class="sidebar-link"><i data-lucide="building-2"></i>Faculdades · Cursos</a>
-  <a href="#" class="sidebar-link"><i data-lucide="package"></i>Produtos · Brindes</a>
-  <a href="#" class="sidebar-link"><i data-lucide="briefcase"></i>Vendedores</a>
-  <a href="#" class="sidebar-link"><i data-lucide="contact"></i>Responsáveis</a>
-
-  <div class="sidebar-section">Sistema</div>
-  <a href="usuarios.html" class="sidebar-link"><i data-lucide="shield-check"></i>Usuários</a>
-  <a href="configuracoes.html" class="sidebar-link"><i data-lucide="settings"></i>Configurações</a>
-  <a href="relatorios.html" class="sidebar-link"><i data-lucide="file-text"></i>Relatórios</a>
-
-  <div class="sidebar-footer">
-    <div class="avatar">EP</div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:13px;font-weight:600;">Elison Perini</div>
-      <div style="font-size:11px;opacity:.6;">Admin · Ventus</div>
-    </div>
-    <a href="login.html" style="color:rgba(255,255,255,.6);"><i data-lucide="log-out" class="w-4 h-4"></i></a>
-  </div>
-</aside>
-
-<!-- Main shell -->
+<aside id="admin-sidebar" class="sidebar"></aside>
 <div class="app-shell">
   <header class="topbar">
-    <div class="topbar-search">
-      <i data-lucide="search" class="w-4 h-4"></i>
-      <input type="text" placeholder="Buscar turma, aluno, OS, contrato…  (Cmd+K)">
-    </div>
-    <div class="flex items-center gap-3">
-      <button class="btn btn-secondary btn-sm"><i data-lucide="bell" class="w-4 h-4"></i> 3</button>
-      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Nova turma</button>
-    </div>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar turma, aluno, OS, contrato…"></div>
   </header>
-
   <main class="app-content">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Painel · Visão Geral</h1>
-        <p class="text-sm" style="color:var(--gray-500);">Atualizado agora · período: este mês</p>
-      </div>
-      <div class="flex gap-2">
-        <select class="select" style="width:200px;"><option>Todas as faculdades</option><option>UNIMONTES</option><option>FUNORTE</option></select>
-        <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
-      </div>
+    <div class="page-head">
+      <div class="chip"><i data-lucide="layout-dashboard"></i></div>
+      <div><h1>Painel</h1><p>Resumo geral das turmas, formandos e financeiro.</p></div>
     </div>
 
-    <!-- KPI Cards (mantendo os 4 do legado) -->
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="users-round" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Turmas Cadastradas</div>
-        <div class="kpi-value">123</div>
-        <div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +5 este mês</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="calendar-days" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Eventos Registrados</div>
-        <div class="kpi-value">726</div>
-        <div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> 39 agendados</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="gift" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Brindes</div>
-        <div class="kpi-value">13.459</div>
-        <div class="kpi-trend"><span style="color:var(--warning);">12 pendentes</span></div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Ordens de Serviço</div>
-        <div class="kpi-value">990</div>
-        <div class="kpi-trend down"><span>14 fora do prazo</span></div>
-      </div>
-    </div>
-
-    <!-- Banner de alertas -->
-    <div class="card mb-4" style="border-left:4px solid var(--warning);background:#FFFBEB;">
-      <div class="card-body" style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;">
-        <div class="flex items-center gap-3">
-          <i data-lucide="alert-triangle" class="w-5 h-5" style="color:var(--warning);"></i>
-          <div>
-            <strong style="color:#92400E;">3 alertas importantes</strong>
-            <span style="font-size:13px;color:var(--gray-600);margin-left:8px;">14 OS fora do prazo · 3 cobranças >15d atrasadas · 2 galerias aguardando seleção</span>
-          </div>
-        </div>
-        <button class="btn btn-secondary btn-sm">Ver todos</button>
-      </div>
-    </div>
-
-    <!-- Linha vendas e fotos (NOVO) -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#FCE7F3;color:#9D174D;"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Vendas adicionais (mês)</div>
-        <div class="kpi-value">R$ 28K</div>
-        <div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +43% vs mês ant.</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="image-plus" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Fotos extras vendidas</div>
-        <div class="kpi-value">412</div>
-        <div class="kpi-trend"><span style="color:var(--gray-500);">média 12,4 fotos/aluno · R$ 14K</span></div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="trophy" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Top produto adicional</div>
-        <div class="kpi-value" style="font-size:18px;line-height:1.3;">Álbum<br><span style="font-size:14px;color:var(--gray-500);font-weight:500;">"Memórias" 30x30cm</span></div>
-        <div class="kpi-trend"><span style="color:var(--gray-500);">142 unidades · R$ 8,5K</span></div>
-      </div>
-    </div>
-
-    <!-- Linha financeira -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#EFF6FF;color:#1D4ED8;"><i data-lucide="receipt" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Volume contratado</div>
-        <div class="kpi-value">R$ 2,4M</div>
-        <div class="kpi-trend"><span style="color:var(--gray-500);">1.924 alunos · ticket R$ 850,00</span></div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Taxa de pagamento em dia</div>
-        <div class="kpi-value">87%</div>
-        <div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +4pp vs mês anterior</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
-        <div class="kpi-label">Inadimplência</div>
-        <div class="kpi-value">R$ 87K</div>
-        <div class="kpi-trend"><span style="color:var(--gray-500);">23 alunos · 1,8% a vencer</span></div>
-      </div>
-    </div>
-
-    <!-- Gráfico de alunos por faculdade + Top contratos -->
-    <div class="grid grid-cols-3 gap-4 mb-6" style="grid-template-columns: 2fr 3fr;">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Alunos por faculdade</div><span class="badge">1.924 total</span></div>
-        <div class="card-body" style="padding-top:8px;">
-          <canvas id="chartFaculdades" height="280"></canvas>
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="filtros">
+        <div class="f"><label>Previsão formatura (de)</label><input type="date" id="fil-di"></div>
+        <div class="f"><label>Previsão formatura (até)</label><input type="date" id="fil-df"></div>
+        <div class="f"><label>Situação da turma</label><select id="fil-sit"><option value="">Todas</option><option value="ativa">Ativa</option><option value="inativa">Inativa</option></select></div>
+        <div class="f"><label>Situação eventos</label><select id="fil-sev"><option value="">Todas</option><option value="previsto">Previsto</option><option value="confirmado">Confirmado</option><option value="realizado">Realizado</option><option value="cancelado">Cancelado</option></select></div>
+        <div class="f"><label>Possui cerimonial</label><select id="fil-cer"><option value="">Todas</option><option value="1">Sim</option><option value="0">Não</option></select></div>
+        <div class="f"><label>Vendedor</label><select id="fil-vend"><option value="">Todos</option></select></div>
+        <div class="f"><label>Assinatura (de)</label><input type="date" id="fil-ai"></div>
+        <div class="f"><label>Assinatura (até)</label><input type="date" id="fil-af"></div>
+        <div class="acoes">
+          <button class="btn btn-primary" onclick="carregar()"><i data-lucide="filter" class="w-4 h-4"></i> Filtrar</button>
+          <button class="btn btn-secondary" onclick="limparFiltros()">Limpar</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Top contratos por valor</div>
-          <a href="financeiro.html" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver tudo →</a>
-        </div>
-        <table class="table">
-          <thead><tr><th>Contrato</th><th class="num">Alunos</th><th class="num">Vl. Contrato</th><th class="num">Ticket Aluno</th></tr></thead>
-          <tbody>
-            <tr><td><strong>UNIFICADA - IPATINGA</strong><div style="font-size:12px;color:var(--gray-500);">Resp.: Beatriz Lima</div></td><td class="num">100</td><td class="num">R$ 94.200,00</td><td class="num">R$ 886,77</td></tr>
-            <tr><td><strong>ENGENHARIA FLORESTAL - UFMG</strong><div style="font-size:12px;color:var(--gray-500);">Resp.: Carolina Reis</div></td><td class="num">72</td><td class="num">R$ 81.500,00</td><td class="num">R$ 1.102,78</td></tr>
-            <tr><td><strong>MEDICINA T84 - UNIMONTES</strong></td><td class="num">23</td><td class="num">R$ 76.300,00</td><td class="num">R$ 3.396,09</td></tr>
-            <tr><td><strong>MEDICINA - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp.: Daniela Souza</div></td><td class="num">25</td><td class="num">R$ 68.900,00</td><td class="num">R$ 2.899,48</td></tr>
-            <tr><td><strong>LETRAS/ENFERMAGEM - UNIMONTES</strong><div style="font-size:12px;color:var(--gray-500);">Resp.: Fernanda Alves</div></td><td class="num">73</td><td class="num">R$ 65.400,00</td><td class="num">R$ 978,25</td></tr>
-            <tr><td><strong>ODONTOLOGIA - FUNORTE</strong><div style="font-size:12px;color:var(--gray-500);">Resp.: Gabriela Nunes</div></td><td class="num">39</td><td class="num">R$ 67.016,00</td><td class="num">R$ 1.718,36</td></tr>
-            <tr><td><strong>MEDICINA T85 - UNIMONTES</strong></td><td class="num">20</td><td class="num">R$ 61.252,99</td><td class="num">R$ 3.062,65</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
-    <!-- Funil de fotografia (NOVO) -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Funil de fotografia</div><span class="badge badge-info">12 turmas ativas</span></div>
-        <div class="card-body">
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div>
-              <div class="flex justify-between" style="font-size:13px;margin-bottom:4px;"><span><strong>Capturadas</strong></span><span>4.812 fotos · 12 eventos</span></div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:100%;background:var(--primary-600);height:100%;"></div></div>
+    <div class="kpis" id="kpis"></div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-head"><span style="display:flex;align-items:center;gap:9px;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--primary-600);"></i> Indicadores <span style="font-size:12px;color:var(--gray-400);font-weight:500;">(referência: data de assinatura)</span></span></div>
+      <div class="panel-body"><div class="kpis" id="indicadores"></div></div>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><i data-lucide="users-round" style="width:17px;height:17px;color:var(--primary-600);"></i> Turmas</div>
+          <div style="overflow-x:auto;"><table class="tbl">
+            <thead><tr><th>Turma</th><th class="num">Formandos</th><th>Preenchimento</th><th class="num">Contratado</th><th class="num">Recebido</th></tr></thead>
+            <tbody id="turmas-tbody"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><i data-lucide="calendar" style="width:17px;height:17px;color:var(--primary-600);"></i> Próximos eventos</div>
+          <div class="panel-body" id="eventos"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><i data-lucide="wallet" style="width:17px;height:17px;color:var(--primary-600);"></i> Financeiro</div>
+          <div class="panel-body">
+            <div class="fin-head">
+              <div><div class="fin-l">Recebido</div><div class="fin-big" id="fin-receb">R$ 0,00</div></div>
+              <div class="fin-pct" id="fin-pct">0%</div>
             </div>
-            <div>
-              <div class="flex justify-between" style="font-size:13px;margin-bottom:4px;"><span><strong>Processadas (Rekognition)</strong></span><span>4.612 (96%)</span></div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:96%;background:var(--primary-500);height:100%;"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between" style="font-size:13px;margin-bottom:4px;"><span><strong>Selecionadas pelo aluno</strong></span><span>1.243 (26%)</span></div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:26%;background:#A855F7;height:100%;"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between" style="font-size:13px;margin-bottom:4px;"><span><strong>Em edição</strong></span><span>318 (26%)</span></div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:26%;background:#EC4899;height:100%;"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between" style="font-size:13px;margin-bottom:4px;"><span><strong>Entregues</strong></span><span>891 (72%)</span></div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:72%;background:var(--success);height:100%;"></div></div>
+            <div class="fin-bar"><div class="fin-seg verde" id="fin-seg-r"></div><div class="fin-seg laranja" id="fin-seg-a"></div></div>
+            <div class="fin-rows">
+              <div class="fin-row"><span><i class="fdot verde"></i> Recebido</span><b id="fin-r2">R$ 0,00</b></div>
+              <div class="fin-row"><span><i class="fdot laranja"></i> A receber</span><b id="fin-a2">R$ 0,00</b></div>
+              <div class="fin-row tot"><span>Contratado (total)</span><b id="fin-c2">R$ 0,00</b></div>
             </div>
           </div>
-          <div class="divider"></div>
-          <div class="flex justify-between" style="font-size:13px;color:var(--gray-600);">
-            <span>Lead time médio (upload → entrega)</span>
-            <strong style="color:var(--gray-900);">4,2 dias</strong>
-          </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><div class="card-title">OS por área (atual)</div><a href="os.html" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ir para o kanban →</a></div>
-        <div class="card-body">
-          <table class="table" style="margin:-8px 0;">
-            <tbody>
-              <tr><td><span class="tag-os-area tag-EDICAO">EDIÇÃO</span></td><td class="num">412 abertas</td><td class="num"><span class="badge badge-warning">7 atrasadas</span></td></tr>
-              <tr><td><span class="tag-os-area tag-ADMINISTRATIVO">ADMINISTRATIVO</span></td><td class="num">218 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-              <tr><td><span class="tag-os-area tag-FINANCEIRO">FINANCEIRO</span></td><td class="num">87 abertas</td><td class="num"><span class="badge badge-warning">3 atrasadas</span></td></tr>
-              <tr><td><span class="tag-os-area tag-CERIMONIAL">CERIMONIAL</span></td><td class="num">64 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-              <tr><td><span class="tag-os-area tag-COMERCIAL">COMERCIAL</span></td><td class="num">44 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-              <tr><td><span class="tag-os-area tag-MARKETING">MARKETING</span></td><td class="num">29 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-              <tr><td><span class="tag-os-area tag-QUALIDADE">QUALIDADE</span></td><td class="num">21 abertas</td><td class="num"><span class="badge badge-warning">2 atrasadas</span></td></tr>
-              <tr><td><span class="tag-os-area tag-POS">PÓS-VENDAS</span></td><td class="num">18 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-              <tr><td><span class="tag-os-area tag-DIRETORIA">DIRETORIA</span></td><td class="num">3 abertas</td><td class="num"><span class="badge badge-success">no prazo</span></td></tr>
-            </tbody>
-          </table>
+        <div class="panel">
+          <div class="panel-head"><i data-lucide="package-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Planos mais escolhidos</div>
+          <div class="panel-body" id="planos"></div>
         </div>
       </div>
     </div>
-
-    <!-- Próximos eventos -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Próximos eventos agendados</div>
-        <span class="badge">39 nos próximos 60 dias</span>
-      </div>
-      <table class="table">
-        <thead><tr><th>Turma</th><th>Evento</th><th>Responsável</th><th>Local</th><th>Data</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td><strong>MEDICINA T85 - UNIMONTES</strong></td><td>BAILE + AFTER</td><td>Camila Santos</td><td>Espaço Ventus</td><td>03/05/2026</td><td><span class="badge badge-success">Confirmado</span></td></tr>
-          <tr><td><strong>ODONTOLOGIA - FUNORTE</strong></td><td>FOTO CONVITE INTERNO</td><td>Gabriela Nunes</td><td>Estúdio Ventus</td><td>05/05/2026</td><td><span class="badge badge-info">Planejado</span></td></tr>
-          <tr><td><strong>DIREITO - UNIMONTES</strong></td><td>FAMILY DAY (você + 3 familiares)</td><td>Igor Martins</td><td>Salão Ipiranga</td><td>10/05/2026</td><td><span class="badge badge-success">Confirmado</span></td></tr>
-          <tr><td><strong>MEDICINA VETERINÁRIA - IFNMG</strong></td><td>COLAÇÃO OFICIAL</td><td>Karoline</td><td>Auditório UNIMONTES</td><td>15/05/2026</td><td><span class="badge badge-info">Planejado</span></td></tr>
-          <tr><td><strong>ENFERMAGEM - FUNORTE</strong></td><td>CULTO ECUMÊNICO (20 fotos editadas)</td><td>Thais Caroline</td><td>Igreja Matriz</td><td>22/05/2026</td><td><span class="badge badge-warning">Aguardando</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
   </main>
 </div>
 
+<script src="../assets/js/app.js"></script>
 <script>
 lucide.createIcons();
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const MES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
 
-// Pie chart — Alunos por faculdade (dados reais)
-const ctx = document.getElementById('chartFaculdades').getContext('2d');
-new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels: ['UNIMONTES','FUNORTE','IFNMG','FIPMOC','GRAU','IPATINGA','IESC','UFMG','Outras'],
-    datasets: [{
-      data: [510, 302, 216, 189, 123, 121, 101, 72, 290],
-      backgroundColor: ['#1E3A8A','#2563EB','#3B82F6','#60A5FA','#93C5FD','#0EA5E9','#7DD3FC','#1E40AF','#CBD5E1'],
-      borderWidth: 0,
-    }]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'right', labels: { boxWidth: 10, font: { size: 12 } } }
-    },
-    cutout: '60%'
-  }
-});
+initPainel();
+async function initPainel(){
+  try{ const r=await fetch(apiUrl('/api/painel/opcoes')); const o=await r.json();
+    document.getElementById('fil-vend').innerHTML='<option value="">Todos</option>'+(o.vendedores||[]).map(v=>`<option value="${v.id}">${v.nome}</option>`).join('');
+  }catch(e){}
+  carregar();
+}
+window.limparFiltros = () => { ['fil-di','fil-df','fil-sit','fil-sev','fil-cer','fil-vend','fil-ai','fil-af'].forEach(k=>document.getElementById(k).value=''); carregar(); };
+function queryFiltros(){
+  const p = new URLSearchParams();
+  const G=id=>document.getElementById(id);
+  if(G('fil-di').value) p.set('previsao_inicio',G('fil-di').value);
+  if(G('fil-df').value) p.set('previsao_fim',G('fil-df').value);
+  if(G('fil-sit').value) p.set('situacao',G('fil-sit').value);
+  if(G('fil-sev').value) p.set('situacao_evento',G('fil-sev').value);
+  if(G('fil-cer').value) p.set('possui_cerimonial', G('fil-cer').value==='1'?'true':'false');
+  if(G('fil-vend').value) p.set('vendedor_id',G('fil-vend').value);
+  if(G('fil-ai').value) p.set('assinatura_inicio',G('fil-ai').value);
+  if(G('fil-af').value) p.set('assinatura_fim',G('fil-af').value);
+  const q=p.toString(); return q?('?'+q):'';
+}
+async function carregar(){
+  const r = await fetch(apiUrl('/api/painel'+queryFiltros())); const d = await r.json();
+  const f = d.financeiro, al = d.alunos;
+  const taxa = al.total ? Math.round(al.preenchidos/al.total*100) : 0;
+  document.getElementById('kpis').innerHTML = `
+    ${kpi('','users-round','Turmas', d.turmas, '')}
+    ${kpi('','user-check','Formandos', al.total, `${al.preenchidos} preencheram (${taxa}%)`)}
+    ${kpi('','file-text','Contratado', brl(f.contratado), 'soma dos planos escolhidos')}
+    ${kpi('verde','banknote','Recebido', brl(f.recebido), '')}
+    ${kpi('laranja','clock','A receber', brl(f.a_receber), 'parcelas em aberto')}`;
+
+  // indicadores (doc Revisão 2)
+  const ind = d.indicadores || {};
+  document.getElementById('indicadores').innerHTML = `
+    ${kpi('','shopping-cart','Vendas', brl(ind.vendas), 'contratos + produtos/serviços')}
+    ${kpi('','file-signature','Contratos', brl(ind.contratos_valor), `${ind.contratos_qtd||0} contrato(s)`)}
+    ${kpi('','utensils','Cerimonial', brl(ind.cerimonial), '')}
+    ${kpi('','package','Produtos/Serviços', brl(ind.produtos_servicos), '')}
+    ${kpi('','receipt','Ticket médio/contrato', brl(ind.ticket_medio_contrato), '')}
+    ${kpi('','trending-up','LTV', (ind.ltv_meses||0).toFixed(1)+'x', 'prazo médio (parcelas)')}
+    ${kpi('','credit-card','Ticket médio/parcela', brl(ind.ticket_medio_parcela), '')}`;
+  lucide.createIcons();
+
+  // turmas
+  const tb = document.getElementById('turmas-tbody');
+  tb.innerHTML = d.turmas_lista.length ? d.turmas_lista.map(t=>{
+    const pct = t.alunos ? Math.round(t.preenchidos/t.alunos*100) : 0;
+    return `<tr onclick="location.href='turma-detalhe.html?id=${t.id}'" style="cursor:pointer;">
+      <td class="nome">${t.nome}<div style="font-size:12px;color:var(--gray-400);font-weight:400;">${t.instituicao||''}</div></td>
+      <td class="num">${t.alunos}</td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="prog"><div style="width:${pct}%"></div></div><span style="font-size:12px;color:var(--gray-500);">${t.preenchidos}/${t.alunos}</span></div></td>
+      <td class="num">${brl(t.contratado)}</td><td class="num" style="color:#16A34A;font-weight:600;">${brl(t.recebido)}</td></tr>`;
+  }).join('') : `<tr><td colspan="5"><div class="empty">Nenhuma turma cadastrada ainda.</div></td></tr>`;
+
+  // financeiro — barra clara (recebido x a receber sobre o contratado)
+  const totalFin = f.contratado || (f.recebido + f.a_receber) || 1;
+  const pctR = Math.round((f.recebido/totalFin)*100);
+  document.getElementById('fin-receb').textContent = brl(f.recebido);
+  document.getElementById('fin-pct').textContent = pctR + '% recebido';
+  document.getElementById('fin-seg-r').style.width = (f.recebido/totalFin*100) + '%';
+  document.getElementById('fin-seg-a').style.width = (f.a_receber/totalFin*100) + '%';
+  document.getElementById('fin-r2').textContent = brl(f.recebido);
+  document.getElementById('fin-a2').textContent = brl(f.a_receber);
+  document.getElementById('fin-c2').textContent = brl(f.contratado);
+
+  // eventos
+  document.getElementById('eventos').innerHTML = d.eventos_proximos.length ? d.eventos_proximos.map(e=>{
+    const [y,m,dia]=e.data.split('-');
+    return `<div class="evt"><div class="d"><b>${dia}</b><span>${MES[+m-1]}</span></div>
+      <div class="info"><strong>${e.evento}</strong><span>${e.turma||''} · ${e.situacao}</span></div></div>`;
+  }).join('') : `<div class="empty">Nenhum evento futuro agendado.</div>`;
+
+  // planos
+  document.getElementById('planos').innerHTML = d.planos_populares.length ? d.planos_populares.map(p=>
+    `<div class="pop"><span class="n">${p.nome}</span><span class="b">${p.escolhas} formando(s)</span></div>`).join('') : `<div class="empty">Nenhum plano escolhido ainda.</div>`;
+}
+function kpi(cls,ic,l,v,s){ return `<div class="kpi ${cls}"><div class="top"><div class="ic"><i data-lucide="${ic}"></i></div></div><div class="l">${l}</div><div class="v">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`; }
 </script>
-
-<script src="../assets/js/app.js"></script>
-
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
 </body>
 </html>

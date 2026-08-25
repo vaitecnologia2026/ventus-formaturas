@@ -1,165 +1,776 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>MEDICINA T85 — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turma — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 <style>
-.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
-.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
-.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
+  .crumb { font-size:13px; color:var(--gray-500); margin-bottom:10px; } .crumb a{color:var(--gray-500);text-decoration:none;} .crumb a:hover{color:var(--gray-700);}
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+
+  .segmented { display:inline-flex; background:var(--gray-100); border-radius:12px; padding:4px; gap:2px; margin-bottom:22px; flex-wrap:wrap; }
+  .segmented .tab { border:none; background:transparent; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--gray-500); padding:8px 16px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:.15s; }
+  .segmented .tab.on { background:var(--surface); color:var(--primary-700); box-shadow:var(--shadow-sm); }
+
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:18px; }
+  .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 22px; border-bottom:1px solid var(--gray-100); }
+  .panel-head h2 { font-size:14.5px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:9px; }
+  .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
+  .panel-body { padding:22px; }
+
+  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:180px;}
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
+  .add-bar input, .add-bar select { padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar input:focus, .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .add-bar .prestadores { display:flex; flex-wrap:wrap; gap:6px; max-width:340px; }
+  .chip-check { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border:1px solid var(--gray-300); border-radius:999px; font-size:12.5px; font-weight:600; color:var(--gray-600); cursor:pointer; background:var(--surface); }
+  .chip-check.on { border-color:var(--primary-500); background:var(--primary-50); color:var(--primary-700); }
+
+  .switch { position:relative; display:inline-block; width:46px; height:27px; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
+  .switch .track::after { content:''; position:absolute; width:21px; height:21px; left:3px; top:3px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+  .switch input:checked + .track { background:var(--success); } .switch input:checked + .track::after { transform:translateX(19px); }
+
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:13px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); vertical-align:middle; }
+  table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.nome { font-weight:600; color:var(--gray-900); }
+  .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; display:inline-block; }
+  .b-previsto{background:#FEF3C7;color:#92400E;} .b-confirmado{background:var(--primary-50);color:var(--primary-700);}
+  .b-realizado{background:#DCFCE7;color:#166534;} .b-cancelado{background:#FEE2E2;color:#991B1B;}
+  .b-todos{background:var(--primary-50);color:var(--primary-700);} .b-comissao{background:#EDE9FE;color:#5B21B6;}
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); } .icon-btn.danger:hover{border-color:#FCA5A5;color:#DC2626;background:#FEF2F2;}
+  .empty { text-align:center; color:var(--gray-500); padding:44px 20px; } .empty svg{width:34px;height:34px;color:var(--gray-300);margin:0 auto 10px;display:block;}
+
+  .dados-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:2px 0; }
+  .dado { padding:16px 22px; border-bottom:1px solid var(--gray-100); }
+  .dado .l { font-size:12px; font-weight:600; color:var(--gray-500); } .dado .v { font-size:15px; font-weight:600; color:var(--gray-900); margin-top:3px; }
+  @media (max-width:640px){ .panel-body{padding:16px;} }
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
 </style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div></div>
-  <div class="sidebar-section">Geral</div>
-  <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i>Painel</a>
-  <a href="turmas.html" class="sidebar-link active"><i data-lucide="users-round"></i>Turmas</a>
-  <a href="os.html" class="sidebar-link"><i data-lucide="clipboard-list"></i>Ordens de Serviço</a>
-  <a href="financeiro.html" class="sidebar-link"><i data-lucide="banknote"></i>Financeiro</a>
-  <a href="galerias.html" class="sidebar-link"><i data-lucide="images"></i>Galerias</a>
-  <div class="sidebar-footer"><div class="avatar">EP</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Elison Perini</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
-</aside>
-
+<aside id="admin-sidebar" class="sidebar"></aside>
 <div class="app-shell">
   <header class="topbar">
     <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
-    <div class="flex gap-2"><button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Mensagem em massa</button><button class="btn btn-primary btn-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar turma</button></div>
+    <div class="flex items-center gap-3"><a href="turmas.html" class="btn btn-secondary btn-sm"><i data-lucide="arrow-left" class="w-4 h-4"></i> Turmas</a></div>
   </header>
-
   <main class="app-content">
-    <div class="text-sm" style="color:var(--gray-500);margin-bottom:8px;">
-      <a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> /
-      <a href="turmas.html" style="color:inherit;text-decoration:none;">Turmas</a> /
-      <span style="color:var(--gray-700);">MEDICINA T85 - UNIMONTES</span>
+    <div class="crumb"><a href="turmas.html">Turmas</a> › <span id="crumb-nome">…</span></div>
+    <div class="page-head">
+      <div class="chip"><i data-lucide="users-round"></i></div>
+      <div><h1 id="turma-nome">Carregando…</h1><p id="turma-sub"></p></div>
     </div>
 
-    <div class="card mb-6" style="background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 100%);color:white;border:none;">
-      <div class="card-body" style="padding:28px;">
-        <div class="flex justify-between items-start">
-          <div>
-            <span class="badge" style="background:rgba(255,255,255,.18);color:white;font-weight:600;">UNIMONTES · Medicina</span>
-            <h1 class="text-3xl font-bold mt-3" style="letter-spacing:-0.02em;">MEDICINA T85</h1>
-            <p style="opacity:.85;font-size:14px;margin-top:4px;">Turno noturno · Previsão de formatura: <strong>Jul/2026</strong></p>
-            <div class="flex gap-6 mt-4" style="font-size:13px;">
-              <div><span style="opacity:.7;">Vendedor:</span> <strong>RAFAEL CARVALHO</strong></div>
-              <div><span style="opacity:.7;">Comissão da turma:</span> <strong>4 representantes</strong></div>
-              <div><span style="opacity:.7;">Cor da beca:</span> <strong style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:3px;background:#1E3A8A;border:1px solid white;"></span>AZUL</strong></div>
-            </div>
-          </div>
-          <div class="flex gap-4 text-center">
-            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Alunos</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">20</div></div>
-            <div style="width:1px;background:rgba(255,255,255,.2);"></div>
-            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Vl. Contrato</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">R$ 61K</div></div>
-            <div style="width:1px;background:rgba(255,255,255,.2);"></div>
-            <div><div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Eventos</div><div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">13</div></div>
-          </div>
+    <div class="segmented">
+      <button class="tab on" data-tab="dados"><i data-lucide="info" style="width:15px;height:15px;"></i> Dados</button>
+      <button class="tab" data-tab="eventos"><i data-lucide="calendar" style="width:15px;height:15px;"></i> Eventos fotográficos</button>
+      <button class="tab" data-tab="brindes"><i data-lucide="gift" style="width:15px;height:15px;"></i> Brindes</button>
+      <button class="tab" data-tab="cerimonial"><i data-lucide="utensils" style="width:15px;height:15px;"></i> Cerimonial</button>
+      <button class="tab" data-tab="planos"><i data-lucide="package-2" style="width:15px;height:15px;"></i> Planos</button>
+      <button class="tab" data-tab="alunos"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Pré-cadastro</button>
+    </div>
+
+    <!-- DADOS -->
+    <section id="pane-dados">
+      <div class="panel">
+        <div class="panel-head"><h2>Dados da turma</h2><a href="turmas.html" class="btn btn-secondary btn-sm"><i data-lucide="pencil" class="w-4 h-4"></i> Editar</a></div>
+        <div class="dados-grid" id="dados-grid"></div>
+      </div>
+    </section>
+
+    <!-- EVENTOS -->
+    <section id="pane-eventos" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="ev-form-title">Novo evento fotográfico</span></h2></div>
+        <div class="add-bar" id="ev-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Eventos da turma</h2><span class="count" id="ev-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Evento</th><th>Previsão</th><th>Horário</th><th>Local</th><th>Prestadores</th><th>Galeria</th><th>Situação</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="ev-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- BRINDES -->
+    <section id="pane-brindes" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="br-form-title">Adicionar brinde</span></h2></div>
+        <div class="add-bar" id="br-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Brindes da turma</h2><span class="count" id="br-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Brinde</th><th>Para quem</th><th>Observação</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="br-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- CERIMONIAL -->
+    <section id="pane-cerimonial" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="cev-form-title">Adicionar evento de cerimonial</span></h2></div>
+        <div class="add-bar" id="cev-form"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Cerimonial da turma</h2><span class="count" id="ce-total">R$ 0,00</span></div>
+        <div class="panel-body" id="ce-eventos"><div class="empty"><i data-lucide="utensils"></i>Nenhum evento de cerimonial. Adicione o primeiro acima.</div></div>
+      </div>
+    </section>
+
+    <!-- PLANOS -->
+    <section id="pane-planos" hidden>
+      <!-- lista de planos -->
+      <div id="planos-lista">
+        <div class="panel">
+          <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> <span id="pl-form-title">Novo plano</span></h2></div>
+          <div class="add-bar" id="pl-form"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Planos da turma</h2><span class="count" id="pl-count">0</span></div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Plano</th><th class="num">Valor</th><th>Pagamento</th><th class="num">Itens</th><th>Status</th><th style="text-align:right;">Ações</th></tr></thead>
+            <tbody id="pl-tbody"></tbody></table></div>
         </div>
       </div>
-    </div>
-
-    <div class="tabs">
-      <a href="#" class="tab active" data-tab="visao">Visão geral</a>
-      <a href="#" class="tab" data-tab="alunos">Alunos (20)</a>
-      <a href="#" class="tab" data-tab="eventos">Eventos (13)</a>
-      <a href="#" class="tab" data-tab="brindes">Brindes (60)</a>
-      <a href="#" class="tab" data-tab="contratos">Contratos</a>
-      <a href="#" class="tab" data-tab="cerimonial">Cerimonial</a>
-      <a href="#" class="tab" data-tab="os">OS (8)</a>
-      <a href="#" class="tab" data-tab="galerias">Galerias (3)</a>
-      <a href="#" class="tab" data-tab="historico">Histórico</a>
-    </div>
-
-    <div data-tab-panel="visao" class="grid gap-6" style="grid-template-columns: 2fr 1fr;">
-      <div>
-        <!-- Eventos contratados -->
-        <div class="card mb-6">
-          <div class="card-header"><div class="card-title">Eventos contratados</div><button class="btn btn-secondary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>
-          <table class="table">
-            <thead><tr><th>Evento</th><th>Data prevista</th><th>Local</th><th>Status</th><th>Fotos editadas</th></tr></thead>
-            <tbody>
-              <tr><td><strong>FOTO CONVITE INTERNO E EXTERNO</strong><div style="font-size:12px;color:var(--gray-500);">10 fotos editadas inclusas</div></td><td>14/03/2026</td><td>Estúdio Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>10/10</td></tr>
-              <tr><td><strong>FOTOS FAMÍLIA</strong> (5 familiares)</td><td>14/03/2026</td><td>Estúdio Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>20/20</td></tr>
-              <tr><td><strong>FESTA DE 100 DIAS</strong></td><td>22/04/2026</td><td>Espaço Ventus</td><td><span class="badge badge-success">Realizado</span></td><td>—</td></tr>
-              <tr><td><strong>BAILE + AFTER (40 fotos editadas)</strong></td><td>03/05/2026</td><td>Espaço Ventus</td><td><span class="badge badge-info">Confirmado</span></td><td>0/40</td></tr>
-              <tr><td><strong>POSICIONAMENTO DE IMAGEM</strong></td><td>10/06/2026</td><td>Estúdio Ventus</td><td><span class="badge">Planejado</span></td><td>—</td></tr>
-              <tr><td><strong>COLAÇÃO OFICIAL (30 fotos editadas)</strong></td><td>15/07/2026</td><td>Auditório UNIMONTES</td><td><span class="badge">Planejado</span></td><td>0/30</td></tr>
-              <tr><td><strong>COLAÇÃO SIMBÓLICA (35 fotos editadas)</strong></td><td>15/07/2026</td><td>Auditório UNIMONTES</td><td><span class="badge">Planejado</span></td><td>0/35</td></tr>
-              <tr><td><strong>CULTO ECUMÊNICO (20 fotos editadas)</strong></td><td>16/07/2026</td><td>Igreja Matriz</td><td><span class="badge">Planejado</span></td><td>0/20</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Financeiro resumo -->
-        <div class="card">
-          <div class="card-header"><div class="card-title">Financeiro</div><a href="financeiro.html" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver detalhes →</a></div>
-          <div class="card-body">
-            <div class="grid grid-cols-3 gap-4">
-              <div><div style="font-size:12px;color:var(--gray-500);">Vl. Total contratado</div><div style="font-size:22px;font-weight:700;margin-top:2px;">R$ 61.252,99</div></div>
-              <div><div style="font-size:12px;color:var(--gray-500);">Recebido</div><div style="font-size:22px;font-weight:700;margin-top:2px;color:var(--success);">R$ 42.870,00</div><div style="font-size:11px;color:var(--gray-500);">70%</div></div>
-              <div><div style="font-size:12px;color:var(--gray-500);">A receber</div><div style="font-size:22px;font-weight:700;margin-top:2px;">R$ 18.382,99</div><div style="font-size:11px;color:var(--warning);">3 atrasadas</div></div>
-            </div>
-            <div style="height:8px;background:var(--gray-100);border-radius:4px;margin-top:16px;overflow:hidden;">
-              <div style="width:70%;height:100%;background:var(--success);"></div>
-            </div>
+      <!-- detalhe de um plano (itens) -->
+      <div id="planos-detalhe" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <h2 id="pd-nome">Plano</h2>
+            <button class="btn btn-secondary btn-sm" onclick="voltarPlanos()"><i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar aos planos</button>
           </div>
+          <div class="add-bar" id="pi-form"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Itens do plano</h2><span class="count" id="pi-total">R$ 0,00</span></div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Tipo</th><th>Descrição</th><th class="num">Qtd</th><th class="num">Valor</th><th class="num">Subtotal</th><th style="text-align:right;">Ações</th></tr></thead>
+            <tbody id="pi-tbody"></tbody></table></div>
         </div>
       </div>
+    </section>
 
-      <div>
-        <!-- Comissão da turma -->
-        <div class="card mb-4">
-          <div class="card-header"><div class="card-title">Comissão da turma</div></div>
-          <div class="card-body" style="padding:12px 0;">
-            <div style="display:flex;flex-direction:column;">
-              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">CA</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Camila Almeida</div><div style="font-size:12px;color:var(--gray-500);">Presidente · (38) 99863-1234</div></div></div>
-              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">PH</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Pedro Henrique</div><div style="font-size:12px;color:var(--gray-500);">Tesoureiro</div></div></div>
-              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">JR</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Júlia Ribeiro</div><div style="font-size:12px;color:var(--gray-500);">Secretária</div></div></div>
-              <div class="flex items-center gap-3" style="padding:10px 22px;"><div class="avatar" style="background:var(--primary-100);color:var(--primary-800);">RM</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Tiago Moreira Mendes</div><div style="font-size:12px;color:var(--gray-500);">Comunicação</div></div></div>
+    <!-- PRÉ-CADASTRO / ALUNOS -->
+    <section id="pane-alunos" hidden>
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-body" style="padding:18px 22px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13px;color:var(--gray-500);font-weight:600;">Preenchimento da turma</div>
+              <div style="font-size:22px;font-weight:800;color:var(--gray-900);" id="al-progresso-txt">0 de 0 preencheram</div>
             </div>
-          </div>
-        </div>
-
-        <!-- Brindes (resumo) -->
-        <div class="card mb-4">
-          <div class="card-header"><div class="card-title">Brindes</div><span class="badge badge-warning">12 pendentes</span></div>
-          <div class="card-body" style="padding:14px 22px;">
-            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Álbum "Memórias" 21x30cm</span><strong>20</strong></div>
-            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Link em nuvem</span><strong>20</strong></div>
-            <div class="flex justify-between" style="padding:6px 0;font-size:13px;"><span>Encartes personalizados</span><strong>20</strong></div>
-          </div>
-        </div>
-
-        <!-- Próximos compromissos -->
-        <div class="card">
-          <div class="card-header"><div class="card-title">Próximos compromissos</div></div>
-          <div class="card-body" style="padding:14px 22px;">
-            <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
-              <div style="font-size:13px;font-weight:600;">Aprovar fotos do FOTO CONVITE</div>
-              <div style="font-size:12px;color:var(--gray-500);">Vence em 2 dias · OS #0142</div>
-            </div>
-            <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
-              <div style="font-size:13px;font-weight:600;">Liberar pacote de seleção</div>
-              <div style="font-size:12px;color:var(--gray-500);">Vence em 5 dias</div>
-            </div>
-            <div style="padding:8px 0;">
-              <div style="font-size:13px;font-weight:600;">Fechar lista de convidados (BAILE)</div>
-              <div style="font-size:12px;color:var(--gray-500);">Vence em 12 dias</div>
+            <div style="flex:1;min-width:220px;max-width:420px;">
+              <div style="height:12px;background:var(--gray-100);border-radius:999px;overflow:hidden;">
+                <div id="al-progresso-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--primary-500),var(--success));border-radius:999px;transition:width .3s;"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="upload" style="width:16px;height:16px;color:var(--primary-600);"></i> Importar alunos (nome + WhatsApp)</h2></div>
+        <div class="panel-body">
+          <p style="margin:0 0 10px;font-size:13px;color:var(--gray-500);">Cole uma linha por aluno, no formato <b>Nome; WhatsApp</b> (ou só o nome). Cada um recebe um link individual de cadastro.</p>
+          <textarea id="al-import" style="width:100%;min-height:110px;padding:12px 14px;border:1px solid var(--gray-300);border-radius:11px;font-family:inherit;font-size:14px;outline:none;resize:vertical;" placeholder="Camila Almeida; 38999990001&#10;Pedro Henrique; 38999990002&#10;Júlia Ribeiro; 38999990003"></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-primary" id="al-importar"><i data-lucide="user-plus" class="w-4 h-4"></i> Importar lista</button>
+            <span style="color:var(--gray-300);">|</span>
+            <input type="text" id="al-nome" placeholder="Nome" style="padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;font-size:14px;outline:none;">
+            <input type="text" id="al-cel" placeholder="WhatsApp" style="padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;font-size:14px;outline:none;width:150px;">
+            <button class="btn btn-secondary" id="al-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar 1</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Alunos e status de preenchimento</h2><span class="count" id="al-count">0</span></div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Aluno</th><th>WhatsApp</th><th>Status</th><th>Comissão</th><th>Vendedor</th><th>Plano escolhido</th><th>Link individual</th><th style="text-align:right;">Ações</th></tr></thead>
+          <tbody id="al-tbody"></tbody></table></div>
+      </div>
+    </section>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
-<!-- ventus-demo-back -->
-<a href="../index.html" id="ventus-demo-back" style="position:fixed;right:16px;bottom:16px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#0A1430;color:#F4E4A6;border:1px solid rgba(212,175,55,.45);border-radius:999px;font:600 13px/1 Inter,-apple-system,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:.92;">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-Voltar &agrave; demo</a>
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+const id = new URLSearchParams(location.search).get('id');
+let OPC = { eventos:[], prestadores:[], brindes:[], situacoes:[], escopos:[] };
+let PLOPC = { bases:[], tipos:[] };
+let evEdit = null, brEdit = null, ceEdit = null, plEdit = null, piEdit = null, planoAtual = null;
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+if (!id) location.href = 'turmas.html'; else init();
+
+async function init() {
+  const [rt, ro, rp] = await Promise.all([
+    fetch(apiUrl('/api/turma-formatura/'+id)),
+    fetch(apiUrl(`/api/turma-formatura/${id}/detalhe-opcoes`)),
+    fetch(apiUrl(`/api/turma-formatura/${id}/planos-opcoes`)),
+  ]);
+  if (!rt.ok) { $('#turma-nome').textContent = 'Turma não encontrada'; return; }
+  const t = await rt.json(); OPC = await ro.json(); PLOPC = await rp.json();
+  $('#crumb-nome').textContent = t.nome; $('#turma-nome').textContent = t.nome;
+  $('#turma-sub').textContent = [t.instituicao, t.periodo, t.ano].filter(Boolean).join(' · ');
+  pintarDados(t);
+  document.querySelectorAll('.tab').forEach(x => x.onclick = () => trocarAba(x.dataset.tab));
+  montarEvForm(); montarBrForm(); montarCeForm(); montarPlForm();
+  carregarEventos(); carregarBrindes(); carregarCerim(); carregarPlanos();
+  $('#al-importar').onclick = importarAlunos;
+  $('#al-add').onclick = addAluno;
+}
+const SITE = location.origin;
+function linkAluno(a){ return SITE + a.link; }
+
+function trocarAba(aba) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab===aba));
+  ['dados','eventos','brindes','cerimonial','planos','alunos'].forEach(p => $('#pane-'+p).hidden = p!==aba);
+  if (aba==='alunos') carregarAlunos();
+}
+
+function pintarDados(t) {
+  const cursos = (t.cursos||[]).map(c=>c.nome).join(', ') || '—';
+  const d = [['Nome',t.nome],['Instituição',t.instituicao||'—'],['Período',t.periodo||'—'],['Ano',t.ano||'—'],
+    ['Cursos',cursos],['Vendedor',t.vendedor||'—'],['Status',t.ativo?'Ativa':'Inativa'],['Observações',t.observacoes||'—']];
+  $('#dados-grid').innerHTML = d.map(([l,v])=>`<div class="dado"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('');
+}
+
+/* ---- helpers de opções ---- */
+const optSel = (arr, cur) => `<option value="">—</option>` + arr.map(o=>`<option value="${o.id}" ${cur==o.id?'selected':''}>${o.nome}</option>`).join('');
+const optSit = (cur) => OPC.situacoes.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
+const optEsc = (cur) => OPC.escopos.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
+const optAlbum = (cur) => `<option value="">— sem galeria —</option>` + (OPC.albuns||[]).map(a=>`<option value="${a.id}" ${cur===a.id?'selected':''}>${a.nome} (${a.total_fotos} fotos)</option>`).join('');
+const albumNome = (aid) => { const a=(OPC.albuns||[]).find(x=>x.id===aid); return a?a.nome:null; };
+
+/* ---------------- EVENTOS ---------------- */
+function montarEvForm() {
+  $('#ev-form').innerHTML = `
+    <div class="fld grow"><label>Evento *</label><select id="ev-evento_id">${optSel(OPC.eventos)}</select></div>
+    <div class="fld"><label>Previsão</label><input type="date" id="ev-data" onchange="checarAgenda()"><div id="ev-data-nota" style="font-size:12px;margin-top:5px;"></div></div>
+    <div class="fld"><label>Início</label><input type="time" id="ev-ini" style="width:110px;"></div>
+    <div class="fld"><label>Fim</label><input type="time" id="ev-fim" style="width:110px;"></div>
+    <div class="fld grow"><label>Local</label><input type="text" id="ev-local" placeholder="Local do evento"></div>
+    <div class="fld"><label>Situação</label><select id="ev-situacao">${optSit('previsto')}</select></div>
+    <div class="fld grow"><label>Galeria</label><select id="ev-album">${optAlbum('')}</select></div>
+    <div class="fld"><label>Confirmado</label><label class="switch"><input type="checkbox" id="ev-confirmado"><span class="track"></span></label></div>
+    <div class="fld grow"><label>Prestadores</label><div class="prestadores" id="ev-prestadores">${OPC.prestadores.map(p=>`<label class="chip-check"><input type="checkbox" value="${p.id}"> ${p.nome}</label>`).join('') || '<span style="font-size:12.5px;color:var(--gray-400);">Nenhum prestador cadastrado.</span>'}</div></div>
+    <div class="fld"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
+  $('#ev-prestadores').querySelectorAll('input').forEach(i=>i.onchange=()=>i.closest('.chip-check').classList.toggle('on',i.checked));
+  lucide.createIcons();
+  $('#ev-salvar').onclick = salvarEvento;
+}
+function evPrest() { return [...$('#ev-prestadores').querySelectorAll('input:checked')].map(i=>+i.value); }
+function limparEv() {
+  evEdit=null; $('#ev-evento_id').value=''; $('#ev-data').value=''; $('#ev-ini').value=''; $('#ev-fim').value='';
+  $('#ev-local').value=''; $('#ev-situacao').value='previsto'; $('#ev-confirmado').checked=false; $('#ev-album').value='';
+  $('#ev-prestadores').querySelectorAll('input').forEach(i=>{i.checked=false;i.closest('.chip-check').classList.remove('on');});
+  if($('#ev-data-nota')) $('#ev-data-nota').innerHTML='';
+  $('#ev-btn').textContent='Adicionar'; $('#ev-form-title').textContent='Novo evento fotográfico';
+}
+/* Agenda: conflito de data + sugestão de dia livre */
+let AGENDA = null;
+async function carregarAgenda(force){ if(AGENDA && !force) return AGENDA; try{ const r=await fetch(apiUrl('/api/agenda')); AGENDA=(await r.json()).itens||[]; }catch(e){ AGENDA=[]; } return AGENDA; }
+function proximaLivre(dataISO, ocupadas){ const d=new Date(dataISO+'T12:00:00'); for(let i=0;i<180;i++){ d.setDate(d.getDate()+1); const s=d.toISOString().slice(0,10); if(!ocupadas.has(s)) return s; } return null; }
+window.checarAgenda=async function(){
+  const nota=$('#ev-data-nota'); const data=$('#ev-data').value; if(!nota) return; if(!data){ nota.innerHTML=''; return; }
+  const ag=await carregarAgenda();
+  const conflitos=ag.filter(x=>x.data===data);
+  const ocupadas=new Set(ag.map(x=>x.data));
+  if(conflitos.length){
+    const lista=conflitos.map(c=>`${c.evento}${c.turma?(' · '+c.turma):''}`).join(', ');
+    const sug=proximaLivre(data, ocupadas);
+    nota.innerHTML=`<span style="color:#B45309;font-weight:600;">⚠ Já há evento nesse dia: ${lista}.</span>`+(sug?` <a href="#" onclick="usarData('${sug}');return false;" style="color:var(--primary-600);font-weight:700;">Sugerir ${sug.split('-').reverse().join('/')}</a>`:'');
+  } else {
+    nota.innerHTML=`<span style="color:#15803D;font-weight:600;">✓ Sem conflito na agenda.</span>`;
+  }
+};
+window.usarData=function(s){ $('#ev-data').value=s; checarAgenda(); };
+async function salvarEvento() {
+  const body = { evento_id:$('#ev-evento_id').value||null, data_prevista:$('#ev-data').value||null,
+    hora_inicio:$('#ev-ini').value||null, hora_fim:$('#ev-fim').value||null, local:$('#ev-local').value,
+    situacao:$('#ev-situacao').value, confirmado:$('#ev-confirmado').checked, album_id:$('#ev-album').value||null, prestador_ids:evPrest() };
+  if(!body.evento_id){ alert('Escolha o evento.'); return; }
+  const url = evEdit ? apiUrl('/api/turma-formatura/eventos/'+evEdit) : apiUrl(`/api/turma-formatura/${id}/eventos`);
+  const r = await fetch(url,{method:evEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  AGENDA=null; // invalida cache da agenda (mudou uma data)
+  limparEv(); carregarEventos();
+}
+async function carregarEventos() {
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/eventos`)); const {itens}=await r.json();
+  $('#ev-count').textContent = itens.length;
+  if(!itens.length){ $('#ev-tbody').innerHTML=`<tr><td colspan="8"><div class="empty"><i data-lucide="calendar-off"></i>Nenhum evento fotográfico ainda.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#ev-tbody').innerHTML = itens.map(e=>{
+    const hora = [e.hora_inicio,e.hora_fim].filter(Boolean).join(' – ') || '—';
+    const data = e.data_prevista ? e.data_prevista.split('-').reverse().join('/') : '—';
+    return `<tr>
+      <td class="nome">${e.evento||'—'}${e.confirmado?' <i data-lucide="badge-check" style="width:14px;height:14px;color:var(--success);vertical-align:-2px;"></i>':''}</td>
+      <td>${data}</td><td>${hora}</td><td>${e.local||'—'}</td>
+      <td>${e.prestadores.length? e.prestadores.join(', ') : '—'}</td>
+      <td>${e.album_id ? `<a href="../fotos/turma.html?id=${encodeURIComponent(e.album_id)}" target="_blank" style="color:var(--primary-600);font-weight:600;">${albumNome(e.album_id)||'galeria'} <i data-lucide="external-link" style="width:12px;height:12px;vertical-align:-1px;"></i></a>` : '<span style="color:var(--gray-400);">—</span>'}</td>
+      <td><span class="badge b-${e.situacao}">${(OPC.situacoes.find(s=>s[0]===e.situacao)||[])[1]||e.situacao}</span></td>
+      <td><div class="row-actions">
+        ${e.situacao==='realizado'
+          ? `<button class="icon-btn" title="Evento concluído — reabra a situação p/ editar" disabled style="opacity:.5;cursor:not-allowed;"><i data-lucide="lock" style="width:15px;height:15px;"></i></button>`
+          : `<button class="icon-btn" title="Editar" onclick='editarEvento(${JSON.stringify(e)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>`}
+        <button class="icon-btn danger" title="Excluir" onclick="excluirEvento(${e.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`;}).join('');
+  lucide.createIcons();
+}
+window.editarEvento = function(e){
+  evEdit=e.id; $('#ev-evento_id').value=e.evento_id||''; $('#ev-data').value=e.data_prevista||'';
+  $('#ev-ini').value=e.hora_inicio||''; $('#ev-fim').value=e.hora_fim||''; $('#ev-local').value=e.local||'';
+  $('#ev-situacao').value=e.situacao; $('#ev-confirmado').checked=!!e.confirmado; $('#ev-album').value=e.album_id||'';
+  $('#ev-prestadores').querySelectorAll('input').forEach(i=>{const on=e.prestador_ids.includes(+i.value);i.checked=on;i.closest('.chip-check').classList.toggle('on',on);});
+  $('#ev-btn').textContent='Atualizar'; $('#ev-form-title').textContent='Editar evento'; window.scrollTo({top:0,behavior:'smooth'});
+};
+window.excluirEvento = async function(eid){ if(!confirm('Excluir este evento?'))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok)carregarEventos(); };
+
+/* ---------------- BRINDES ---------------- */
+function montarBrForm() {
+  $('#br-form').innerHTML = `
+    <div class="fld grow"><label>Brinde *</label><select id="br-brinde_id">${optSel(OPC.brindes)}</select></div>
+    <div class="fld"><label>Para quem</label><select id="br-escopo">${optEsc('todos')}</select></div>
+    <div class="fld grow"><label>Observação</label><input type="text" id="br-obs" placeholder="Opcional"></div>
+    <div class="fld"><button class="btn btn-primary" id="br-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="br-btn">Adicionar</span></button></div>`;
+  lucide.createIcons();
+  $('#br-salvar').onclick = salvarBrinde;
+}
+function limparBr(){ brEdit=null; $('#br-brinde_id').value=''; $('#br-escopo').value='todos'; $('#br-obs').value=''; $('#br-btn').textContent='Adicionar'; $('#br-form-title').textContent='Adicionar brinde'; }
+async function salvarBrinde() {
+  const body = { brinde_id:$('#br-brinde_id').value||null, escopo:$('#br-escopo').value, observacao:$('#br-obs').value };
+  if(!body.brinde_id){ alert('Escolha o brinde.'); return; }
+  const url = brEdit ? apiUrl('/api/turma-formatura/brindes/'+brEdit) : apiUrl(`/api/turma-formatura/${id}/brindes`);
+  const r = await fetch(url,{method:brEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  limparBr(); carregarBrindes();
+}
+async function carregarBrindes() {
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/brindes`)); const {itens}=await r.json();
+  $('#br-count').textContent = itens.length;
+  if(!itens.length){ $('#br-tbody').innerHTML=`<tr><td colspan="4"><div class="empty"><i data-lucide="gift"></i>Nenhum brinde ainda.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#br-tbody').innerHTML = itens.map(b=>{
+    const esc = (OPC.escopos.find(s=>s[0]===b.escopo)||[])[1]||b.escopo;
+    return `<tr>
+      <td class="nome">${b.brinde||'—'}</td>
+      <td><span class="badge b-${b.escopo}">${esc}</span></td>
+      <td>${b.observacao||'—'}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-secondary btn-sm" title="Marcar como entregue para todos os alunos da turma" onclick="entregarTodos(${b.id})"><i data-lucide="check-check" style="width:14px;height:14px;"></i> Entregar a todos</button>
+        <button class="icon-btn" title="Editar" onclick='editarBrinde(${JSON.stringify(b)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluirBrinde(${b.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`;}).join('');
+  lucide.createIcons();
+}
+window.entregarTodos = async function(tbid){ if(!confirm('Marcar este brinde como ENTREGUE para todos os alunos da turma que o recebem?'))return;
+  const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+tbid+'/entregar-todos'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue:true})});
+  const d=await r.json(); if(r.ok) toast(`Entregue para ${d.afetados} aluno(s).`); else alert('Erro'); };
+window.editarBrinde = function(b){ brEdit=b.id; $('#br-brinde_id').value=b.brinde_id||''; $('#br-escopo').value=b.escopo; $('#br-obs').value=b.observacao||''; $('#br-btn').textContent='Atualizar'; $('#br-form-title').textContent='Editar brinde'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluirBrinde = async function(bid){ if(!confirm('Excluir este brinde?'))return; const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+bid),{method:'DELETE'}); if(r.ok)carregarBrindes(); };
+
+/* ---------------- CERIMONIAL (evento de cerimonial > itens) ---------------- */
+let CEDATA = { bases:[], catalogo_eventos:[], catalogo_itens:[] };
+const escAttr = s => String(s==null?'':s).replace(/"/g,'&quot;');
+function baseLabel(v){ return (CEDATA.bases.find(b=>b[0]===v)||[])[1] || v; }
+function optBase(cur){ return CEDATA.bases.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join(''); }
+
+function montarCeForm(){
+  const evs = CEDATA.catalogo_eventos||[];
+  $('#cev-form').innerHTML = `
+    <div class="fld grow"><label>Evento de cerimonial *</label>
+      <select id="cev-evento">${evs.length?'<option value="">Selecione…</option>'+evs.map(e=>`<option value="${e.id}">${e.nome}</option>`).join(''):'<option value="">Cadastre um Evento primeiro</option>'}</select></div>
+    <div class="fld"><label>Convidados</label><input type="number" min="0" id="cev-conv" value="0" style="width:110px;"></div>
+    <div class="fld"><label>Alunos</label><input type="number" min="0" id="cev-alu" value="0" style="width:110px;"></div>
+    <div class="fld"><button class="btn btn-primary" id="cev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar evento</button></div>`;
+  lucide.createIcons(); $('#cev-salvar').onclick = salvarEventoCerim;
+}
+async function salvarEventoCerim(){
+  const evento_id = $('#cev-evento').value;
+  if(!evento_id){ alert('Selecione o evento de cerimonial.'); return; }
+  const body={ evento_id:+evento_id, qtd_convidados:$('#cev-conv').value||0, qtd_alunos:$('#cev-alu').value||0 };
+  const r=await fetch(apiUrl(`/api/turma-formatura/${id}/cerimonial-eventos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  $('#cev-conv').value='0'; $('#cev-alu').value='0'; $('#cev-evento').value=''; carregarCerim();
+}
+async function carregarCerim(){
+  const r=await fetch(apiUrl(`/api/turma-formatura/${id}/cerimonial`)); const d=await r.json();
+  CEDATA = { bases:d.bases||[], catalogo_eventos:d.catalogo_eventos||[], catalogo_itens:d.catalogo_itens||[] };
+  montarCeForm(); // (re)monta o form já com o catálogo de eventos carregado
+  const rat = d.rateio || {qtd_alunos:0, por_aluno:0};
+  $('#ce-total').innerHTML = brl(d.total||0) + (rat.qtd_alunos ? ` · <span title="Total dividido pelos alunos da turma">${brl(rat.por_aluno)}/aluno (${rat.qtd_alunos})</span>` : '');
+  const evs = d.eventos||[];
+  if(!evs.length){ $('#ce-eventos').innerHTML=`<div class="empty"><i data-lucide="utensils"></i>Nenhum evento de cerimonial. Adicione o primeiro acima.</div>`; lucide.createIcons(); return; }
+  $('#ce-eventos').innerHTML = evs.map(ev=>cardEvento(ev)).join('');
+  lucide.createIcons();
+}
+function cardEvento(ev){
+  const cat = CEDATA.catalogo_itens||[];
+  const optItens = `<option value="">Selecione um item…</option>` + cat.map(it=>`<option value="${escAttr(it.descricao)}" data-base="${it.base_calculo}" data-custo="${it.custo}">${it.descricao} · ${baseLabel(it.base_calculo)} · ${brl(it.custo)}</option>`).join('');
+  const linhas = ev.itens.length ? ev.itens.map(it=>`<tr>
+      <td class="nome">${it.descricao}</td><td><span class="badge b-todos">${baseLabel(it.base_calculo)}</span></td>
+      <td class="num">${it.quantidade}</td><td class="num">${brl(it.custo)}</td><td class="num">${brl(it.total)}</td>
+      <td><div class="row-actions"><button class="icon-btn danger" title="Excluir" onclick="excluirItemCerim(${it.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td>
+    </tr>`).join('') : `<tr><td colspan="6" style="color:var(--gray-500);padding:14px 22px;">Nenhum item neste evento ainda.</td></tr>`;
+  return `<div style="border:1px solid var(--gray-200);border-radius:14px;margin-bottom:16px;overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);">
+      <div style="font-weight:800;color:var(--gray-900);font-size:15px;flex:1;min-width:140px;">${ev.evento}</div>
+      <label style="font-size:12px;color:var(--gray-600);font-weight:600;">Convidados <input type="number" min="0" value="${ev.qtd_convidados}" onchange="saveEventoCerim(${ev.id})" id="ev-conv-${ev.id}" style="width:74px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:8px;margin-left:4px;"></label>
+      <label style="font-size:12px;color:var(--gray-600);font-weight:600;">Alunos <input type="number" min="0" value="${ev.qtd_alunos}" onchange="saveEventoCerim(${ev.id})" id="ev-alu-${ev.id}" style="width:74px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:8px;margin-left:4px;"></label>
+      <span class="badge b-todos" title="Convidados + Alunos">Participantes: ${ev.participantes}</span>
+      <span style="font-weight:800;color:var(--primary-700);">${brl(ev.total)}</span>
+      <button class="icon-btn danger" title="Excluir evento" onclick="excluirEventoCerim(${ev.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+    </div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>Item</th><th>Base do custo</th><th class="num">Qtd</th><th class="num">Custo</th><th class="num">Total</th><th style="text-align:right;">Ações</th></tr></thead>
+      <tbody>${linhas}</tbody></table></div>
+    <div class="add-bar" style="border-top:1px solid var(--gray-100);">
+      <div class="fld grow"><label>Item de cerimonial *</label><select id="it-sel-${ev.id}" onchange="onItemSelect(${ev.id},this)">${optItens}</select></div>
+      <div class="fld"><label>Base do custo</label><select id="it-base-${ev.id}">${optBase('por_evento')}</select></div>
+      <div class="fld"><label>Qtd</label><input type="number" id="it-qtd-${ev.id}" value="1" style="width:80px;"></div>
+      <div class="fld"><label>Custo (R$)</label><input type="number" step="0.01" id="it-custo-${ev.id}" placeholder="0,00" style="width:120px;"></div>
+      <div class="fld"><button class="btn btn-secondary" onclick="addItemCerim(${ev.id})"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar item</button></div>
+    </div>
+  </div>`;
+}
+window.onItemSelect=function(evId,sel){ const o=sel.options[sel.selectedIndex]; if(!o||!o.value)return; if(o.dataset.base) $(`#it-base-${evId}`).value=o.dataset.base; if(o.dataset.custo!=null) $(`#it-custo-${evId}`).value=o.dataset.custo; };
+window.addItemCerim=async function(evId){
+  const desc=$(`#it-sel-${evId}`).value;
+  if(!desc){ alert('Selecione o item de cerimonial.'); return; }
+  const body={ descricao:desc, base_calculo:$(`#it-base-${evId}`).value, quantidade:$(`#it-qtd-${evId}`).value||1, custo:$(`#it-custo-${evId}`).value||0 };
+  const r=await fetch(apiUrl(`/api/turma-formatura/cerimonial-eventos/${evId}/itens`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  carregarCerim();
+};
+window.saveEventoCerim=async function(evId){
+  const body={ qtd_convidados:$(`#ev-conv-${evId}`).value||0, qtd_alunos:$(`#ev-alu-${evId}`).value||0 };
+  const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-eventos/'+evId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok)carregarCerim();
+};
+window.excluirEventoCerim=async function(evId){ if(!confirm('Excluir este evento de cerimonial e todos os itens dele?'))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-eventos/'+evId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
+window.excluirItemCerim=async function(itemId){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-itens/'+itemId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
+
+/* ---------------- PLANOS (espelha o legado) ---------------- */
+const optPair = (arr,cur) => (arr||[]).map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
+const optObj = (arr,cur) => (arr||[]).map(o=>`<option value="${o.id}" ${cur==o.id?'selected':''}>${o.nome}</option>`).join('');
+function montarPlForm(){
+  $('#pl-form').innerHTML = `
+    <div class="fld grow"><label>Nome do plano *</label><input type="text" id="pl-nome" placeholder="Ex.: Plano Ouro"></div>
+    <div class="fld"><label>Tipo de contrato</label><select id="pl-tipocontrato"><option value="">—</option>${optPair(PLOPC.tipos_contrato)}</select></div>
+    <div class="fld"><label>QT fotos</label><input type="number" id="pl-qtfotos" placeholder="ex.: 10" style="width:100px;"></div>
+    <div class="fld"><label>Valor fotografia (R$)</label><input type="number" step="0.01" id="pl-vfoto" placeholder="0,00" style="width:140px;"></div>
+    <div class="fld"><label>Valor cerimonial (R$)</label><input type="number" step="0.01" id="pl-vcerim" placeholder="0,00" style="width:140px;"></div>
+    <div class="fld"><label>Foto excedente (R$)</label><input type="number" step="0.01" id="pl-vexc" placeholder="0,00" style="width:130px;" title="Preço por foto que passar do limite do contrato"></div>
+    <div class="fld grow"><label>Forma de entrega</label><select id="pl-fentrega"><option value="">—</option>${optObj(PLOPC.formas_entrega)}</select></div>
+    <div class="fld"><label>Prazo de ingresso</label><input type="date" id="pl-limite"></div>
+    <div class="fld"><label>Vagas (cota)</label><input type="number" id="pl-vagas" placeholder="ilimitado" style="width:110px;" title="Nº máximo de formandos neste plano (vazio = ilimitado)"></div>
+    <div class="fld"><label>Máx. parcelas</label><input type="number" id="pl-parc" value="1" style="width:100px;"></div>
+    <div class="fld grow"><label>Forma de pagamento (texto)</label><input type="text" id="pl-fpag" placeholder="Ex.: Pix, Cartão, Boleto"></div>
+    <div class="fld full"><label>Inclui</label><div style="display:flex;gap:16px;flex-wrap:wrap;padding-top:4px;">
+      <label class="chip-check"><input type="checkbox" id="pl-inc-cerimonial"> Cerimonial</label>
+      <label class="chip-check"><input type="checkbox" id="pl-inc-eventos"> Eventos fotográficos</label>
+      <label class="chip-check"><input type="checkbox" id="pl-inc-produto"> Produto</label>
+      <label class="chip-check"><input type="checkbox" id="pl-inc-servico"> Serviço</label>
+      <label class="chip-check"><input type="checkbox" id="pl-inc-brinde"> Brinde</label>
+    </div></div>
+    <div class="fld grow"><label>Descrição</label><input type="text" id="pl-desc" placeholder="Opcional"></div>
+    <div class="fld grow"><label>Observação</label><input type="text" id="pl-obs" placeholder="Opcional"></div>
+    <div class="fld"><label>Ativo</label><label class="switch"><input type="checkbox" id="pl-ativo" checked><span class="track"></span></label></div>
+    <div class="fld"><button class="btn btn-primary" id="pl-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="pl-btn">Criar plano</span></button></div>`;
+  $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>i.onchange=()=>i.closest('.chip-check').classList.toggle('on',i.checked));
+  lucide.createIcons(); $('#pl-salvar').onclick = salvarPlano;
+}
+function limparPl(){ plEdit=null;
+  ['pl-nome','pl-qtfotos','pl-vfoto','pl-vcerim','pl-vexc','pl-vagas','pl-fpag','pl-desc','pl-obs','pl-limite'].forEach(k=>$('#'+k).value='');
+  $('#pl-tipocontrato').value=''; $('#pl-fentrega').value=''; $('#pl-parc').value='1'; $('#pl-ativo').checked=true;
+  $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>{i.checked=false;i.closest('.chip-check').classList.remove('on');});
+  $('#pl-btn').textContent='Criar plano'; $('#pl-form-title').textContent='Novo plano';
+}
+async function salvarPlano(){
+  const inc = k => $('#pl-inc-'+k).checked;
+  const body={ nome:$('#pl-nome').value, forma_pagamento:$('#pl-fpag').value, max_parcelas:$('#pl-parc').value||1,
+    ativo:$('#pl-ativo').checked, descricao:$('#pl-desc').value, observacao:$('#pl-obs').value,
+    tipo_contrato:$('#pl-tipocontrato').value||null, qt_fotos:$('#pl-qtfotos').value||null, vagas_ingresso:$('#pl-vagas').value||null,
+    valor_fotografia:$('#pl-vfoto').value||0, valor_cerimonial:$('#pl-vcerim').value||0, valor_foto_excedente:$('#pl-vexc').value||0,
+    forma_entrega_id:$('#pl-fentrega').value?+$('#pl-fentrega').value:null, limite_ingresso:$('#pl-limite').value||null,
+    inclui_cerimonial:inc('cerimonial'), inclui_eventos:inc('eventos'), inclui_produto:inc('produto'),
+    inclui_servico:inc('servico'), inclui_brinde:inc('brinde') };
+  if(!body.nome.trim()){ alert('Informe o nome do plano.'); return; }
+  const url = plEdit ? apiUrl('/api/turma-formatura/planos/'+plEdit) : apiUrl(`/api/turma-formatura/${id}/planos`);
+  const r=await fetch(url,{method:plEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  limparPl(); carregarPlanos();
+}
+async function carregarPlanos(){
+  const r=await fetch(apiUrl(`/api/turma-formatura/${id}/planos`)); const {itens}=await r.json();
+  $('#pl-count').textContent = itens.length;
+  if(!itens.length){ $('#pl-tbody').innerHTML=`<tr><td colspan="6"><div class="empty"><i data-lucide="package-open"></i>Nenhum plano ainda.</div></td></tr>`; lucide.createIcons(); return; }
+  const tcLabel = v => (PLOPC.tipos_contrato?.find(t=>t[0]===v)||[])[1]||'';
+  $('#pl-tbody').innerHTML = itens.map(p=>`<tr>
+    <td class="nome">${p.nome}${p.tipo_contrato?`<div style="font-size:11px;color:var(--gray-500);font-weight:400;">${tcLabel(p.tipo_contrato)}${p.qt_fotos?` · ${p.qt_fotos} fotos`:''}</div>`:''}</td>
+    <td class="num">${brl(p.valor)}${(p.valor_fotografia||p.valor_cerimonial)?`<div style="font-size:11px;color:var(--gray-500);">F ${brl(p.valor_fotografia)} · C ${brl(p.valor_cerimonial)}</div>`:''}</td>
+    <td>${p.tem_config?'<span class="badge b-realizado" title="Config financeira definida">Financeiro ✓</span>':(p.forma_pagamento||'—')}${p.max_parcelas>1?` · ${p.max_parcelas}x`:''}</td>
+    <td class="num">${p.qtd_itens}</td>
+    <td>${p.ativo?'<span class="badge b-realizado">Ativo</span>':'<span class="badge b-cancelado">Inativo</span>'}</td>
+    <td><div class="row-actions">
+      <button class="icon-btn" title="Config financeira" onclick="abrirConfig(${p.id},'${p.nome.replace(/'/g,"\\'")}')"><i data-lucide="dollar-sign" style="width:15px;height:15px;color:#16A34A;"></i></button>
+      <button class="icon-btn" title="Descontos por CPF" onclick="abrirDescontos(${p.id},'${p.nome.replace(/'/g,"\\'")}')"><i data-lucide="percent" style="width:15px;height:15px;color:#7C3AED;"></i></button>
+      <button class="icon-btn" title="Itens do plano" onclick="abrirPlano(${p.id})"><i data-lucide="folder-open" style="width:15px;height:15px;"></i></button>
+      <button class="icon-btn" title="Editar" onclick='editarPlano(${JSON.stringify(p)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+      <button class="icon-btn danger" title="Excluir" onclick="excluirPlano(${p.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+    </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+window.editarPlano=function(p){ plEdit=p.id;
+  $('#pl-nome').value=p.nome; $('#pl-fpag').value=p.forma_pagamento||''; $('#pl-parc').value=p.max_parcelas; $('#pl-ativo').checked=!!p.ativo; $('#pl-desc').value=p.descricao||'';
+  $('#pl-tipocontrato').value=p.tipo_contrato||''; $('#pl-qtfotos').value=p.qt_fotos||''; $('#pl-vagas').value=p.vagas_ingresso||''; $('#pl-vfoto').value=p.valor_fotografia||''; $('#pl-vcerim').value=p.valor_cerimonial||''; $('#pl-vexc').value=p.valor_foto_excedente||'';
+  $('#pl-fentrega').value=p.forma_entrega_id||''; $('#pl-limite').value=p.limite_ingresso||''; $('#pl-obs').value=p.observacao||'';
+  [['cerimonial',p.inclui_cerimonial],['eventos',p.inclui_eventos],['produto',p.inclui_produto],['servico',p.inclui_servico],['brinde',p.inclui_brinde]]
+    .forEach(([k,v])=>{const el=$('#pl-inc-'+k);el.checked=!!v;el.closest('.chip-check').classList.toggle('on',!!v);});
+  $('#pl-btn').textContent='Atualizar plano'; $('#pl-form-title').textContent='Editar plano'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluirPlano=async function(pid){ if(!confirm('Excluir este plano e seus itens?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid),{method:'DELETE'}); if(r.ok)carregarPlanos(); };
+
+/* -------- Config financeira do plano (modal) -------- */
+window.abrirConfig=async function(pid,nome){
+  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`)); const {config:c}=await r.json();
+  const modal=document.createElement('div'); modal.id='cfg-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:300;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:28px 16px;';
+  const sel=(arr,cur)=>optPair(arr,cur);
+  const qtParc=cur=>`<option value="0" ${!cur?'selected':''}>NÃO</option>`+Array.from({length:72},(_,i)=>`<option value="${i+1}" ${cur==i+1?'selected':''}>${i+1} PARCELA(S)</option>`).join('');
+  const meioRow=m=>`<tr data-meio="${m.meio}">
+      <td class="nome">${m.label}</td>
+      <td><label class="switch"><input type="checkbox" class="cfg-ativo" ${m.ativo?'checked':''}><span class="track"></span></label></td>
+      <td><input type="text" class="cfg-desc" value="${(m.descricao||'').replace(/"/g,'&quot;')}" placeholder="Mensagem p/ o cliente" style="width:100%;padding:7px 9px;border:1px solid var(--gray-300);border-radius:8px;"></td>
+      <td><select class="cfg-qt" style="padding:7px;border:1px solid var(--gray-300);border-radius:8px;">${qtParc(m.qt_parcela)}</select></td>
+    </tr>`;
+  modal.innerHTML=`<div style="background:var(--surface);border-radius:16px;max-width:960px;width:100%;box-shadow:0 20px 60px -20px rgba(0,0,0,.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--gray-100);">
+      <h2 style="margin:0;font-size:16px;font-weight:800;color:var(--gray-900);">Config financeira — ${nome}</h2>
+      <button class="icon-btn" onclick="document.getElementById('cfg-modal').remove()"><i data-lucide="x" style="width:16px;height:16px;"></i></button></div>
+    <div style="padding:20px 22px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:16px;">
+        <div class="med-fld"><label>Dia de vencimento</label><select id="cfg-dia"><option value="">—</option>${(PLOPC.dias_vencimento||[]).map(d=>`<option ${c.dia_vencimento==d?'selected':''}>${d}</option>`).join('')}</select></div>
+        <div class="med-fld"><label>1ª parcela 01</label><input type="date" id="cfg-p1" value="${c.primeira_parcela_01||''}"></div>
+        <div class="med-fld"><label>1ª parcela 02</label><input type="date" id="cfg-p2" value="${c.primeira_parcela_02||''}"></div>
+        <div class="med-fld"><label>1ª parcela 03</label><input type="date" id="cfg-p3" value="${c.primeira_parcela_03||''}"></div>
+        <div class="med-fld"><label>Última parcela</label><input type="date" id="cfg-pu" value="${c.ultima_parcela||''}"></div>
+        <div class="med-fld"><label>Nota fiscal</label><select id="cfg-nf"><option value="false" ${!c.nota_fiscal?'selected':''}>NÃO</option><option value="true" ${c.nota_fiscal?'selected':''}>SIM</option></select></div>
+        <div class="med-fld"><label>Tipo NF</label><select id="cfg-tiponf">${sel(PLOPC.tipo_nf,c.tipo_nota_fiscal)}</select></div>
+        <div class="med-fld"><label>Modelo Documento (contrato)</label><select id="cfg-modelo"><option value="">—</option>${optObj(PLOPC.modelos_documento,c.modelo_documento_id)}</select></div>
+      </div>
+      <div style="font-weight:700;font-size:13px;margin:6px 0 8px;color:var(--gray-700);">Meios de pagamento</div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Meio</th><th>Ativo</th><th>Mensagem</th><th>Parcelas</th></tr></thead>
+        <tbody id="cfg-meios">${c.meios.map(meioRow).join('')}</tbody></table></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:16px;">
+        <div class="med-fld"><label>Taxa de boleto</label><select id="cfg-taxa"><option value="false" ${!c.taxa_boleto?'selected':''}>NÃO</option><option value="true" ${c.taxa_boleto?'selected':''}>SIM</option></select></div>
+        <div class="med-fld"><label>Valor da taxa (R$/parcela)</label><input type="number" step="0.01" id="cfg-vtaxa" value="${c.valor_taxa||''}"></div>
+        <div class="med-fld"><label>Emissão de carnê</label><select id="cfg-carne">${sel(PLOPC.emissao_carne,c.emissao_carne)}</select></div>
+        <div class="med-fld"><label>Multa (%)</label><input type="number" step="0.01" id="cfg-multa" value="${c.multa||''}"></div>
+        <div class="med-fld"><label>Juros (% a.m.)</label><input type="number" step="0.01" id="cfg-juros" value="${c.juros||''}"></div>
+        <div class="med-fld"><label>Desconto pix antecipado (%)</label><input type="number" step="0.01" id="cfg-descpix" value="${c.desconto_pix_antecipado||''}"></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--gray-100);">
+      <button class="btn btn-secondary" onclick="document.getElementById('cfg-modal').remove()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarConfig(${pid})"><i data-lucide="check" class="w-4 h-4"></i> Salvar config</button>
+    </div></div>`;
+  document.body.appendChild(modal); lucide.createIcons();
+};
+window.salvarConfig=async function(pid){
+  const meios=[...document.querySelectorAll('#cfg-meios tr')].map(tr=>({
+    meio:tr.dataset.meio, ativo:tr.querySelector('.cfg-ativo').checked,
+    descricao:tr.querySelector('.cfg-desc').value, qt_parcela:+tr.querySelector('.cfg-qt').value }));
+  const body={ dia_vencimento:$('#cfg-dia').value||null, primeira_parcela_01:$('#cfg-p1').value||null,
+    primeira_parcela_02:$('#cfg-p2').value||null, primeira_parcela_03:$('#cfg-p3').value||null, ultima_parcela:$('#cfg-pu').value||null,
+    nota_fiscal:$('#cfg-nf').value==='true', tipo_nota_fiscal:$('#cfg-tiponf').value, modelo_documento_id:$('#cfg-modelo').value?+$('#cfg-modelo').value:null,
+    taxa_boleto:$('#cfg-taxa').value==='true', valor_taxa:$('#cfg-vtaxa').value||0, emissao_carne:$('#cfg-carne').value,
+    multa:$('#cfg-multa').value||0, juros:$('#cfg-juros').value||0, desconto_pix_antecipado:$('#cfg-descpix').value||0, meios };
+  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(r.ok){ document.getElementById('cfg-modal').remove(); toast('Config financeira salva.'); carregarPlanos(); } else alert('Erro ao salvar config.');
+};
+
+/* -------- Descontos por CPF do plano (modal) -------- */
+const maskCpf = v => { const d=String(v||'').replace(/\D/g,'').slice(0,11); return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
+window.abrirDescontos=async function(pid,nome){
+  const modal=document.createElement('div'); modal.id='desc-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:300;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:36px 16px;';
+  modal.innerHTML=`<div style="background:var(--surface);border-radius:16px;max-width:720px;width:100%;box-shadow:0 20px 60px -20px rgba(0,0,0,.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--gray-100);">
+      <h2 style="margin:0;font-size:16px;font-weight:800;color:var(--gray-900);">Descontos por CPF — ${nome}</h2>
+      <button class="icon-btn" onclick="document.getElementById('desc-modal').remove()"><i data-lucide="x" style="width:16px;height:16px;"></i></button></div>
+    <div class="add-bar" style="padding:16px 22px;">
+      <div class="fld"><label>CPF</label><input type="text" id="dc-cpf" placeholder="000.000.000-00" style="width:160px;"></div>
+      <div class="fld grow"><label>Nome (opcional)</label><input type="text" id="dc-nome" placeholder="Formando"></div>
+      <div class="fld"><label>Desc. fotografia (R$)</label><input type="number" step="0.01" id="dc-foto" placeholder="0,00" style="width:140px;"></div>
+      <div class="fld"><label>Desc. cerimonial (R$)</label><input type="number" step="0.01" id="dc-cerim" placeholder="0,00" style="width:140px;"></div>
+      <div class="fld"><button class="btn btn-primary" onclick="salvarDesconto(${pid})"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>
+    </div>
+    <div class="tbl-wrap" style="padding:0 8px 16px;"><table class="tbl">
+      <thead><tr><th>CPF</th><th>Nome</th><th class="num">Fotografia</th><th class="num">Cerimonial</th><th style="text-align:right;">Ação</th></tr></thead>
+      <tbody id="dc-tbody"></tbody></table></div>
+  </div>`;
+  document.body.appendChild(modal); lucide.createIcons();
+  $('#dc-cpf').oninput = e => e.target.value = maskCpf(e.target.value);
+  carregarDescontos(pid);
+};
+async function carregarDescontos(pid){
+  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/descontos`)); const {itens}=await r.json();
+  if(!itens.length){ $('#dc-tbody').innerHTML=`<tr><td colspan="5"><div class="empty" style="padding:24px;"><i data-lucide="percent"></i>Nenhum CPF com desconto.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#dc-tbody').innerHTML = itens.map(d=>`<tr>
+    <td class="nome">${maskCpf(d.cpf)}</td><td>${d.nome||'—'}</td>
+    <td class="num">${brl(d.desconto_fotografia)}</td><td class="num">${brl(d.desconto_cerimonial)}</td>
+    <td><div class="row-actions"><button class="icon-btn danger" title="Excluir" onclick="excluirDesconto(${d.id},${pid})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td></tr>`).join('');
+  lucide.createIcons();
+}
+window.salvarDesconto=async function(pid){
+  const body={ cpf:$('#dc-cpf').value, nome:$('#dc-nome').value, desconto_fotografia:$('#dc-foto').value||0, desconto_cerimonial:$('#dc-cerim').value||0 };
+  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/descontos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  $('#dc-cpf').value='';$('#dc-nome').value='';$('#dc-foto').value='';$('#dc-cerim').value=''; carregarDescontos(pid);
+};
+window.excluirDesconto=async function(did,pid){ if(!confirm('Excluir este desconto?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-descontos/'+did),{method:'DELETE'}); if(r.ok)carregarDescontos(pid); };
+
+/* itens do plano */
+const optTipo=(cur)=>PLOPC.tipos.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
+function montarPiForm(){
+  $('#pi-form').innerHTML = `
+    <div class="fld"><label>Tipo</label><select id="pi-tipo">${optTipo('produto')}</select></div>
+    <div class="fld grow"><label>Descrição *</label><input type="text" id="pi-desc" placeholder="O que o cliente recebe"></div>
+    <div class="fld"><label>Qtd</label><input type="number" id="pi-qtd" value="1" style="width:90px;"></div>
+    <div class="fld"><label>Valor (R$)</label><input type="number" step="0.01" id="pi-valor" placeholder="0,00" style="width:130px;"></div>
+    <div class="fld"><button class="btn btn-primary" id="pi-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="pi-btn">Adicionar item</span></button></div>`;
+  lucide.createIcons(); $('#pi-salvar').onclick = salvarItem;
+}
+window.abrirPlano=async function(pid){
+  montarPiForm(); planoAtual=pid; piEdit=null;
+  $('#planos-lista').hidden=true; $('#planos-detalhe').hidden=false;
+  const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid)); const p=await r.json();
+  $('#pd-nome').textContent = p.nome + ' — ' + brl(p.valor);
+  pintarItens(p.itens); window.scrollTo({top:0,behavior:'smooth'});
+};
+window.voltarPlanos=function(){ $('#planos-detalhe').hidden=true; $('#planos-lista').hidden=false; carregarPlanos(); };
+function limparPi(){ piEdit=null; $('#pi-tipo').value='produto'; $('#pi-desc').value=''; $('#pi-qtd').value='1'; $('#pi-valor').value=''; $('#pi-btn').textContent='Adicionar item'; }
+async function salvarItem(){
+  const body={ tipo:$('#pi-tipo').value, descricao:$('#pi-desc').value, quantidade:$('#pi-qtd').value||1, valor:$('#pi-valor').value||0 };
+  if(!body.descricao.trim()){ alert('Informe a descrição.'); return; }
+  const url = piEdit ? apiUrl('/api/turma-formatura/planos-itens/'+piEdit) : apiUrl(`/api/turma-formatura/planos/${planoAtual}/itens`);
+  const r=await fetch(url,{method:piEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  limparPi(); recarregarItens();
+}
+async function recarregarItens(){ const r=await fetch(apiUrl('/api/turma-formatura/planos/'+planoAtual)); const p=await r.json(); pintarItens(p.itens); }
+function pintarItens(itens){
+  const total = itens.reduce((s,i)=>s+i.subtotal,0);
+  $('#pi-total').textContent = brl(total);
+  if(!itens.length){ $('#pi-tbody').innerHTML=`<tr><td colspan="6"><div class="empty"><i data-lucide="inbox"></i>Nenhum item no plano.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#pi-tbody').innerHTML = itens.map(i=>{
+    const tipo=(PLOPC.tipos.find(t=>t[0]===i.tipo)||[])[1]||i.tipo;
+    return `<tr><td><span class="badge b-todos">${tipo}</span></td><td class="nome">${i.descricao}</td>
+      <td class="num">${i.quantidade}</td><td class="num">${brl(i.valor)}</td><td class="num">${brl(i.subtotal)}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn" title="Editar" onclick='editarItem(${JSON.stringify(i)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluirItem(${i.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`;}).join('');
+  lucide.createIcons();
+}
+window.editarItem=function(i){ piEdit=i.id; $('#pi-tipo').value=i.tipo; $('#pi-desc').value=i.descricao; $('#pi-qtd').value=i.quantidade; $('#pi-valor').value=i.valor; $('#pi-btn').textContent='Atualizar item'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.excluirItem=async function(iid){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-itens/'+iid),{method:'DELETE'}); if(r.ok)recarregarItens(); };
+
+/* ---------------- PRÉ-CADASTRO / ALUNOS ---------------- */
+let CARGOS = [], VENDEDORES = [];
+async function carregarAlunos(){
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos`)); const {itens,resumo,cargos,vendedores}=await r.json(); CARGOS=cargos||[]; VENDEDORES=vendedores||[];
+  $('#al-count').textContent = resumo.total;
+  $('#al-progresso-txt').textContent = `${resumo.preenchidos} de ${resumo.total} preencheram` + (resumo.comissao?` · ${resumo.comissao} na comissão`:'');
+  const pct = resumo.total ? Math.round(resumo.preenchidos/resumo.total*100) : 0;
+  $('#al-progresso-bar').style.width = pct+'%';
+  if(!itens.length){ $('#al-tbody').innerHTML=`<tr><td colspan="8"><div class="empty"><i data-lucide="users"></i>Nenhum aluno ainda. Importe a lista acima.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#al-tbody').innerHTML = itens.map(a=>{
+    const link = linkAluno(a);
+    const wa = a.celular ? `https://wa.me/55${a.celular.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+a.nome+'! Faça seu cadastro da formatura aqui: '+link)}` : null;
+    const cargoSel = `<select onchange="setCargo(${a.id},this.value)" style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:${a.cargo_comissao?'var(--primary-700)':'var(--gray-500)'};font-weight:${a.cargo_comissao?'600':'400'};"><option value="">— formando —</option>${CARGOS.map(c=>`<option ${a.cargo_comissao===c?'selected':''}>${c}</option>`).join('')}</select>`;
+    const vendSel = `<select onchange="setVendedor(${a.id},this.value)" style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:${a.vendedor_id?'var(--primary-700)':'var(--gray-500)'};font-weight:${a.vendedor_id?'600':'400'};"><option value="">— da turma —</option>${VENDEDORES.map(v=>`<option value="${v.id}" ${a.vendedor_id==v.id?'selected':''}>${v.nome}</option>`).join('')}</select>`;
+    return `<tr>
+      <td class="nome">${a.nome}</td>
+      <td>${a.celular||'—'}</td>
+      <td>${a.status==='preenchido'?'<span class="badge b-realizado">Preenchido</span>':'<span class="badge b-previsto">Pendente</span>'}</td>
+      <td>${cargoSel}</td>
+      <td>${vendSel}</td>
+      <td>${a.plano||'—'}</td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="icon-btn" title="Copiar link de pré-cadastro" onclick="copiarLink('${link}')"><i data-lucide="link" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn" title="Copiar link do encarte" onclick="copiarLink('${SITE}/encarte.html?t=${a.token}')" style="color:#7C3AED;"><i data-lucide="image" style="width:15px;height:15px;"></i></button>
+        ${wa?`<a class="icon-btn" title="Enviar no WhatsApp" href="${wa}" target="_blank" style="color:#16A34A;"><i data-lucide="message-circle" style="width:15px;height:15px;"></i></a>`:''}
+      </div></td>
+      <td><div class="row-actions">
+        <a class="icon-btn" title="Abrir ficha do aluno" href="aluno-detalhe.html?id=${a.id}"><i data-lucide="folder-open" style="width:15px;height:15px;"></i></a>
+        <button class="icon-btn danger" title="Excluir" onclick="excluirAluno(${a.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`;}).join('');
+  lucide.createIcons();
+}
+async function importarAlunos(){
+  const txt = $('#al-import').value.trim();
+  if(!txt){ alert('Cole a lista de alunos.'); return; }
+  const linhas = txt.split('\n').map(l=>{ const p=l.split(/[;,\t]/).map(s=>s.trim()); return { nome:p[0]||'', celular:p[1]||'' }; }).filter(x=>x.nome);
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos/importar`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({linhas})});
+  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  $('#al-import').value=''; toast(`${d.criados} aluno(s) importado(s).`); carregarAlunos();
+}
+async function addAluno(){
+  const nome=$('#al-nome').value.trim(); if(!nome){alert('Informe o nome.');return;}
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome,celular:$('#al-cel').value})});
+  if(r.ok){ $('#al-nome').value=''; $('#al-cel').value=''; carregarAlunos(); } else alert('Erro');
+}
+window.copiarLink = function(link){ navigator.clipboard?.writeText(link).then(()=>toast('Link copiado!'),()=>prompt('Copie o link:',link)); };
+window.excluirAluno = async function(aid){ if(!confirm('Excluir este aluno?'))return; const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'DELETE'}); if(r.ok)carregarAlunos(); };
+window.setCargo = async function(aid,cargo){ const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({cargo_comissao:cargo})}); if(r.ok)carregarAlunos(); };
+window.setVendedor = async function(aid,vid){ const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({vendedor_id:vid?+vid:null})}); if(r.ok)carregarAlunos(); };
+
+function toast(msg){ let t=document.getElementById('vt-toast'); if(!t){t=document.createElement('div');t.id='vt-toast';t.style.cssText='position:fixed;bottom:22px;left:22px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s;';document.body.appendChild(t);} t.textContent=msg;t.style.opacity='1';clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity='0',2000); }
+</script>
 </body>
 </html>

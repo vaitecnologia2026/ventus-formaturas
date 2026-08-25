@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suas fotos — Ventus Fotos</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="fotos.css">
+</head>
+<body style="background: var(--gray-50);">
+
+<header class="ft-nav">
+  <a href="index.html" class="ft-logo"><img class="ft-logo-img" src="/assets/img/logo.png" alt="Ventus Formaturas"></a>
+  <div class="ft-nav-actions">
+    <a href="selfie.html" class="ft-btn ft-btn-ghost"><i data-lucide="refresh-ccw"></i> Nova busca</a>
+    <a href="login.html" class="ft-btn ft-btn-ghost" data-auth-link><i data-lucide="log-in"></i> Entrar</a>
+    <span class="ft-cart" title="Carrinho"><i data-lucide="shopping-cart"></i><span class="ft-cart-badge" data-cart-count hidden>0</span></span>
+  </div>
+</header>
+
+<div class="ft-results-head">
+  <img class="ft-selfie-thumb" id="selfie-thumb" alt="Sua selfie" hidden>
+  <div class="ft-selfie-thumb-fallback" id="selfie-thumb-fallback"><i data-lucide="scan-face"></i></div>
+  <div>
+    <h1>Encontramos <span id="total-fotos">0</span> fotos suas</h1>
+    <p id="results-sub">identificadas por reconhecimento facial · <a href="index.html#faq" style="color:var(--gray-500);">não sou eu?</a></p>
+  </div>
+</div>
+
+<div class="ft-chips" id="chips"></div>
+<div class="ft-photo-grid" id="grid"></div>
+
+<div class="ft-cart-bar" id="cart-bar">
+  <div class="ft-cart-bar-inner">
+    <div class="ft-cart-bar-info"><strong id="cart-total">R$ 0,00</strong><span id="cart-qtd">0 fotos selecionadas</span></div>
+    <button class="ft-btn ft-btn-primary" id="btn-checkout">Comprar fotos <i data-lucide="arrow-right"></i></button>
+  </div>
+</div>
+
+<script src="app-cliente.js"></script>
+<script>
+lucide.createIcons();
+const brl = Ventus.brl;
+
+// Selfie capturada na tela anterior
+const selfieData = sessionStorage.getItem('ventus_selfie');
+if (selfieData) {
+  const thumb = document.getElementById('selfie-thumb');
+  thumb.src = selfieData; thumb.hidden = false;
+  document.getElementById('selfie-thumb-fallback').style.display = 'none';
+}
+
+const resultados = JSON.parse(sessionStorage.getItem('ventus_resultados') || 'null');
+const grid = document.getElementById('grid');
+
+if (!resultados) {
+  document.getElementById('results-sub').innerHTML = 'Faça uma busca com sua selfie para ver suas fotos.';
+  grid.innerHTML = '<p class="vt-empty">Nenhuma busca ainda. <a href="selfie.html">Buscar com minha selfie</a></p>';
+} else if (!resultados.length) {
+  document.getElementById('total-fotos').textContent = '0';
+  grid.innerHTML = '<p class="vt-empty">Nenhuma foto sua no acervo. <a href="selfie.html">Tentar outra selfie</a></p>';
+} else {
+  document.getElementById('total-fotos').textContent = resultados.length;
+  const albuns = new Map();
+  resultados.forEach(r => albuns.set(r.album_id, { nome: r.album_nome, total: (albuns.get(r.album_id)?.total || 0) + 1 }));
+  document.getElementById('results-sub').innerHTML =
+    `em ${albuns.size} álbum(ns) · identificadas por reconhecimento facial · <a href="index.html#faq" style="color:var(--gray-500);">não sou eu?</a>`;
+  document.getElementById('chips').innerHTML =
+    `<button class="ft-chip on" data-album="todos">Todos · ${resultados.length}</button>` +
+    [...albuns].map(([idA, a]) => `<button class="ft-chip" data-album="${idA}">${a.nome} · ${a.total}</button>`).join('');
+
+  grid.innerHTML = resultados.map(r => `
+    <div class="ft-photo" data-album="${r.album_id}" data-id="${r.foto_id}" data-arquivo="${r.arquivo}" data-album-nome="${r.album_nome}">
+      <div class="ft-photo-img real">
+        <img src="${apiUrl(r.url)}" alt="${r.arquivo}" loading="lazy">
+        <span class="ft-match">match ${Math.round(r.similaridade * 100)}%${r.alta_confianca ? ' · alta confiança' : ''}</span>
+      </div>
+      <div class="ft-photo-bar"><div><strong>${brl(Ventus.PRECO)}</strong><span>${r.album_nome} · ${r.arquivo}</span></div>
+        <button class="ft-photo-add">Adicionar</button></div>
+    </div>`).join('');
+  lucide.createIcons();
+  marcar();
+
+  document.getElementById('chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.ft-chip'); if (!chip) return;
+    document.querySelectorAll('.ft-chip').forEach(c => c.classList.remove('on'));
+    chip.classList.add('on');
+    const al = chip.dataset.album;
+    document.querySelectorAll('.ft-photo').forEach(p => { p.style.display = (al === 'todos' || p.dataset.album === al) ? '' : 'none'; });
+  });
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.ft-photo'); if (!card) return;
+    Ventus.Cart.toggle({ foto_id: card.dataset.id, arquivo: card.dataset.arquivo, album_nome: card.dataset.albumNome, preco: Ventus.PRECO, url: apiUrl(card.querySelector('img').getAttribute('src')) });
+    marcar();
+  });
+}
+
+function marcar() {
+  document.querySelectorAll('.ft-photo').forEach(c => {
+    const dentro = Ventus.Cart.tem(c.dataset.id);
+    c.classList.toggle('in-cart', dentro);
+    c.querySelector('.ft-photo-add').textContent = dentro ? 'No carrinho' : 'Adicionar';
+  });
+}
+
+Ventus.onCart(() => {
+  document.getElementById('cart-total').textContent = brl(Ventus.Cart.total());
+  const n = Ventus.Cart.count();
+  document.getElementById('cart-qtd').textContent = n === 1 ? '1 foto selecionada' : n + ' fotos selecionadas';
+  document.getElementById('cart-bar').classList.toggle('on', n > 0);
+});
+document.getElementById('btn-checkout').addEventListener('click', () => Ventus.iniciarCheckout());
+</script>
+</body>
+</html>

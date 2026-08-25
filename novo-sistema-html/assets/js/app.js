@@ -2,13 +2,79 @@
 // Cobre: ícones Lucide, toast em ações simuladas, troca de tabs, ativação de filtros, seleção de fotos.
 
 document.addEventListener('DOMContentLoaded', () => {
+  aplicarTema();          // tema claro/escuro salvo
   renderAdminSidebar();   // se houver #admin-sidebar
   if (window.lucide) lucide.createIcons();
   installToastContainer();
-  installClickInterceptor();
   installTabSwitcher();
-  installFilterSelectFeedback();
+  installMobileNav();
+  installThemeToggle();
+  installTableScroll();
 });
+
+/* ================== Tema claro / escuro ================== */
+function aplicarTema() {
+  const t = localStorage.getItem('ventus-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+}
+function installThemeToggle() {
+  const topbar = document.querySelector('.topbar');
+  if (!topbar || topbar.querySelector('.theme-toggle')) return;
+  const btn = document.createElement('button');
+  btn.className = 'theme-toggle';
+  btn.setAttribute('aria-label', 'Alternar tema claro/escuro');
+  topbar.appendChild(btn);
+  const pintar = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
+    if (window.lucide) lucide.createIcons();
+  };
+  btn.addEventListener('click', () => {
+    const novo = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', novo);
+    localStorage.setItem('ventus-theme', novo);
+    pintar();
+  });
+  pintar();
+}
+
+/* ================== Navegação mobile (hambúrguer + overlay) ================== */
+function installMobileNav() {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar || document.querySelector('.topbar-menu-btn')) return;
+  const topbar = document.querySelector('.topbar');
+
+  const btn = document.createElement('button');
+  btn.className = 'topbar-menu-btn';
+  btn.setAttribute('aria-label', 'Abrir menu');
+  btn.innerHTML = '<i data-lucide="menu"></i>';
+  if (topbar) topbar.insertBefore(btn, topbar.firstChild);
+  else { btn.classList.add('topbar-menu-btn--float'); document.body.appendChild(btn); }
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'sidebar-backdrop';
+  document.body.appendChild(backdrop);
+
+  const fechar = () => document.body.classList.remove('nav-open');
+  btn.addEventListener('click', () => document.body.classList.toggle('nav-open'));
+  backdrop.addEventListener('click', fechar);
+  sidebar.addEventListener('click', (e) => { if (e.target.closest('a')) fechar(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 900) fechar(); });
+
+  if (window.lucide) lucide.createIcons();
+}
+
+/* ================== Tabelas roláveis no mobile ================== */
+function installTableScroll() {
+  document.querySelectorAll('table.table').forEach(t => {
+    if (t.closest('.table-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    t.parentNode.insertBefore(wrap, t);
+    wrap.appendChild(t);
+  });
+}
 
 /* ================== Admin Sidebar (render dinâmico) ================== */
 function renderAdminSidebar() {
@@ -54,7 +120,7 @@ function renderAdminSidebar() {
     {
       title: 'Cadastros',
       items: [
-        { href: 'cadastros.html',         icon: 'database',         label: 'Cadastros' },
+        { href: 'cadastro.html',          icon: 'database',         label: 'Cadastros' },
         { href: 'usuarios.html',          icon: 'shield-check',     label: 'Usuários' },
       ],
     },
@@ -71,7 +137,7 @@ function renderAdminSidebar() {
 
   let html = `
     <div class="sidebar-brand">
-      <div class="sidebar-brand-mark">V</div>
+      <div class="sidebar-brand-mark"><img src="/assets/img/icon-app.png" alt="Ventus"></div>
       <div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div>
     </div>
   `;

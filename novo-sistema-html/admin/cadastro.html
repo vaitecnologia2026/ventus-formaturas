@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastros — Ventus</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .crumb { font-size:13px; color:var(--gray-500); margin-bottom:10px; }
+  .crumb a { color:var(--gray-500); text-decoration:none; }
+  .crumb a:hover { color:var(--gray-700); }
+
+  /* Cabeçalho da página com chip de ícone */
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:26px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center;
+    background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+
+  /* Hub */
+  .cad-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .cad-card { text-decoration:none; display:flex; align-items:center; gap:14px; padding:18px; border-radius:16px;
+    background:var(--surface); border:1px solid var(--gray-200); transition:.16s; }
+  .cad-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:var(--primary-300); }
+  .cad-card .ic { width:46px; height:46px; border-radius:13px; flex:none; display:grid; place-items:center;
+    background:var(--primary-50); color:var(--primary-700); transition:.16s; }
+  .cad-card:hover .ic { background:var(--primary-600); color:#fff; }
+  .cad-card strong { display:block; font-size:14.5px; color:var(--gray-900); line-height:1.25; }
+  .cad-card span { font-size:12px; color:var(--gray-400); }
+  .hub-sec { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); margin:6px 2px 14px; }
+
+  /* Abas segmentadas */
+  .segmented { display:inline-flex; background:var(--gray-100); border-radius:12px; padding:4px; gap:2px; margin-bottom:22px; }
+  .segmented .tab { border:none; background:transparent; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--gray-500);
+    padding:8px 18px; border-radius:9px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:.15s; }
+  .segmented .tab.on { background:var(--surface); color:var(--primary-700); box-shadow:var(--shadow-sm); }
+
+  /* Card (usa .card do app.css) */
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+  .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 22px; border-bottom:1px solid var(--gray-100); }
+  .panel-head h2 { font-size:15px; font-weight:700; color:var(--gray-900); margin:0; display:flex; align-items:center; gap:9px; }
+  .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
+  .panel-body { padding:24px 22px; }
+
+  /* Formulário moderno (label em cima) */
+  .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 24px; }
+  .fld { display:flex; flex-direction:column; gap:7px; }
+  .fld.full { grid-column:1/-1; }
+  .fld > label { font-size:13px; font-weight:600; color:var(--gray-700); }
+  .fld > label .req { color:#DC2626; margin-left:2px; }
+  .fld input[type=text], .fld input[type=number], .fld select, .fld textarea {
+    width:100%; padding:11px 13px; border:1px solid var(--gray-300); border-radius:11px; background:var(--surface);
+    color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .fld input:focus, .fld select:focus, .fld textarea:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .fld textarea { min-height:96px; resize:vertical; }
+
+  /* Toggle (corrigido: inline-block para width/height valerem) */
+  .switch { position:relative; display:inline-block; width:46px; height:27px; }
+  .switch input { position:absolute; opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
+  .switch .track::after { content:''; position:absolute; width:21px; height:21px; left:3px; top:3px; background:#fff; border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+  .switch input:checked + .track { background:var(--success); }
+  .switch input:checked + .track::after { transform:translateX(19px); }
+
+  .form-actions { display:flex; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--gray-100); }
+
+  /* Tabela */
+  .tbl-wrap { overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400);
+    font-weight:700; padding:13px 22px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:14px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+  table.tbl tr:last-child td { border-bottom:none; }
+  table.tbl tbody tr { transition:background .12s; }
+  table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.nome { font-weight:600; color:var(--gray-900); }
+  .badge-ativo { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .badge-ativo.sim { background:#DCFCE7; color:#166534; }
+  .badge-ativo.nao { background:var(--gray-200); color:var(--gray-600); }
+  .row-actions { display:flex; gap:6px; justify-content:flex-end; }
+  .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
+  .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); }
+  .icon-btn.danger:hover { border-color:#FCA5A5; color:#DC2626; background:#FEF2F2; }
+  .empty { text-align:center; color:var(--gray-500); padding:52px 20px; }
+  .empty svg { width:34px; height:34px; color:var(--gray-300); margin:0 auto 10px; display:block; }
+
+  @media (max-width:640px){ .form-grid{grid-template-columns:1fr;} .panel-body{padding:18px 16px;} }
+
+  /* ===== Responsivo mobile (passada geral) ===== */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;}
+    .page-head .chip{width:44px;height:44px;border-radius:13px;}
+    .page-head .chip svg{width:22px;height:22px;}
+    .page-head h1{font-size:20px;}
+    .crumb{font-size:12px;}
+    .form-grid{grid-template-columns:1fr;}
+    .med-grid{grid-template-columns:1fr;}
+    .add-bar{padding:16px;gap:12px;}
+    .add-bar .fld{flex:1 1 100%;min-width:0;}
+    .add-bar input,.add-bar select,.add-bar textarea{width:100%!important;}
+    .panel-head{padding:14px 16px;}
+    .panel-body{padding:16px;}
+    .segmented{width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
+    .segmented .tab{white-space:nowrap;flex:0 0 auto;}
+    table.tbl th, table.tbl td{padding:11px 14px;}
+    .form-actions{flex-direction:column;align-items:stretch;}
+    .form-actions .btn{width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar…"></div>
+    <div class="flex items-center gap-3">
+      <a href="cadastro.html" class="btn btn-secondary btn-sm"><i data-lucide="database" class="w-4 h-4"></i> Todos os cadastros</a>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="crumb" id="crumb"></div>
+    <div class="page-head">
+      <div class="chip" id="head-chip"><i data-lucide="database"></i></div>
+      <div><h1 id="titulo">Cadastros</h1><p id="subtitulo"></p></div>
+    </div>
+
+    <!-- HUB -->
+    <div id="hub" hidden>
+      <div class="hub-sec">Módulo Cadastro</div>
+      <div class="cad-grid" id="hub-grid"></div>
+    </div>
+
+    <!-- ENTIDADE -->
+    <div id="entidade" hidden>
+      <div class="segmented">
+        <button class="tab on" data-tab="cadastrar"><i data-lucide="pencil" style="width:15px;height:15px;"></i> Cadastrar</button>
+        <button class="tab" data-tab="consultar"><i data-lucide="list" style="width:15px;height:15px;"></i> Consultar</button>
+      </div>
+      <div id="pane-cadastrar">
+        <div class="panel">
+          <div class="panel-head"><h2 id="form-title"><i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Novo cadastro</h2></div>
+          <div class="panel-body"><form id="form"></form></div>
+        </div>
+      </div>
+      <div id="pane-consultar" hidden>
+        <div class="panel">
+          <div class="panel-head"><h2 id="list-title">Registros</h2><span class="count" id="list-count">0</span></div>
+          <div class="tbl-wrap"><table class="tbl"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const slug = params.get('entidade');
+const ICONES = { instituicao:'building-2', curso:'graduation-cap', evento:'calendar', brinde:'gift',
+  vendedor:'user-round', produto:'shopping-bag', 'tipo-foto':'image', 'forma-entrega':'truck',
+  prestador:'briefcase', 'modelo-documento':'file-text' };
+const setChip = ic => { $('#head-chip').innerHTML = `<i data-lucide="${ic}"></i>`; lucide.createIcons(); };
+
+if (!slug) renderHub(); else renderEntidade();
+
+/* ------------------------- HUB ------------------------- */
+async function renderHub() {
+  $('#hub').hidden = false;
+  $('#titulo').textContent = 'Cadastros';
+  $('#subtitulo').textContent = 'Dados base do sistema. Selecione um cadastro para gerenciar.';
+  setChip('database');
+  const [rc, rt] = await Promise.all([fetch(apiUrl('/api/cadastro')), fetch(apiUrl('/api/tabela'))]);
+  const { cadastros } = await rc.json();
+  const { tabelas } = await rt.json();
+  const cards = cadastros.map(c => `
+    <a class="cad-card" href="cadastro.html?entidade=${c.slug}">
+      <div class="ic"><i data-lucide="${ICONES[c.slug] || 'folder'}"></i></div>
+      <div><strong>${c.plural}</strong><span>${c.modulo}</span></div>
+    </a>`);
+  const iconTab = { 'tabela-preco':'table-2', 'tabela-cerimonial':'utensils' };
+  for (const t of tabelas) cards.push(`
+    <a class="cad-card" href="tabela.html?tipo=${t.tipo}">
+      <div class="ic"><i data-lucide="${iconTab[t.tipo] || 'table-2'}"></i></div>
+      <div><strong>${t.plural}</strong><span>${t.modulo}</span></div>
+    </a>`);
+  $('#hub-grid').innerHTML = cards.join('');
+  lucide.createIcons();
+}
+
+/* --------------------- ENTIDADE (CRUD) --------------------- */
+let CAMPOS = [], LABEL = '', PLURAL = '', editId = null;
+
+async function renderEntidade() {
+  $('#entidade').hidden = false;
+  const rs = await fetch(apiUrl(`/api/cadastro/${slug}/schema`));
+  if (!rs.ok) { $('#titulo').textContent = 'Cadastro não encontrado'; return; }
+  const schema = await rs.json();
+  CAMPOS = schema.campos; LABEL = schema.label; PLURAL = schema.plural;
+  $('#crumb').innerHTML = `<a href="cadastro.html">Cadastros</a> › ${PLURAL}`;
+  $('#titulo').textContent = PLURAL;
+  $('#subtitulo').textContent = `Cadastre e consulte ${PLURAL.toLowerCase()}.`;
+  $('#list-title').textContent = PLURAL + ' cadastrados';
+  setChip(ICONES[slug] || 'folder');
+  montarForm();
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => trocarAba(t.dataset.tab));
+  await carregarTabela();
+}
+
+function trocarAba(aba) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === aba));
+  $('#pane-cadastrar').hidden = aba !== 'cadastrar';
+  $('#pane-consultar').hidden = aba !== 'consultar';
+  if (aba === 'consultar') carregarTabela();
+}
+
+function montarForm() {
+  const campoHtml = c => {
+    const req = c.obrigatorio ? '<span class="req">*</span>' : '';
+    const full = (c.tipo === 'textarea') ? ' full' : '';
+    let ctrl = '';
+    if (c.tipo === 'text') ctrl = `<input type="text" id="f-${c.nome}">`;
+    else if (c.tipo === 'number') ctrl = `<input type="number" step="0.01" id="f-${c.nome}">`;
+    else if (c.tipo === 'int') ctrl = `<input type="number" step="1" id="f-${c.nome}">`;
+    else if (c.tipo === 'textarea') ctrl = `<textarea id="f-${c.nome}"></textarea>`;
+    else if (c.tipo === 'select') ctrl = `<select id="f-${c.nome}">${(c.opcoes||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`;
+    else if (c.tipo === 'bool') ctrl = `<label class="switch"><input type="checkbox" id="f-${c.nome}"><span class="track"></span></label>`;
+    return `<div class="fld${full}"><label for="f-${c.nome}">${c.label} ${req}</label><div>${ctrl}</div></div>`;
+  };
+  $('#form').innerHTML = `<div class="form-grid">${CAMPOS.map(campoHtml).join('')}</div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i> <span id="btn-salvar-txt">Salvar</span></button>
+      <button type="button" class="btn btn-secondary" id="btn-limpar">Limpar</button>
+    </div>`;
+  aplicarDefaults();
+  lucide.createIcons();
+  $('#form').onsubmit = salvar;
+  $('#btn-limpar').onclick = () => { editId = null; aplicarDefaults(); $('#btn-salvar-txt').textContent = 'Salvar'; $('#form-title').innerHTML = '<i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Novo cadastro'; lucide.createIcons(); };
+}
+
+function aplicarDefaults() {
+  for (const c of CAMPOS) {
+    const el = $(`#f-${c.nome}`); if (!el) continue;
+    if (c.tipo === 'bool') el.checked = c.default !== undefined ? !!c.default : false;
+    else el.value = c.default !== undefined ? c.default : '';
+  }
+}
+
+function lerForm() {
+  const body = {};
+  for (const c of CAMPOS) {
+    const el = $(`#f-${c.nome}`); if (!el) continue;
+    body[c.nome] = c.tipo === 'bool' ? el.checked : el.value;
+  }
+  return body;
+}
+
+async function salvar(e) {
+  e.preventDefault();
+  const body = lerForm();
+  const url = editId ? apiUrl(`/api/cadastro/${slug}/${editId}`) : apiUrl(`/api/cadastro/${slug}`);
+  const r = await fetch(url, { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!r.ok) { alert(d.detail || 'Erro ao salvar.'); return; }
+  editId = null; aplicarDefaults(); $('#btn-salvar-txt').textContent = 'Salvar';
+  toast(`${LABEL} salvo com sucesso.`);
+  trocarAba('consultar');
+}
+
+async function carregarTabela() {
+  const r = await fetch(apiUrl(`/api/cadastro/${slug}`));
+  const { itens } = await r.json();
+  $('#list-count').textContent = itens.length;
+  const cols = CAMPOS.filter(c => c.tipo !== 'textarea');
+  $('#thead').innerHTML = '<tr>' + cols.map(c => `<th>${c.label}</th>`).join('') + '<th style="text-align:right;">Ações</th></tr>';
+  if (!itens.length) { $('#tbody').innerHTML = `<tr><td colspan="${cols.length+1}"><div class="empty"><i data-lucide="inbox"></i>Nenhum registro ainda. Use a aba <b>Cadastrar</b>.</div></td></tr>`; lucide.createIcons(); return; }
+  $('#tbody').innerHTML = itens.map(it => '<tr>' + cols.map((c,idx) => `<td class="${idx===0?'nome':''}">${celula(c, it[c.nome])}</td>`).join('')
+    + `<td><div class="row-actions">
+        <button class="icon-btn" title="Editar" onclick='editar(${JSON.stringify(it)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+        <button class="icon-btn danger" title="Excluir" onclick="excluir(${it.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
+      </div></td></tr>`).join('');
+  lucide.createIcons();
+}
+
+function celula(c, v) {
+  if (c.tipo === 'bool') return v ? '<span class="badge-ativo sim">Ativo</span>' : '<span class="badge-ativo nao">Inativo</span>';
+  if (c.tipo === 'select') { const o = (c.opcoes||[]).find(([val])=>val===v); return o ? o[1] : (v ?? '—'); }
+  return (v === '' || v === null || v === undefined) ? '—' : v;
+}
+
+window.editar = function(it) {
+  editId = it.id;
+  for (const c of CAMPOS) {
+    const el = $(`#f-${c.nome}`); if (!el) continue;
+    if (c.tipo === 'bool') el.checked = !!it[c.nome];
+    else el.value = it[c.nome] ?? '';
+  }
+  $('#btn-salvar-txt').textContent = 'Atualizar';
+  $('#form-title').innerHTML = '<i data-lucide="pencil" style="width:17px;height:17px;color:var(--primary-600);"></i> Editar cadastro';
+  trocarAba('cadastrar'); lucide.createIcons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.excluir = async function(id) {
+  if (!confirm('Excluir este registro?')) return;
+  const r = await fetch(apiUrl(`/api/cadastro/${slug}/${id}`), { method: 'DELETE' });
+  if (r.ok) { toast('Registro excluído.'); carregarTabela(); } else alert('Erro ao excluir.');
+};
+
+function toast(msg) {
+  let t = document.getElementById('vt-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'vt-toast'; t.style.cssText = 'position:fixed;bottom:22px;left:22px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+}
+</script>
+</body>
+</html>
