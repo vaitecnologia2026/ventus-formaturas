@@ -97,6 +97,7 @@ function renderAdminSidebar() {
       title: 'Operação',
       items: [
         { href: 'os.html',                icon: 'clipboard-list',   label: 'Ordens de Serviço' },
+        { href: 'brindes-pendentes.html', icon: 'gift',             label: 'Brindes pendentes' },
         { href: 'galerias.html',          icon: 'images',           label: 'Galerias e Fotos' },
         { href: 'checkin-ao-vivo.html',   icon: 'qr-code',          label: 'Check-in ao vivo' },
       ],

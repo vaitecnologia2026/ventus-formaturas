@@ -141,19 +141,20 @@ function montarForm(){
     <div class="fld"><label>Data final</label><input type="date" id="o-dfim"></div>
     <div class="fld"><label>Prazo</label><input type="date" id="o-prazo"></div>
     <div class="fld"><label>Status</label><select id="o-status">${optArr(OPC.status,'aberta')}</select></div>
-    <div class="fld grow"><label>Chamado / Observação</label><input type="text" id="o-chamado" placeholder="Descrição do chamado"></div>
+    <div class="fld grow"><label>Chamado</label><input type="text" id="o-chamado" placeholder="Descrição do chamado"></div>
+    <div class="fld grow"><label>Observação</label><textarea id="o-obs" rows="2" placeholder="Anotações internas" style="padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;background:var(--surface);color:var(--gray-900);font-size:14px;font-family:inherit;outline:none;resize:vertical;min-width:180px;"></textarea></div>
     <div class="fld"><button class="btn btn-primary" id="o-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="o-btn">Criar OS</span></button></div>`;
   lucide.createIcons(); $('#o-salvar').onclick = salvar;
 }
 function limpar(){ editId=null;
-  ['o-tit','o-turma','o-aluno','o-evento','o-setor','o-tipoos','o-situacao','o-solic','o-prio','o-resp','o-dini','o-dfim','o-prazo','o-chamado'].forEach(k=>{const el=$('#'+k);if(el)el.value='';});
+  ['o-tit','o-turma','o-aluno','o-evento','o-setor','o-tipoos','o-situacao','o-solic','o-prio','o-resp','o-dini','o-dfim','o-prazo','o-chamado','o-obs'].forEach(k=>{const el=$('#'+k);if(el)el.value='';});
   $('#o-tipo').value='edicao'; $('#o-status').value='aberta'; $('#o-btn').textContent='Criar OS'; }
 async function salvar(){
   const body={ titulo:$('#o-tit').value, tipo:$('#o-tipo').value, turma_id:$('#o-turma').value||null, aluno_id:$('#o-aluno').value||null, evento_id:$('#o-evento').value||null,
     responsavel:$('#o-resp').value, prazo:$('#o-prazo').value||null, status:$('#o-status').value,
     setor_id:$('#o-setor').value||null, tipo_os_id:$('#o-tipoos').value||null, situacao_id:$('#o-situacao').value||null,
     solicitante:$('#o-solic').value||null, prioridade:$('#o-prio').value||null,
-    data_inicial:$('#o-dini').value||null, data_final:$('#o-dfim').value||null, chamado:$('#o-chamado').value||null };
+    data_inicial:$('#o-dini').value||null, data_final:$('#o-dfim').value||null, chamado:$('#o-chamado').value||null, observacoes:$('#o-obs').value||null };
   if(!body.titulo.trim()){alert('Informe o título.');return;}
   const url = editId ? apiUrl('/api/os/'+editId) : apiUrl('/api/os');
   const r=await fetch(url,{method:editId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -180,6 +181,7 @@ function cardOS(o){
     <div style="margin:8px 0 6px;"><span class="badge b-tipo">${tipo}</span>${o.situacao_os?` <span class="badge b-todos">${esc(o.situacao_os)}</span>`:''}</div>
     ${linha('users-round',o.turma)}${linha('user',o.aluno)}${linha('calendar-days',o.evento)}${linha('user-check',o.responsavel)}
     ${o.chamado?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;">${esc(o.chamado)}</div>`:''}
+    ${o.observacoes?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;display:flex;gap:6px;align-items:center;"><i data-lucide="sticky-note" style="width:13px;height:13px;flex:none;"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(o.observacoes)}</span></div>`:''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:8px;border-top:1px solid var(--gray-100);">
       <span style="font-size:11px;color:var(--gray-400);">${o.dias_na_etapa!=null?`há ${o.dias_na_etapa}d nesta etapa`:''}</span>
       <span style="display:flex;gap:4px;">
@@ -216,7 +218,7 @@ window.mover=async function(id,status){ const r=await fetch(apiUrl('/api/os/'+id
 window.editar=function(o){ editId=o.id; $('#o-tit').value=o.titulo; $('#o-tipo').value=o.tipo; $('#o-turma').value=o.turma_id||''; refiltrarTurma(o.aluno_id,o.evento_id);
   $('#o-resp').value=o.responsavel||''; $('#o-prazo').value=o.prazo||''; $('#o-status').value=o.status;
   $('#o-setor').value=o.setor_id||''; $('#o-tipoos').value=o.tipo_os_id||''; $('#o-situacao').value=o.situacao_id||'';
-  $('#o-solic').value=o.solicitante||''; $('#o-prio').value=o.prioridade||''; $('#o-dini').value=o.data_inicial||''; $('#o-dfim').value=o.data_final||''; $('#o-chamado').value=o.chamado||'';
+  $('#o-solic').value=o.solicitante||''; $('#o-prio').value=o.prioridade||''; $('#o-dini').value=o.data_inicial||''; $('#o-dfim').value=o.data_final||''; $('#o-chamado').value=o.chamado||''; $('#o-obs').value=o.observacoes||'';
   $('#o-btn').textContent='Atualizar OS'; window.scrollTo({top:0,behavior:'smooth'}); };
 window.excluir=async function(oid){ if(!confirm('Excluir esta OS?'))return; const r=await fetch(apiUrl('/api/os/'+oid),{method:'DELETE'}); if(r.ok)carregar(); };
 </script>

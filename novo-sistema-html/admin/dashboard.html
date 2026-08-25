@@ -107,6 +107,7 @@
         <div class="f"><label>Situação eventos</label><select id="fil-sev"><option value="">Todas</option><option value="previsto">Previsto</option><option value="confirmado">Confirmado</option><option value="realizado">Realizado</option><option value="cancelado">Cancelado</option></select></div>
         <div class="f"><label>Possui cerimonial</label><select id="fil-cer"><option value="">Todas</option><option value="1">Sim</option><option value="0">Não</option></select></div>
         <div class="f"><label>Vendedor</label><select id="fil-vend"><option value="">Todos</option></select></div>
+        <div class="f"><label>Tipo de boleto</label><select id="fil-tb"><option value="">Tipo de boleto (todos)</option></select></div>
         <div class="f"><label>Assinatura (de)</label><input type="date" id="fil-ai"></div>
         <div class="f"><label>Assinatura (até)</label><input type="date" id="fil-af"></div>
         <div class="acoes">
@@ -171,10 +172,11 @@ initPainel();
 async function initPainel(){
   try{ const r=await fetch(apiUrl('/api/painel/opcoes')); const o=await r.json();
     document.getElementById('fil-vend').innerHTML='<option value="">Todos</option>'+(o.vendedores||[]).map(v=>`<option value="${v.id}">${v.nome}</option>`).join('');
+    document.getElementById('fil-tb').innerHTML='<option value="">Tipo de boleto (todos)</option>'+(o.tipos_boleto||[]).map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('');
   }catch(e){}
   carregar();
 }
-window.limparFiltros = () => { ['fil-di','fil-df','fil-sit','fil-sev','fil-cer','fil-vend','fil-ai','fil-af'].forEach(k=>document.getElementById(k).value=''); carregar(); };
+window.limparFiltros = () => { ['fil-di','fil-df','fil-sit','fil-sev','fil-cer','fil-vend','fil-tb','fil-ai','fil-af'].forEach(k=>document.getElementById(k).value=''); carregar(); };
 function queryFiltros(){
   const p = new URLSearchParams();
   const G=id=>document.getElementById(id);
@@ -184,6 +186,7 @@ function queryFiltros(){
   if(G('fil-sev').value) p.set('situacao_evento',G('fil-sev').value);
   if(G('fil-cer').value) p.set('possui_cerimonial', G('fil-cer').value==='1'?'true':'false');
   if(G('fil-vend').value) p.set('vendedor_id',G('fil-vend').value);
+  if(G('fil-tb').value) p.set('tipo_boleto',G('fil-tb').value);
   if(G('fil-ai').value) p.set('assinatura_inicio',G('fil-ai').value);
   if(G('fil-af').value) p.set('assinatura_fim',G('fil-af').value);
   const q=p.toString(); return q?('?'+q):'';

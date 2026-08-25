@@ -240,7 +240,10 @@ function montarForm() {
     else if (c.tipo === 'textarea') ctrl = `<textarea id="f-${c.nome}"></textarea>`;
     else if (c.tipo === 'select') ctrl = `<select id="f-${c.nome}">${(c.opcoes||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`;
     else if (c.tipo === 'bool') ctrl = `<label class="switch"><input type="checkbox" id="f-${c.nome}"><span class="track"></span></label>`;
-    return `<div class="fld${full}"><label for="f-${c.nome}">${c.label} ${req}</label><div>${ctrl}</div></div>`;
+    else if (c.tipo === 'imagem') ctrl = `<input type="hidden" id="f-${c.nome}"><input type="file" accept="image/png,image/jpeg" onchange="lerImagem(this,'${c.nome}')"><div id="prev-${c.nome}" style="margin-top:8px;"></div>`;
+    else if (c.tipo === 'multiselect') ctrl = `<div id="f-${c.nome}" style="display:flex;flex-wrap:wrap;gap:8px 16px;">${(c.opcoes||[]).map(([v,l])=>`<label style="display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--gray-700);cursor:pointer;"><input type="checkbox" value="${v}"> ${l}</label>`).join('')}</div>`;
+    const isFull = full || c.tipo === 'multiselect' || c.tipo === 'imagem';
+    return `<div class="fld${isFull?' full':''}"><label for="f-${c.nome}">${c.label} ${req}</label><div>${ctrl}</div></div>`;
   };
   $('#form').innerHTML = `<div class="form-grid">${CAMPOS.map(campoHtml).join('')}</div>
     <div class="form-actions">
@@ -256,7 +259,9 @@ function montarForm() {
 function aplicarDefaults() {
   for (const c of CAMPOS) {
     const el = $(`#f-${c.nome}`); if (!el) continue;
-    if (c.tipo === 'bool') el.checked = c.default !== undefined ? !!c.default : false;
+    if (c.tipo === 'bool') { el.checked = c.default !== undefined ? !!c.default : false; }
+    else if (c.tipo === 'multiselect') { el.querySelectorAll('input').forEach(x => x.checked = false); }
+    else if (c.tipo === 'imagem') { el.value = ''; const p = $(`#prev-${c.nome}`); if (p) p.innerHTML = ''; }
     else el.value = c.default !== undefined ? c.default : '';
   }
 }
@@ -265,10 +270,23 @@ function lerForm() {
   const body = {};
   for (const c of CAMPOS) {
     const el = $(`#f-${c.nome}`); if (!el) continue;
-    body[c.nome] = c.tipo === 'bool' ? el.checked : el.value;
+    if (c.tipo === 'bool') body[c.nome] = el.checked;
+    else if (c.tipo === 'multiselect') body[c.nome] = [...el.querySelectorAll('input:checked')].map(x => x.value);
+    else body[c.nome] = el.value;
   }
   return body;
 }
+
+window.lerImagem = function(input, nome) {
+  const f = input.files && input.files[0]; if (!f) return;
+  if (f.size > 3 * 1024 * 1024) { alert('Imagem muito grande (máx. 3MB).'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    $(`#f-${nome}`).value = e.target.result;
+    const p = $(`#prev-${nome}`); if (p) p.innerHTML = `<img src="${e.target.result}" style="max-height:90px;border-radius:10px;border:1px solid var(--gray-200);">`;
+  };
+  reader.readAsDataURL(f);
+};
 
 async function salvar(e) {
   e.preventDefault();
@@ -300,6 +318,8 @@ async function carregarTabela() {
 function celula(c, v) {
   if (c.tipo === 'bool') return v ? '<span class="badge-ativo sim">Ativo</span>' : '<span class="badge-ativo nao">Inativo</span>';
   if (c.tipo === 'select') { const o = (c.opcoes||[]).find(([val])=>val===v); return o ? o[1] : (v ?? '—'); }
+  if (c.tipo === 'imagem') return v ? `<img src="${v}" style="height:34px;border-radius:6px;border:1px solid var(--gray-200);">` : '—';
+  if (c.tipo === 'multiselect') { if (!v) return '—'; return String(v).split(',').map(s=>s.trim()).map(val=>{const o=(c.opcoes||[]).find(([x])=>x===val); return o?o[1]:val;}).join(', '); }
   return (v === '' || v === null || v === undefined) ? '—' : v;
 }
 
@@ -308,6 +328,8 @@ window.editar = function(it) {
   for (const c of CAMPOS) {
     const el = $(`#f-${c.nome}`); if (!el) continue;
     if (c.tipo === 'bool') el.checked = !!it[c.nome];
+    else if (c.tipo === 'multiselect') { const vals = String(it[c.nome]||'').split(',').map(s=>s.trim()); el.querySelectorAll('input').forEach(x => x.checked = vals.includes(x.value)); }
+    else if (c.tipo === 'imagem') { el.value = it[c.nome] || ''; const p = $(`#prev-${c.nome}`); if (p) p.innerHTML = it[c.nome] ? `<img src="${it[c.nome]}" style="max-height:90px;border-radius:10px;border:1px solid var(--gray-200);">` : ''; }
     else el.value = it[c.nome] ?? '';
   }
   $('#btn-salvar-txt').textContent = 'Atualizar';

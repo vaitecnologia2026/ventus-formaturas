@@ -108,7 +108,9 @@
       <button class="tab" data-tab="brindes"><i data-lucide="gift" style="width:15px;height:15px;"></i> Brindes</button>
       <button class="tab" data-tab="cerimonial"><i data-lucide="utensils" style="width:15px;height:15px;"></i> Cerimonial</button>
       <button class="tab" data-tab="planos"><i data-lucide="package-2" style="width:15px;height:15px;"></i> Planos</button>
+      <button class="tab" data-tab="cursos"><i data-lucide="graduation-cap" style="width:15px;height:15px;"></i> Cursos</button>
       <button class="tab" data-tab="alunos"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Pré-cadastro</button>
+      <button class="tab" data-tab="historico"><i data-lucide="history" style="width:15px;height:15px;"></i> Histórico</button>
     </div>
 
     <!-- DADOS -->
@@ -232,6 +234,35 @@
           <tbody id="al-tbody"></tbody></table></div>
       </div>
     </section>
+
+    <section id="pane-cursos" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="graduation-cap" style="width:16px;height:16px;color:var(--primary-600);"></i> Cursos vinculados</h2></div>
+        <div class="panel-body">
+          <p style="margin:0 0 12px;font-size:13px;color:var(--gray-500);">Turmas de cursos unificados podem ter vários cursos (até de instituições diferentes). Marque os cursos desta turma.</p>
+          <div id="cur-lista" style="display:flex;flex-wrap:wrap;gap:8px 16px;"></div>
+          <div style="margin-top:16px;"><button class="btn btn-primary" id="cur-salvar"><i data-lucide="check" class="w-4 h-4"></i> Salvar cursos</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pane-historico" hidden>
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head"><h2><i data-lucide="history" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo lançamento no histórico</h2></div>
+        <div class="panel-body">
+          <p style="margin:0 0 10px;font-size:13px;color:var(--gray-500);">Registre a evolução da negociação e os fatos da turma (o que foi combinado, alterações, etc.).</p>
+          <textarea id="hist-texto" style="width:100%;min-height:90px;padding:12px 14px;border:1px solid var(--gray-300);border-radius:11px;font-family:inherit;font-size:14px;outline:none;resize:vertical;" placeholder="Ex.: Comissão aprovou o plano Ouro. Data de assinatura remarcada para 10/09."></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="hist-autor" placeholder="Autor (opcional)" style="padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;font-size:14px;outline:none;width:200px;">
+            <button class="btn btn-primary" id="hist-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar ao histórico</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Histórico da turma</h2><span class="count" id="hist-count">0</span></div>
+        <div class="panel-body" id="hist-lista" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -269,9 +300,57 @@ function linkAluno(a){ return SITE + a.link; }
 
 function trocarAba(aba) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab===aba));
-  ['dados','eventos','brindes','cerimonial','planos','alunos'].forEach(p => $('#pane-'+p).hidden = p!==aba);
+  ['dados','eventos','brindes','cerimonial','planos','cursos','alunos','historico'].forEach(p => $('#pane-'+p).hidden = p!==aba);
   if (aba==='alunos') carregarAlunos();
+  if (aba==='cursos') carregarCursos();
+  if (aba==='historico') carregarHistorico();
 }
+
+/* ---------------- CURSOS vinculados ---------------- */
+let CURSOS_OPC = [];
+async function carregarCursos() {
+  if (!CURSOS_OPC.length) {
+    const r = await fetch(apiUrl('/api/turma-formatura/opcoes'));
+    CURSOS_OPC = (await r.json()).cursos || [];
+  }
+  const rt = await fetch(apiUrl('/api/turma-formatura/'+id));
+  const t = await rt.json();
+  const sel = new Set((t.curso_ids)||[]);
+  $('#cur-lista').innerHTML = CURSOS_OPC.length
+    ? CURSOS_OPC.map(c=>`<label style="display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--gray-700);cursor:pointer;"><input type="checkbox" value="${c.id}" ${sel.has(c.id)?'checked':''}> ${c.nome}</label>`).join('')
+    : '<span style="font-size:13px;color:var(--gray-400);">Nenhum curso cadastrado. Cadastre em Cadastros › Cursos.</span>';
+  $('#cur-salvar').onclick = salvarCursos;
+}
+async function salvarCursos() {
+  const ids = [...$('#cur-lista').querySelectorAll('input:checked')].map(x=>Number(x.value));
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/cursos`), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso_ids:ids})});
+  if (r.ok) { toast('Cursos atualizados.'); const t=await(await fetch(apiUrl('/api/turma-formatura/'+id))).json(); pintarDados(t); }
+  else alert('Erro ao salvar cursos.');
+}
+
+/* ---------------- HISTÓRICO da turma ---------------- */
+async function carregarHistorico() {
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/historico`));
+  const { itens } = await r.json();
+  $('#hist-count').textContent = itens.length;
+  $('#hist-lista').innerHTML = itens.length ? itens.map(h=>{
+    const dt = h.data ? new Date(h.data).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    return `<div style="border-left:3px solid var(--primary-300);padding:8px 14px;background:var(--gray-50);border-radius:0 10px 10px 0;">
+      <div style="font-size:12px;color:var(--gray-500);display:flex;justify-content:space-between;gap:10px;">
+        <span>${dt}${h.autor?' · '+h.autor:''}</span>
+        <button onclick="excluirHist(${h.id})" style="border:none;background:none;color:var(--gray-400);cursor:pointer;font-size:12px;">excluir</button>
+      </div>
+      <div style="font-size:14px;color:var(--gray-800);margin-top:3px;white-space:pre-wrap;">${(h.texto||'').replace(/</g,'&lt;')}</div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--gray-400);padding:30px;">Nenhum lançamento ainda.</div>';
+  $('#hist-add').onclick = addHist;
+}
+async function addHist() {
+  const texto = $('#hist-texto').value.trim(); if (!texto) { alert('Escreva o histórico.'); return; }
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/historico`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto,autor:$('#hist-autor').value.trim()||null})});
+  if (r.ok) { $('#hist-texto').value=''; carregarHistorico(); toast('Histórico registrado.'); } else alert('Erro ao salvar.');
+}
+window.excluirHist = async function(hid){ if(!confirm('Excluir este lançamento?'))return; const r=await fetch(apiUrl(`/api/turma-formatura/historico/${hid}`),{method:'DELETE'}); if(r.ok) carregarHistorico(); };
 
 function pintarDados(t) {
   const cursos = (t.cursos||[]).map(c=>c.nome).join(', ') || '—';
