@@ -1,85 +1,84 @@
 <!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Revisão 3 · Respostas + Etapa 2 — Ventus</title>
+<title>Ventus · Etapa 2 e novidades</title>
 <style>
-:root{--bg:#0A2540;--card:#0f2f4d;--line:rgba(255,255,255,.09);--sub:#9db2cd;--azul:#2563EB;--ok:#34D399;--warn:#FBBF24;--next:#93C5FD}
-*{box-sizing:border-box} html,body{margin:0} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#e6edf6;-webkit-text-size-adjust:100%}
-header{padding:20px clamp(16px,4vw,40px);border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
-h1{margin:0;font-size:clamp(18px,4vw,24px);letter-spacing:.01em}
-.lead{margin:6px 0 0;color:var(--sub);font-size:13px;max-width:720px}
-.filters{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
-.filters button{background:var(--card);border:1px solid var(--line);color:#cfe0f5;font:inherit;font-size:12.5px;padding:6px 13px;border-radius:999px;cursor:pointer}
+:root{--bg:#0A2540;--card:#0f2f4d;--line:rgba(255,255,255,.10);--sub:#9db2cd;--azul:#2563EB;--azul2:#60A5FA}
+*{box-sizing:border-box} html,body{margin:0} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:
+  radial-gradient(120% 80% at 12% -10%, rgba(59,130,246,.14) 0%, transparent 46%),
+  radial-gradient(120% 80% at 100% 0%, rgba(37,99,235,.12) 0%, transparent 42%),
+  var(--bg);color:#e6edf6;-webkit-text-size-adjust:100%;min-height:100vh}
+header{padding:26px clamp(16px,4vw,44px) 20px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--azul2)}
+h1{margin:8px 0 0;font-size:clamp(22px,4.4vw,32px);letter-spacing:-.01em;font-weight:800}
+.lead{margin:8px 0 0;color:var(--sub);font-size:14px;max-width:760px;line-height:1.6}
+.filters{margin-top:16px;display:flex;gap:7px;flex-wrap:wrap}
+.filters button{background:var(--card);border:1px solid var(--line);color:#cfe0f5;font:inherit;font-size:12.5px;padding:7px 14px;border-radius:999px;cursor:pointer;transition:.15s}
 .filters button.on{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
-.sec-title{padding:22px clamp(16px,4vw,40px) 4px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7aa2d6}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:10px clamp(16px,4vw,40px) 6px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:9px}
-.top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
-.badge{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:7px}
-.b-ok{background:rgba(52,211,153,.16);color:var(--ok)} .b-warn{background:rgba(251,191,36,.16);color:var(--warn)} .b-next{background:rgba(147,197,253,.16);color:var(--next)}
-.mod{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#7aa2d6;font-weight:700}
-.card strong{font-size:14.5px;color:#fff;line-height:1.35;font-weight:700}
-.card p{margin:0;font-size:12.5px;color:var(--sub);line-height:1.5}
-.open{margin-top:4px;align-self:flex-start;background:var(--azul);color:#fff;text-decoration:none;font-size:12.5px;font-weight:700;padding:8px 13px;border-radius:9px;display:inline-flex;align-items:center;gap:6px}
-.open:hover{background:#1d4ed8} .open.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line)}
-.foot{padding:22px clamp(16px,4vw,40px) 44px;color:var(--sub);font-size:12px}
+.sec{padding:20px clamp(16px,4vw,44px) 2px;display:flex;align-items:center;gap:10px}
+.sec h2{margin:0;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8fb2e0}
+.sec .rule{flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;padding:12px clamp(16px,4vw,44px) 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:.18s;position:relative;overflow:hidden}
+.card:hover{border-color:rgba(96,165,250,.45);transform:translateY(-2px)}
+.ic{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,rgba(37,99,235,.25),rgba(96,165,250,.15));border:1px solid rgba(96,165,250,.25);display:grid;place-items:center;font-size:19px}
+.mod{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#7aa2d6;font-weight:800}
+.card strong{font-size:15px;color:#fff;line-height:1.35;font-weight:700}
+.card p{margin:0;font-size:12.5px;color:var(--sub);line-height:1.55;flex:1}
+.open{margin-top:2px;align-self:flex-start;background:var(--azul);color:#fff;text-decoration:none;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:9px;display:inline-flex;align-items:center;gap:6px}
+.open:hover{background:#1d4ed8}
+.foot{padding:24px clamp(16px,4vw,44px) 48px;color:var(--sub);font-size:12px;opacity:.8}
 </style></head><body>
 <header>
-  <h1>REVISÃO 3 · RESPOSTAS + ETAPA 2</h1>
-  <p class="lead">Cada ponto do PDF enviado, com o status atual e um link direto pra ver no sistema. Abaixo, o showcase da Etapa 2 (telas de perfil = protótipos de design + o módulo que gera os links personalizados).</p>
+  <div class="eyebrow">Ventus Formaturas</div>
+  <h1>Etapa 2 e novidades do sistema</h1>
+  <p class="lead">Um mapa das telas e recursos do sistema, com acesso direto a cada um. Abaixo, o showcase da Etapa 2 — as áreas de cada perfil (formando, fotógrafo, editor e operador) e o painel que gera os links de acesso personalizados.</p>
   <div class="filters" id="filters"></div>
 </header>
 
-<div class="sec-title">Itens do PDF (Revisão 3)</div>
+<div class="sec"><h2>Recursos do sistema</h2><span class="rule"></span></div>
 <div class="grid" id="grid-pdf"></div>
 
-<div class="sec-title">Etapa 2 · Telas de perfil (design) + acesso</div>
+<div class="sec"><h2>Etapa 2 · Áreas por perfil</h2><span class="rule"></span></div>
 <div class="grid" id="grid-etapa2"></div>
 
-<div class="foot">✅ feito &nbsp;·&nbsp; 🟡 parcial / a refinar &nbsp;·&nbsp; 🔵 próximo (feature nova). As telas de perfil da Etapa 2 são protótipos de design de como cada uma será; o acesso real é por link personalizado gerado em <b>Etapa 2 · Links de acesso</b>.</div>
+<div class="foot">Cada card abre a tela real no sistema. As áreas de perfil da Etapa 2 são acessadas por um link personalizado por pessoa, gerado em <b>Etapa 2 · Links de acesso</b>.</div>
 
 <script>
 const BASE=location.origin;
-// [modulo, ponto do PDF, status(ok|warn|next), detalhe, urlRelativa]
-const PDF=[
- ["Cadastros","Cupom de desconto com limites de uso (fotografia/cerimonial/avulsas)","ok","Cadastro de cupom com limite + aplicação no checkout.","/admin/cadastro.html?entidade=cupom"],
- ["Turma","Itens do plano puxarem da tabela configurada no cadastro da turma","warn","Itens do plano vêm das tabelas da turma; conferir cobertura total.","/admin/turma-detalhe.html?id=2"],
- ["Turma","Seleção de cursos com turno + previsão de formatura (2026/2, 2026/1…)","ok","Cada curso vinculado tem turno e previsão próprios.","/admin/turmas.html"],
- ["Painel","Selecionar uma turma específica + abrir detalhamento dos valores","ok","Filtro por turma e drilldown de turmas/formandos/contratos.","/admin/dashboard.html"],
- ["Encarte","Link de preenchimento pelo aluno · limite 2000 caracteres","ok","Link dedicado, textarea com limite de 2000.","/admin/encarte.html"],
- ["Encarte","Fluxo por CPF (aluno digita CPF → habilita turma) + IA de correção do texto","next","A implementar: entrada por CPF e correção do texto por IA.","/admin/encarte.html"],
- ["Brindes","Entregar para todos OU individual, com data de entrega diferente por aluno","warn","Entrega em massa e por aluno; refinar data individual.","/admin/brindes-pendentes.html"],
- ["Aluno","Cadastro: curso por config; plus-size sim/não (sem peso); medidas de calça sem elastano (sem calçado); só se 'solicitar medidas'","next","Ajustar campos do cadastro do aluno conforme o PDF.","/inscricao.html?t=demo"],
- ["Aluno","Campos obrigatórios + repetir e-mail (validação)","next","Tornar campos obrigatórios e confirmar e-mail.","/inscricao.html?t=demo"],
- ["Aluno","Mostrar itens do plano, brindes (exclusivos da comissão se CPF for comissão), fotografia × cerimonial × total, descontos por CPF, nº de parcelas","next","Resumo e-commerce do que foi adquirido.","/inscricao.html?t=demo"],
- ["Aluno","Quantidade com botão +/− (estilo e-commerce), não digitar número","next","Stepper +/− no lugar do input numérico.","/inscricao.html?t=demo"],
- ["Fotógrafo","Identificar qual fotógrafo (do cadastro de prestadores) + nº do cartão de memória no upload","ok","Upload identifica o fotógrafo por link (?p) e registra o cartão na O.S.","/fotografo/upload.html?p=1"],
- ["Etapa 2","Onde acessar as páginas da Etapa 2 / como compartilhar","ok","Módulo que gera o link pessoal de cada formando e de cada prestador.","/admin/etapa2.html"],
- ["Etapa 2","Como configurar itens da Etapa 2 (ex.: check-in)","warn","Check-in usa os 'eventos fotográficos' da turma; deixar isso mais óbvio.","/admin/turma-detalhe.html?id=2"],
+// [modulo, titulo, icone, descricao, urlRelativa]
+const RECURSOS=[
+ ["Cadastros","Cupom de desconto","🏷️","Cupom com limite de uso, aplicável a fotografia, cerimonial ou fotos avulsas no checkout.","/admin/cadastro.html?entidade=cupom"],
+ ["Turma","Cursos por turno e previsão","🎓","Cada curso da turma com turno e previsão de formatura próprios (2026/1, 2026/2…).","/admin/turmas.html"],
+ ["Turma","Planos e itens","📦","Planos com itens vindos das tabelas da turma, fotos por evento e config financeira.","/admin/turma-detalhe.html?id=2"],
+ ["Turma","Config financeira","💳","Parcelas, vencimentos, meios de pagamento, taxas, juros, descontos e forma especial.","/admin/turma-detalhe.html?id=2"],
+ ["Painel","Indicadores por turma","📊","Filtro por turma e detalhamento dos valores (turmas, formandos, contratos).","/admin/dashboard.html"],
+ ["Encarte","Preenchimento pelo aluno","📖","Link dedicado por aluno para preencher o encarte (até 2000 caracteres).","/admin/encarte.html"],
+ ["Brindes","Controle de entrega","🎁","Entrega para a turma inteira ou individual, com data de entrega por aluno.","/admin/brindes-pendentes.html"],
+ ["Formando","Inscrição e-commerce","🛒","Fluxo de inscrição do formando repaginado, com plano, adicionais e pagamento.","/inscricao.html?t=demo"],
+ ["Serviços","Ordens de serviço","🗂️","Fila de produção por etapa: edição, álbum, impressão, tratamento.","/admin/os.html"],
+ ["Eventos","Calendário","📅","Calendário de eventos navegável (mês/semana/lista) com conflitos.","/admin/eventos.html"],
+ ["Comercial","Contratos","📄","Templates de contrato com pré-visualização, edição e duplicação.","/admin/contratos.html"],
+ ["Financeiro","Financeiro","🏦","Recebíveis, exportações e emissão — com filtros e visão consolidada.","/admin/financeiro.html"],
 ];
 const ETAPA2=[
- ["Formando","Área do formando (design)","Home do aluno: plano, financeiro, encarte, atalhos. Responsivo no desktop.","/aluno/inicio.html?id=1"],
- ["Fotógrafo","Upload (design)","Identifica o fotógrafo + cartão de memória; envia p/ a fila do editor.","/fotografo/upload.html?p=1"],
- ["Editor","Fila de edição (design)","Fila de O.S. por etapa (aberta → em andamento → concluída → entregue).","/editor/fila.html?p=1"],
- ["Operador","Check-in ao vivo (design)","Marca presença dos formandos por evento, com contadores.","/operador/checkin.html"],
- ["Etapa 2","Links de acesso (real)","Gera o link personalizado de cada pessoa (formando/fotógrafo/editor/operador).","/admin/etapa2.html"],
+ ["Formando","Área do formando","🎓","Home do aluno: plano, financeiro, encarte e atalhos. Responsivo no computador e no celular.","/aluno/inicio.html?id=1"],
+ ["Fotógrafo","Upload de fotos","📷","Identifica o fotógrafo e o cartão de memória, e envia direto para a fila do editor.","/fotografo/upload.html?p=1"],
+ ["Editor","Fila de edição","🪄","Fila de trabalho por etapa: aberta → em andamento → concluída → entregue.","/editor/fila.html?p=1"],
+ ["Operador","Check-in ao vivo","📲","Marca a presença dos formandos por evento, com contadores em tempo real.","/operador/checkin.html"],
+ ["Acesso","Links de acesso","🔗","Gera o link personalizado de cada pessoa — cada formando e cada prestador recebe o seu.","/admin/etapa2.html"],
 ];
-const glyph={ok:'✅',warn:'🟡',next:'🔵'};
-const cls={ok:'b-ok',warn:'b-warn',next:'b-next'};
-function card(mod,titulo,st,det,url){
+function card(mod,titulo,ic,det,url){
   return `<div class="card" data-mod="${mod}">
-    <div class="top"><span class="mod">${mod}</span><span class="badge ${cls[st]}">${glyph[st]} ${st==='ok'?'Feito':st==='warn'?'Parcial':'Próximo'}</span></div>
+    <div class="ic">${ic}</div>
+    <span class="mod">${mod}</span>
     <strong>${titulo}</strong><p>${det}</p>
-    <a class="open ${st==='next'?'ghost':''}" href="${BASE}${url}" target="_blank" rel="noopener">Abrir no site ↗</a>
+    <a class="open" href="${BASE}${url}" target="_blank" rel="noopener">Abrir no site ↗</a>
   </div>`;
 }
-document.getElementById('grid-pdf').innerHTML = PDF.map(x=>card(...x)).join('');
-document.getElementById('grid-etapa2').innerHTML = ETAPA2.map(([m,t,d,u])=>card(m,t,'ok',d,u)).join('');
-// filtros por status
+document.getElementById('grid-pdf').innerHTML = RECURSOS.map(x=>card(...x)).join('');
+document.getElementById('grid-etapa2').innerHTML = ETAPA2.map(x=>card(...x)).join('');
 const fb=document.getElementById('filters'), cards=[...document.querySelectorAll('#grid-pdf .card')];
 function mk(l,fn,on){const b=document.createElement('button');b.textContent=l;if(on)b.className='on';b.onclick=()=>{fb.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn();};fb.appendChild(b);}
-mk('Todos ('+cards.length+')',()=>cards.forEach(c=>c.style.display=''),true);
-[['ok','✅ Feito'],['warn','🟡 Parcial'],['next','🔵 Próximo']].forEach(([k,l])=>{
-  const arr=PDF.map((x,i)=>[x[2],i]); const n=arr.filter(a=>a[0]===k).length;
-  mk(l+' ('+n+')',()=>cards.forEach((c,i)=>c.style.display=PDF[i][2]===k?'':'none'));
-});
+mk('Todos',()=>cards.forEach(c=>c.style.display=''),true);
+[...new Set(RECURSOS.map(x=>x[0]))].forEach(m=>mk(m,()=>cards.forEach((c,i)=>c.style.display=RECURSOS[i][0]===m?'':'none')));
 </script></body></html>
