@@ -71,6 +71,16 @@
   .ms-opt.sel::after { content:'✓'; margin-left:auto; font-weight:700; color:var(--primary-600); }
   .ms-empty { padding:10px 12px; font-size:12.5px; color:var(--gray-400); }
 
+  /* Single-select com busca (reaproveita .ms-list/.ms-opt) — mesma altura dos inputs do form */
+  .ss { position:relative; }
+  .ss-box { display:flex; align-items:center; gap:6px; height:40px; padding:0 10px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); cursor:text; }
+  .ss-box:focus-within { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .ss-search { flex:1; min-width:40px; border:none; outline:none; background:transparent; font-family:inherit; font-size:14px; color:var(--gray-900); padding:0; }
+  .ss-search::placeholder { color:var(--gray-400); }
+  .ss-caret { flex:none; color:var(--gray-400); display:grid; place-items:center; pointer-events:none; }
+  .ss-caret svg { width:16px; height:16px; }
+  .add-bar .ss-box { height:40px; }
+
   .switch { position:relative; display:inline-block; width:46px; height:27px; }
   .switch input { position:absolute; opacity:0; width:0; height:0; }
   .switch .track { position:absolute; inset:0; background:var(--gray-300); border-radius:999px; cursor:pointer; transition:.18s; }
@@ -315,6 +325,105 @@
 lucide.createIcons();
 const $ = s => document.querySelector(s);
 const id = new URLSearchParams(location.search).get('id');
+
+/* =============================================================
+   Single-select com busca (reaproveita o visual .ms-list/.ms-opt
+   do multiselect de prestadores). Mantém o <select> nativo como
+   FONTE DA VERDADE, apenas escondido — todo código que lê/seta
+   selectEl.value continua funcionando. Idempotente.
+   ============================================================= */
+let __ssSeq = 0;
+function enhanceSelect(selectEl){
+  if(!selectEl) return;
+  if(selectEl.__ss){ refreshSelect(selectEl); return; } // já melhorado: só sincroniza
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ss';
+  const listId = 'ss-list-'+(++__ssSeq);
+  wrap.innerHTML =
+    `<div class="ss-box"><input type="text" class="ss-search" placeholder="Buscar…" autocomplete="off"><span class="ss-caret"><i data-lucide="chevron-down"></i></span></div>`
+    + `<div class="ss-list ms-list" id="${listId}"></div>`;
+
+  // esconde o nativo e insere a caixa ao lado (mantém no DOM p/ leitura do value)
+  selectEl.style.display = 'none';
+  selectEl.parentNode.insertBefore(wrap, selectEl.nextSibling);
+
+  const box = wrap.querySelector('.ss-box');
+  const search = wrap.querySelector('.ss-search');
+  const list = wrap.querySelector('.ss-list');
+
+  const ctx = { el:selectEl, wrap, box, search, list };
+  selectEl.__ss = ctx;
+
+  // texto da opção atualmente selecionada (ou vazio → placeholder)
+  function currentLabel(){
+    const o = selectEl.options[selectEl.selectedIndex];
+    if(!o || o.value==='') return '';
+    return o.textContent.trim();
+  }
+  // opções válidas (ignora a vazia/placeholder)
+  function options(){ return [...selectEl.options].filter(o=>o.value!==''); }
+
+  function posiciona(){
+    const r = box.getBoundingClientRect();
+    list.style.top=(r.bottom+4)+'px'; list.style.left=r.left+'px'; list.style.width=r.width+'px';
+  }
+  function renderList(){
+    const q=(search.value||'').toLowerCase().trim();
+    const opts=options().filter(o=>!q || o.textContent.toLowerCase().includes(q));
+    list.innerHTML = opts.length
+      ? opts.map(o=>`<div class="ms-opt ${o.value===selectEl.value?'sel':''}" data-val="${(o.value+'').replace(/"/g,'&quot;')}">${o.textContent}</div>`).join('')
+      : '<div class="ms-empty">Nada encontrado.</div>';
+    list.querySelectorAll('.ms-opt').forEach(op=>op.onclick=(e)=>{
+      e.stopPropagation();
+      escolher(op.dataset.val);
+    });
+  }
+  function abrir(){ renderList(); posiciona(); list.classList.add('open'); }
+  function fechar(){ list.classList.remove('open'); search.value=currentLabel(); }
+  function escolher(val){
+    selectEl.value = val;
+    selectEl.dispatchEvent(new Event('change', {bubbles:true}));
+    search.value = currentLabel();
+    list.classList.remove('open');
+  }
+
+  // placeholder: se não há opções reais mas há um texto-guia na opção vazia, usa-o
+  if(options().length===0){
+    const hint=[...selectEl.options].find(o=>o.value===''&&o.textContent.trim());
+    if(hint) search.placeholder = hint.textContent.trim();
+  }
+  search.value = currentLabel();
+  search.onfocus = ()=>{ search.select(); abrir(); };
+  search.oninput = ()=>{ abrir(); };
+  search.onkeydown = (e)=>{ if(e.key==='Escape'){ fechar(); search.blur(); } };
+  box.onclick = (e)=>{ if(e.target!==search) search.focus(); };
+  wrap.querySelector('.ss-caret').style.pointerEvents='none';
+
+  // reposiciona ao rolar/redimensionar enquanto aberto
+  window.addEventListener('scroll', ()=>{ if(list.classList.contains('open')) posiciona(); }, true);
+  window.addEventListener('resize', ()=>{ if(list.classList.contains('open')) posiciona(); });
+
+  // fechar ao clicar fora (um único listener global cobre todos os ss)
+  if(!window.__ssOutside){
+    window.__ssOutside = true;
+    document.addEventListener('click',(e)=>{
+      document.querySelectorAll('.ss-list.open').forEach(l=>{
+        const w = l.closest('.ss');
+        if(w && !w.contains(e.target)){ l.classList.remove('open'); const s=w.querySelector('.ss-search'), sel=w.previousElementSibling; if(s&&sel&&sel.__ss){ const o=sel.options[sel.selectedIndex]; s.value=(o&&o.value!=='')?o.textContent.trim():''; } }
+      });
+    });
+  }
+
+  ctx.refresh = ()=>{ search.value = currentLabel(); if(list.classList.contains('open')) renderList(); };
+  lucide.createIcons(); // renderiza o chevron recém-inserido
+}
+/* Re-sincroniza o texto exibido com o value atual do <select> (usar após setar value ao editar) */
+function refreshSelect(selectEl){ if(selectEl && selectEl.__ss) selectEl.__ss.refresh(); }
+/* Aplica enhance a vários selects por id (silencioso se não existir) */
+function enhanceSelects(ids){ ids.forEach(sid=>{ const el=document.getElementById(sid); if(el) enhanceSelect(el); }); }
+/* Re-sincroniza vários selects por id */
+function refreshSelects(ids){ ids.forEach(sid=>refreshSelect(document.getElementById(sid))); }
 let OPC = { eventos:[], prestadores:[], brindes:[], situacoes:[], escopos:[] };
 let PLOPC = { bases:[], tipos:[] };
 let evEdit = null, brEdit = null, ceEdit = null, plEdit = null, piEdit = null, planoAtual = null;
@@ -436,6 +545,7 @@ function montarEvForm() {
     <div class="fld"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
   initPrestMulti();
   lucide.createIcons();
+  enhanceSelects(['ev-evento_id','ev-album']);
   $('#ev-salvar').onclick = salvarEvento;
 }
 /* ---- Multi-select de prestadores (busca + tags) ---- */
@@ -496,6 +606,7 @@ function evPrest() { return [...evPrestSel]; }
 function limparEv() {
   evEdit=null; $('#ev-evento_id').value=''; $('#ev-data').value=''; $('#ev-ini').value=''; $('#ev-fim').value='';
   $('#ev-local').value=''; $('#ev-situacao').value='previsto'; $('#ev-confirmado').checked=false; $('#ev-album').value='';
+  refreshSelects(['ev-evento_id','ev-album']);
   setPrestSel([]);
   if($('#ev-data-nota')) $('#ev-data-nota').innerHTML='';
   $('#ev-btn').textContent='Adicionar'; $('#ev-form-title').textContent='Novo evento fotográfico';
@@ -554,6 +665,7 @@ window.editarEvento = function(e){
   evEdit=e.id; $('#ev-evento_id').value=e.evento_id||''; $('#ev-data').value=e.data_prevista||'';
   $('#ev-ini').value=e.hora_inicio||''; $('#ev-fim').value=e.hora_fim||''; $('#ev-local').value=e.local||'';
   $('#ev-situacao').value=e.situacao; $('#ev-confirmado').checked=!!e.confirmado; $('#ev-album').value=e.album_id||'';
+  refreshSelects(['ev-evento_id','ev-album']);
   setPrestSel(e.prestador_ids||[]);
   $('#ev-btn').textContent='Atualizar'; $('#ev-form-title').textContent='Editar evento'; window.scrollTo({top:0,behavior:'smooth'});
 };
@@ -567,9 +679,10 @@ function montarBrForm() {
     <div class="fld grow"><label>Observação</label><input type="text" id="br-obs" placeholder="Opcional"></div>
     <div class="fld"><button class="btn btn-primary" id="br-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="br-btn">Adicionar</span></button></div>`;
   lucide.createIcons();
+  enhanceSelects(['br-brinde_id']);
   $('#br-salvar').onclick = salvarBrinde;
 }
-function limparBr(){ brEdit=null; $('#br-brinde_id').value=''; $('#br-escopo').value='todos'; $('#br-obs').value=''; $('#br-btn').textContent='Adicionar'; $('#br-form-title').textContent='Adicionar brinde'; }
+function limparBr(){ brEdit=null; $('#br-brinde_id').value=''; $('#br-escopo').value='todos'; $('#br-obs').value=''; refreshSelects(['br-brinde_id']); $('#br-btn').textContent='Adicionar'; $('#br-form-title').textContent='Adicionar brinde'; }
 async function salvarBrinde() {
   const body = { brinde_id:$('#br-brinde_id').value||null, escopo:$('#br-escopo').value, observacao:$('#br-obs').value };
   if(!body.brinde_id){ await vtAlert('Escolha o brinde.',{title:'Ops'}); return; }
@@ -598,7 +711,7 @@ async function carregarBrindes() {
 window.entregarTodos = async function(tbid){ if(!await vtConfirm('Marcar este brinde como ENTREGUE para todos os alunos da turma que o recebem?',{title:'Confirmar'}))return;
   const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+tbid+'/entregar-todos'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue:true})});
   const d=await r.json(); if(r.ok) toast(`Entregue para ${d.afetados} aluno(s).`); else await vtAlert('Erro',{title:'Ops'}); };
-window.editarBrinde = function(b){ brEdit=b.id; $('#br-brinde_id').value=b.brinde_id||''; $('#br-escopo').value=b.escopo; $('#br-obs').value=b.observacao||''; $('#br-btn').textContent='Atualizar'; $('#br-form-title').textContent='Editar brinde'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.editarBrinde = function(b){ brEdit=b.id; $('#br-brinde_id').value=b.brinde_id||''; $('#br-escopo').value=b.escopo; $('#br-obs').value=b.observacao||''; refreshSelects(['br-brinde_id']); $('#br-btn').textContent='Atualizar'; $('#br-form-title').textContent='Editar brinde'; window.scrollTo({top:0,behavior:'smooth'}); };
 window.excluirBrinde = async function(bid){ if(!await vtConfirm('Excluir este brinde?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+bid),{method:'DELETE'}); if(r.ok)carregarBrindes(); };
 
 /* ---------------- CERIMONIAL (evento de cerimonial > itens) ---------------- */
@@ -628,7 +741,7 @@ function montarCeForm(){
     <div class="fld"><label>Convidados</label><input type="number" min="0" id="cev-conv" value="0" style="width:110px;"></div>
     <div class="fld"><label>Alunos</label><input type="number" min="0" id="cev-alu" value="0" style="width:110px;"></div>
     <div class="fld"><button class="btn btn-primary" id="cev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar evento</button></div>`;
-  lucide.createIcons(); $('#cev-salvar').onclick = salvarEventoCerim;
+  lucide.createIcons(); enhanceSelects(['cev-evento']); $('#cev-salvar').onclick = salvarEventoCerim;
 }
 async function salvarEventoCerim(){
   const evento_id = $('#cev-evento').value;
@@ -636,7 +749,7 @@ async function salvarEventoCerim(){
   const body={ evento_id:+evento_id, qtd_convidados:$('#cev-conv').value||0, qtd_alunos:$('#cev-alu').value||0 };
   const r=await fetch(apiUrl(`/api/turma-formatura/${id}/cerimonial-eventos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
-  $('#cev-conv').value='0'; $('#cev-alu').value='0'; $('#cev-evento').value=''; carregarCerim();
+  $('#cev-conv').value='0'; $('#cev-alu').value='0'; $('#cev-evento').value=''; refreshSelects(['cev-evento']); carregarCerim();
 }
 async function carregarCerim(){
   const r=await fetch(apiUrl(`/api/turma-formatura/${id}/cerimonial`)); const d=await r.json();
@@ -730,7 +843,7 @@ function montarPlForm(){
     <div class="fld"><button class="btn btn-primary" id="pl-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="pl-btn">Criar plano</span></button></div>`;
   $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>i.onchange=()=>i.closest('.chip-check').classList.toggle('on',i.checked));
   $('#pl-tipocontrato').onchange = toggleFotosEventos;
-  lucide.createIcons(); $('#pl-salvar').onclick = salvarPlano;
+  lucide.createIcons(); enhanceSelects(['pl-fentrega']); $('#pl-salvar').onclick = salvarPlano;
 }
 
 // #36 — bloco "fotos por evento" (contrato limitado por evento)
@@ -759,7 +872,7 @@ function fotosEventosSelecionados(){
 }
 function limparPl(){ plEdit=null;
   ['pl-nome','pl-qtfotos','pl-vfoto','pl-vcerim','pl-vexc','pl-vagas','pl-fpag','pl-desc','pl-obs','pl-limite'].forEach(k=>$('#'+k).value='');
-  $('#pl-tipocontrato').value=''; $('#pl-fentrega').value=''; $('#pl-parc').value='1'; $('#pl-ativo').checked=true;
+  $('#pl-tipocontrato').value=''; $('#pl-fentrega').value=''; refreshSelects(['pl-fentrega']); $('#pl-parc').value='1'; $('#pl-ativo').checked=true;
   $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>{i.checked=false;i.closest('.chip-check').classList.remove('on');});
   toggleFotosEventos();
   $('#pl-btn').textContent='Criar plano'; $('#pl-form-title').textContent='Novo plano';
@@ -802,7 +915,7 @@ async function carregarPlanos(){
 window.editarPlano=async function(p){ plEdit=p.id;
   $('#pl-nome').value=p.nome; $('#pl-fpag').value=p.forma_pagamento||''; $('#pl-parc').value=p.max_parcelas; $('#pl-ativo').checked=!!p.ativo; $('#pl-desc').value=p.descricao||'';
   $('#pl-tipocontrato').value=p.tipo_contrato||''; $('#pl-qtfotos').value=p.qt_fotos||''; $('#pl-vagas').value=p.vagas_ingresso||''; $('#pl-vfoto').value=p.valor_fotografia||''; $('#pl-vcerim').value=p.valor_cerimonial||''; $('#pl-vexc').value=p.valor_foto_excedente||'';
-  $('#pl-fentrega').value=p.forma_entrega_id||''; $('#pl-limite').value=p.limite_ingresso||''; $('#pl-obs').value=p.observacao||'';
+  $('#pl-fentrega').value=p.forma_entrega_id||''; refreshSelects(['pl-fentrega']); $('#pl-limite').value=p.limite_ingresso||''; $('#pl-obs').value=p.observacao||'';
   [['cerimonial',p.inclui_cerimonial],['eventos',p.inclui_eventos],['produto',p.inclui_produto],['servico',p.inclui_servico],['brinde',p.inclui_brinde]]
     .forEach(([k,v])=>{const el=$('#pl-inc-'+k);el.checked=!!v;el.closest('.chip-check').classList.toggle('on',!!v);});
   toggleFotosEventos();
@@ -945,6 +1058,7 @@ function montarPiDescSelect(tipo, descAtual){
   const opts = `<option value="">Selecione…</option>` + lista.map(it=>`<option value="${escAttr(it.descricao)}" data-valor="${it.valor!=null?it.valor:''}" ${encontrada&&it.descricao===descAtual?'selected':''}>${it.descricao}${it.valor!=null?` · ${brl(it.valor)}`:''}</option>`).join('') + `<option value="__outro__" ${modoTexto?'selected':''}>Outro (digitar)…</option>`;
   wrap.innerHTML=`<select id="pi-desc-sel" onchange="onPiDescSelect(this)" style="width:100%;">${opts}</select>`
     + `<input type="text" id="pi-desc" placeholder="O que o cliente recebe" value="${escAttr(modoTexto?descAtual:'')}" style="margin-top:6px;display:${modoTexto?'block':'none'};">`;
+  enhanceSelects(['pi-desc-sel']);
 }
 window.onPiDescSelect=function(sel){
   const inp=$('#pi-desc'); const o=sel.options[sel.selectedIndex];
