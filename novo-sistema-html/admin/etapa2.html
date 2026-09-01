@@ -304,62 +304,57 @@ function copiarTodosAlunos(){
 
 /* ============ Equipe (prestadores) ============ */
 initEquipe();
+const ROLE_META = {
+  fotografo: { ic:'camera',    titulo:'Fotógrafos',  sub:'Fazem o upload das fotos', link:linkFotografo },
+  editor:    { ic:'wand-2',    titulo:'Editores',    sub:'Recebem a fila de edição', link:linkEditor },
+  operador:  { ic:'scan-line', titulo:'Operadores',  sub:'Fazem o check-in no evento', link:linkOperador },
+};
 async function initEquipe(){
   const wrap = document.getElementById('equipe-wrap');
   try {
     const r = await fetch(apiUrl('/api/cadastro/prestador'));
     const d = await r.json();
     const itens = (d && d.itens) || [];
-
     if (!itens.length){
       wrap.innerHTML = '<div class="empty"><i data-lucide="user-x"></i>Nenhum prestador cadastrado ainda. Cadastre fotógrafos, editores e operadores em Cadastros.</div>';
-      lucide.createIcons();
-      return;
+      lucide.createIcons(); return;
     }
+    // agrupa por função
+    const grupos = { fotografo:[], editor:[], operador:[] };
+    const semFuncao = [];
+    itens.forEach(p => { const ps = papeisDoPrestador(p); if(!ps.length) semFuncao.push(p); else ps.forEach(r=>grupos[r].push(p)); });
 
-    wrap.innerHTML = '<div class="team-grid">' + itens.map(p => {
-      const id = p.id;
-      const tel = p.telefone || '';
-      const wa  = waNumero(tel);
-      const lf = linkFotografo(id), le = linkEditor(id), lo = linkOperador(id);
-      const linkRow = (ic, role, url, msg) => `
-        <div class="link-row">
-          <div class="lr-ic"><i data-lucide="${ic}"></i></div>
-          <div class="lr-txt"><div class="lr-role">${role}</div><div class="lr-url">${esc(url)}</div></div>
-          <button class="icon-btn pri" onclick="copiar('${esc(url)}','${msg}')"><i data-lucide="copy"></i> Copiar</button>
-        </div>`;
-      const rowFor = {
-        fotografo: linkRow('camera',    'Fotógrafo · Upload',  lf, 'Link do fotógrafo copiado'),
-        editor:    linkRow('wand-2',    'Editor · Fila',       le, 'Link do editor copiado'),
-        operador:  linkRow('scan-line', 'Operador · Check-in', lo, 'Link do operador copiado'),
-      };
-      const urlFor = { fotografo:lf, editor:le, operador:lo };
-      const papeis = papeisDoPrestador(p);
-      const mostrar = papeis.length ? papeis : ['fotografo','editor','operador'];
-      const linksHtml = mostrar.map(r=>rowFor[r]).join('');
-      const hint = papeis.length
-        ? 'Link pessoal desta pessoa (traz o identificador dela). Definido pela função no cadastro.'
-        : 'Sem função definida no cadastro — mostrando todos os acessos. Defina a função do prestador em Cadastros p/ restringir.';
-      const msgWa = `Olá ${p.nome||''}! Este é o seu acesso pessoal da produção (Etapa 2):\n\n` +
-        mostrar.map(r=>`${r.charAt(0).toUpperCase()+r.slice(1)}: ${urlFor[r]}`).join('\n');
-      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
-      return `<div class="team-card">
-        <div class="tc-head">
-          <div class="tc-av">${esc(iniciais(p.nome))}</div>
-          <div style="min-width:0;">
-            <div class="tc-nome">${esc(p.nome)||'—'}</div>
-            <div class="tc-meta">${p.funcao ? esc(p.funcao) : 'Prestador'}${tel ? ' · '+esc(tel) : ''}</div>
-          </div>
-        </div>
-        <div class="tc-hint">${hint}</div>
-        <div class="tc-links">${linksHtml}</div>
-        <div class="tc-foot">
-          ${wa
-            ? `<a class="icon-btn wa" href="${esc(waHref)}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> Enviar por WhatsApp</a>`
-            : `<button class="icon-btn" disabled title="Prestador sem telefone"><i data-lucide="message-circle-off"></i> WhatsApp indisponível</button>`}
-        </div>
+    const pessoaRow = (p, role) => {
+      const url = ROLE_META[role].link(p.id);
+      const wa = waNumero(p.telefone||'');
+      const msg = `Olá ${p.nome||''}! Este é o seu link pessoal de acesso da Etapa 2 (${ROLE_META[role].titulo.slice(0,-2)}):\n\n${url}`;
+      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msg)}` : '';
+      return `<div class="link-row">
+        <div class="tc-av" style="width:34px;height:34px;font-size:12px;">${esc(iniciais(p.nome))}</div>
+        <div class="lr-txt"><div class="lr-role">${esc(p.nome)||'—'}</div><div class="lr-url">${esc(url)}</div></div>
+        <button class="icon-btn pri" onclick="copiar('${esc(url)}','Link copiado')"><i data-lucide="copy"></i> Copiar</button>
+        ${wa?`<a class="icon-btn wa" href="${esc(waHref)}" target="_blank" rel="noopener" title="Enviar por WhatsApp"><i data-lucide="message-circle"></i></a>`:''}
       </div>`;
-    }).join('') + '</div>';
+    };
+    const secao = (role) => {
+      const M = ROLE_META[role]; const lista = grupos[role];
+      return `<div class="team-card" style="grid-column:1/-1;">
+        <div class="tc-head">
+          <div class="tc-av"><i data-lucide="${M.ic}"></i></div>
+          <div style="min-width:0;"><div class="tc-nome">${M.titulo} <span style="color:var(--gray-400);font-weight:600;">(${lista.length})</span></div><div class="tc-meta">${M.sub}</div></div>
+        </div>
+        <div class="tc-links">${lista.length ? lista.map(p=>pessoaRow(p,role)).join('') : '<div class="tc-hint">Nenhum prestador com esta função. Marque a função no cadastro do prestador.</div>'}</div>
+      </div>`;
+    };
+    let html = '<div class="team-grid">' + ['fotografo','editor','operador'].map(secao).join('');
+    if (semFuncao.length){
+      html += `<div class="team-card" style="grid-column:1/-1;border-color:rgba(234,179,8,.4);">
+        <div class="tc-head"><div class="tc-av" style="background:var(--warning-bg,#FEF3C7);color:var(--warning-fg,#92400E);"><i data-lucide="alert-triangle"></i></div>
+          <div><div class="tc-nome">Sem função definida <span style="color:var(--gray-400);font-weight:600;">(${semFuncao.length})</span></div><div class="tc-meta">Defina a função (Fotógrafo/Editor/Operador) no cadastro p/ gerar o link certo</div></div></div>
+        <div class="tc-links">${semFuncao.map(p=>`<div class="link-row"><div class="tc-av" style="width:34px;height:34px;font-size:12px;">${esc(iniciais(p.nome))}</div><div class="lr-txt"><div class="lr-role">${esc(p.nome)||'—'}</div><div class="lr-url">${esc(p.funcao||'sem função')}</div></div><a class="icon-btn" href="cadastro.html?entidade=prestador" title="Definir função"><i data-lucide="pencil"></i> Definir função</a></div>`).join('')}</div>
+      </div>`;
+    }
+    wrap.innerHTML = html + '</div>';
     lucide.createIcons();
   } catch(e){
     wrap.innerHTML = '<div class="empty"><i data-lucide="triangle-alert"></i>Não foi possível carregar os prestadores.</div>';
