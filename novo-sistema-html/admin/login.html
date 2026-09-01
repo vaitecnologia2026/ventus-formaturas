@@ -20,16 +20,41 @@
   .shell{display:grid;grid-template-columns:1.05fr .95fr;min-height:100vh;}
   @media(max-width:920px){ .shell{grid-template-columns:1fr;} .brand-side{display:none;} }
 
-  /* ===== Lado da marca ===== */
-  .brand-side{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--azul-950) 0%,var(--azul-900) 45%,var(--azul-700) 130%);color:#fff;padding:56px 60px;display:flex;flex-direction:column;justify-content:space-between;}
-  .brand-side::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.35),transparent 65%);top:-160px;right:-140px;}
-  .brand-side::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.06),transparent 65%);bottom:-160px;left:-120px;}
+  /* ===== Lado da marca (azul animado) ===== */
+  .brand-side{position:relative;overflow:hidden;color:#fff;padding:clamp(28px,4.5vh,56px) clamp(38px,4vw,60px);display:flex;flex-direction:column;justify-content:space-between;gap:clamp(20px,4vh,44px);
+    background:linear-gradient(150deg,var(--azul-950) 0%,var(--azul-900) 45%,var(--azul-700) 130%);
+    background-size:200% 200%; animation:bgShift 18s ease-in-out infinite;}
+  /* aurora que gira suave por trás */
+  .brand-side .aurora{position:absolute;inset:-45%;z-index:0;pointer-events:none;
+    background:conic-gradient(from 0deg,
+      transparent 0%, rgba(59,130,246,.30) 16%, transparent 34%,
+      rgba(147,197,253,.20) 55%, transparent 72%, rgba(37,99,235,.28) 90%, transparent 100%);
+    filter:blur(70px); opacity:.75; animation:spin 42s linear infinite;}
+  /* orbs flutuantes */
+  .brand-side::before{content:"";position:absolute;z-index:1;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle,rgba(59,130,246,.40),transparent 65%);top:-170px;right:-150px;
+    animation:floatA 15s ease-in-out infinite;}
+  .brand-side::after{content:"";position:absolute;z-index:1;width:440px;height:440px;border-radius:50%;
+    background:radial-gradient(circle,rgba(147,197,253,.14),transparent 65%);bottom:-170px;left:-130px;
+    animation:floatB 19s ease-in-out infinite;}
+  /* brilho diagonal que atravessa devagar */
+  .brand-side .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 48%,transparent 62%);
+    background-size:250% 250%; animation:sheen 9s ease-in-out infinite;}
+  @keyframes bgShift{0%,100%{background-position:0% 0%;}50%{background-position:100% 100%;}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes floatA{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-46px,34px) scale(1.14);}}
+  @keyframes floatB{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(38px,-28px) scale(1.1);}}
+  @keyframes sheen{0%,100%{background-position:0% 0%;opacity:.35;}50%{background-position:100% 100%;opacity:.6;}}
+  @media (prefers-reduced-motion:reduce){
+    .brand-side,.brand-side .aurora,.brand-side::before,.brand-side::after,.brand-side .grain,.btn,.btn::before{animation:none;}
+  }
   .b-logo{display:inline-flex;align-items:center;gap:12px;position:relative;z-index:2;}
   .b-logo .chip{background:#fff;border-radius:12px;padding:8px 14px;display:inline-flex;box-shadow:0 8px 24px -10px rgba(0,0,0,.5);}
   .b-logo .chip img{height:30px;display:block;}
   .b-logo .chip .fb{font-weight:900;color:var(--azul-950);font-size:20px;letter-spacing:-.02em;}
   .b-mid{position:relative;z-index:2;max-width:460px;}
-  .b-mid h1{font-family:'Playfair Display',serif;font-weight:800;font-size:40px;line-height:1.1;letter-spacing:-.01em;margin:0 0 16px;}
+  .b-mid h1{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(30px,3.2vw,40px);line-height:1.1;letter-spacing:-.01em;margin:0 0 14px;}
   .b-mid h1 em{font-style:italic;color:#93C5FD;}
   .b-mid p{color:rgba(255,255,255,.8);font-size:16px;line-height:1.6;margin:0;}
   .b-feats{position:relative;z-index:2;display:flex;flex-direction:column;gap:14px;}
@@ -61,9 +86,15 @@
   .rem input{width:17px;height:17px;padding:0;accent-color:var(--azul);}
   .link{color:var(--azul);font-size:13.5px;font-weight:600;text-decoration:none;}
   .link:hover{text-decoration:underline;}
-  .btn{width:100%;background:var(--azul);color:#fff;border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s;}
-  .btn:hover{background:var(--azul-700);transform:translateY(-1px);box-shadow:0 12px 30px -12px rgba(37,99,235,.6);}
+  .btn{width:100%;color:#fff;border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;
+    position:relative;overflow:hidden;isolation:isolate;
+    background:linear-gradient(135deg,var(--azul-700),var(--azul) 48%,var(--azul-700));background-size:200% 200%;animation:btnShift 8s ease infinite;}
+  .btn::before{content:"";position:absolute;inset:-70%;z-index:-1;
+    background:conic-gradient(from 0deg,transparent 0%,rgba(147,197,253,.55) 14%,transparent 33%,rgba(59,130,246,.6) 58%,transparent 78%,rgba(37,99,235,.5) 100%);
+    filter:blur(6px);opacity:.8;animation:spin 9s linear infinite;}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 14px 34px -12px rgba(37,99,235,.7);}
   .btn:disabled{opacity:.7;cursor:default;transform:none;box-shadow:none;}
+  @keyframes btnShift{0%,100%{background-position:0% 0%;}50%{background-position:100% 100%;}}
   .erro{background:var(--erro-bg);color:#991B1B;border:1px solid #FECACA;border-radius:10px;padding:11px 13px;font-size:13.5px;margin-bottom:16px;display:none;gap:8px;align-items:flex-start;}
   .erro.show{display:flex;}
   .erro svg{width:16px;height:16px;flex:none;margin-top:1px;}
@@ -74,8 +105,10 @@
 <div class="shell">
   <!-- Marca -->
   <aside class="brand-side">
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
     <div class="b-logo">
-      <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" style="height:56px;display:block;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{style:'color:#fff;font-weight:900;font-size:22px',textContent:'Ventus'}))">
+      <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" style="height:56px;display:block;opacity:.75;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{style:'color:#fff;font-weight:900;font-size:22px',textContent:'Ventus'}))">
     </div>
     <div class="b-mid">
       <h1>A formatura, <em>reinventada.</em></h1>
@@ -121,8 +154,6 @@
 
         <button type="submit" class="btn" id="btn">Entrar <i data-lucide="arrow-right" style="width:18px;height:18px;"></i></button>
       </form>
-
-      <div class="foot">É formando ou comissão? <a href="../aluno/login.html" class="link">Acesse pelo WhatsApp</a></div>
     </div>
   </main>
 </div>
