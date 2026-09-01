@@ -30,17 +30,23 @@
   .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
   .panel-body { padding:22px; }
 
-  .add-bar { display:flex; gap:14px 16px; flex-wrap:wrap; align-items:flex-start; padding:18px 22px; }
-  .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:180px;}
+  .add-bar { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:16px; align-items:start; padding:18px 22px; }
+  .add-bar .fld { position:relative; display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .add-bar .fld.grow{ grid-column:span 2; }
+  .add-bar .fld .ss-box{ height:40px; } .add-bar .fld .ms-box{ min-height:40px; }
+  /* nota da Previsão flutua abaixo, não empurra a linha do grid */
+  #ev-data-nota{ position:absolute; top:100%; left:0; margin-top:3px!important; }
+  .add-bar .fld input, .add-bar .fld select, .add-bar .fld .ms, .add-bar .fld .ss, .add-bar .fld .ms-box, .add-bar .fld .ss-box { width:100%; }
+  .add-bar .fld .ms{ max-width:none; }
   .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); min-height:16px; }
   .add-bar input, .add-bar select { height:40px; padding:0 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
   .add-bar input[type=time]{ padding:0 10px; }
   .add-bar input[type=date], .add-bar input[type=time]{ min-height:40px; }
   /* inputs de busca DENTRO das caixas .ms/.ss não herdam borda/altura de .add-bar input (senão vira caixa dentro de caixa) */
   .add-bar .ms-search, .add-bar .ss-search{ border:none!important; height:auto; min-height:0; padding:0 2px; background:transparent; box-shadow:none!important; border-radius:0; }
-  .add-bar .fld .btn { height:40px; }
+  .add-bar .fld .btn { height:40px; margin-top:22px; width:100%; justify-content:center; }
   /* campo com switch: alinha o toggle na área do input (sem distorcer o switch) */
-  .add-bar .fld > .switch { margin-top:7px; }
+  .add-bar .fld > .switch { margin-top:9px; }
   .add-bar input:focus, .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
   .add-bar .prestadores { display:flex; flex-wrap:wrap; gap:6px; max-width:340px; }
   .chip-check { position:relative; display:inline-flex; align-items:center; gap:9px; padding:9px 14px; border:1.5px solid var(--gray-200); border-radius:10px; font-size:13px; font-weight:600; color:var(--gray-600); cursor:pointer; background:var(--surface); user-select:none; transition:border-color .15s, background .15s, color .15s; }
@@ -539,11 +545,11 @@ function montarEvForm() {
     <div class="fld"><label>Confirmado</label><label class="switch"><input type="checkbox" id="ev-confirmado"><span class="track"></span></label></div>
     <div class="fld grow"><label>Local</label><input type="text" id="ev-local" placeholder="Local do evento"></div>
     <div class="fld grow"><label>Galeria</label><select id="ev-album">${optAlbum('')}</select></div>
-    <div class="fld" style="min-width:280px;"><label>Prestadores</label>${OPC.prestadores.length?`<div class="ms" id="ev-prestadores">
+    <div class="fld grow"><label>Prestadores</label>${OPC.prestadores.length?`<div class="ms" id="ev-prestadores">
         <div class="ms-box" id="ev-prest-box"><input type="text" class="ms-search" id="ev-prest-search" placeholder="Buscar prestador…" autocomplete="off"></div>
         <div class="ms-list" id="ev-prest-list"></div>
       </div>`:'<div class="ms" id="ev-prestadores"><span style="font-size:12.5px;color:var(--gray-400);">Nenhum prestador cadastrado.</span></div>'}</div>
-    <div class="fld" style="align-self:flex-end;"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
+    <div class="fld"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
   initPrestMulti();
   lucide.createIcons();
   enhanceSelects(['ev-evento_id','ev-album']);
