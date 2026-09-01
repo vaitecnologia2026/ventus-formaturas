@@ -188,7 +188,7 @@ window.entregar = async function(alunoId, tbId) {
     const row = document.getElementById(`row-${alunoId}-${tbId}`); if (row) row.remove();
     $('#cnt').textContent = Math.max(0, Number($('#cnt').textContent)-1);
     if (!$('#tbody').children.length) carregarPendentes();
-  } else alert('Erro ao marcar entrega.');
+  } else vtAlert('Erro ao marcar entrega.');
 };
 
 $('#fil-turma').onchange = e => { TURMA = e.target.value; carregar(); };

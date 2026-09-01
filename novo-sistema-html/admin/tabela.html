@@ -203,7 +203,7 @@ async function salvarMaster() {
   const body = lerCampos(SCHEMA.campos_master, 'm');
   const url = editMasterId ? apiUrl(`/api/tabela/${tipo}/${editMasterId}`) : apiUrl(`/api/tabela/${tipo}`);
   const r = await fetch(url, { method: editMasterId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro'); return; }
+  const d = await r.json(); if(!r.ok){ vtAlert(d.detail||'Erro'); return; }
   editMasterId=null; $('#m-btn-txt').textContent='Nova tabela'; $('#m-form-title').textContent='Nova tabela'; limparCampos(SCHEMA.campos_master,'m'); carregarMaster();
 }
 
@@ -224,7 +224,7 @@ async function carregarMaster() {
 }
 
 window.editarMaster = function(it){ editMasterId=it.id; for(const c of SCHEMA.campos_master){const el=$(`#m-${c.nome}`);if(!el)continue;if(c.tipo==='bool')el.checked=!!it[c.nome];else el.value=it[c.nome]??'';} $('#m-btn-txt').textContent='Atualizar'; $('#m-form-title').textContent='Editar tabela'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluirMaster = async function(id){ if(!confirm('Excluir esta tabela e todos os itens?'))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/${id}`),{method:'DELETE'}); if(r.ok)carregarMaster(); else alert('Erro'); };
+window.excluirMaster = async function(id){ if(!await vtConfirm('Excluir esta tabela e todos os itens?',{danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/${id}`),{method:'DELETE'}); if(r.ok)carregarMaster(); else vtAlert('Erro'); };
 
 /* ---------------- DETALHE (itens) ---------------- */
 async function abrirDetalhe(masterId) {
@@ -252,7 +252,7 @@ async function salvarItem() {
   const body = lerCampos(SCHEMA.campos_item, 'i');
   const url = editItemId ? apiUrl(`/api/tabela/${tipo}/itens/${editItemId}`) : apiUrl(`/api/tabela/${tipo}/${masterAtual}/itens`);
   const r = await fetch(url, { method: editItemId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro'); return; }
+  const d = await r.json(); if(!r.ok){ vtAlert(d.detail||'Erro'); return; }
   editItemId=null; $('#i-btn-txt').textContent='Adicionar item'; $('#i-form-title').textContent='Adicionar item'; limparCampos(SCHEMA.campos_item,'i'); recarregarItens();
 }
 
@@ -281,7 +281,7 @@ window.editarItem = function(it){ editItemId=it.id; for(const c of SCHEMA.campos
     if(c.tipo==='select-cadastro' && val && !Array.from(el.options).some(o=>o.value===val)){ el.insertAdjacentHTML('beforeend',`<option value="${String(val).replace(/"/g,'&quot;')}">${val} (fora do cadastro)</option>`); }
     el.value=val;
   } $('#i-btn-txt').textContent='Atualizar item'; $('#i-form-title').textContent='Editar item'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluirItem = async function(id){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/itens/${id}`),{method:'DELETE'}); if(r.ok)recarregarItens(); else alert('Erro'); };
+window.excluirItem = async function(id){ if(!await vtConfirm('Excluir este item?',{danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl(`/api/tabela/${tipo}/itens/${id}`),{method:'DELETE'}); if(r.ok)recarregarItens(); else vtAlert('Erro'); };
 
 /* util */
 function celula(c, v) {

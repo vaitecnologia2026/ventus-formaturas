@@ -12,7 +12,7 @@
 <script src="../assets/js/config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="fotos.css">
 </head>
@@ -38,28 +38,40 @@
 
 <!-- Hero -->
 <section class="ft-hero">
-  <h1>Encontre e compre as suas<br>fotos da formatura</h1>
-  <p>Tire uma selfie e a nossa inteligência artificial procura o seu rosto<br class="ft-br-desk">em todos os álbuns do seu evento. Simples assim.</p>
-
-  <div class="ft-hero-search">
-    <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
-      <i data-lucide="scan-face"></i> Buscar com minha selfie
-    </a>
-    <div class="ft-search-box">
-      <i data-lucide="search"></i>
-      <input type="text" placeholder="Ou busque pelo evento, turma ou instituição…" onkeydown="if(event.key==='Enter')location.href='#albuns'">
-    </div>
+  <div class="ft-hero-bg" aria-hidden="true">
+    <span class="ft-aurora-spin"></span>
+    <span class="ft-orb ft-orb-a"></span>
+    <span class="ft-orb ft-orb-b"></span>
+    <span class="ft-sheen"></span>
+    <span class="ft-hero-grid"></span>
   </div>
 
-  <div class="ft-hero-trust">
-    <span><i data-lucide="lock"></i> Sua selfie não é armazenada</span>
-    <span><i data-lucide="zap"></i> Resultado em segundos</span>
-    <span><i data-lucide="image"></i> +12.000 fotos indexadas</span>
+  <div class="ft-hero-inner">
+    <span class="ft-hero-badge"><i data-lucide="sparkles"></i> Reconhecimento facial por IA</span>
+    <h1>Encontre e compre as suas fotos da formatura</h1>
+    <p>Tire uma selfie e a nossa inteligência artificial procura o seu rosto em todos os álbuns do seu evento. Simples assim.</p>
+
+    <div class="ft-hero-search">
+      <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
+        <i data-lucide="scan-face"></i> Buscar com minha selfie
+      </a>
+      <div class="ft-search-box">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Ou busque pelo evento, turma ou instituição…" onkeydown="if(event.key==='Enter')location.href='#albuns'">
+      </div>
+    </div>
+
+    <div class="ft-hero-trust">
+      <span><i data-lucide="lock"></i> Sua selfie não é armazenada</span>
+      <span><i data-lucide="zap"></i> Resultado em segundos</span>
+      <span><i data-lucide="image"></i> +12.000 fotos indexadas</span>
+    </div>
   </div>
 </section>
 
 <!-- Como funciona -->
 <section class="ft-section" id="como-funciona">
+  <span class="ft-eyebrow">Simples e rápido</span>
   <h2 class="ft-h2">Como funciona</h2>
   <p class="ft-sub">Procuramos seu rosto em todos os álbuns automaticamente.</p>
   <div class="ft-steps">
@@ -86,6 +98,7 @@
 
 <!-- Álbuns -->
 <section class="ft-section ft-section-gray" id="albuns">
+  <span class="ft-eyebrow">Eventos publicados</span>
   <h2 class="ft-h2">Álbuns disponíveis</h2>
   <p class="ft-sub">Eventos com fotos prontas para busca.</p>
   <div class="ft-albums" id="albuns-grid"></div>
@@ -94,6 +107,7 @@
 
 <!-- FAQ -->
 <section class="ft-section ft-section-narrow" id="faq">
+  <span class="ft-eyebrow">Tudo que você precisa saber</span>
   <h2 class="ft-h2">Dúvidas frequentes</h2>
   <details class="ft-faq">
     <summary>Minha selfie fica salva em algum lugar?</summary>
@@ -115,24 +129,50 @@
 
 <!-- CTA final -->
 <section class="ft-cta-final">
-  <h2>Suas fotos estão te esperando</h2>
-  <p>Leva menos de um minuto para encontrá-las.</p>
-  <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
-    <i data-lucide="scan-face"></i> Buscar com minha selfie
-  </a>
+  <div class="ft-cta-bg" aria-hidden="true">
+    <span class="ft-aurora-spin"></span>
+    <span class="ft-orb ft-orb-a"></span>
+    <span class="ft-orb ft-orb-b"></span>
+    <span class="ft-sheen"></span>
+  </div>
+  <div class="ft-cta-inner">
+    <h2>Suas fotos estão te esperando</h2>
+    <p>Leva menos de um minuto para encontrá-las.</p>
+    <a href="selfie.html" class="ft-btn ft-btn-primary ft-btn-lg">
+      <i data-lucide="scan-face"></i> Buscar com minha selfie
+    </a>
+  </div>
 </section>
 
 <footer class="ft-footer">
-  <div>
-    <strong>Ventus Formaturas</strong>
-    <span>Fotografia de formaturas · Montes Claros/MG</span>
+  <div class="ft-footer-top">
+    <div class="ft-footer-brand">
+      <img class="ft-footer-logo" src="/assets/img/logo-branca.png" alt="Ventus Formaturas">
+      <p>Fotografia de formaturas com busca por reconhecimento facial. Suas melhores fotos, na hora.</p>
+      <a href="https://wa.me/5538998639570" target="_blank" rel="noopener" class="ft-footer-wa"><i data-lucide="message-circle"></i> Falar no WhatsApp</a>
+    </div>
+    <div class="ft-footer-cols">
+      <div class="ft-footer-col">
+        <h4>Navegar</h4>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#albuns">Álbuns</a>
+        <a href="#faq">Dúvidas</a>
+      </div>
+      <div class="ft-footer-col">
+        <h4>Privacidade</h4>
+        <a href="/privacidade/">Política de Privacidade</a>
+        <a href="/excluir-conta/">Excluir conta</a>
+        <a href="/excluir-dados/">Excluir dados</a>
+      </div>
+      <div class="ft-footer-col">
+        <h4>Ventus</h4>
+        <a href="login.html">Entrar</a>
+        <a href="admin.html">Área do fotógrafo</a>
+      </div>
+    </div>
   </div>
-  <div class="ft-footer-links">
-    <a href="admin.html">Área do fotógrafo</a>
-    <a href="/privacidade/">Privacidade</a>
-    <a href="/excluir-conta/">Excluir conta</a>
-    <a href="/excluir-dados/">Excluir dados</a>
-    <a href="https://wa.me/5538998639570" target="_blank" rel="noopener">WhatsApp</a>
+  <div class="ft-footer-bottom">
+    <span>© 2026 Ventus Formaturas · Montes Claros/MG</span>
   </div>
 </footer>
 

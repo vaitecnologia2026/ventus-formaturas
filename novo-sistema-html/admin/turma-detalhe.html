@@ -30,14 +30,24 @@
   .panel-head .count { font-size:12px; font-weight:700; color:var(--primary-700); background:var(--primary-50); padding:3px 11px; border-radius:999px; }
   .panel-body { padding:22px; }
 
-  .add-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; padding:18px 22px; }
+  .add-bar { display:flex; gap:14px 16px; flex-wrap:wrap; align-items:flex-start; padding:18px 22px; }
   .add-bar .fld { display:flex; flex-direction:column; gap:6px; } .add-bar .fld.grow{flex:1;min-width:180px;}
-  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); }
-  .add-bar input, .add-bar select { padding:10px 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar label { font-size:12.5px; font-weight:600; color:var(--gray-600); min-height:16px; }
+  .add-bar input, .add-bar select { height:40px; padding:0 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
+  .add-bar input[type=time]{ padding:0 10px; }
+  .add-bar input[type=date], .add-bar input[type=time]{ min-height:40px; }
+  .add-bar .ms-search{ height:auto; padding:2px; }
+  .add-bar .fld .btn { height:40px; }
+  /* campo com switch: alinha o toggle na área do input (sem distorcer o switch) */
+  .add-bar .fld > .switch { margin-top:7px; }
   .add-bar input:focus, .add-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
   .add-bar .prestadores { display:flex; flex-wrap:wrap; gap:6px; max-width:340px; }
-  .chip-check { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border:1px solid var(--gray-300); border-radius:999px; font-size:12.5px; font-weight:600; color:var(--gray-600); cursor:pointer; background:var(--surface); }
+  .chip-check { position:relative; display:inline-flex; align-items:center; gap:9px; padding:9px 14px; border:1.5px solid var(--gray-200); border-radius:10px; font-size:13px; font-weight:600; color:var(--gray-600); cursor:pointer; background:var(--surface); user-select:none; transition:border-color .15s, background .15s, color .15s; }
+  .chip-check input { position:absolute; opacity:0; width:0; height:0; }
+  .chip-check::before { content:''; width:18px; height:18px; flex:none; border:1.5px solid var(--gray-300); border-radius:5px; background:var(--surface); background-repeat:no-repeat; background-position:center; background-size:12px; transition:.15s; }
+  .chip-check:hover { border-color:var(--gray-300); background:var(--gray-50); }
   .chip-check.on { border-color:var(--primary-500); background:var(--primary-50); color:var(--primary-700); }
+  .chip-check.on::before { background-color:var(--primary-600); border-color:var(--primary-600); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
   /* #36 — fotos por evento */
   .fe-list { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
   .fe-row { display:flex; align-items:center; gap:12px; padding:9px 13px; border:1px solid var(--gray-200); border-radius:10px; background:var(--surface); }
@@ -46,16 +56,18 @@
 
   /* Multi-select de prestadores (busca + tags) */
   .ms { position:relative; max-width:340px; }
-  .ms-box { border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); padding:6px 8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-height:42px; }
+  .ms-box { border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); padding:5px 8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-height:40px; }
   .ms-box:focus-within { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
   .ms-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; font-size:12.5px; font-weight:600; background:var(--primary-50); color:var(--primary-700); border:1px solid var(--primary-500); }
   .ms-tag button { border:none; background:none; color:inherit; cursor:pointer; font-size:14px; line-height:1; padding:0; display:grid; place-items:center; }
   .ms-search { flex:1; min-width:90px; border:none; outline:none; background:transparent; font-family:inherit; font-size:13.5px; color:var(--gray-900); padding:3px 2px; }
-  .ms-list { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; box-shadow:var(--shadow-lg,0 10px 30px rgba(0,0,0,.15)); max-height:220px; overflow-y:auto; z-index:50; display:none; }
+  /* mostra no máx ~4 prestadores; o resto ROLA (não cresce infinito) */
+  .ms-list { position:fixed; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; box-shadow:var(--shadow-lg,0 10px 30px rgba(0,0,0,.15)); max-height:156px; overflow-y:auto; z-index:200; display:none; }
   .ms-list.open { display:block; }
   .ms-opt { padding:9px 12px; font-size:13.5px; color:var(--gray-700); cursor:pointer; display:flex; align-items:center; gap:8px; }
-  .ms-opt:hover, .ms-opt.active { background:var(--primary-50); color:var(--primary-700); }
-  .ms-opt.sel { color:var(--gray-400); }
+  .ms-opt:not(.sel):hover { background:var(--primary-50); color:var(--primary-700); }
+  .ms-opt.sel { color:var(--gray-400); background:var(--gray-50); }
+  .ms-opt.sel:hover { background:var(--gray-100); }
   .ms-opt.sel::after { content:'✓'; margin-left:auto; font-weight:700; color:var(--primary-600); }
   .ms-empty { padding:10px 12px; font-size:12.5px; color:var(--gray-400); }
 
@@ -335,7 +347,7 @@ async function gerarLinkPublico(){
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/link-publico`), {method:'POST'});
   const d = await r.json();
   if (r.ok && d.path) { $('#lk-url').value = SITE + d.path; toast('Link gerado!'); }
-  else alert(d.detail || 'Erro ao gerar link.');
+  else await vtAlert(d.detail || 'Erro ao gerar link.',{title:'Ops'});
 }
 
 function trocarAba(aba) {
@@ -365,7 +377,7 @@ async function salvarCursos() {
   const ids = [...$('#cur-lista').querySelectorAll('input:checked')].map(x=>Number(x.value));
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/cursos`), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso_ids:ids})});
   if (r.ok) { toast('Cursos atualizados.'); const t=await(await fetch(apiUrl('/api/turma-formatura/'+id))).json(); pintarDados(t); }
-  else alert('Erro ao salvar cursos.');
+  else await vtAlert('Erro ao salvar cursos.',{title:'Ops'});
 }
 
 /* ---------------- HISTÓRICO da turma ---------------- */
@@ -386,11 +398,11 @@ async function carregarHistorico() {
   $('#hist-add').onclick = addHist;
 }
 async function addHist() {
-  const texto = $('#hist-texto').value.trim(); if (!texto) { alert('Escreva o histórico.'); return; }
+  const texto = $('#hist-texto').value.trim(); if (!texto) { await vtAlert('Escreva o histórico.',{title:'Ops'}); return; }
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/historico`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto,autor:$('#hist-autor').value.trim()||null})});
-  if (r.ok) { $('#hist-texto').value=''; carregarHistorico(); toast('Histórico registrado.'); } else alert('Erro ao salvar.');
+  if (r.ok) { $('#hist-texto').value=''; carregarHistorico(); toast('Histórico registrado.'); } else await vtAlert('Erro ao salvar.',{title:'Ops'});
 }
-window.excluirHist = async function(hid){ if(!confirm('Excluir este lançamento?'))return; const r=await fetch(apiUrl(`/api/turma-formatura/historico/${hid}`),{method:'DELETE'}); if(r.ok) carregarHistorico(); };
+window.excluirHist = async function(hid){ if(!await vtConfirm('Excluir este lançamento?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl(`/api/turma-formatura/historico/${hid}`),{method:'DELETE'}); if(r.ok) carregarHistorico(); };
 
 function pintarDados(t) {
   const cursos = (t.cursos||[]).map(c=>c.nome).join(', ') || '—';
@@ -428,6 +440,13 @@ function montarEvForm() {
 }
 /* ---- Multi-select de prestadores (busca + tags) ---- */
 let evPrestSel = [];
+function prestPosiciona(){
+  const box=$('#ev-prest-box'), list=$('#ev-prest-list');
+  if(!box||!list) return;
+  const r=box.getBoundingClientRect();
+  list.style.top=(r.bottom+4)+'px'; list.style.left=r.left+'px'; list.style.width=r.width+'px';
+}
+function prestAbrir(){ const list=$('#ev-prest-list'); if(!list) return; prestRenderList(); prestPosiciona(); list.classList.add('open'); }
 function prestRenderTags(){
   const box=$('#ev-prest-box'), search=$('#ev-prest-search');
   if(!box||!search) return;
@@ -446,20 +465,30 @@ function prestRenderList(){
   const q=(search.value||'').toLowerCase().trim();
   const opts=OPC.prestadores.filter(p=>!q||p.nome.toLowerCase().includes(q));
   list.innerHTML = opts.length ? opts.map(p=>`<div class="ms-opt ${evPrestSel.includes(p.id)?'sel':''}" data-id="${p.id}">${p.nome}</div>`).join('') : '<div class="ms-empty">Nenhum prestador encontrado.</div>';
-  list.querySelectorAll('.ms-opt').forEach(o=>o.onclick=()=>{
+  list.querySelectorAll('.ms-opt').forEach(o=>o.onclick=(e)=>{
+    e.stopPropagation();  // evita que o clique borbulhe e feche a lista (o nó é recriado no render)
     const pid=+o.dataset.id;
     if(evPrestSel.includes(pid)) evPrestSel=evPrestSel.filter(x=>x!==pid); else evPrestSel.push(pid);
-    search.value=''; prestRenderTags(); prestRenderList(); search.focus();
+    search.value=''; prestRenderTags(); prestRenderList(); prestPosiciona(); list.classList.add('open'); search.focus();
   });
 }
 function initPrestMulti(){
   evPrestSel = [];
   const box=$('#ev-prest-box'), search=$('#ev-prest-search'), list=$('#ev-prest-list');
   if(!box||!search||!list) return;
-  search.onfocus=()=>{ prestRenderList(); list.classList.add('open'); };
-  search.oninput=()=>{ prestRenderList(); list.classList.add('open'); };
-  box.onclick=(e)=>{ if(e.target===box) search.focus(); };
-  document.addEventListener('click',(e)=>{ if(!$('#ev-prestadores')?.contains(e.target)) list.classList.remove('open'); });
+  search.onfocus=()=>{ prestAbrir(); };
+  search.oninput=()=>{ prestAbrir(); };
+  box.onclick=(e)=>{ if(e.target===box||e.target.classList.contains('ms-box')) search.focus(); };
+  window.addEventListener('scroll',()=>{ if(list.classList.contains('open')) prestPosiciona(); }, true);
+  window.addEventListener('resize',()=>{ if(list.classList.contains('open')) prestPosiciona(); });
+  // listener de "clicar fora" registrado UMA vez só (evita empilhar a cada render)
+  if(!window.__msPrestOutside){
+    window.__msPrestOutside=true;
+    document.addEventListener('click',(e)=>{
+      const l=document.getElementById('ev-prest-list');
+      if(l && !document.getElementById('ev-prestadores')?.contains(e.target)) l.classList.remove('open');
+    });
+  }
   prestRenderTags(); prestRenderList();
 }
 function setPrestSel(ids){ evPrestSel=(ids||[]).map(Number); prestRenderTags(); prestRenderList(); }
@@ -493,10 +522,10 @@ async function salvarEvento() {
   const body = { evento_id:$('#ev-evento_id').value||null, data_prevista:$('#ev-data').value||null,
     hora_inicio:$('#ev-ini').value||null, hora_fim:$('#ev-fim').value||null, local:$('#ev-local').value,
     situacao:$('#ev-situacao').value, confirmado:$('#ev-confirmado').checked, album_id:$('#ev-album').value||null, prestador_ids:evPrest() };
-  if(!body.evento_id){ alert('Escolha o evento.'); return; }
+  if(!body.evento_id){ await vtAlert('Escolha o evento.',{title:'Ops'}); return; }
   const url = evEdit ? apiUrl('/api/turma-formatura/eventos/'+evEdit) : apiUrl(`/api/turma-formatura/${id}/eventos`);
   const r = await fetch(url,{method:evEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   AGENDA=null; // invalida cache da agenda (mudou uma data)
   limparEv(); carregarEventos();
 }
@@ -528,7 +557,7 @@ window.editarEvento = function(e){
   setPrestSel(e.prestador_ids||[]);
   $('#ev-btn').textContent='Atualizar'; $('#ev-form-title').textContent='Editar evento'; window.scrollTo({top:0,behavior:'smooth'});
 };
-window.excluirEvento = async function(eid){ if(!confirm('Excluir este evento?'))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok)carregarEventos(); };
+window.excluirEvento = async function(eid){ if(!await vtConfirm('Excluir este evento?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok)carregarEventos(); };
 
 /* ---------------- BRINDES ---------------- */
 function montarBrForm() {
@@ -543,10 +572,10 @@ function montarBrForm() {
 function limparBr(){ brEdit=null; $('#br-brinde_id').value=''; $('#br-escopo').value='todos'; $('#br-obs').value=''; $('#br-btn').textContent='Adicionar'; $('#br-form-title').textContent='Adicionar brinde'; }
 async function salvarBrinde() {
   const body = { brinde_id:$('#br-brinde_id').value||null, escopo:$('#br-escopo').value, observacao:$('#br-obs').value };
-  if(!body.brinde_id){ alert('Escolha o brinde.'); return; }
+  if(!body.brinde_id){ await vtAlert('Escolha o brinde.',{title:'Ops'}); return; }
   const url = brEdit ? apiUrl('/api/turma-formatura/brindes/'+brEdit) : apiUrl(`/api/turma-formatura/${id}/brindes`);
   const r = await fetch(url,{method:brEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   limparBr(); carregarBrindes();
 }
 async function carregarBrindes() {
@@ -566,11 +595,11 @@ async function carregarBrindes() {
       </div></td></tr>`;}).join('');
   lucide.createIcons();
 }
-window.entregarTodos = async function(tbid){ if(!confirm('Marcar este brinde como ENTREGUE para todos os alunos da turma que o recebem?'))return;
+window.entregarTodos = async function(tbid){ if(!await vtConfirm('Marcar este brinde como ENTREGUE para todos os alunos da turma que o recebem?',{title:'Confirmar'}))return;
   const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+tbid+'/entregar-todos'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue:true})});
-  const d=await r.json(); if(r.ok) toast(`Entregue para ${d.afetados} aluno(s).`); else alert('Erro'); };
+  const d=await r.json(); if(r.ok) toast(`Entregue para ${d.afetados} aluno(s).`); else await vtAlert('Erro',{title:'Ops'}); };
 window.editarBrinde = function(b){ brEdit=b.id; $('#br-brinde_id').value=b.brinde_id||''; $('#br-escopo').value=b.escopo; $('#br-obs').value=b.observacao||''; $('#br-btn').textContent='Atualizar'; $('#br-form-title').textContent='Editar brinde'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluirBrinde = async function(bid){ if(!confirm('Excluir este brinde?'))return; const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+bid),{method:'DELETE'}); if(r.ok)carregarBrindes(); };
+window.excluirBrinde = async function(bid){ if(!await vtConfirm('Excluir este brinde?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+bid),{method:'DELETE'}); if(r.ok)carregarBrindes(); };
 
 /* ---------------- CERIMONIAL (evento de cerimonial > itens) ---------------- */
 let CEDATA = { bases:[], catalogo_eventos:[], catalogo_itens:[] };
@@ -603,10 +632,10 @@ function montarCeForm(){
 }
 async function salvarEventoCerim(){
   const evento_id = $('#cev-evento').value;
-  if(!evento_id){ alert('Selecione o evento de cerimonial.'); return; }
+  if(!evento_id){ await vtAlert('Selecione o evento de cerimonial.',{title:'Ops'}); return; }
   const body={ evento_id:+evento_id, qtd_convidados:$('#cev-conv').value||0, qtd_alunos:$('#cev-alu').value||0 };
   const r=await fetch(apiUrl(`/api/turma-formatura/${id}/cerimonial-eventos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   $('#cev-conv').value='0'; $('#cev-alu').value='0'; $('#cev-evento').value=''; carregarCerim();
 }
 async function carregarCerim(){
@@ -654,10 +683,10 @@ function cardEvento(ev){
 window.onItemSelect=function(evId,sel){ const o=sel.options[sel.selectedIndex]; if(!o||!o.value)return; if(o.dataset.base) $(`#it-base-${evId}`).value=o.dataset.base; if(o.dataset.custo!=null) $(`#it-custo-${evId}`).value=o.dataset.custo; };
 window.addItemCerim=async function(evId){
   const desc=$(`#it-sel-${evId}`).value;
-  if(!desc){ alert('Selecione o item de cerimonial.'); return; }
+  if(!desc){ await vtAlert('Selecione o item de cerimonial.',{title:'Ops'}); return; }
   const body={ descricao:desc, base_calculo:$(`#it-base-${evId}`).value, quantidade:$(`#it-qtd-${evId}`).value||1, custo:$(`#it-custo-${evId}`).value||0 };
   const r=await fetch(apiUrl(`/api/turma-formatura/cerimonial-eventos/${evId}/itens`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   carregarCerim();
 };
 window.saveEventoCerim=async function(evId){
@@ -665,8 +694,8 @@ window.saveEventoCerim=async function(evId){
   const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-eventos/'+evId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(r.ok)carregarCerim();
 };
-window.excluirEventoCerim=async function(evId){ if(!confirm('Excluir este evento de cerimonial e todos os itens dele?'))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-eventos/'+evId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
-window.excluirItemCerim=async function(itemId){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-itens/'+itemId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
+window.excluirEventoCerim=async function(evId){ if(!await vtConfirm('Excluir este evento de cerimonial e todos os itens dele?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-eventos/'+evId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
+window.excluirItemCerim=async function(itemId){ if(!await vtConfirm('Excluir este item?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/cerimonial-itens/'+itemId),{method:'DELETE'}); if(r.ok)carregarCerim(); };
 
 /* ---------------- PLANOS (espelha o legado) ---------------- */
 const optPair = (arr,cur) => (arr||[]).map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
@@ -744,10 +773,10 @@ async function salvarPlano(){
     forma_entrega_id:$('#pl-fentrega').value?+$('#pl-fentrega').value:null, limite_ingresso:$('#pl-limite').value||null,
     inclui_cerimonial:inc('cerimonial'), inclui_eventos:inc('eventos'), inclui_produto:inc('produto'),
     inclui_servico:inc('servico'), inclui_brinde:inc('brinde'), fotos_eventos:fotosEventosSelecionados() };
-  if(!body.nome.trim()){ alert('Informe o nome do plano.'); return; }
+  if(!body.nome.trim()){ await vtAlert('Informe o nome do plano.',{title:'Ops'}); return; }
   const url = plEdit ? apiUrl('/api/turma-formatura/planos/'+plEdit) : apiUrl(`/api/turma-formatura/${id}/planos`);
   const r=await fetch(url,{method:plEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   limparPl(); carregarPlanos();
 }
 async function carregarPlanos(){
@@ -781,7 +810,7 @@ window.editarPlano=async function(p){ plEdit=p.id;
     try{ const rd=await fetch(apiUrl('/api/turma-formatura/planos/'+p.id)); const full=await rd.json(); montarFotosEventos(full.fotos_eventos||[]); }catch(e){}
   }
   $('#pl-btn').textContent='Atualizar plano'; $('#pl-form-title').textContent='Editar plano'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluirPlano=async function(pid){ if(!confirm('Excluir este plano e seus itens?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid),{method:'DELETE'}); if(r.ok)carregarPlanos(); };
+window.excluirPlano=async function(pid){ if(!await vtConfirm('Excluir este plano e seus itens?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid),{method:'DELETE'}); if(r.ok)carregarPlanos(); };
 
 /* -------- Config financeira do plano (modal) -------- */
 window.abrirConfig=async function(pid,nome){
@@ -839,7 +868,7 @@ window.salvarConfig=async function(pid){
     multa:$('#cfg-multa').value||0, juros:$('#cfg-juros').value||0, desconto_pix_antecipado:$('#cfg-descpix').value||0,
     modalidade_pagamento_id:$('#cfg-modalidade').value||null, meios };
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok){ document.getElementById('cfg-modal').remove(); toast('Config financeira salva.'); carregarPlanos(); } else alert('Erro ao salvar config.');
+  if(r.ok){ document.getElementById('cfg-modal').remove(); toast('Config financeira salva.'); carregarPlanos(); } else await vtAlert('Erro ao salvar config.',{title:'Ops'});
 };
 
 /* -------- Descontos por CPF do plano (modal) -------- */
@@ -880,10 +909,10 @@ async function carregarDescontos(pid){
 window.salvarDesconto=async function(pid){
   const body={ cpf:$('#dc-cpf').value, nome:$('#dc-nome').value, desconto_tipo:$('#dc-tipo').value, desconto_fotografia:$('#dc-foto').value||0, desconto_cerimonial:$('#dc-cerim').value||0 };
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/descontos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   $('#dc-cpf').value='';$('#dc-nome').value='';$('#dc-foto').value='';$('#dc-cerim').value=''; carregarDescontos(pid);
 };
-window.excluirDesconto=async function(did,pid){ if(!confirm('Excluir este desconto?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-descontos/'+did),{method:'DELETE'}); if(r.ok)carregarDescontos(pid); };
+window.excluirDesconto=async function(did,pid){ if(!await vtConfirm('Excluir este desconto?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-descontos/'+did),{method:'DELETE'}); if(r.ok)carregarDescontos(pid); };
 
 /* itens do plano */
 const optTipo=(cur)=>PLOPC.tipos.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
@@ -948,10 +977,10 @@ window.voltarPlanos=function(){ $('#planos-detalhe').hidden=true; $('#planos-lis
 function limparPi(){ piEdit=null; $('#pi-tipo').value='produto'; montarPiDescSelect('produto',''); $('#pi-qtd').value='1'; $('#pi-valor').value=''; $('#pi-btn').textContent='Adicionar item'; }
 async function salvarItem(){
   const body={ tipo:$('#pi-tipo').value, descricao:piDescValor(), quantidade:$('#pi-qtd').value||1, valor:$('#pi-valor').value||0 };
-  if(!body.descricao.trim()){ alert('Informe a descrição.'); return; }
+  if(!body.descricao.trim()){ await vtAlert('Informe a descrição.',{title:'Ops'}); return; }
   const url = piEdit ? apiUrl('/api/turma-formatura/planos-itens/'+piEdit) : apiUrl(`/api/turma-formatura/planos/${planoAtual}/itens`);
   const r=await fetch(url,{method:piEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   limparPi(); recarregarItens();
 }
 async function recarregarItens(){ const r=await fetch(apiUrl('/api/turma-formatura/planos/'+planoAtual)); const p=await r.json(); pintarItens(p.itens); }
@@ -970,7 +999,7 @@ function pintarItens(itens){
   lucide.createIcons();
 }
 window.editarItem=function(i){ piEdit=i.id; $('#pi-tipo').value=i.tipo; montarPiDescSelect(i.tipo, i.descricao); $('#pi-qtd').value=i.quantidade; $('#pi-valor').value=i.valor; $('#pi-btn').textContent='Atualizar item'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluirItem=async function(iid){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-itens/'+iid),{method:'DELETE'}); if(r.ok)recarregarItens(); };
+window.excluirItem=async function(iid){ if(!await vtConfirm('Excluir este item?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-itens/'+iid),{method:'DELETE'}); if(r.ok)recarregarItens(); };
 
 /* ---------------- PRÉ-CADASTRO / ALUNOS ---------------- */
 let CARGOS = [], VENDEDORES = [];
@@ -1006,19 +1035,19 @@ async function carregarAlunos(){
 }
 async function importarAlunos(){
   const txt = $('#al-import').value.trim();
-  if(!txt){ alert('Cole a lista de alunos.'); return; }
+  if(!txt){ await vtAlert('Cole a lista de alunos.',{title:'Ops'}); return; }
   const linhas = txt.split('\n').map(l=>{ const p=l.split(/[;,\t]/).map(s=>s.trim()); return { nome:p[0]||'', celular:p[1]||'' }; }).filter(x=>x.nome);
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos/importar`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({linhas})});
-  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   $('#al-import').value=''; toast(`${d.criados} aluno(s) importado(s).`); carregarAlunos();
 }
 async function addAluno(){
-  const nome=$('#al-nome').value.trim(); if(!nome){alert('Informe o nome.');return;}
+  const nome=$('#al-nome').value.trim(); if(!nome){await vtAlert('Informe o nome.',{title:'Ops'});return;}
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome,celular:$('#al-cel').value})});
-  if(r.ok){ $('#al-nome').value=''; $('#al-cel').value=''; carregarAlunos(); } else alert('Erro');
+  if(r.ok){ $('#al-nome').value=''; $('#al-cel').value=''; carregarAlunos(); } else await vtAlert('Erro',{title:'Ops'});
 }
 window.copiarLink = function(link){ navigator.clipboard?.writeText(link).then(()=>toast('Link copiado!'),()=>prompt('Copie o link:',link)); };
-window.excluirAluno = async function(aid){ if(!confirm('Excluir este aluno?'))return; const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'DELETE'}); if(r.ok)carregarAlunos(); };
+window.excluirAluno = async function(aid){ if(!await vtConfirm('Excluir este aluno?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'DELETE'}); if(r.ok)carregarAlunos(); };
 window.setCargo = async function(aid,cargo){ const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({cargo_comissao:cargo})}); if(r.ok)carregarAlunos(); };
 window.setVendedor = async function(aid,vid){ const r=await fetch(apiUrl('/api/turma-formatura/alunos/'+aid),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({vendedor_id:vid?+vid:null})}); if(r.ok)carregarAlunos(); };
 

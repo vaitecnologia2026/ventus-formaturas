@@ -180,10 +180,10 @@ async function salvar(){
     setor_id:$('#o-setor').value||null, tipo_os_id:$('#o-tipoos').value||null, situacao_id:$('#o-situacao').value||null,
     solicitante:$('#o-solic').value||null, prioridade:$('#o-prio').value||null,
     data_inicial:$('#o-dini').value||null, data_final:$('#o-dfim').value||null, chamado:$('#o-chamado').value||null, observacoes:$('#o-obs').value||null };
-  if(!body.titulo.trim()){alert('Informe o título.');return;}
+  if(!body.titulo.trim()){vtAlert('Informe o título.');return;}
   const url = editId ? apiUrl('/api/os/'+editId) : apiUrl('/api/os');
   const r=await fetch(url,{method:editId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d=await r.json(); if(!r.ok){vtAlert(d.detail||'Erro');return;}
   limpar(); carregar();
 }
 window.setView=function(v){ VIEW=v; $('#vw-kanban').classList.toggle('on',v==='kanban'); $('#vw-lista').classList.toggle('on',v==='lista');
@@ -239,13 +239,13 @@ function renderLista(){
 let dragId=null;
 window.dragStart=function(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; };
 window.dropCol=async function(e,status,col){ e.preventDefault(); col.style.background=''; if(dragId==null)return; await mover(dragId,status); dragId=null; };
-window.mover=async function(id,status){ const r=await fetch(apiUrl('/api/os/'+id+'/status'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}); if(r.ok)carregar(); else alert('Erro ao mover.'); };
+window.mover=async function(id,status){ const r=await fetch(apiUrl('/api/os/'+id+'/status'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}); if(r.ok)carregar(); else vtAlert('Erro ao mover.'); };
 window.editar=function(o){ editId=o.id; $('#o-tit').value=o.titulo; $('#o-tipo').value=o.tipo; $('#o-turma').value=o.turma_id||''; refiltrarTurma(o.aluno_id,o.evento_id);
   $('#o-resp').value=o.responsavel||''; $('#o-prazo').value=o.prazo||''; $('#o-status').value=o.status;
   $('#o-setor').value=o.setor_id||''; $('#o-tipoos').value=o.tipo_os_id||''; $('#o-situacao').value=o.situacao_id||'';
   $('#o-solic').value=o.solicitante||''; $('#o-prio').value=o.prioridade||''; $('#o-dini').value=o.data_inicial||''; $('#o-dfim').value=o.data_final||''; $('#o-chamado').value=o.chamado||''; $('#o-obs').value=o.observacoes||'';
   $('#o-btn').textContent='Atualizar OS'; window.scrollTo({top:0,behavior:'smooth'}); };
-window.excluir=async function(oid){ if(!confirm('Excluir esta OS?'))return; const r=await fetch(apiUrl('/api/os/'+oid),{method:'DELETE'}); if(r.ok)carregar(); };
+window.excluir=async function(oid){ if(!await vtConfirm('Excluir esta OS?',{danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/os/'+oid),{method:'DELETE'}); if(r.ok)carregar(); };
 </script>
 </body>
 </html>

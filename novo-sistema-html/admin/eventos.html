@@ -14,17 +14,41 @@
 <style>
 .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
 .cal-day-head { background:var(--gray-50); padding:10px; text-align:center; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-500); }
-.cal-cell { background:white; min-height:108px; padding:8px; position:relative; transition:background .15s; cursor:pointer; }
+.cal-cell { background:var(--surface); min-height:108px; padding:8px; position:relative; transition:background .15s; cursor:pointer; }
 .cal-cell:hover { background:var(--gray-50); }
-.cal-cell.other { background:#FAFBFC; color:var(--gray-400); }
-.cal-cell.today { background:#EFF6FF; }
-.cal-num { font-size:13px; font-weight:600; }
-.cal-today-mark { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--primary-600); color:white; font-size:12px; font-weight:700; }
+.cal-cell.other { background:var(--gray-50); color:var(--gray-400); }
+.cal-cell.other .cal-num { color:var(--gray-400); }
+.cal-cell.today { background:var(--primary-50); }
+.cal-num { font-size:13px; font-weight:600; color:var(--gray-900); }
+.cal-today-mark { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--primary-600); color:#fff; font-size:12px; font-weight:700; }
 .cal-evt { display:block; font-size:11px; padding:3px 6px; border-radius:4px; margin-top:4px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
-.cal-evt.cer { background:#DBEAFE; color:#1E40AF; }
-.cal-evt.fes { background:#FCE7F3; color:#9D174D; }
-.cal-evt.fot { background:var(--purple-bg); color:var(--purple-fg); }
+.cal-evt.cer { background:var(--primary-50); color:var(--primary-800); }
+.cal-evt.fes { background:var(--purple-bg); color:var(--purple-fg); }
+.cal-evt.fot { background:var(--warning-bg); color:var(--warning-fg); }
 .cal-evt.ens { background:var(--success-bg); color:var(--success-fg); }
+.cal-legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; }
+/* Views */
+.cal-view { display:none; }
+.cal-view.active { display:block; }
+/* Lista / Semana */
+.cal-list { display:flex; flex-direction:column; gap:2px; }
+.cal-list-day { padding:12px 4px 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-500); border-bottom:1px solid var(--gray-200); }
+.cal-list-item { display:flex; align-items:center; gap:12px; padding:11px 8px; border-radius:8px; cursor:pointer; transition:background .15s; }
+.cal-list-item:hover { background:var(--gray-50); }
+.cal-list-chip { width:12px; height:12px; border-radius:4px; flex:none; }
+.cal-list-chip.cer { background:var(--primary-800); }
+.cal-list-chip.fes { background:var(--purple-fg); }
+.cal-list-chip.fot { background:var(--warning-fg); }
+.cal-list-chip.ens { background:var(--success-fg); }
+.cal-list-txt { flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--gray-900); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cal-list-empty { padding:40px 8px; text-align:center; color:var(--gray-400); font-size:14px; }
+.cal-week { display:flex; flex-direction:column; gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
+.cal-week-row { display:flex; gap:12px; background:var(--surface); padding:12px 14px; align-items:flex-start; min-height:56px; }
+.cal-week-row.today { background:var(--primary-50); }
+.cal-week-date { width:112px; flex:none; font-size:13px; font-weight:700; color:var(--gray-900); text-transform:capitalize; }
+.cal-week-date small { display:block; font-size:11px; font-weight:500; color:var(--gray-500); text-transform:none; }
+.cal-week-evts { flex:1; display:flex; flex-direction:column; gap:5px; min-width:0; }
+.cal-week-empty { color:var(--gray-400); font-size:12px; padding-top:2px; }
 </style>
 </head>
 <body>
@@ -34,9 +58,9 @@
   <header class="topbar">
     <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar evento, turma, local…"></div>
     <div class="flex gap-2 items-center">
-      <button class="btn btn-secondary btn-sm"><i data-lucide="calendar-sync" class="w-4 h-4"></i> Sincronizar Google Agenda</button>
-      <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar ICS</button>
-      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
+      <button class="btn btn-secondary btn-sm" id="cal-btn-sync"><i data-lucide="calendar-sync" class="w-4 h-4"></i> Sincronizar Google Agenda</button>
+      <button class="btn btn-secondary btn-sm" id="cal-btn-ics"><i data-lucide="download" class="w-4 h-4"></i> Exportar ICS</button>
+      <button class="btn btn-primary btn-sm" id="cal-btn-new"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
     </div>
   </header>
 
@@ -44,15 +68,15 @@
     <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Eventos</div>
     <div class="flex justify-between items-center mt-1 mb-6">
       <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Calendário de eventos</h1>
-      <div class="flex gap-2">
-        <button class="btn btn-secondary btn-sm" style="background:var(--primary-50);color:var(--primary-700);border-color:var(--primary-200);">Mês</button>
-        <button class="btn btn-secondary btn-sm">Semana</button>
-        <button class="btn btn-secondary btn-sm">Lista</button>
+      <div class="flex gap-2" id="cal-view-toggle">
+        <button class="btn btn-secondary btn-sm" data-view="month">Mês</button>
+        <button class="btn btn-secondary btn-sm" data-view="week">Semana</button>
+        <button class="btn btn-secondary btn-sm" data-view="list">Lista</button>
       </div>
     </div>
 
     <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="calendar" class="w-5 h-5"></i></div><div class="kpi-label">Eventos no mês</div><div class="kpi-value">17</div><div class="kpi-trend" style="color:var(--gray-500);">+ 5 vs abr</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--primary-50);color:var(--primary-700);"><i data-lucide="calendar" class="w-5 h-5"></i></div><div class="kpi-label">Eventos no mês</div><div class="kpi-value">17</div><div class="kpi-trend" style="color:var(--gray-500);">+ 5 vs abr</div></div>
       <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Confirmados</div><div class="kpi-value">12</div><div class="kpi-trend up">71%</div></div>
       <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Hoje</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">2 fotografias · 1 baile</div></div>
       <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Conflitos detectados</div><div class="kpi-value">1</div><div class="kpi-trend down">15/07 · 2 turmas</div></div>
@@ -61,69 +85,27 @@
     <div class="card mb-6">
       <div class="card-header">
         <div class="flex items-center gap-3">
-          <button class="btn btn-ghost btn-icon"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-          <h2 style="font-size:18px;font-weight:700;">Maio · 2026</h2>
-          <button class="btn btn-ghost btn-icon"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
-          <button class="btn btn-secondary btn-sm" style="margin-left:8px;">Hoje</button>
+          <button class="btn btn-ghost btn-icon" id="cal-prev" aria-label="Mês anterior"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+          <h2 id="cal-label" style="font-size:18px;font-weight:700;min-width:150px;text-align:center;">—</h2>
+          <button class="btn btn-ghost btn-icon" id="cal-next" aria-label="Próximo mês"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+          <button class="btn btn-secondary btn-sm" id="cal-today" style="margin-left:8px;">Hoje</button>
         </div>
         <div class="flex gap-2 items-center" style="font-size:12px;color:var(--gray-600);">
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#DBEAFE;border-radius:3px;"></span> Cerimônia</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#FCE7F3;border-radius:3px;"></span> Festa</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--purple-bg);border-radius:3px;"></span> Fotografia</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--success-bg);border-radius:3px;"></span> Ensaio</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--primary-800);"></span> Cerimônia</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--purple-fg);"></span> Festa</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--warning-fg);"></span> Fotografia</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--success-fg);"></span> Ensaio</span>
         </div>
       </div>
       <div class="card-body">
-        <div class="cal-grid">
-          <div class="cal-day-head">Dom</div><div class="cal-day-head">Seg</div><div class="cal-day-head">Ter</div><div class="cal-day-head">Qua</div><div class="cal-day-head">Qui</div><div class="cal-day-head">Sex</div><div class="cal-day-head">Sáb</div>
-
-          <div class="cal-cell other"><div class="cal-num">26</div></div>
-          <div class="cal-cell other"><div class="cal-num">27</div><span class="cal-evt fot">FOTO CONVITE · Med T85</span></div>
-          <div class="cal-cell other"><div class="cal-num">28</div></div>
-          <div class="cal-cell other"><div class="cal-num">29</div></div>
-          <div class="cal-cell today"><div class="cal-today-mark">30</div><span class="cal-evt fot">14h Foto Convite Externo</span><span class="cal-evt cer">19h Ensaio Beca</span><span class="cal-evt fes">21h Festa 365 dias · DIR</span></div>
-          <div class="cal-cell"><div class="cal-num">1</div></div>
-          <div class="cal-cell"><div class="cal-num">2</div></div>
-
-          <div class="cal-cell"><div class="cal-num">3</div><span class="cal-evt fes">21h BAILE+AFTER · Med T84</span></div>
-          <div class="cal-cell"><div class="cal-num">4</div></div>
-          <div class="cal-cell"><div class="cal-num">5</div><span class="cal-evt fot">FOTO CONVITE · ODONTO FUN</span></div>
-          <div class="cal-cell"><div class="cal-num">6</div></div>
-          <div class="cal-cell"><div class="cal-num">7</div></div>
-          <div class="cal-cell"><div class="cal-num">8</div></div>
-          <div class="cal-cell"><div class="cal-num">9</div><span class="cal-evt cer">CULTO ECUMÊNICO · Enf FUN</span></div>
-
-          <div class="cal-cell"><div class="cal-num">10</div><span class="cal-evt fes">FAMILY DAY · DIREITO UNI</span></div>
-          <div class="cal-cell"><div class="cal-num">11</div></div>
-          <div class="cal-cell"><div class="cal-num">12</div><span class="cal-evt ens">ENSAIO IND · Letras</span></div>
-          <div class="cal-cell"><div class="cal-num">13</div></div>
-          <div class="cal-cell"><div class="cal-num">14</div></div>
-          <div class="cal-cell"><div class="cal-num">15</div><span class="cal-evt cer">COLAÇÃO OFICIAL · Med Vet IFNMG</span></div>
-          <div class="cal-cell"><div class="cal-num">16</div><span class="cal-evt cer">COLAÇÃO SIMBÓLICA · Med Vet IFNMG</span></div>
-
-          <div class="cal-cell"><div class="cal-num">17</div></div>
-          <div class="cal-cell"><div class="cal-num">18</div></div>
-          <div class="cal-cell"><div class="cal-num">19</div><span class="cal-evt fes">100 DIAS · Direito FUN</span></div>
-          <div class="cal-cell"><div class="cal-num">20</div></div>
-          <div class="cal-cell"><div class="cal-num">21</div></div>
-          <div class="cal-cell"><div class="cal-num">22</div><span class="cal-evt cer">CULTO · Enf UNIMONTES</span></div>
-          <div class="cal-cell"><div class="cal-num">23</div></div>
-
-          <div class="cal-cell"><div class="cal-num">24</div></div>
-          <div class="cal-cell"><div class="cal-num">25</div></div>
-          <div class="cal-cell"><div class="cal-num">26</div><span class="cal-evt fot">POSICIONAMENTO · Eng UFMG</span></div>
-          <div class="cal-cell"><div class="cal-num">27</div></div>
-          <div class="cal-cell"><div class="cal-num">28</div></div>
-          <div class="cal-cell"><div class="cal-num">29</div><span class="cal-evt fes">FESTA EXTRA · Odontologia</span></div>
-          <div class="cal-cell"><div class="cal-num">30</div></div>
-
-          <div class="cal-cell"><div class="cal-num">31</div></div>
-          <div class="cal-cell other"><div class="cal-num">1</div></div>
-          <div class="cal-cell other"><div class="cal-num">2</div></div>
-          <div class="cal-cell other"><div class="cal-num">3</div></div>
-          <div class="cal-cell other"><div class="cal-num">4</div></div>
-          <div class="cal-cell other"><div class="cal-num">5</div></div>
-          <div class="cal-cell other"><div class="cal-num">6</div></div>
+        <div id="cal-month" class="cal-view active">
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div id="cal-week" class="cal-view">
+          <div class="cal-week" id="cal-week-body"></div>
+        </div>
+        <div id="cal-list" class="cal-view">
+          <div class="cal-list" id="cal-list-body"></div>
         </div>
       </div>
     </div>
@@ -146,6 +128,231 @@
   </main>
 </div>
 <script src="../assets/js/app.js"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  const EVENTOS = {
+    '2026-04-27':[{tipo:'fot',txt:'FOTO CONVITE · Med T85'}],
+    '2026-04-30':[{tipo:'fot',txt:'14h Foto Convite Externo'},{tipo:'cer',txt:'19h Ensaio Beca'},{tipo:'fes',txt:'21h Festa 365 dias · DIR'}],
+    '2026-05-03':[{tipo:'fes',txt:'21h BAILE+AFTER · Med T84'}],
+    '2026-05-05':[{tipo:'fot',txt:'FOTO CONVITE · ODONTO FUN'}],
+    '2026-05-09':[{tipo:'cer',txt:'CULTO ECUMÊNICO · Enf FUN'}],
+    '2026-05-10':[{tipo:'fes',txt:'FAMILY DAY · DIREITO UNI'}],
+    '2026-05-12':[{tipo:'ens',txt:'ENSAIO IND · Letras'}],
+    '2026-05-15':[{tipo:'cer',txt:'COLAÇÃO OFICIAL · Med Vet IFNMG'}],
+    '2026-05-16':[{tipo:'cer',txt:'COLAÇÃO SIMBÓLICA · Med Vet IFNMG'}],
+    '2026-05-19':[{tipo:'fes',txt:'100 DIAS · Direito FUN'}],
+    '2026-05-22':[{tipo:'cer',txt:'CULTO · Enf UNIMONTES'}],
+    '2026-05-26':[{tipo:'fot',txt:'POSICIONAMENTO · Eng UFMG'}],
+    '2026-05-29':[{tipo:'fes',txt:'FESTA EXTRA · Odontologia'}],
+  };
+
+  const TIPO_LABEL = { cer:'Cerimônia', fes:'Festa', fot:'Fotografia', ens:'Ensaio' };
+  const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DIAS_SEM = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+  const today = new Date();
+  const todayISO = iso(today.getFullYear(), today.getMonth(), today.getDate());
+
+  // Mês de referência: começa em Maio 2026 (onde há eventos)
+  let refYear = 2026, refMonth = 4; // 4 = Maio (0-based)
+  let view = 'month';
+
+  const $ = (id) => document.getElementById(id);
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function iso(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
+  function eventsFor(isoDate) { return EVENTOS[isoDate] || []; }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function refreshIcons() {
+    if (window.lucide) { try { lucide.createIcons(); } catch (e) {} }
+  }
+
+  function openEvent(ev, isoDate) {
+    const [y, m, d] = isoDate.split('-');
+    const dataFmt = d + '/' + m + '/' + y;
+    const alertFn = window.vtAlert || ((msg) => window.alert(msg));
+    alertFn('Evento: ' + ev.txt + ' — ' + dataFmt, { title: TIPO_LABEL[ev.tipo] || 'Evento' });
+  }
+
+  /* ---------- Visão Mês ---------- */
+  function renderMonth() {
+    const grid = $('cal-grid');
+    let html = '';
+    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
+      html += '<div class="cal-day-head">' + d + '</div>';
+    });
+
+    const first = new Date(refYear, refMonth, 1);
+    const startOffset = first.getDay(); // 0 = Domingo
+    const start = new Date(refYear, refMonth, 1 - startOffset);
+    const showTodayMark = (refYear === today.getFullYear() && refMonth === today.getMonth());
+
+    for (let i = 0; i < 42; i++) {
+      const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const cy = cur.getFullYear(), cm = cur.getMonth(), cd = cur.getDate();
+      const cIso = iso(cy, cm, cd);
+      const other = (cm !== refMonth);
+      const isToday = (cIso === todayISO);
+      const evts = eventsFor(cIso);
+
+      let cls = 'cal-cell';
+      if (other) cls += ' other';
+      if (isToday) cls += ' today';
+
+      let numHtml;
+      if (isToday && showTodayMark && !other) {
+        numHtml = '<div class="cal-today-mark">' + cd + '</div>';
+      } else {
+        numHtml = '<div class="cal-num">' + cd + '</div>';
+      }
+
+      let evHtml = '';
+      evts.forEach((ev, idx) => {
+        evHtml += '<span class="cal-evt ' + ev.tipo + '" data-iso="' + cIso + '" data-idx="' + idx + '" title="' + esc(ev.txt) + '">' + esc(ev.txt) + '</span>';
+      });
+
+      html += '<div class="' + cls + '" data-iso="' + cIso + '">' + numHtml + evHtml + '</div>';
+    }
+    grid.innerHTML = html;
+  }
+
+  /* ---------- Visão Lista (mês visível) ---------- */
+  function renderList() {
+    const body = $('cal-list-body');
+    const days = Object.keys(EVENTOS)
+      .filter(k => { const [y, m] = k.split('-').map(Number); return y === refYear && (m - 1) === refMonth; })
+      .sort();
+
+    if (!days.length) {
+      body.innerHTML = '<div class="cal-list-empty">Nenhum evento em ' + MESES[refMonth] + ' de ' + refYear + '.</div>';
+      return;
+    }
+
+    let html = '';
+    days.forEach(isoDate => {
+      const [y, m, d] = isoDate.split('-');
+      const dt = new Date(Number(y), Number(m) - 1, Number(d));
+      html += '<div class="cal-list-day">' + d + '/' + m + ' · ' + DIAS_SEM[dt.getDay()] + '</div>';
+      eventsFor(isoDate).forEach((ev, idx) => {
+        html += '<div class="cal-list-item" data-iso="' + isoDate + '" data-idx="' + idx + '">' +
+          '<span class="cal-list-chip ' + ev.tipo + '"></span>' +
+          '<span class="cal-list-txt">' + esc(ev.txt) + '</span>' +
+          '<span class="badge badge-info">' + (TIPO_LABEL[ev.tipo] || '') + '</span>' +
+        '</div>';
+      });
+    });
+    body.innerHTML = html;
+  }
+
+  /* ---------- Visão Semana (1ª semana do mês visível, ou semana atual se hoje ∈ mês) ---------- */
+  function renderWeek() {
+    const body = $('cal-week-body');
+    // Se o mês visível é o mês real de hoje, mostra a semana de hoje; senão, a 1ª semana do mês.
+    let anchor;
+    if (refYear === today.getFullYear() && refMonth === today.getMonth()) {
+      anchor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    } else {
+      anchor = new Date(refYear, refMonth, 1);
+    }
+    const start = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - anchor.getDay());
+
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const cIso = iso(cur.getFullYear(), cur.getMonth(), cur.getDate());
+      const isToday = (cIso === todayISO);
+      const evts = eventsFor(cIso);
+
+      let evtsHtml = '';
+      if (evts.length) {
+        evts.forEach((ev, idx) => {
+          evtsHtml += '<span class="cal-evt ' + ev.tipo + '" style="white-space:normal;" data-iso="' + cIso + '" data-idx="' + idx + '">' + esc(ev.txt) + '</span>';
+        });
+      } else {
+        evtsHtml = '<span class="cal-week-empty">Sem eventos</span>';
+      }
+
+      html += '<div class="cal-week-row' + (isToday ? ' today' : '') + '">' +
+        '<div class="cal-week-date">' + DIAS_SEM[cur.getDay()] +
+          '<small>' + pad(cur.getDate()) + '/' + pad(cur.getMonth() + 1) + '</small></div>' +
+        '<div class="cal-week-evts">' + evtsHtml + '</div>' +
+      '</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  /* ---------- Orquestração ---------- */
+  function render() {
+    $('cal-label').textContent = MESES[refMonth] + ' · ' + refYear;
+
+    if (view === 'month') renderMonth();
+    else if (view === 'list') renderList();
+    else if (view === 'week') renderWeek();
+
+    document.querySelectorAll('.cal-view').forEach(v => v.classList.remove('active'));
+    $('cal-' + view).classList.add('active');
+
+    // Botões de view ativos
+    document.querySelectorAll('#cal-view-toggle [data-view]').forEach(b => {
+      const on = (b.dataset.view === view);
+      b.style.background = on ? 'var(--primary-50)' : '';
+      b.style.color = on ? 'var(--primary-700)' : '';
+      b.style.borderColor = on ? 'var(--primary-200)' : '';
+    });
+
+    refreshIcons();
+  }
+
+  function shiftMonth(delta) {
+    refMonth += delta;
+    while (refMonth < 0) { refMonth += 12; refYear--; }
+    while (refMonth > 11) { refMonth -= 12; refYear++; }
+    render();
+  }
+
+  /* ---------- Eventos de UI ---------- */
+  $('cal-prev').addEventListener('click', () => shiftMonth(-1));
+  $('cal-next').addEventListener('click', () => shiftMonth(1));
+  $('cal-today').addEventListener('click', () => {
+    refYear = today.getFullYear();
+    refMonth = today.getMonth();
+    render();
+  });
+
+  document.querySelectorAll('#cal-view-toggle [data-view]').forEach(b => {
+    b.addEventListener('click', () => { view = b.dataset.view; render(); });
+  });
+
+  // Delegação de clique: chip de evento / linha de lista / semana
+  document.querySelector('.card-body').addEventListener('click', (e) => {
+    const item = e.target.closest('[data-iso][data-idx]');
+    if (item) {
+      const isoDate = item.dataset.iso;
+      const idx = Number(item.dataset.idx);
+      const ev = eventsFor(isoDate)[idx];
+      if (ev) openEvent(ev, isoDate);
+      return;
+    }
+    // Célula vazia do mês → nada de erro (silencioso)
+  });
+
+  // Botões mortos → feedback
+  const alertFn = (m, t) => (window.vtAlert ? window.vtAlert(m, { title: t }) : window.alert(m));
+  const bSync = $('cal-btn-sync'), bIcs = $('cal-btn-ics'), bNew = $('cal-btn-new');
+  if (bNew)  bNew.addEventListener('click',  () => alertFn('Cadastro de evento em construção.', 'Novo evento (protótipo)'));
+  if (bSync) bSync.addEventListener('click', () => alertFn('Sincronização com o Google Agenda em construção.', 'Sincronizar (protótipo)'));
+  if (bIcs)  bIcs.addEventListener('click',  () => alertFn('Exportação de agenda (.ics) em construção.', 'Exportar ICS (protótipo)'));
+
+  render();
+})();
+</script>
 
 </body>
 </html>

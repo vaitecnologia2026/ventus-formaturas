@@ -17,8 +17,24 @@
 .tab:hover { color:var(--gray-700); }
 .tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
 .placeholder-pill { display:inline-block; padding:3px 8px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; }
-.placeholder-pill:hover { background:#FDE68A; }
-.editor-fake { min-height:280px; padding:20px; background:white; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; line-height:1.7; color:var(--gray-700); }
+.placeholder-pill:hover { filter:brightness(.95); }
+.editor-fake { min-height:280px; padding:20px; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; font-size:14px; line-height:1.7; color:var(--gray-700); }
+
+/* Bloco de leitura do template na pré-visualização (respeita dark theme) */
+.contract-doc { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:26px 30px; font-family:Georgia,'Times New Roman',serif; font-size:14px; line-height:1.85; color:var(--gray-800); max-height:56vh; overflow:auto; }
+.contract-doc h4 { text-align:center; font-weight:800; font-size:15px; color:var(--gray-900); margin:0 0 18px; letter-spacing:.02em; }
+.contract-doc p { margin:0 0 14px; }
+.contract-doc .ph { display:inline-block; padding:1px 6px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:12px; }
+.contract-note { display:flex; gap:8px; align-items:center; margin-top:14px; padding:10px 14px; background:var(--primary-50); color:var(--primary-700); border-radius:10px; font-family:system-ui,sans-serif; font-size:12.5px; }
+/* Editor de template (textarea) */
+.tpl-editor { width:100%; height:340px; resize:vertical; padding:16px; border:1px solid var(--gray-200); border-radius:12px; background:var(--surface); color:var(--gray-800); font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; }
+.tpl-editor:focus { outline:none; border-color:var(--primary-600); box-shadow:0 0 0 3px var(--primary-50); }
+/* Dropdown de exportação */
+.export-wrap { position:relative; }
+.export-menu { position:absolute; right:0; top:calc(100% + 6px); min-width:190px; background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 20px 50px -18px rgba(15,23,42,.4); padding:6px; z-index:50; display:none; }
+.export-menu.open { display:block; }
+.export-menu button { display:flex; align-items:center; gap:9px; width:100%; padding:9px 11px; border:0; background:transparent; color:var(--gray-700); font:inherit; font-size:13.5px; text-align:left; border-radius:8px; cursor:pointer; }
+.export-menu button:hover { background:var(--gray-100); color:var(--gray-900); }
 </style>
 </head>
 <body>
@@ -73,10 +89,17 @@
               <p style="margin-bottom:0;color:var(--gray-400);font-size:12px;">[Texto truncado · ver template completo]</p>
             </div>
             <div class="flex gap-2 mt-3">
-              <button class="btn btn-secondary btn-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
-              <button class="btn btn-secondary btn-sm"><i data-lucide="eye" class="w-4 h-4"></i> Pré-visualizar</button>
-              <button class="btn btn-secondary btn-sm"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
-              <button class="btn btn-secondary btn-sm" style="margin-left:auto;"><i data-lucide="download" class="w-4 h-4"></i> Exportar PDF</button>
+              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="editar" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
+              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="preview" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="eye" class="w-4 h-4"></i> Pré-visualizar</button>
+              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="duplicar" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
+              <div class="export-wrap" style="margin-left:auto;">
+                <button class="btn btn-secondary btn-sm" data-no-toast data-export-toggle><i data-lucide="download" class="w-4 h-4"></i> Exportar <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+                <div class="export-menu" data-export-menu>
+                  <button data-no-toast data-export="PDF"><i data-lucide="file-text" class="w-4 h-4"></i> Exportar PDF</button>
+                  <button data-no-toast data-export="DOCX"><i data-lucide="file" class="w-4 h-4"></i> Exportar DOCX</button>
+                  <button data-no-toast data-export="CSV"><i data-lucide="table" class="w-4 h-4"></i> Exportar CSV (dados)</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -123,7 +146,7 @@
           <div class="flex gap-2">
             <select class="select" style="width:160px;font-size:13px;padding:6px 10px;"><option>Todas turmas</option><option>MEDICINA T85</option><option>DIREITO T42</option><option>ENGENHARIA T31</option></select>
             <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todos status</option><option>Em dia</option><option>Em atraso</option><option>Quitado</option></select>
-            <button class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Exportar CSV</button>
+            <button class="btn btn-secondary btn-sm" data-no-toast data-export="CSV"><i data-lucide="download" class="w-4 h-4"></i> Exportar CSV</button>
           </div>
         </div>
         <table class="table">
@@ -165,6 +188,149 @@
   </main>
 </div>
 <script src="../assets/js/app.js"></script>
+<script>
+(function () {
+  // Texto completo do template (mock) — placeholders preenchidos por aluno.
+  const TEMPLATES = {
+    'Contrato Padrão Ouro 2026': [
+      'CONTRATO DE PRESTAÇÃO DE SERVIÇOS Nº {{NR_CONTRATO}}',
+      '',
+      'Pelo presente instrumento particular, de um lado VENTUS PRODUTORA LTDA, inscrita no CNPJ sob nº 00.000.000/0001-00, doravante denominada CONTRATADA, e de outro lado {{NM_ALUNO}}, CPF {{CPF}}, RG {{RG}}, residente em {{DS_ENDERECO}}, {{NR_ENDERECO}}, {{DS_COMPLEMENTO}}, {{DS_BAIRRO}}, {{DS_CIDADE}}/{{DS_UF}}, CEP {{CEP}}, doravante denominado(a) CONTRATANTE, têm entre si justo e contratado o seguinte:',
+      '',
+      'CLÁUSULA 1ª — DO OBJETO. A CONTRATADA prestará serviços relativos à formatura da turma {{NM_TURMA}} do curso {{NM_CURSO}}, da instituição {{NM_INSTITUICAO}}, com previsão de realização para {{DT_PREVISAO_FORMATURA}}, contemplando o plano {{NM_PLANO}}.',
+      '',
+      'CLÁUSULA 2ª — DO VALOR E PAGAMENTO. O valor total contratado é de {{VL_CONTRATO}}, parcelado em {{NR_PARCELA}} parcelas mensais de {{VL_PARCELA}}, com primeira parcela em {{DT_PARCELA_PRIMEIRA}} e última em {{DT_PARCELA_ULTIMA}}, via {{TP_PAGAMENTO}}.',
+      '',
+      'CLÁUSULA 3ª — DOS EVENTOS E PRODUTOS. Ficam contratados os seguintes eventos: {{LISTA_EVENTOS}}. Cerimonial: {{LISTA_CERIMONIAL}}. Brindes: {{LISTA_BRINDE}}. Produtos e serviços: {{LISTA_PRODUTO}}, {{LISTA_SERVICO}}.',
+      '',
+      'CLÁUSULA 4ª — DA BECA. A CONTRATADA disponibilizará beca conforme medidas informadas: altura {{ALTURA}}, nº de calça {{NR_CALCA}}, plus size {{PLUS_SIZE}}.',
+      '',
+      'CLÁUSULA 5ª — DO FORO. Fica eleito o foro da comarca de {{DS_CIDADE}}/{{DS_UF}} para dirimir quaisquer questões oriundas deste contrato.',
+      '',
+      'E, por estarem assim justas e contratadas, as partes assinam o presente em {{DIA_ATUAL}} de {{MES_ATUAL}} de {{ANO_ATUAL}}.',
+      '',
+      '_________________________________',
+      '{{NM_ALUNO}} — CONTRATANTE',
+      '',
+      '_________________________________',
+      'VENTUS PRODUTORA LTDA — CONTRATADA'
+    ].join('\n')
+  };
+
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  // Envelopa {{...}} num <span class="ph"> e converte quebras de linha em parágrafos.
+  function renderDoc(text) {
+    const withPills = esc(text).replace(/\{\{[A-Z0-9_]+\}\}/g, m => `<span class="ph">${m}</span>`);
+    const lines = withPills.split('\n');
+    const head = lines[0];
+    const body = lines.slice(1).join('\n')
+      .split(/\n{2,}/)
+      .map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '')
+      .join('');
+    return `<h4>${head}</h4>${body}`;
+  }
+
+  function toast(msg) {
+    // usa o stack de toast do app.js se existir; senão, cai no vtAlert
+    const stack = document.getElementById('vt-toast-stack');
+    if (stack) {
+      const t = document.createElement('div');
+      t.className = 'vt-toast';
+      t.textContent = msg;
+      stack.appendChild(t);
+      setTimeout(() => t.classList.add('fade'), 2200);
+      setTimeout(() => t.remove(), 2500);
+    } else {
+      window.vtAlert(msg);
+    }
+  }
+
+  function getText(nome) {
+    return TEMPLATES[nome] || (TEMPLATES['Contrato Padrão Ouro 2026']);
+  }
+
+  function preview(nome) {
+    window.vtModal({
+      title: `Pré-visualização — ${nome}`,
+      size: 'lg',
+      bodyHTML:
+        `<div class="contract-doc">${renderDoc(getText(nome))}</div>` +
+        `<div class="contract-note"><i data-lucide="info" class="w-4 h-4"></i> Os campos {{...}} são preenchidos automaticamente por aluno no momento da geração do contrato.</div>`
+    });
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function editar(nome) {
+    const text = getText(nome);
+    const wrap = document.createElement('div');
+    wrap.innerHTML =
+      `<label style="display:block;font-size:12.5px;font-weight:700;color:var(--gray-600);margin-bottom:8px;">Texto do template · use {{PLACEHOLDERS}} para campos dinâmicos</label>` +
+      `<textarea class="tpl-editor" spellcheck="false"></textarea>` +
+      `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">` +
+      `<button class="btn btn-secondary btn-sm" data-no-toast data-act="cancel">Cancelar</button>` +
+      `<button class="btn btn-primary btn-sm" data-no-toast data-act="save"><i data-lucide="check" class="w-4 h-4"></i> Salvar template</button>` +
+      `</div>`;
+    wrap.querySelector('textarea').value = text;
+
+    const m = window.vtModal({ title: `Editar template — ${nome}`, size: 'lg', bodyHTML: wrap });
+    if (window.lucide) lucide.createIcons();
+
+    wrap.addEventListener('click', e => {
+      const b = e.target.closest('[data-act]');
+      if (!b) return;
+      m.close();
+      if (b.dataset.act === 'save') toast('Template salvo (protótipo).');
+    });
+  }
+
+  async function duplicar(nome) {
+    const ok = await window.vtConfirm(`Duplicar o template "${nome}"?`, { okText: 'Duplicar' });
+    if (ok) await window.vtAlert('Template duplicado.', { title: 'Pronto' });
+  }
+
+  function exportar(formato) {
+    toast(`Exportando ${formato}… (protótipo)`);
+  }
+
+  // Delegação de eventos — cobre todos os cards de template.
+  document.addEventListener('click', e => {
+    const act = e.target.closest('[data-tpl-action]');
+    if (act) {
+      e.preventDefault();
+      const nome = act.dataset.nome || 'Template';
+      if (act.dataset.tplAction === 'preview') preview(nome);
+      else if (act.dataset.tplAction === 'editar') editar(nome);
+      else if (act.dataset.tplAction === 'duplicar') duplicar(nome);
+      return;
+    }
+
+    // Toggle do dropdown de exportação
+    const toggle = e.target.closest('[data-export-toggle]');
+    if (toggle) {
+      e.preventDefault();
+      const menu = toggle.parentElement.querySelector('[data-export-menu]');
+      const wasOpen = menu.classList.contains('open');
+      document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
+      if (!wasOpen) menu.classList.add('open');
+      return;
+    }
+
+    // Item de exportação (dentro do menu ou botão CSV direto)
+    const exp = e.target.closest('[data-export]');
+    if (exp) {
+      e.preventDefault();
+      document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
+      exportar(exp.dataset.export);
+      return;
+    }
+
+    // Clique fora fecha qualquer dropdown aberto
+    document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
+  });
+})();
+</script>
 
 </body>
 </html>

@@ -198,7 +198,7 @@
 
   function feedback(msg) {
     if (typeof showToast === 'function') showToast(msg);
-    else alert(msg);
+    else if (typeof vtAlert === 'function') vtAlert(msg);
   }
 
   // Carrega o valor atual ao abrir a página

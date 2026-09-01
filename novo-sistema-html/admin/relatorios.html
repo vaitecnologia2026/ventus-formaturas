@@ -110,7 +110,7 @@ async function gerar(){
   $('#r-tbody').innerHTML = atual.linhas.map(l=>'<tr>'+l.map(c=>`<td>${c===''?'—':c}</td>`).join('')+'</tr>').join('');
 }
 function exportarCSV(){
-  if(!atual || !atual.linhas.length){ alert('Gere um relatório primeiro.'); return; }
+  if(!atual || !atual.linhas.length){ vtAlert('Gere um relatório primeiro.'); return; }
   const esc = v => `"${String(v).replace(/"/g,'""')}"`;
   const linhas = [atual.colunas.map(esc).join(';'), ...atual.linhas.map(l=>l.map(esc).join(';'))];
   const blob = new Blob(['﻿'+linhas.join('\n')], {type:'text/csv;charset=utf-8;'});

@@ -163,7 +163,7 @@ $('form-nova').addEventListener('submit', async e => {
   e.preventDefault();
   const nome = $('nome-turma').value.trim(); if (!nome) return;
   const r = await fetch(apiUrl('/api/albuns'), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome})});
-  const d = await r.json(); if (!r.ok){alert(d.erro);return;}
+  const d = await r.json(); if (!r.ok){vtAlert(d.erro);return;}
   $('nome-turma').value=''; await carregar(); abrir(d.id);
 });
 $('btn-nova').addEventListener('click', () => { $('nome-turma').focus(); $('nome-turma').scrollIntoView({behavior:'smooth',block:'center'}); });
@@ -172,7 +172,7 @@ $('lista').addEventListener('click', e => { if(e.target.closest('#card-novo')){$
 async function abrir(id) {
   turmaAtual = id;
   const r = await fetch(apiUrl('/api/albuns/'+id)); const t = await r.json();
-  if(!r.ok){alert(t.erro);return;}
+  if(!r.ok){vtAlert(t.erro);return;}
   capaAtual = t.capa;
   const st = VENDAS.por_turma?.[id] || {vendas:0,receita:0,fotos:0};
   const rostos = t.fotos.reduce((s,f)=>s+(f.rostos||0),0);
@@ -203,7 +203,7 @@ $('t-pub').addEventListener('click', async () => {
   const novo = $('t-pub').dataset.vis !== '1';
   const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/config`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({visivel:novo})});
   const d = await r.json();
-  if(!r.ok){ alert(d.erro); return; }
+  if(!r.ok){ vtAlert(d.erro); return; }
   pintarPublicar(d.visivel);
   $('t-versite').style.display = d.visivel ? '' : 'none';
 });
@@ -221,7 +221,7 @@ $('grade').addEventListener('click', async e => {
   const b = e.target.closest('.foto-capa-btn'); if(!b) return;
   const arquivo = b.dataset.capa;
   const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/config`), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({capa:arquivo})});
-  const d = await r.json(); if(!r.ok){alert(d.erro);return;}
+  const d = await r.json(); if(!r.ok){vtAlert(d.erro);return;}
   capaAtual = d.capa;
   document.querySelectorAll('#grade .foto').forEach(el => {
     const on = el.dataset.arquivo === capaAtual;
@@ -232,9 +232,9 @@ $('grade').addEventListener('click', async e => {
 });
 
 $('t-excluir').addEventListener('click', async () => {
-  if (!confirm('Excluir esta turma e todas as suas fotos? Esta ação não pode ser desfeita.')) return;
+  if (!await vtConfirm('Excluir esta turma e todas as suas fotos? Esta ação não pode ser desfeita.', {danger:true,okText:'Excluir'})) return;
   const r = await fetch(apiUrl(`/api/albuns/${turmaAtual}/excluir`), {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-  const d = await r.json(); if(!r.ok){alert(d.erro);return;}
+  const d = await r.json(); if(!r.ok){vtAlert(d.erro);return;}
   $('view-turma').hidden=true; $('view-lista').hidden=false; carregar();
 });
 $('btn-voltar').addEventListener('click', () => { $('view-turma').hidden=true; $('view-lista').hidden=false; carregar(); });

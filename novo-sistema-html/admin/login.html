@@ -63,7 +63,13 @@
   .b-feat .ic svg{width:17px;height:17px;color:#BFDBFE;}
 
   /* ===== Lado do formulário ===== */
-  .form-side{display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+  .form-side{position:relative;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+  /* rodapé legal */
+  .legal-foot{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:13px;color:var(--cinza2);font-weight:500;}
+  .legal-foot .sep{margin:0 9px;opacity:.5;}
+  .legal-foot a{color:var(--cinza);text-decoration:none;transition:color .15s;}
+  .legal-foot a:hover{color:var(--azul);}
+  @media(max-width:920px){ .form-side{padding-bottom:64px;} }
   .card{width:100%;max-width:400px;}
   .m-logo{display:none;align-items:center;gap:10px;margin-bottom:26px;}
   .m-logo .chip{background:var(--azul-900);border-radius:11px;padding:7px 12px;display:inline-flex;}
@@ -155,6 +161,11 @@
         <button type="submit" class="btn" id="btn">Entrar <i data-lucide="arrow-right" style="width:18px;height:18px;"></i></button>
       </form>
     </div>
+    <footer class="legal-foot">
+      © 2026 Ventus <span class="sep">·</span>
+      <a href="../termos/">Termos</a> <span class="sep">·</span>
+      <a href="../privacidade/">Privacidade</a>
+    </footer>
   </main>
 </div>
 

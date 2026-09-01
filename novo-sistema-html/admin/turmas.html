@@ -123,15 +123,12 @@
       <div><h1>Turmas</h1><p>Cadastre as turmas de formatura, com instituição, cursos e vendedor.</p></div>
     </div>
 
-    <div class="segmented">
-      <button class="tab on" data-tab="cadastrar"><i data-lucide="pencil" style="width:15px;height:15px;"></i> Nova turma</button>
-      <button class="tab" data-tab="consultar"><i data-lucide="list" style="width:15px;height:15px;"></i> Turmas cadastradas</button>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:18px;">
+      <button type="button" class="btn btn-primary" id="btn-nova"><i data-lucide="plus" class="w-4 h-4"></i> Nova turma</button>
     </div>
 
-    <div id="pane-cadastrar">
-      <div class="panel">
-        <div class="panel-head"><h2 id="form-title"><i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Nova turma</h2></div>
-        <div class="panel-body">
+    <div id="pane-cadastrar" hidden>
+      <div id="form-wrap" class="panel-body" style="padding:0;">
           <form id="form">
             <div class="form-grid">
               <div class="fld full"><label>Nome da Turma <span class="req">*</span></label><div><input type="text" id="f-nome" placeholder="Ex.: Medicina T85 — UNIMONTES 2026"></div></div>
@@ -179,11 +176,10 @@
               <button type="button" class="btn btn-secondary" id="btn-limpar">Limpar</button>
             </div>
           </form>
-        </div>
       </div>
     </div>
 
-    <div id="pane-consultar" hidden>
+    <div id="pane-consultar">
       <div class="panel">
         <div class="panel-head"><h2>Turmas cadastradas</h2><span class="count" id="list-count">0</span></div>
         <div class="tbl-wrap"><table class="tbl"><thead>
@@ -211,11 +207,30 @@ async function init() {
   $('#f-tabela_servico_id').innerHTML = optHtml(OPCOES.tabelas_produto||[]);
   $('#f-tabela_cerimonial_id').innerHTML = optHtml(OPCOES.tabelas_cerimonial||[]);
   montarCursos([]);
-  document.querySelectorAll('.tab').forEach(t => t.onclick = () => trocarAba(t.dataset.tab));
+  $('#btn-nova').onclick = () => { limpar(); abrirModal('Nova turma'); };
   $('#form').onsubmit = salvar;
   $('#btn-limpar').onclick = limpar;
   carregar();
 }
+
+// ===== Modal: move o form de #pane-cadastrar pra dentro do vtModal e devolve ao fechar =====
+let modalRef = null;
+function abrirModal(titulo) {
+  if (modalRef) return; // já aberto
+  const wrap = $('#form-wrap');
+  modalRef = window.vtModal({
+    title: titulo,
+    bodyHTML: wrap,
+    size: 'lg',
+    onClose: () => {
+      // devolve o form pro pane pra reusar na próxima vez
+      $('#pane-cadastrar').appendChild(wrap);
+      modalRef = null;
+    }
+  });
+  lucide.createIcons();
+}
+function fecharModal() { if (modalRef) modalRef.close(); }
 
 function montarCursos(sel) {
   // sel pode ser [ids] (legado) ou [{id/curso_id, turno, previsao_formatura}]
@@ -245,12 +260,6 @@ function cursosSelecionados() {
   }));
 }
 
-function trocarAba(aba) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === aba));
-  $('#pane-cadastrar').hidden = aba !== 'cadastrar';
-  $('#pane-consultar').hidden = aba !== 'consultar';
-  if (aba === 'consultar') carregar();
-}
 
 function montarPeriodo(){
   const ano = $('#f-ano').value.trim(); const sem = $('#f-semestre').value;
@@ -285,23 +294,23 @@ function limpar() {
   $('#f-solicitar_medidas').checked = false; $('#f-cerimonial_vinculado').checked = false; toggleCerim();
   $('#f-instituicao_id').value = ''; $('#f-vendedor_id').value = ''; $('#f-ativo').checked = true;
   montarCursos([]); $('#btn-txt').textContent = 'Salvar turma';
-  $('#form-title').innerHTML = '<i data-lucide="file-plus-2" style="width:17px;height:17px;color:var(--primary-600);"></i> Nova turma'; lucide.createIcons();
+  lucide.createIcons();
 }
 
 async function salvar(e) {
   e.preventDefault();
   const body = lerForm();
-  if (!body.nome.trim()) { alert('Informe o nome da turma.'); return; }
+  if (!body.nome.trim()) { await vtAlert('Informe o nome da turma.'); return; }
   const url = editId ? apiUrl('/api/turma-formatura/'+editId) : apiUrl('/api/turma-formatura');
   const r = await fetch(url, { method: editId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-  const d = await r.json(); if(!r.ok){ alert(d.detail||'Erro ao salvar.'); return; }
-  toast('Turma salva com sucesso.'); limpar(); trocarAba('consultar');
+  const d = await r.json(); if(!r.ok){ await vtAlert(d.detail||'Erro ao salvar.'); return; }
+  toast('Turma salva com sucesso.'); fecharModal(); limpar(); carregar();
 }
 
 async function carregar() {
   const r = await fetch(apiUrl('/api/turma-formatura')); const { itens } = await r.json();
   $('#list-count').textContent = itens.length;
-  if (!itens.length) { $('#tbody').innerHTML = `<tr><td colspan="8"><div class="empty"><i data-lucide="inbox"></i>Nenhuma turma ainda. Use a aba <b>Nova turma</b>.</div></td></tr>`; lucide.createIcons(); return; }
+  if (!itens.length) { $('#tbody').innerHTML = `<tr><td colspan="8"><div class="empty"><i data-lucide="inbox"></i>Nenhuma turma ainda. Use o botão <b>Nova turma</b>.</div></td></tr>`; lucide.createIcons(); return; }
   $('#tbody').innerHTML = itens.map(t => `<tr>
     <td class="nome">${t.nome}</td>
     <td>${t.instituicao || '—'}</td>
@@ -334,14 +343,13 @@ window.editar = async function(id) {
   $('#f-cerimonial_vinculado').checked = !!t.cerimonial_vinculado; toggleCerim();
   montarCursos(t.cursos || t.curso_ids || []);
   $('#btn-txt').textContent = 'Atualizar turma';
-  $('#form-title').innerHTML = '<i data-lucide="pencil" style="width:17px;height:17px;color:var(--primary-600);"></i> Editar turma';
-  trocarAba('cadastrar'); lucide.createIcons(); window.scrollTo({top:0,behavior:'smooth'});
+  abrirModal('Editar turma');
 };
 
 window.excluir = async function(id) {
-  if (!confirm('Excluir esta turma?')) return;
+  if (!await vtConfirm('Excluir esta turma?', { danger:true, okText:'Excluir' })) return;
   const r = await fetch(apiUrl('/api/turma-formatura/'+id), { method:'DELETE' });
-  if (r.ok) { toast('Turma excluída.'); carregar(); } else alert('Erro ao excluir.');
+  if (r.ok) { toast('Turma excluída.'); carregar(); } else await vtAlert('Erro ao excluir.');
 };
 
 function toast(msg) {

@@ -279,7 +279,7 @@ function lerForm() {
 
 window.lerImagem = async function(input, nome) {
   const f = input.files && input.files[0]; if (!f) return;
-  if (f.size > 5 * 1024 * 1024) { alert('Arquivo muito grande (máx. 5MB).'); input.value = ''; return; }
+  if (f.size > 5 * 1024 * 1024) { vtAlert('Arquivo muito grande (máx. 5MB).'); input.value = ''; return; }
   const p = $(`#prev-${nome}`); if (p) p.innerHTML = '<span style="font-size:12px;color:var(--gray-500);">Enviando…</span>';
   try {
     const fd = new FormData(); fd.append('file', f);
@@ -300,7 +300,7 @@ async function salvar(e) {
   const url = editId ? apiUrl(`/api/cadastro/${slug}/${editId}`) : apiUrl(`/api/cadastro/${slug}`);
   const r = await fetch(url, { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const d = await r.json();
-  if (!r.ok) { alert(d.detail || 'Erro ao salvar.'); return; }
+  if (!r.ok) { vtAlert(d.detail || 'Erro ao salvar.'); return; }
   editId = null; aplicarDefaults(); $('#btn-salvar-txt').textContent = 'Salvar';
   toast(`${LABEL} salvo com sucesso.`);
   trocarAba('consultar');
@@ -345,9 +345,9 @@ window.editar = function(it) {
 };
 
 window.excluir = async function(id) {
-  if (!confirm('Excluir este registro?')) return;
+  if (!await vtConfirm('Excluir este registro?', { danger: true, okText: 'Excluir' })) return;
   const r = await fetch(apiUrl(`/api/cadastro/${slug}/${id}`), { method: 'DELETE' });
-  if (r.ok) { toast('Registro excluído.'); carregarTabela(); } else alert('Erro ao excluir.');
+  if (r.ok) { toast('Registro excluído.'); carregarTabela(); } else vtAlert('Erro ao excluir.');
 };
 
 function toast(msg) {

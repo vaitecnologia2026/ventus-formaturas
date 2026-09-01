@@ -304,7 +304,7 @@ window.salvarDados=async function(){
   const g=id=>{const el=$('#d-'+id);return el?el.value:undefined;};
   const body={};['nome','cpf','rg','data_nascimento','celular','telefone2','email','curso','ano_formatura','nome_fotografia','nome_mae','nome_pai','cep','rua','numero','complemento','bairro','cidade','uf','mensagem'].forEach(k=>body[k]=g(k));
   const r=await fetch(apiUrl(`/api/aluno/${id}/dados`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok) toast('Dados salvos.'); else alert('Erro ao salvar.');
+  if(r.ok) toast('Dados salvos.'); else await vtAlert('Erro ao salvar.',{title:'Ops'});
 };
 
 /* -------- Fase 5: contrato de fotos (limite/uso/excedente) -------- */
@@ -354,7 +354,7 @@ async function carregarFotosStatus(){
 /* -------- Fase 6: gerar contrato (imprimir) -------- */
 window.gerarContrato=async function(){
   const r=await fetch(apiUrl(`/api/aluno/${id}/contrato`)); const c=await r.json();
-  if(!c.tem_contrato){ alert(c.motivo||'Sem contrato configurado no plano.'); return; }
+  if(!c.tem_contrato){ await vtAlert(c.motivo||'Sem contrato configurado no plano.',{title:'Ops'}); return; }
   const w=window.open('','_blank');
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${c.modelo}</title>
     <style>body{font-family:Georgia,serif;max-width:800px;margin:32px auto;padding:0 24px;color:#111;line-height:1.6;}
@@ -384,7 +384,7 @@ async function carregarEventos(){
     <td>${sel}</td></tr>`;}).join('');
   lucide.createIcons();
 }
-window.salvarRealizacao=async function(eid,situacao){ const r=await fetch(apiUrl(`/api/aluno/${id}/eventos/${eid}/realizacao`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({situacao})}); if(r.ok)toast('Situação salva.'); else alert('Erro'); };
+window.salvarRealizacao=async function(eid,situacao){ const r=await fetch(apiUrl(`/api/aluno/${id}/eventos/${eid}/realizacao`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({situacao})}); if(r.ok)toast('Situação salva.'); else await vtAlert('Erro',{title:'Ops'}); };
 async function carregarBrindes(){
   const r=await fetch(apiUrl(`/api/aluno/${id}/brindes`)); const {itens}=await r.json();
   $('#br-count').textContent = itens.length;
@@ -399,7 +399,7 @@ async function carregarBrindes(){
 }
 window.toggleEntrega=async function(turmaBrindeId,entregue){
   const r=await fetch(apiUrl(`/api/aluno/${id}/brindes/${turmaBrindeId}/entrega`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue})});
-  if(r.ok)carregarBrindes(); else alert('Erro');
+  if(r.ok)carregarBrindes(); else await vtAlert('Erro',{title:'Ops'});
 };
 let AD_CAT=[];
 async function carregarAdicionais(){
@@ -422,11 +422,11 @@ async function carregarAdicionais(){
   lucide.createIcons();
 }
 window.adPrefill=function(){ const s=$('#ad-sel'); const o=s.options[s.selectedIndex]; if(o&&o.dataset.v!=null) $('#ad-valor').value=o.dataset.v; };
-window.comprarAdicional=async function(){ const s=$('#ad-sel'); const i=s.value; if(i===''){alert('Escolha o produto/serviço.');return;}
+window.comprarAdicional=async function(){ const s=$('#ad-sel'); const i=s.value; if(i===''){await vtAlert('Escolha o produto/serviço.',{title:'Ops'});return;}
   const cat=AD_CAT[+i]; const body={descricao:cat.descricao, valor:$('#ad-valor').value||cat.valor, quantidade:$('#ad-qtd').value||1};
   const r=await fetch(apiUrl(`/api/aluno/${id}/adicionais`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok){ toast('Adicionado.'); carregarAdicionais(); } else alert('Erro'); };
-window.removerAdicional=async function(adid){ if(!confirm('Remover este item?'))return; const r=await fetch(apiUrl('/api/aluno/adicionais/'+adid),{method:'DELETE'}); if(r.ok)carregarAdicionais(); };
+  if(r.ok){ toast('Adicionado.'); carregarAdicionais(); } else await vtAlert('Erro',{title:'Ops'}); };
+window.removerAdicional=async function(adid){ if(!await vtConfirm('Remover este item?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/aluno/adicionais/'+adid),{method:'DELETE'}); if(r.ok)carregarAdicionais(); };
 
 /* -------- Pagamentos -------- */
 function montarPgForms(){
@@ -447,9 +447,9 @@ function montarPgForms(){
   lucide.createIcons();
 }
 window.gerarCarneDoPlano=async function(){
-  if(!confirm('Emitir o carnê a partir da config do plano? Isso substitui as parcelas atuais deste aluno.'))return;
+  if(!await vtConfirm('Emitir o carnê a partir da config do plano? Isso substitui as parcelas atuais deste aluno.',{title:'Confirmar'}))return;
   const r = await fetch(apiUrl(`/api/aluno/${id}/pagamentos/gerar-do-plano`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
-  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   let msg = `${d.geradas} parcelas de ${brl(d.valor_parcela)}`;
   if(d.desconto_cpf) msg += ` · desconto CPF ${brl(d.desconto_cpf)}`;
   if(d.taxa_boleto) msg += ` · taxa boleto ${brl(d.taxa_boleto)}/parcela`;
@@ -459,13 +459,13 @@ window.gerarCarneDoPlano=async function(){
 async function gerarParcelas(){
   const body = { parcelas:$('#g-parc').value||1, valor_total:$('#g-total').value||planoValor, primeiro_vencimento:$('#g-venc').value||null };
   const r = await fetch(apiUrl(`/api/aluno/${id}/pagamentos/gerar-parcelas`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d = await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
+  const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   carregarPagamentos(); refreshKPIs();
 }
 async function addPagamento(){
   const body={ descricao:$('#p-desc').value||'Pagamento', valor:$('#p-valor').value||0, vencimento:$('#p-venc').value||null };
   const r=await fetch(apiUrl(`/api/aluno/${id}/pagamentos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok){ $('#p-desc').value='';$('#p-valor').value='';$('#p-venc').value=''; carregarPagamentos(); refreshKPIs(); } else alert('Erro');
+  if(r.ok){ $('#p-desc').value='';$('#p-valor').value='';$('#p-venc').value=''; carregarPagamentos(); refreshKPIs(); } else await vtAlert('Erro',{title:'Ops'});
 }
 async function carregarPagamentos(){
   const r=await fetch(apiUrl(`/api/aluno/${id}/pagamentos`)); const {itens,resumo,formas}=await r.json(); FORMAS=formas;
@@ -481,7 +481,7 @@ async function carregarPagamentos(){
   lucide.createIcons();
 }
 window.togglePago=async function(p){ const body={descricao:p.descricao,valor:p.valor,vencimento:p.vencimento,forma:p.forma,pago:!p.pago}; const r=await fetch(apiUrl('/api/aluno/pagamentos/'+p.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); if(r.ok){carregarPagamentos();refreshKPIs();} };
-window.excluirPag=async function(pid){ if(!confirm('Excluir este pagamento?'))return; const r=await fetch(apiUrl('/api/aluno/pagamentos/'+pid),{method:'DELETE'}); if(r.ok){carregarPagamentos();refreshKPIs();} };
+window.excluirPag=async function(pid){ if(!await vtConfirm('Excluir este pagamento?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/aluno/pagamentos/'+pid),{method:'DELETE'}); if(r.ok){carregarPagamentos();refreshKPIs();} };
 async function refreshKPIs(){ const r=await fetch(apiUrl('/api/aluno/'+id)); const a=await r.json(); $('#k-total').textContent=brl(a.resumo_pagamento.total); $('#k-pago').textContent=brl(a.resumo_pagamento.pago); $('#k-rest').textContent=brl(a.resumo_pagamento.restante); }
 
 /* -------- Medidas -------- */
@@ -503,14 +503,14 @@ async function carregarMedidas(){
 async function salvarMedidas(){
   const body={ altura:$('#m-altura').value, peso:$('#m-peso').value, tam_beca:$('#m-beca').value, tam_capelo:$('#m-capelo').value, tam_anel:$('#m-anel').value, calcado:$('#m-calcado').value, num_calca:$('#m-numcalca').value, plus_size:$('#m-plussize').checked, observacoes:$('#m-obs').value };
   const r=await fetch(apiUrl(`/api/aluno/${id}/medidas`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok) toast('Medidas salvas.'); else alert('Erro');
+  if(r.ok) toast('Medidas salvas.'); else await vtAlert('Erro',{title:'Ops'});
 }
 
 /* -------- Evolução -------- */
 async function addLog(){
-  const texto=$('#lg-texto').value.trim(); if(!texto){alert('Escreva a observação.');return;}
+  const texto=$('#lg-texto').value.trim(); if(!texto){await vtAlert('Escreva a observação.',{title:'Ops'});return;}
   const r=await fetch(apiUrl(`/api/aluno/${id}/logs`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto})});
-  if(r.ok){ $('#lg-texto').value=''; carregarLogs(); } else alert('Erro');
+  if(r.ok){ $('#lg-texto').value=''; carregarLogs(); } else await vtAlert('Erro',{title:'Ops'});
 }
 async function carregarLogs(){
   const r=await fetch(apiUrl(`/api/aluno/${id}/logs`)); const {itens}=await r.json();
@@ -536,9 +536,9 @@ function montarCtForm(){
 }
 async function addContrato(){
   const body={ titulo:$('#c-tit').value, status:$('#c-status').value, data:$('#c-data').value||null, url:$('#c-url').value };
-  if(!body.titulo.trim()){alert('Informe o título.');return;}
+  if(!body.titulo.trim()){await vtAlert('Informe o título.',{title:'Ops'});return;}
   const r=await fetch(apiUrl(`/api/aluno/${id}/contratos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(r.ok){ $('#c-tit').value='';$('#c-url').value='';$('#c-data').value=''; carregarContratos(); } else alert('Erro');
+  if(r.ok){ $('#c-tit').value='';$('#c-url').value='';$('#c-data').value=''; carregarContratos(); } else await vtAlert('Erro',{title:'Ops'});
 }
 async function carregarContratos(){
   const r=await fetch(apiUrl(`/api/aluno/${id}/contratos`)); const {itens}=await r.json();
@@ -556,7 +556,7 @@ async function carregarContratos(){
   lucide.createIcons();
 }
 window.toggleContrato=async function(c){ const body={titulo:c.titulo,status:c.status==='assinado'?'pendente':'assinado',data:c.data,url:c.url}; const r=await fetch(apiUrl('/api/aluno/contratos/'+c.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); if(r.ok)carregarContratos(); };
-window.excluirContrato=async function(cid){ if(!confirm('Excluir este contrato?'))return; const r=await fetch(apiUrl('/api/aluno/contratos/'+cid),{method:'DELETE'}); if(r.ok)carregarContratos(); };
+window.excluirContrato=async function(cid){ if(!await vtConfirm('Excluir este contrato?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/aluno/contratos/'+cid),{method:'DELETE'}); if(r.ok)carregarContratos(); };
 
 /* -------- Encartes -------- */
 let ENST = [];
@@ -580,12 +580,12 @@ async function carregarEncartes(){
   lucide.createIcons();
 }
 async function addEncarte(){
-  const desc=$('#en-desc').value.trim(); if(!desc){alert('Informe a descrição.');return;}
+  const desc=$('#en-desc').value.trim(); if(!desc){await vtAlert('Informe a descrição.',{title:'Ops'});return;}
   const r=await fetch(apiUrl(`/api/aluno/${id}/encartes`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:desc,status:$('#en-status').value,observacao:$('#en-obs').value})});
-  if(r.ok){ $('#en-desc').value='';$('#en-obs').value=''; carregarEncartes(); } else alert('Erro');
+  if(r.ok){ $('#en-desc').value='';$('#en-obs').value=''; carregarEncartes(); } else await vtAlert('Erro',{title:'Ops'});
 }
 window.mudarEncStatus=async function(e,st){ const r=await fetch(apiUrl('/api/aluno/encartes/'+e.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:e.descricao,status:st,observacao:e.observacao})}); if(r.ok)carregarEncartes(); };
-window.excluirEncarte=async function(eid){ if(!confirm('Excluir este encarte?'))return; const r=await fetch(apiUrl('/api/aluno/encartes/'+eid),{method:'DELETE'}); if(r.ok)carregarEncartes(); };
+window.excluirEncarte=async function(eid){ if(!await vtConfirm('Excluir este encarte?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/aluno/encartes/'+eid),{method:'DELETE'}); if(r.ok)carregarEncartes(); };
 
 function toast(msg){ let t=document.getElementById('vt-toast'); if(!t){t=document.createElement('div');t.id='vt-toast';t.style.cssText='position:fixed;bottom:22px;left:22px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s;';document.body.appendChild(t);} t.textContent=msg;t.style.opacity='1';clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity='0',2000); }
 </script>
