@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<meta name="theme-color" content="#0A2540">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 2 · Links de acesso — Ventus Formaturas</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:16px; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .panel + .panel { margin-top:18px; }
+  .panel-head { padding:15px 20px; border-bottom:1px solid var(--gray-100); font-size:14.5px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .panel-head .sub { font-size:12px; color:var(--gray-400); font-weight:500; }
+  .panel-head .spacer { margin-left:auto; }
+  .panel-body { padding:20px; }
+
+  /* Seletor de turma */
+  .turma-bar { display:flex; align-items:end; gap:14px; flex-wrap:wrap; padding:18px 20px; }
+  .turma-bar .f { display:flex; flex-direction:column; gap:6px; min-width:260px; flex:1; }
+  .turma-bar .f label { font-size:12px; font-weight:600; color:var(--gray-600); }
+  .turma-bar select { width:100%; height:42px; padding:0 12px; border:1px solid var(--gray-300); border-radius:9px; font-size:14px; font-family:inherit; background:var(--surface); color:var(--gray-900); outline:none; transition:.15s; }
+  .turma-bar select:focus { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+
+  /* Botões auxiliares menores para as linhas de link */
+  .icon-btn { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 11px; border:1px solid var(--gray-300); border-radius:9px; background:var(--surface); color:var(--gray-700); font-size:12.5px; font-weight:600; font-family:inherit; cursor:pointer; transition:.15s; white-space:nowrap; }
+  .icon-btn svg { width:15px; height:15px; }
+  .icon-btn:hover { background:var(--gray-50); border-color:var(--gray-400); color:var(--gray-900); }
+  .icon-btn.wa { color:#128C7E; border-color:rgba(18,140,126,.3); } .icon-btn.wa:hover { background:rgba(18,140,126,.08); border-color:#128C7E; }
+  .icon-btn.pri { background:var(--primary-600); border-color:var(--primary-600); color:#fff; } .icon-btn.pri:hover { background:var(--primary-700); border-color:var(--primary-700); color:#fff; }
+  .icon-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* Tabela de formandos */
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-400); font-weight:700; padding:12px 20px; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  table.tbl td { padding:13px 20px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); vertical-align:middle; }
+  table.tbl tr:last-child td { border-bottom:none; }
+  table.tbl tbody tr:hover td { background:var(--gray-50); }
+  td.nome { font-weight:600; color:var(--gray-900); }
+  .link-preview { display:block; font-size:11.5px; color:var(--gray-400); font-weight:400; margin-top:3px; font-variant-numeric:tabular-nums; word-break:break-all; }
+  .cel { font-size:12.5px; color:var(--gray-500); }
+  .acoes-cell { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  td.acoes-td { text-align:right; }
+
+  /* Cards de prestador (equipe) */
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+  .team-card { border:1px solid var(--gray-200); border-radius:14px; padding:16px; background:var(--surface); display:flex; flex-direction:column; gap:12px; }
+  .team-card .tc-head { display:flex; align-items:center; gap:12px; }
+  .team-card .tc-av { width:42px; height:42px; border-radius:11px; flex:none; display:grid; place-items:center; background:var(--primary-50); color:var(--primary-700); font-weight:800; font-size:15px; }
+  .team-card .tc-nome { font-size:15px; font-weight:700; color:var(--gray-900); line-height:1.2; }
+  .team-card .tc-meta { font-size:12px; color:var(--gray-500); margin-top:2px; }
+  .team-card .tc-hint { font-size:11.5px; color:var(--gray-400); }
+  .team-card .tc-links { display:flex; flex-direction:column; gap:8px; }
+  .link-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--gray-200); border-radius:10px; background:var(--gray-50); }
+  .link-row .lr-ic { width:30px; height:30px; border-radius:8px; flex:none; display:grid; place-items:center; background:var(--surface); border:1px solid var(--gray-200); color:var(--primary-700); }
+  .link-row .lr-ic svg { width:15px; height:15px; }
+  .link-row .lr-txt { flex:1; min-width:0; }
+  .link-row .lr-role { font-size:12.5px; font-weight:700; color:var(--gray-800); }
+  .link-row .lr-url { font-size:10.5px; color:var(--gray-400); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .team-card .tc-foot { display:flex; gap:8px; padding-top:2px; }
+
+  .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; background:var(--primary-100); color:var(--primary-800); }
+
+  .empty { text-align:center; color:var(--gray-400); padding:40px 20px; font-size:13.5px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .empty svg { width:34px; height:34px; color:var(--gray-300); }
+  .muted { color:var(--gray-500); font-size:13px; }
+
+  @media (max-width:640px){
+    .app-content{ padding:16px; }
+    .page-head{ gap:12px; margin-bottom:18px; } .page-head .chip{ width:44px; height:44px; } .page-head h1{ font-size:20px; }
+    .panel-head{ padding:14px 16px; } .panel-body{ padding:16px; }
+    .turma-bar{ padding:16px; } .turma-bar .f{ min-width:0; }
+    table.tbl th, table.tbl td{ padding:11px 14px; }
+    .acoes-cell{ justify-content:flex-start; }
+    .team-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="link-2" class="w-4 h-4"></i><input type="text" placeholder="Etapa 2 — gere e compartilhe os links de acesso…"></div>
+  </header>
+  <main class="app-content">
+    <div class="page-head">
+      <div class="chip"><i data-lucide="share-2"></i></div>
+      <div><h1>Etapa 2 · Links de acesso</h1><p>Gere e compartilhe o link pessoal de cada formando e de cada membro da produção.</p></div>
+    </div>
+
+    <!-- Seletor de turma -->
+    <div class="panel">
+      <div class="turma-bar">
+        <div class="f">
+          <label>Turma</label>
+          <select id="sel-turma"><option value="">Carregando turmas…</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formandos -->
+    <div class="panel">
+      <div class="panel-head">
+        <i data-lucide="graduation-cap" style="width:17px;height:17px;color:var(--primary-600);"></i>
+        Formandos
+        <span class="sub" id="alunos-resumo"></span>
+        <span class="spacer"></span>
+        <button class="icon-btn" id="btn-copiar-todos" onclick="copiarTodosAlunos()" disabled><i data-lucide="copy"></i> Copiar todos os links</button>
+      </div>
+      <div id="alunos-wrap">
+        <div class="panel-body"><div class="empty"><i data-lucide="arrow-up"></i>Escolha uma turma acima para ver os formandos e seus links.</div></div>
+      </div>
+    </div>
+
+    <!-- Equipe (produção) -->
+    <div class="panel">
+      <div class="panel-head">
+        <i data-lucide="users" style="width:17px;height:17px;color:var(--primary-600);"></i>
+        Equipe (produção)
+        <span class="sub">cada botão copia o link PESSOAL daquela pessoa (com o identificador dela)</span>
+      </div>
+      <div class="panel-body" id="equipe-wrap">
+        <div class="empty"><i data-lucide="loader"></i>Carregando prestadores…</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+lucide.createIcons();
+
+const ORIGIN = location.origin;
+let ALUNOS_CACHE = [];   // formandos da turma atual
+let TURMA_NOME  = '';
+
+// Feedback — usa o toast do app.js quando disponível, senão vtAlert.
+function toast(msg){
+  if (typeof showToast === 'function') showToast(msg);
+  else if (typeof window.vtAlert === 'function') window.vtAlert(msg);
+}
+
+// util: escapa texto p/ HTML
+const esc = s => String(s==null?'':s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+// util: só dígitos do telefone/celular
+const soDigitos = s => String(s||'').replace(/\D+/g,'');
+
+// util: monta número WhatsApp BR (adiciona 55 se faltar)
+function waNumero(raw){
+  let d = soDigitos(raw);
+  if (!d) return '';
+  if (d.length <= 11) d = '55' + d;        // sem DDI -> assume Brasil
+  return d;
+}
+
+// iniciais p/ avatar
+const iniciais = nome => String(nome||'?').trim().split(/\s+/).slice(0,2).map(p=>p[0]||'').join('').toUpperCase() || '?';
+
+// copiar texto (com fallback p/ browsers sem clipboard API)
+async function copiar(texto, msg){
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(texto);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = texto; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); ta.remove();
+    }
+    toast(msg || 'Link copiado');
+  } catch(e){
+    toast('Não foi possível copiar automaticamente.');
+  }
+}
+
+/* ============ Links por perfil ============ */
+const linkAluno     = id => `${ORIGIN}/aluno/inicio.html?id=${encodeURIComponent(id)}`;
+const linkFotografo = id => `${ORIGIN}/fotografo/upload.html?p=${encodeURIComponent(id)}`;
+const linkEditor    = id => `${ORIGIN}/editor/fila.html?p=${encodeURIComponent(id)}`;
+const linkOperador  = id => `${ORIGIN}/operador/checkin.html?p=${encodeURIComponent(id)}`;
+
+/* ============ Turmas ============ */
+initTurmas();
+async function initTurmas(){
+  const sel = document.getElementById('sel-turma');
+  try {
+    const r = await fetch(apiUrl('/api/turma-formatura'));
+    const d = await r.json();
+    const itens = (d && d.itens) || [];
+    if (!itens.length){
+      sel.innerHTML = '<option value="">Nenhuma turma cadastrada</option>';
+      return;
+    }
+    sel.innerHTML = '<option value="">— Selecione uma turma —</option>' +
+      itens.map(t => `<option value="${esc(t.id)}">${esc(t.nome)}</option>`).join('');
+  } catch(e){
+    sel.innerHTML = '<option value="">Erro ao carregar turmas</option>';
+    toast('Não foi possível carregar as turmas.');
+  }
+  sel.addEventListener('change', () => {
+    const opt = sel.options[sel.selectedIndex];
+    TURMA_NOME = opt ? opt.textContent : '';
+    carregarAlunos(sel.value);
+  });
+}
+
+/* ============ Formandos da turma ============ */
+async function carregarAlunos(turmaId){
+  const wrap = document.getElementById('alunos-wrap');
+  const resumoEl = document.getElementById('alunos-resumo');
+  const btnTodos = document.getElementById('btn-copiar-todos');
+  ALUNOS_CACHE = [];
+  resumoEl.textContent = '';
+  btnTodos.disabled = true;
+
+  if (!turmaId){
+    wrap.innerHTML = '<div class="panel-body"><div class="empty"><i data-lucide="arrow-up"></i>Escolha uma turma acima para ver os formandos e seus links.</div></div>';
+    lucide.createIcons();
+    return;
+  }
+
+  wrap.innerHTML = '<div class="panel-body"><div class="empty"><i data-lucide="loader"></i>Carregando formandos…</div></div>';
+  lucide.createIcons();
+
+  try {
+    const r = await fetch(apiUrl(`/api/turma-formatura/${encodeURIComponent(turmaId)}/alunos`));
+    const d = await r.json();
+    const itens = (d && d.itens) || [];
+    const resumo = (d && d.resumo) || {};
+    ALUNOS_CACHE = itens;
+
+    if (!itens.length){
+      wrap.innerHTML = '<div class="panel-body"><div class="empty"><i data-lucide="user-x"></i>Esta turma ainda não tem formandos cadastrados.</div></div>';
+      lucide.createIcons();
+      return;
+    }
+
+    resumoEl.textContent = `· ${resumo.total != null ? resumo.total : itens.length} formando(s)`;
+    btnTodos.disabled = false;
+
+    const linhas = itens.map(a => {
+      const url = linkAluno(a.id);
+      const cel = a.celular || '';
+      const wa  = waNumero(cel);
+      const msgWa = `Olá ${a.nome||''}! Este é o seu link pessoal de acesso da formatura (Etapa 2): ${url}`;
+      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
+      return `<tr>
+        <td class="nome">${esc(a.nome)||'—'}
+          <span class="link-preview">${esc(url)}</span>
+        </td>
+        <td class="cel">${cel ? esc(cel) : '<span style="color:var(--gray-300)">sem celular</span>'}</td>
+        <td class="acoes-td"><div class="acoes-cell">
+          <button class="icon-btn pri" onclick="copiar('${esc(url)}','Link do formando copiado')"><i data-lucide="copy"></i> Copiar</button>
+          ${wa
+            ? `<a class="icon-btn wa" href="${esc(waHref)}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> WhatsApp</a>`
+            : `<button class="icon-btn" disabled title="Formando sem celular"><i data-lucide="message-circle-off"></i> WhatsApp</button>`}
+          <a class="icon-btn" href="${esc(url)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Abrir</a>
+        </div></td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `<div style="overflow-x:auto;"><table class="tbl">
+      <thead><tr><th>Formando / link pessoal</th><th>Celular</th><th style="text-align:right;">Ações</th></tr></thead>
+      <tbody>${linhas}</tbody>
+    </table></div>`;
+    lucide.createIcons();
+  } catch(e){
+    wrap.innerHTML = '<div class="panel-body"><div class="empty"><i data-lucide="triangle-alert"></i>Não foi possível carregar os formandos desta turma.</div></div>';
+    lucide.createIcons();
+    toast('Erro ao carregar os formandos.');
+  }
+}
+
+function copiarTodosAlunos(){
+  if (!ALUNOS_CACHE.length){ toast('Nenhum formando para copiar.'); return; }
+  const cabec = TURMA_NOME ? `Links de acesso — ${TURMA_NOME}\n\n` : 'Links de acesso dos formandos\n\n';
+  const texto = cabec + ALUNOS_CACHE.map(a => `${a.nome||'(sem nome)'}: ${linkAluno(a.id)}`).join('\n');
+  copiar(texto, `${ALUNOS_CACHE.length} link(s) copiado(s)`);
+}
+
+/* ============ Equipe (prestadores) ============ */
+initEquipe();
+async function initEquipe(){
+  const wrap = document.getElementById('equipe-wrap');
+  try {
+    const r = await fetch(apiUrl('/api/cadastro/prestador'));
+    const d = await r.json();
+    const itens = (d && d.itens) || [];
+
+    if (!itens.length){
+      wrap.innerHTML = '<div class="empty"><i data-lucide="user-x"></i>Nenhum prestador cadastrado ainda. Cadastre fotógrafos, editores e operadores em Cadastros.</div>';
+      lucide.createIcons();
+      return;
+    }
+
+    wrap.innerHTML = '<div class="team-grid">' + itens.map(p => {
+      const id = p.id;
+      const tel = p.telefone || '';
+      const wa  = waNumero(tel);
+      const lf = linkFotografo(id), le = linkEditor(id), lo = linkOperador(id);
+      const msgWa = `Olá ${p.nome||''}! Estes são os seus links pessoais de acesso da produção (Etapa 2):\n\nFotógrafo: ${lf}\nEditor: ${le}\nOperador: ${lo}`;
+      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
+      const linkRow = (ic, role, url, msg) => `
+        <div class="link-row">
+          <div class="lr-ic"><i data-lucide="${ic}"></i></div>
+          <div class="lr-txt"><div class="lr-role">${role}</div><div class="lr-url">${esc(url)}</div></div>
+          <button class="icon-btn pri" onclick="copiar('${esc(url)}','${msg}')"><i data-lucide="copy"></i> Copiar</button>
+        </div>`;
+      return `<div class="team-card">
+        <div class="tc-head">
+          <div class="tc-av">${esc(iniciais(p.nome))}</div>
+          <div style="min-width:0;">
+            <div class="tc-nome">${esc(p.nome)||'—'}</div>
+            <div class="tc-meta">${p.funcao ? esc(p.funcao) : 'Prestador'}${tel ? ' · '+esc(tel) : ''}</div>
+          </div>
+        </div>
+        <div class="tc-hint">Cada link abaixo é o acesso PESSOAL desta pessoa (traz o identificador dela).</div>
+        <div class="tc-links">
+          ${linkRow('camera',    'Fotógrafo · Upload',   lf, 'Link do fotógrafo copiado')}
+          ${linkRow('wand-2',    'Editor · Fila',        le, 'Link do editor copiado')}
+          ${linkRow('scan-line', 'Operador · Check-in',  lo, 'Link do operador copiado')}
+        </div>
+        <div class="tc-foot">
+          ${wa
+            ? `<a class="icon-btn wa" href="${esc(waHref)}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> Enviar por WhatsApp</a>`
+            : `<button class="icon-btn" disabled title="Prestador sem telefone"><i data-lucide="message-circle-off"></i> WhatsApp indisponível</button>`}
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+    lucide.createIcons();
+  } catch(e){
+    wrap.innerHTML = '<div class="empty"><i data-lucide="triangle-alert"></i>Não foi possível carregar os prestadores.</div>';
+    lucide.createIcons();
+    toast('Erro ao carregar a equipe de produção.');
+  }
+}
+</script>
+</body>
+</html>

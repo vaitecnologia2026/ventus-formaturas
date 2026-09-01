@@ -105,10 +105,11 @@ function renderAdminSidebar() {
     {
       title: 'Etapa 2 · Produção',
       items: [
-        { href: '../fotografo/upload.html', icon: 'camera',         label: 'Fotógrafo · Upload', blank: true },
-        { href: '../editor/fila.html',      icon: 'wand-2',         label: 'Editor · Fila', blank: true },
-        { href: '../operador/checkin.html', icon: 'scan-line',      label: 'Operador · Check-in', blank: true },
-        { href: '../aluno/inicio.html?id=1', icon: 'graduation-cap', label: 'Formando (prévia)', blank: true },
+        { href: 'etapa2.html',              icon: 'share-2',        label: 'Links de acesso' },
+        { href: '../fotografo/upload.html', icon: 'camera',         label: 'Fotógrafo (design)', blank: true },
+        { href: '../editor/fila.html',      icon: 'wand-2',         label: 'Editor (design)', blank: true },
+        { href: '../operador/checkin.html', icon: 'scan-line',      label: 'Operador (design)', blank: true },
+        { href: '../aluno/inicio.html?id=1', icon: 'graduation-cap', label: 'Formando (design)', blank: true },
       ],
     },
     {

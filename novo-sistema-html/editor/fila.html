@@ -26,7 +26,7 @@
   <a href="fila.html" class="sidebar-link active"><i data-lucide="palette"></i>Fila de edição</a>
   <a href="#" class="sidebar-link"><i data-lucide="check-circle"></i>Finalizadas</a>
   <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Minha produtividade</a>
-  <div class="sidebar-footer"><div class="avatar">RB</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Renato Beto</div><div style="font-size:11px;opacity:.6;">Editor freelancer</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+  <div class="sidebar-footer"><div class="avatar" id="prestadorAvatar">ED</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;" id="prestadorNome">Editor</div><div style="font-size:11px;opacity:.6;" id="prestadorFuncao">Editor freelancer</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
 </aside>
 
 <div class="app-shell">
@@ -60,6 +60,39 @@
 </div>
 <script>
 lucide.createIcons();
+
+// ---- Identificação do prestador via ?p=<id> ----
+(function identificarPrestador(){
+  var pid = new URLSearchParams(location.search).get('p');
+  if(!pid) return; // sem ?p mantém rótulo genérico ("Editor")
+  function iniciais(nome){
+    var partes = String(nome||'').trim().split(/\s+/).filter(Boolean);
+    if(!partes.length) return 'ED';
+    return (partes[0][0] + (partes.length>1 ? partes[partes.length-1][0] : '')).toUpperCase();
+  }
+  function aplicar(p){
+    if(!p || !p.nome) return;
+    var elNome = document.getElementById('prestadorNome');
+    var elFunc = document.getElementById('prestadorFuncao');
+    var elAv   = document.getElementById('prestadorAvatar');
+    if(elNome) elNome.textContent = p.nome;
+    if(elFunc) elFunc.textContent = p.funcao || 'Editor';
+    if(elAv)   elAv.textContent = iniciais(p.nome);
+  }
+  // tenta rota direta; se falhar, busca lista e filtra pelo id
+  fetch(apiUrl('/api/cadastro/prestador/' + encodeURIComponent(pid)))
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(aplicar)
+    .catch(function(){
+      fetch(apiUrl('/api/cadastro/prestador'))
+        .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(d){
+          var lista = (d && d.itens) || [];
+          aplicar(lista.find(function(x){ return String(x.id) === String(pid); }));
+        })
+        .catch(function(){ /* silencioso: mantém rótulo genérico */ });
+    });
+})();
 
 // ---- Estado ----
 var STATUS_ORDER = ["aberta", "em_andamento", "concluida", "entregue"];

@@ -43,7 +43,7 @@
     </div>
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2"><span class="live-dot"></span><span style="font-size:13px;color:#86EFAC;font-weight:600;">ONLINE</span></div>
-      <div style="font-size:13px;opacity:.7;">Operador</div>
+      <div style="font-size:13px;opacity:.7;" id="prestadorNome">Operador</div>
       <a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="x" class="w-5 h-5"></i></a>
     </div>
   </header>
@@ -139,6 +139,27 @@
 
 <script>
 const $ = id => document.getElementById(id);
+
+// ---- Identificação do prestador via ?p=<id> ----
+(function identificarPrestador(){
+  const pid = new URLSearchParams(location.search).get('p');
+  if(!pid) return; // sem ?p mantém rótulo genérico ("Operador")
+  const aplicar = p => {
+    if(!p || !p.nome) return;
+    const el = document.getElementById('prestadorNome');
+    if(el) el.textContent = p.nome;
+  };
+  fetch(apiUrl('/api/cadastro/prestador/' + encodeURIComponent(pid)))
+    .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(aplicar)
+    .catch(() => {
+      fetch(apiUrl('/api/cadastro/prestador'))
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+        .then(d => aplicar(((d && d.itens) || []).find(x => String(x.id) === String(pid))))
+        .catch(() => { /* silencioso: mantém rótulo genérico */ });
+    });
+})();
+
 let opcoes = null;      // {turmas, eventos}
 let eventoAtual = null; // objeto evento
 let itens = [];         // formandos do evento atual

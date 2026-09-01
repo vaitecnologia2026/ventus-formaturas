@@ -13,6 +13,64 @@
 <script src="../assets/js/config.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+
+<!-- Responsivo desktop (escopo desta página apenas) -->
+<style>
+/* Mobile-first: mantém a experiência de app atual (definida em app.css).
+   Abaixo, só desktop (>=900px). Não sobrescreve o mobile. */
+@media (min-width: 900px){
+  body{ padding-bottom: 32px !important; }
+
+  .phone-frame{
+    max-width: 1040px;
+    min-height: auto;
+    margin: 24px auto 40px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(15,37,64,.12);
+    overflow: hidden;
+  }
+
+  /* Cabeçalho/topo continuam full-width dentro do frame */
+  .mobile-header{ padding: 20px 32px; }
+
+  /* Hero e quick-stats permanecem full-width no topo (fora do grid).
+     Cards vão para um grid de 2 colunas: */
+  .aluno-conteudo{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 24px 32px 8px;
+  }
+
+  /* Cards dentro do grid: zera o padding lateral/superior de mobile,
+     pois o espaçamento agora vem do grid */
+  .aluno-conteudo > #card-plano,
+  .aluno-conteudo > #card-financeiro,
+  .aluno-conteudo > #card-encarte,
+  .aluno-conteudo > #card-atalhos{
+    padding: 0 !important;
+    margin: 0;
+  }
+
+  /* Bottom-nav vira uma barra centralizada (mesma largura do frame) */
+  .bottom-nav{
+    position: sticky;
+    max-width: 1040px;
+    margin: 8px auto 0;
+    border-top: 1px solid var(--gray-200);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 -2px 12px rgba(15,37,64,.06);
+    padding: 10px 0;
+  }
+  .bottom-nav-item{ font-size: 12px; }
+}
+
+/* Telas bem largas: um respiro extra no topo */
+@media (min-width: 1200px){
+  .phone-frame{ margin-top: 32px; }
+}
+</style>
 </head>
 <body style="background: var(--gray-100); padding-bottom:80px;">
 
@@ -29,7 +87,7 @@
   </div>
 
   <!-- Hero -->
-  <div style="background:linear-gradient(135deg,#1E3A8A,#7C3AED);color:white;padding:24px 20px 32px;text-align:center;">
+  <div style="background:linear-gradient(135deg,var(--primary-900),var(--primary-700));color:white;padding:24px 20px 32px;text-align:center;">
     <div style="font-size:13px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Sua formatura</div>
     <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin:0 0 4px;" id="hero-turma">…</h1>
     <p style="font-size:14px;opacity:.8;margin:0;" id="hero-sub">Área do formando</p>
@@ -57,7 +115,7 @@
         </div>
         <div>
           <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Restante</div>
-          <div style="font-size:18px;font-weight:700;margin-top:2px;color:#7C3AED;" id="qs-restante">—</div>
+          <div style="font-size:18px;font-weight:700;margin-top:2px;color:var(--primary-700);" id="qs-restante">—</div>
           <div style="font-size:10px;color:var(--gray-500);">a pagar</div>
         </div>
       </div>
@@ -73,6 +131,9 @@
     </div>
   </div>
 
+  <!-- Conteúdo (grid no desktop) -->
+  <div class="aluno-conteudo">
+
   <!-- Card PLANO -->
   <div id="card-plano" style="padding:24px 20px 0;display:none;">
     <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:12px;">Meu plano</strong>
@@ -82,7 +143,7 @@
           <strong style="display:block;color:var(--gray-900);font-size:16px;" id="pl-nome">—</strong>
           <div style="font-size:13px;color:var(--gray-600);margin-top:2px;" id="pl-tipo">—</div>
         </div>
-        <div style="background:#EDE9FE;color:#7C3AED;border-radius:10px;padding:8px 12px;text-align:center;font-weight:800;font-size:15px;white-space:nowrap;" id="pl-valor">—</div>
+        <div style="background:var(--primary-50);color:var(--primary-700);border-radius:10px;padding:8px 12px;text-align:center;font-weight:800;font-size:15px;white-space:nowrap;" id="pl-valor">—</div>
       </div>
       <div class="divider" style="margin:12px 0 8px;"></div>
       <div class="flex justify-between" style="font-size:12px;">
@@ -142,7 +203,7 @@
     <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:12px;">Atalhos</strong>
     <div class="grid grid-cols-2 gap-3">
       <a href="galeria.html" style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:18px;text-decoration:none;color:inherit;">
-        <div style="width:40px;height:40px;border-radius:10px;background:#EDE9FE;color:#7C3AED;display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="image"></i></div>
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--primary-50);color:var(--primary-700);display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="image"></i></div>
         <strong style="display:block;font-size:14px;">Minhas fotos</strong>
         <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="atalho-fotos">Galeria da turma</div>
       </a>
@@ -163,6 +224,8 @@
       </a>
     </div>
   </div>
+
+  </div><!-- /.aluno-conteudo -->
 </div>
 
 <nav class="bottom-nav">

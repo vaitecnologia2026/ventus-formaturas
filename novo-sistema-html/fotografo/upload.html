@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 <script src="../assets/js/config.js"></script>
+<script src="../assets/js/app.js" defer></script>
 </head>
 <body>
 <aside class="sidebar">
@@ -19,7 +20,7 @@
   <a href="upload.html" class="sidebar-link active"><i data-lucide="upload"></i>Upload em massa</a>
   <a href="#" class="sidebar-link"><i data-lucide="folder"></i>Minhas galerias</a>
   <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Histórico</a>
-  <div class="sidebar-footer"><div class="avatar">BS</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">Bruno Sena</div><div style="font-size:11px;opacity:.6;">Fotógrafo · Ventus</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+  <div class="sidebar-footer"><div class="avatar" id="prestadorAvatar">FT</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;" id="prestadorNome">Fotógrafo</div><div style="font-size:11px;opacity:.6;" id="prestadorFuncao">Fotógrafo · Ventus</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
 </aside>
 
 <div class="app-shell">
@@ -39,6 +40,11 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div><label class="label">Turma de destino</label><select id="selTurma" class="select"><option value="">Carregando…</option></select></div>
               <div><label class="label">Evento da turma</label><select id="selEvento" class="select" disabled><option value="">Selecione a turma primeiro</option></select></div>
+            </div>
+            <div class="mb-4">
+              <label class="label">Cartão de memória</label>
+              <input type="text" id="inputCartao" class="select" placeholder="Ex.: Cartão 01" autocomplete="off">
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">Identifica de qual cartão as fotos foram descarregadas. Vai registrado na O.S. de edição.</div>
             </div>
 
             <!-- Feedback global (erros de carregamento) -->
@@ -135,6 +141,7 @@
   var EVENTOS = [];              // todos os eventos vindos da API
   var enviadas = [];             // { url, nome } das fotos já no R2
   var enviando = false;          // trava o botão durante criação da OS
+  var fotografoNome = "";        // nome do prestador (via ?p=), se identificado
 
   // Elementos
   var selTurma = document.getElementById("selTurma");
@@ -151,6 +158,7 @@
   var resumoTurma = document.getElementById("resumoTurma");
   var resumoEvento = document.getElementById("resumoEvento");
   var resumoFotos = document.getElementById("resumoFotos");
+  var inputCartao = document.getElementById("inputCartao");
 
   var MAX_BYTES = 5 * 1024 * 1024;
   var TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -189,6 +197,46 @@
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
+  }
+
+  // Aviso ao usuário: usa vtAlert (app.js) se disponível, senão alert simples.
+  function notificar(msg) {
+    if (typeof window.vtAlert === "function") { window.vtAlert(msg); }
+    else { alert(msg); }
+  }
+
+  function iniciais(nome) {
+    var partes = String(nome || "").trim().split(/\s+/).filter(Boolean);
+    if (!partes.length) return "FT";
+    return (partes[0][0] + (partes.length > 1 ? partes[partes.length - 1][0] : "")).toUpperCase();
+  }
+
+  // ---- Identificação do prestador via ?p=<id> ----
+  function identificarPrestador() {
+    var pid = new URLSearchParams(location.search).get("p");
+    if (!pid) return; // sem ?p mantém rótulo genérico ("Fotógrafo")
+    function aplicar(p) {
+      if (!p || !p.nome) return;
+      fotografoNome = p.nome;
+      var elNome = document.getElementById("prestadorNome");
+      var elFunc = document.getElementById("prestadorFuncao");
+      var elAv = document.getElementById("prestadorAvatar");
+      if (elNome) elNome.textContent = p.nome;
+      if (elFunc) elFunc.textContent = (p.funcao || "Fotógrafo") + " · Ventus";
+      if (elAv) elAv.textContent = iniciais(p.nome);
+    }
+    fetch(apiUrl("/api/cadastro/prestador/" + encodeURIComponent(pid)))
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(aplicar)
+      .catch(function () {
+        fetch(apiUrl("/api/cadastro/prestador"))
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (d) {
+            var lista = (d && d.itens) || [];
+            aplicar(lista.find(function (x) { return String(x.id) === String(pid); }));
+          })
+          .catch(function () { /* silencioso: mantém rótulo genérico */ });
+      });
   }
 
   // ---- Turma escolhida -> popular eventos filtrados ----
@@ -358,15 +406,24 @@
     if (!selTurma.value || !selEvento.value) { aviso("Selecione turma e evento antes de enviar.", "erro"); return; }
     if (!enviadas.length) { aviso("Envie ao menos 1 foto antes de criar a ordem de serviço.", "erro"); return; }
 
+    var cartao = (inputCartao.value || "").trim();
+    if (!cartao) {
+      notificar("Informe o nº do cartão de memória antes de enviar para edição.");
+      inputCartao.focus();
+      return;
+    }
+
     enviando = true;
     atualizarBotao();
     aviso("");
 
     var nomeEvento = selEvento.options[selEvento.selectedIndex].text;
     var n = enviadas.length;
-    var obs = "Fotos enviadas (" + n + "):\n" + enviadas.map(function (f, i) {
-      return (i + 1) + ". " + f.url;
-    }).join("\n");
+    var fotografoLabel = fotografoNome || "Fotógrafo";
+    var obs = "Fotógrafo: " + fotografoLabel + " · Cartão: " + cartao + "\n" +
+      "Fotos enviadas (" + n + "):\n" + enviadas.map(function (f, i) {
+        return (i + 1) + ". " + f.url;
+      }).join("\n");
 
     var body = {
       titulo: "Fotos " + nomeEvento + " (" + n + " fotos)",
@@ -393,6 +450,7 @@
         enviadas = [];
         grade.innerHTML = "";
         filaVazia.style.display = "";
+        inputCartao.value = "";
         atualizarContagens();
       })
       .catch(function (err) {
@@ -405,6 +463,7 @@
   });
 
   // Init
+  identificarPrestador();
   atualizarContagens();
   atualizarBotao();
   carregarOpcoes();
