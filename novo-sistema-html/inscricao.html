@@ -149,6 +149,29 @@
   .pay-hint{display:flex;gap:12px;align-items:center;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px 16px;margin-top:18px;}
   .pay-hint svg{width:26px;height:26px;color:var(--azul);flex:0 0 auto;}
   .pay-hint .ph-t{font-size:14px;color:var(--azul-esc);line-height:1.4;}
+
+  /* ===== Toast (aviso, sem alert nativo) ===== */
+  #vt-toast-stack{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:420px;pointer-events:none;}
+  .vt-toast{background:var(--ink);color:#fff;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;line-height:1.4;box-shadow:0 12px 40px -12px rgba(15,23,42,.5);display:flex;gap:10px;align-items:flex-start;animation:vt-toast-in .2s ease-out;pointer-events:auto;}
+  .vt-toast svg{width:18px;height:18px;flex:0 0 auto;margin-top:1px;}
+  .vt-toast.err{background:#7F1D1D;}
+  .vt-toast.err svg{color:#FCA5A5;}
+  .vt-toast.ok{background:#166534;}
+  .vt-toast.ok svg{color:#86EFAC;}
+  @keyframes vt-toast-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+
+  /* ===== Escolha sim/não (plus size) ===== */
+  .choice{display:flex;gap:10px;}
+  .choice label{flex:1;margin:0;text-align:center;border:1.5px solid var(--linha);border-radius:12px;padding:11px;font-size:14px;font-weight:700;color:var(--cinza2);cursor:pointer;transition:.15s;}
+  .choice label.on{border-color:var(--azul);background:#EFF6FF;color:var(--azul-esc);}
+  .choice input{position:absolute;opacity:0;pointer-events:none;}
+
+  /* ===== Stepper +/- quantidade ===== */
+  .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--linha);border-radius:12px;overflow:hidden;flex:0 0 auto;}
+  .stepper button{width:38px;height:40px;border:none;background:#F8FAFC;color:var(--azul-esc);font-size:20px;font-weight:800;line-height:1;cursor:pointer;padding:0;transition:.15s;}
+  .stepper button:hover{background:#EFF6FF;}
+  .stepper button:disabled{opacity:.4;cursor:not-allowed;}
+  .stepper .st-n{min-width:40px;text-align:center;font-size:15px;font-weight:800;color:var(--ink);padding:0 6px;}
 </style>
 </head>
 <body>
@@ -183,6 +206,20 @@ const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDig
 const esc = s => String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const maskCpf = v => { const x=String(v||'').replace(/\D/g,'').slice(0,11); return x.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
 
+/* ===== Toast (aviso, sem alert nativo) ===== */
+function toast(msg, tipo){
+  let stack = document.getElementById('vt-toast-stack');
+  if(!stack){ stack = document.createElement('div'); stack.id='vt-toast-stack'; document.body.appendChild(stack); }
+  const ic = tipo==='ok'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  const el = document.createElement('div');
+  el.className = 'vt-toast ' + (tipo==='ok'?'ok':'err');
+  el.innerHTML = ic + '<span>'+esc(msg)+'</span>';
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .2s'; el.style.opacity='0'; setTimeout(()=>el.remove(),200); }, 3400);
+}
+
 let DADOS = null;
 let STEP = 0;                 // etapa atual (0..4)
 const TOTAL_STEPS = 5;
@@ -191,8 +228,9 @@ let CUPOM = null;            // cupom aplicado {codigo, tipo:'valor'|'percentual
 
 // ---- estado do formulário (persiste entre etapas) ----
 const F = {
-  nome:'', celular:'', email:'', cpf:'', curso:'', ano_formatura:'',
+  nome:'', celular:'', email:'', email_confirma:'', cpf:'', curso:'', ano_formatura:'',
   altura:'', peso:'', calcado:'',
+  plus_size:null, num_calca:'',      // medidas (só quando a turma solicitar)
   plano_id:null, meio_pagamento:null, forma_pagamento:null, parcelas:null,
   aceite_contrato:false, observacoes:'',
   participacoes:[],   // {evento_fotografico_id, qtd_familiares, qtd_convidados}
@@ -209,6 +247,47 @@ if (!token) {
 
 const planoById = id => (DADOS && DADOS.planos.find(p => String(p.id)===String(id))) || null;
 const planoSel = () => planoById(F.plano_id);
+
+// A turma pede medidas? (flag defensiva: só mostra se a API indicar)
+function pedeMedidas(){
+  if(!DADOS) return false;
+  const t = DADOS.turma || {};
+  const cands = [DADOS.solicitar_medidas, t.solicitar_medidas, DADOS.pede_medidas, t.pede_medidas];
+  return cands.some(v => v === true);
+}
+// Este CPF é da comissão? (defensivo: usa flag da API se vier)
+function cpfEhComissao(){
+  const cands = [DESC && DESC.comissao, DESC && DESC.is_comissao, DADOS && DADOS.aluno && DADOS.aluno.comissao, DADOS && DADOS.aluno && DADOS.aluno.is_comissao];
+  return cands.some(v => v === true);
+}
+// Itens/brindes inclusos no plano (defensivo com os nomes de campo que vierem)
+function brindesDoPlano(p){
+  if(!p) return [];
+  const raw = p.brindes || p.itens_inclusos || p.inclusos || p.brindes_inclusos || [];
+  return (Array.isArray(raw)?raw:[]).map(b => (b && typeof b==='object') ? (b.nome||b.descricao||b.label||'') : String(b)).filter(Boolean);
+}
+// Itens exclusivos da comissão (só quando o CPF for da comissão e a API indicar)
+function itensComissao(p){
+  if(!p || !cpfEhComissao()) return [];
+  const raw = p.itens_comissao || p.brindes_comissao || (DADOS && DADOS.itens_comissao) || [];
+  return (Array.isArray(raw)?raw:[]).map(b => (b && typeof b==='object') ? (b.nome||b.descricao||b.label||'') : String(b)).filter(Boolean);
+}
+// Taxa de boleto quando aplicável (defensivo)
+function taxaBoleto(p){
+  const meio = (F.meio_pagamento||F.forma_pagamento||'').toLowerCase();
+  const ehBoleto = meio.includes('boleto');
+  if(!ehBoleto) return 0;
+  const cands = [p && p.taxa_boleto, DADOS && DADOS.taxa_boleto, DADOS && DADOS.config && DADOS.config.taxa_boleto];
+  const t = cands.find(v => v != null);
+  return Number(t)||0;
+}
+// Lista de cursos da turma (se a API trouxer); aceita array de strings ou de {id,nome}
+function cursosDaTurma(){
+  const raw = (DADOS && (DADOS.cursos || (DADOS.turma && DADOS.turma.cursos))) || [];
+  return (Array.isArray(raw) ? raw : [])
+    .map(c => (c && typeof c === 'object') ? (c.nome || c.descricao || c.label || '') : String(c))
+    .filter(Boolean);
+}
 
 // desconto do cupom, calculado sobre a base (valor da fotografia se houver, senão o total do plano+adicionais)
 function cupomDesconto(baseFotografia, baseTotal){
@@ -231,12 +310,16 @@ async function carregar(){
   F.nome = a.nome || '';
   F.celular = a.celular || '';
   F.email = a.email || '';
+  F.email_confirma = a.email || '';   // se já veio preenchido, considera confirmado
   F.cpf = a.cpf ? maskCpf(a.cpf) : '';
   F.curso = a.curso || '';
   F.ano_formatura = a.ano_formatura || '';
   F.altura = a.altura || '';
   F.peso = a.peso || '';
   F.calcado = a.calcado || '';
+  // medidas (backend: plus_size:bool / num_calca:texto)
+  F.plus_size = (a.plus_size != null) ? !!a.plus_size : null;
+  F.num_calca = a.num_calca || '';
   F.plano_id = a.plano_id != null ? a.plano_id : null;
   F.meio_pagamento = a.meio_pagamento || null;
   F.forma_pagamento = a.forma_pagamento || null;
@@ -277,7 +360,8 @@ function renderResumo(){
   const descTotal = DESC ? ((DESC.desconto_fotografia||0)+(DESC.desconto_cerimonial||0)) : 0;
   const subTotal = planoVal + addTotal;
   const cupomVal = cupomDesconto(p ? (p.valor_fotografia||0) : 0, subTotal);
-  const total = Math.max(0, subTotal - descTotal - cupomVal);
+  const taxa = taxaBoleto(p);
+  const total = Math.max(0, subTotal - descTotal - cupomVal) + taxa;
 
   let inner = `<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Seu pedido</h3>`;
 
@@ -299,6 +383,9 @@ function renderResumo(){
     }
     if(cupomVal>0 && CUPOM){
       inner += `<div class="r-desc">🏷️ Cupom ${esc(CUPOM.codigo)} — desconto ${brl(cupomVal)}</div>`;
+    }
+    if(taxa>0){
+      inner += `<div class="r-line"><span class="l">Taxa de boleto</span><span class="v">${brl(taxa)}</span></div>`;
     }
     inner += `<div class="r-total"><span class="l">Total</span><span class="v">${brl(total)}</span></div>`;
   }
@@ -326,31 +413,55 @@ function clearErro(){ const e=document.getElementById('erro'); if(e) e.style.dis
 function viewDados(){
   const a = DADOS.aluno || {};
   const nomeReadonly = !!(a.nome && a.nome.trim());
+  const cursos = cursosDaTurma();
+  // Curso: dropdown quando a turma trouxer a lista; senão input livre (defensivo)
+  let cursoHtml;
+  if(cursos.length){
+    const temAtual = F.curso && cursos.some(c => c.toLowerCase() === F.curso.toLowerCase());
+    cursoHtml = `<select id="i-curso"><option value="">Selecione…</option>${
+      cursos.map(c=>`<option value="${esc(c)}" ${temAtual && c.toLowerCase()===F.curso.toLowerCase()?'selected':''}>${esc(c)}</option>`).join('')
+    }${(F.curso && !temAtual)?`<option value="${esc(F.curso)}" selected>${esc(F.curso)}</option>`:''}</select>`;
+  } else {
+    cursoHtml = `<input id="i-curso" value="${esc(F.curso)}" placeholder="Ex.: Medicina">`;
+  }
+
+  // Medidas: só quando a turma solicitar. Pede apenas Plus size? e Medida da calça.
+  const medidasHtml = pedeMedidas() ? `
+    <p class="sec-title" style="margin-top:8px;">Suas medidas</p>
+    <p class="sec-hint">Para a beca e produtos personalizados.</p>
+    <div class="grid2">
+      <div class="fld"><label>Plus size?</label>
+        <div class="choice" id="c-plus">
+          <label data-v="1" class="${F.plus_size===true?'on':''}"><input type="radio" name="plus" ${F.plus_size===true?'checked':''}>Sim</label>
+          <label data-v="0" class="${F.plus_size===false?'on':''}"><input type="radio" name="plus" ${F.plus_size===false?'checked':''}>Não</label>
+        </div>
+      </div>
+      <div class="fld"><label>Medida da calça (sem elastano)</label>
+        <input id="i-numcalca" value="${esc(F.num_calca)}" placeholder="Ex.: 42"></div>
+    </div>` : '';
+
   card.innerHTML = `
     <h1>Olá, ${esc((F.nome||'você').split(' ')[0])}! 👋</h1>
     <p class="sub">Confirme seus dados para a turma <b>${esc(DADOS.turma?DADOS.turma.nome:'')}</b>${DADOS.turma&&DADOS.turma.instituicao?` · ${esc(DADOS.turma.instituicao)}`:''}.</p>
     <p class="erro" id="erro"></p>
 
-    <div class="fld"><label>Nome completo</label>
+    <div class="fld"><label>Nome completo *</label>
       <input id="i-nome" value="${esc(F.nome)}" ${nomeReadonly?'readonly':'placeholder="Seu nome completo"'}></div>
 
     <div class="grid2">
-      <div class="fld"><label>CPF</label><input id="i-cpf" value="${esc(F.cpf)}" inputmode="numeric" placeholder="000.000.000-00"></div>
-      <div class="fld"><label>WhatsApp</label><input id="i-cel" value="${esc(F.celular)}" placeholder="(38) 99999-0000"></div>
+      <div class="fld"><label>CPF *</label><input id="i-cpf" value="${esc(F.cpf)}" inputmode="numeric" placeholder="000.000.000-00"></div>
+      <div class="fld"><label>WhatsApp *</label><input id="i-cel" value="${esc(F.celular)}" placeholder="(38) 99999-0000"></div>
     </div>
-    <div class="fld"><label>E-mail</label><input id="i-email" type="email" value="${esc(F.email)}" placeholder="voce@email.com"></div>
     <div class="grid2">
-      <div class="fld"><label>Curso</label><input id="i-curso" value="${esc(F.curso)}" placeholder="Ex.: Medicina"></div>
-      <div class="fld"><label>Ano de formatura</label><input id="i-ano" type="number" value="${esc(F.ano_formatura)}" placeholder="2026"></div>
+      <div class="fld"><label>E-mail *</label><input id="i-email" type="email" value="${esc(F.email)}" placeholder="voce@email.com" autocomplete="email"></div>
+      <div class="fld"><label>Confirmar e-mail *</label><input id="i-email2" type="email" value="${esc(F.email_confirma)}" placeholder="repita seu e-mail" autocomplete="off" onpaste="return false;"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>Curso *</label>${cursoHtml}</div>
+      <div class="fld"><label>Ano de formatura *</label><input id="i-ano" type="number" value="${esc(F.ano_formatura)}" placeholder="2026"></div>
     </div>
 
-    <p class="sec-title" style="margin-top:8px;">Suas medidas</p>
-    <p class="sec-hint">Para a beca e produtos personalizados.</p>
-    <div class="grid3">
-      <div class="fld"><label>Altura</label><input id="i-altura" value="${esc(F.altura)}" placeholder="1,72"></div>
-      <div class="fld"><label>Peso</label><input id="i-peso" value="${esc(F.peso)}" placeholder="68 kg"></div>
-      <div class="fld"><label>Calçado</label><input id="i-calcado" value="${esc(F.calcado)}" placeholder="40"></div>
-    </div>
+    ${medidasHtml}
 
     <div class="nav">
       <button class="btn btn-primary" id="btn-next">Continuar</button>
@@ -360,10 +471,21 @@ function viewDados(){
   cpfEl.value = maskCpf(cpfEl.value);
   cpfEl.oninput = () => { cpfEl.value = maskCpf(cpfEl.value); };
 
+  // Plus size (escolha sim/não)
+  const cplus = document.getElementById('c-plus');
+  if(cplus){
+    cplus.querySelectorAll('label').forEach(l=>{
+      l.onclick = () => {
+        F.plus_size = l.dataset.v === '1';
+        cplus.querySelectorAll('label').forEach(x=>x.classList.toggle('on', x===l));
+        const inp = l.querySelector('input'); if(inp) inp.checked = true;
+      };
+    });
+  }
+
   document.getElementById('btn-next').onclick = () => {
     saveDados();
-    const nome = F.nome.trim();
-    if(!nome){ showErro('Informe seu nome.'); return; }
+    if(!validarDados()) return;
     clearErro();
     // aplica desconto por CPF ao avançar (mantém comportamento existente)
     checarDesconto();
@@ -371,16 +493,37 @@ function viewDados(){
   };
 }
 
+// valida todos os campos obrigatórios da etapa Dados; avisa via toast
+function validarDados(){
+  const cpfNum = (F.cpf||'').replace(/\D/g,'');
+  const email = (F.email||'').trim().toLowerCase();
+  const email2 = (F.email_confirma||'').trim().toLowerCase();
+  if(!F.nome.trim()){ toast('Informe seu nome completo.'); return false; }
+  if(cpfNum.length !== 11){ toast('Informe um CPF válido (11 dígitos).'); return false; }
+  if(!(F.celular||'').trim()){ toast('Informe seu WhatsApp.'); return false; }
+  if(!email){ toast('Informe seu e-mail.'); return false; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('Informe um e-mail válido.'); return false; }
+  if(!email2){ toast('Confirme seu e-mail.'); return false; }
+  if(email !== email2){ toast('Os e-mails não coincidem. Verifique e tente de novo.'); return false; }
+  if(!(F.curso||'').trim()){ toast('Selecione ou informe seu curso.'); return false; }
+  if(!(String(F.ano_formatura||'').trim())){ toast('Informe o ano de formatura.'); return false; }
+  if(pedeMedidas()){
+    if(F.plus_size === null){ toast('Informe se você usa plus size.'); return false; }
+    if(!(F.num_calca||'').trim()){ toast('Informe a medida da calça (sem elastano).'); return false; }
+  }
+  return true;
+}
+
 function saveDados(){
   F.nome = document.getElementById('i-nome').value.trim();
   F.celular = document.getElementById('i-cel').value;
   F.email = document.getElementById('i-email').value;
+  F.email_confirma = document.getElementById('i-email2').value;
   F.cpf = document.getElementById('i-cpf').value;
   F.curso = document.getElementById('i-curso').value;
   F.ano_formatura = document.getElementById('i-ano').value || '';
-  F.altura = document.getElementById('i-altura').value;
-  F.peso = document.getElementById('i-peso').value;
-  F.calcado = document.getElementById('i-calcado').value;
+  const nc = document.getElementById('i-numcalca');
+  if(nc) F.num_calca = nc.value;
 }
 
 /* =================== ETAPA 2: PLANO + PAGAMENTO =================== */
@@ -451,8 +594,8 @@ function viewPlano(){
   document.getElementById('btn-back').onclick = () => { STEP=0; render(); };
   document.getElementById('btn-next').onclick = () => {
     savePagamento();
-    if(!F.plano_id){ showErro('Escolha um plano para continuar.'); return; }
-    if(!F.meio_pagamento && !F.forma_pagamento){ showErro('Selecione a forma de pagamento.'); return; }
+    if(!F.plano_id){ showErro('Escolha um plano para continuar.'); toast('Escolha um plano para continuar.'); return; }
+    if(!F.meio_pagamento && !F.forma_pagamento){ showErro('Selecione a forma de pagamento.'); toast('Selecione a forma de pagamento.'); return; }
     clearErro();
     STEP = 2; render();
   };
@@ -619,11 +762,19 @@ function viewAdicionais(){
   const eventos = DADOS.eventos || [];
   const jaEsc = {}; F.adicionais.forEach(x=>{ jaEsc[x.descricao.toLowerCase()] = x.quantidade; });
 
-  const addHtml = cat.length ? cat.map(it=>`
+  const addHtml = cat.length ? cat.map(it=>{
+    const q = jaEsc[it.descricao.toLowerCase()]||0;
+    return `
       <div class="add" data-desc="${esc(it.descricao)}" data-valor="${it.valor}">
         <div class="a-info"><div class="a-n">${esc(it.descricao)}</div><div class="a-v">${brl(it.valor)}</div></div>
-        <input type="number" min="0" class="q-add" value="${jaEsc[it.descricao.toLowerCase()]||0}">
-      </div>`).join('') : '';
+        <div class="stepper" data-target="add">
+          <button type="button" class="st-minus" aria-label="Diminuir">−</button>
+          <span class="st-n">${q}</span>
+          <input type="hidden" class="q-add" value="${q}">
+          <button type="button" class="st-plus" aria-label="Aumentar">+</button>
+        </div>
+      </div>`;
+  }).join('') : '';
 
   const evHtml = eventos.length ? eventos.map(e=>{
     const prev = F.participacoes.find(x=>x.evento_fotografico_id==e.id) || {};
@@ -633,8 +784,20 @@ function viewAdicionais(){
       <div class="ev" data-ev="${e.id}">
         <div class="ev-n">${esc(e.nome)}</div>
         <div class="grid2">
-          ${e.pede_familiares?`<div><label>Familiares</label><input type="number" min="0" class="q-fam" value="${fam}"></div>`:''}
-          ${e.pede_convidados?`<div><label>Convidados</label><input type="number" min="0" class="q-conv" value="${conv}"></div>`:''}
+          ${e.pede_familiares?`<div><label>Familiares</label>
+            <div class="stepper" data-target="fam">
+              <button type="button" class="st-minus" aria-label="Diminuir">−</button>
+              <span class="st-n">${fam}</span>
+              <input type="hidden" class="q-fam" value="${fam}">
+              <button type="button" class="st-plus" aria-label="Aumentar">+</button>
+            </div></div>`:''}
+          ${e.pede_convidados?`<div><label>Convidados</label>
+            <div class="stepper" data-target="conv">
+              <button type="button" class="st-minus" aria-label="Diminuir">−</button>
+              <span class="st-n">${conv}</span>
+              <input type="hidden" class="q-conv" value="${conv}">
+              <button type="button" class="st-plus" aria-label="Aumentar">+</button>
+            </div></div>`:''}
         </div>
       </div>`;
   }).join('') : '';
@@ -653,8 +816,15 @@ function viewAdicionais(){
       <button class="btn btn-primary" id="btn-next">Continuar</button>
     </div>`;
 
-  // atualiza resumo ao vivo
-  document.querySelectorAll('.q-add').forEach(inp=>{ inp.oninput = () => { saveAdicionais(); renderResumo(); }; });
+  // steppers +/- (produtos e eventos); atualiza resumo ao vivo
+  document.querySelectorAll('#card .stepper').forEach(st=>{
+    const nEl = st.querySelector('.st-n');
+    const inp = st.querySelector('input');
+    const setVal = (v)=>{ v = Math.max(0, v); nEl.textContent = v; inp.value = v; st.querySelector('.st-minus').disabled = (v<=0); saveAdicionais(); renderResumo(); };
+    setVal(+inp.value||0);
+    st.querySelector('.st-minus').onclick = () => setVal((+inp.value||0) - 1);
+    st.querySelector('.st-plus').onclick  = () => setVal((+inp.value||0) + 1);
+  });
 
   document.getElementById('btn-back').onclick = () => { STEP=1; render(); };
   document.getElementById('btn-next').onclick = () => {
@@ -712,7 +882,7 @@ function viewContrato(){
   document.getElementById('btn-back').onclick = () => { STEP=2; render(); };
   document.getElementById('btn-next').onclick = () => {
     if(ac){ F.aceite_contrato = ac.checked; }
-    if(contrato && !F.aceite_contrato){ showErro('É necessário aceitar o contrato para continuar.'); return; }
+    if(contrato && !F.aceite_contrato){ showErro('É necessário aceitar o contrato para continuar.'); toast('Aceite o contrato para continuar.'); return; }
     clearErro();
     STEP = 4; render();
   };
@@ -722,20 +892,65 @@ function viewContrato(){
 function viewFinal(){
   const p = planoSel();
   const addTotal = F.adicionais.reduce((s,x)=> s + (x.valor||0)*(x.quantidade||0), 0);
-  const descTotal = DESC ? ((DESC.desconto_fotografia||0)+(DESC.desconto_cerimonial||0)) : 0;
-  const subTotal = (p?(p.valor||0):0) + addTotal;
-  const cupomVal = cupomDesconto(p ? (p.valor_fotografia||0) : 0, subTotal);
-  const total = Math.max(0, subTotal - descTotal - cupomVal);
+
+  // Composição do plano: fotografia × cerimonial (defensivo)
+  const valFoto = p ? (Number(p.valor_fotografia)||0) : 0;
+  const valCerim = p ? (Number(p.valor_cerimonial)||0) : 0;
+  const planoVal = p ? (Number(p.valor)||0) : 0;
+
+  // Descontos por CPF
+  const descFoto = DESC ? (Number(DESC.desconto_fotografia)||0) : 0;
+  const descCerim = DESC ? (Number(DESC.desconto_cerimonial)||0) : 0;
+  const descTotal = descFoto + descCerim;
+
+  const subTotal = planoVal + addTotal;
+  const cupomVal = cupomDesconto(valFoto, subTotal);
+  const taxa = taxaBoleto(p);
+  const total = Math.max(0, subTotal - descTotal - cupomVal) + taxa;
   const meioLbl = p ? (meioLabel(p, F.meio_pagamento) || formaLabel(F.forma_pagamento) || '—') : '—';
 
   const linhas = [];
-  if(p) linhas.push(`<div class="r-line"><span class="l">Plano</span><span class="v">${esc(p.nome)} · ${brl(p.valor)}</span></div>`);
-  linhas.push(`<div class="r-line"><span class="l">Pagamento</span><span class="v">${esc(meioLbl)}${F.parcelas&&F.parcelas>1?` · ${F.parcelas}x`:''}</span></div>`);
+  if(p){
+    linhas.push(`<div class="r-line"><span class="l"><b>${esc(p.nome)}</b></span><span class="v">${brl(planoVal)}</span></div>`);
+    // Fotografia × Cerimonial (quando a API trouxer a composição)
+    if(valFoto) linhas.push(`<div class="r-line"><span class="l">&nbsp;&nbsp;Fotografia</span><span class="v" style="font-weight:600;">${brl(valFoto)}</span></div>`);
+    if(valCerim) linhas.push(`<div class="r-line"><span class="l">&nbsp;&nbsp;Cerimonial</span><span class="v" style="font-weight:600;">${brl(valCerim)}</span></div>`);
+  }
+  // Adicionais
   F.adicionais.filter(x=>x.quantidade>0).forEach(x=>{
     linhas.push(`<div class="r-line"><span class="l">${esc(x.descricao)} × ${x.quantidade}</span><span class="v">${brl(x.valor*x.quantidade)}</span></div>`);
   });
-  if(descTotal>0) linhas.push(`<div class="r-line"><span class="l">Desconto</span><span class="v" style="color:#166534;">−${brl(descTotal)}</span></div>`);
+  // Descontos por CPF (detalhados)
+  if(descFoto>0) linhas.push(`<div class="r-line"><span class="l">Desconto fotografia (CPF)</span><span class="v" style="color:#166534;">−${brl(descFoto)}</span></div>`);
+  if(descCerim>0) linhas.push(`<div class="r-line"><span class="l">Desconto cerimonial (CPF)</span><span class="v" style="color:#166534;">−${brl(descCerim)}</span></div>`);
   if(cupomVal>0 && CUPOM) linhas.push(`<div class="r-line"><span class="l">Cupom ${esc(CUPOM.codigo)}</span><span class="v" style="color:#166534;">−${brl(cupomVal)}</span></div>`);
+  if(taxa>0) linhas.push(`<div class="r-line"><span class="l">Taxa de boleto</span><span class="v">${brl(taxa)}</span></div>`);
+  linhas.push(`<div class="r-line"><span class="l">Pagamento</span><span class="v">${esc(meioLbl)}${F.parcelas&&F.parcelas>1?` · ${F.parcelas}x`:''}</span></div>`);
+
+  // Brindes inclusos + itens exclusivos da comissão
+  const brindes = brindesDoPlano(p);
+  const comissaoItens = itensComissao(p);
+  const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#16A34A;flex:0 0 auto;margin-top:2px;"><path d="M20 6 9 17l-5-5"/></svg>';
+  let brindesHtml = '';
+  if(brindes.length || comissaoItens.length){
+    brindesHtml = `<div class="fb-t" style="margin-top:16px;">Inclusos no seu plano</div>
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+      ${brindes.map(b=>`<li style="display:flex;gap:8px;font-size:13.5px;color:var(--cinza2);">${chk}<span>${esc(b)}</span></li>`).join('')}
+      ${comissaoItens.map(b=>`<li style="display:flex;gap:8px;font-size:13.5px;color:var(--azul-esc);font-weight:600;">${chk}<span>${esc(b)} <span style="font-size:11px;background:#DBEAFE;color:var(--azul-esc);padding:1px 7px;border-radius:6px;">comissão</span></span></li>`).join('')}
+      </ul>`;
+  }
+
+  // Escolha de parcelas entre as opções do plano (no passo de revisão)
+  const selMeio = (p && p.meios_pagamento && F.meio_pagamento) ? p.meios_pagamento.find(m=>m.meio===F.meio_pagamento) : null;
+  const maxParc = selMeio ? (+selMeio.qt_parcela||1) : 1;
+  let parcHtml = '';
+  if(maxParc > 1){
+    const cur = F.parcelas || 1;
+    const valorParcela = total>0 ? total / cur : 0;
+    parcHtml = `<div class="fld" style="margin-top:16px;margin-bottom:0;"><label>Número de parcelas</label>
+      <select id="i-parc-final">${Array.from({length:maxParc},(_,i)=>`<option value="${i+1}" ${cur==(i+1)?'selected':''}>${i+1}x de ${brl(total/(i+1))}</option>`).join('')}</select>
+      <div class="p-sub" id="parc-info" style="margin-top:6px;font-size:12px;color:var(--cinza);">${cur}x de ${brl(valorParcela)}</div></div>`;
+  }
 
   card.innerHTML = `
     <h1>Confirme seu pedido</h1>
@@ -745,6 +960,8 @@ function viewFinal(){
     <div class="final-box">
       <div class="fb-t">Resumo</div>
       ${linhas.join('')}
+      ${brindesHtml}
+      ${parcHtml}
       <div class="r-total"><span class="l">Total</span><span class="v">${brl(total)}</span></div>
     </div>
 
@@ -759,6 +976,16 @@ function viewFinal(){
     </div>
     <p class="muted">Seus dados ficam disponíveis para a comissão e a Ventus.</p>`;
 
+  const parcSel = document.getElementById('i-parc-final');
+  if(parcSel){
+    parcSel.onchange = () => {
+      F.parcelas = +parcSel.value;
+      const info = document.getElementById('parc-info');
+      if(info) info.textContent = `${F.parcelas}x de ${brl(total/F.parcelas)}`;
+      renderResumo();
+    };
+  }
+
   document.getElementById('btn-back').onclick = () => { STEP=3; render(); };
   document.getElementById('btn-enviar').onclick = enviar;
 }
@@ -768,20 +995,24 @@ async function enviar(){
   const btn = document.getElementById('btn-enviar');
   const p = planoSel();
 
-  if(!F.nome){ showErro('Informe seu nome.'); STEP=0; setTimeout(render,50); return; }
-  if(!F.plano_id){ showErro('Escolha um plano.'); STEP=1; setTimeout(render,50); return; }
-  if(p && p.contrato && !F.aceite_contrato){ showErro('É necessário aceitar o contrato.'); STEP=3; setTimeout(render,50); return; }
+  const emailNorm = (F.email||'').trim().toLowerCase();
+  if(!F.nome){ toast('Informe seu nome.'); STEP=0; setTimeout(render,50); return; }
+  if(!emailNorm || (F.email_confirma && emailNorm !== (F.email_confirma||'').trim().toLowerCase())){ toast('Verifique seu e-mail (confirmação não bate).'); STEP=0; setTimeout(render,50); return; }
+  if(!F.plano_id){ toast('Escolha um plano.'); STEP=1; setTimeout(render,50); return; }
+  if(p && p.contrato && !F.aceite_contrato){ toast('É necessário aceitar o contrato.'); STEP=3; setTimeout(render,50); return; }
 
   const body = {
     nome: F.nome,
     celular: F.celular,
-    email: F.email,
+    email: (F.email||'').trim(),
     cpf: F.cpf,
     curso: F.curso,
     ano_formatura: F.ano_formatura || null,
     altura: F.altura,
     peso: F.peso,
     calcado: F.calcado,
+    plus_size: F.plus_size,
+    num_calca: F.num_calca || '',
     plano_id: p ? p.id : null,
     meio_pagamento: F.meio_pagamento || null,
     forma_pagamento: F.forma_pagamento || F.meio_pagamento || null,

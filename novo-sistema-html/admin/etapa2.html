@@ -193,6 +193,15 @@ const linkAluno     = id => `${ORIGIN}/aluno/inicio.html?id=${encodeURIComponent
 const linkFotografo = id => `${ORIGIN}/fotografo/upload.html?p=${encodeURIComponent(id)}`;
 const linkEditor    = id => `${ORIGIN}/editor/fila.html?p=${encodeURIComponent(id)}`;
 const linkOperador  = id => `${ORIGIN}/operador/checkin.html?p=${encodeURIComponent(id)}`;
+// detecta o(s) papel(is) do prestador pela função cadastrada (fotógrafo/editor/operador)
+function papeisDoPrestador(p){
+  const t = ((p.funcao||'') + ' ' + (p.funcoes||'')).toLowerCase();
+  const r = [];
+  if(/fot[óo]graf|foto/.test(t)) r.push('fotografo');
+  if(/edi[çc][ãa]o|editor/.test(t)) r.push('editor');
+  if(/operad|check|recep|portaria|entrada/.test(t)) r.push('operador');
+  return r;
+}
 
 /* ============ Turmas ============ */
 initTurmas();
@@ -313,14 +322,27 @@ async function initEquipe(){
       const tel = p.telefone || '';
       const wa  = waNumero(tel);
       const lf = linkFotografo(id), le = linkEditor(id), lo = linkOperador(id);
-      const msgWa = `Olá ${p.nome||''}! Estes são os seus links pessoais de acesso da produção (Etapa 2):\n\nFotógrafo: ${lf}\nEditor: ${le}\nOperador: ${lo}`;
-      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
       const linkRow = (ic, role, url, msg) => `
         <div class="link-row">
           <div class="lr-ic"><i data-lucide="${ic}"></i></div>
           <div class="lr-txt"><div class="lr-role">${role}</div><div class="lr-url">${esc(url)}</div></div>
           <button class="icon-btn pri" onclick="copiar('${esc(url)}','${msg}')"><i data-lucide="copy"></i> Copiar</button>
         </div>`;
+      const rowFor = {
+        fotografo: linkRow('camera',    'Fotógrafo · Upload',  lf, 'Link do fotógrafo copiado'),
+        editor:    linkRow('wand-2',    'Editor · Fila',       le, 'Link do editor copiado'),
+        operador:  linkRow('scan-line', 'Operador · Check-in', lo, 'Link do operador copiado'),
+      };
+      const urlFor = { fotografo:lf, editor:le, operador:lo };
+      const papeis = papeisDoPrestador(p);
+      const mostrar = papeis.length ? papeis : ['fotografo','editor','operador'];
+      const linksHtml = mostrar.map(r=>rowFor[r]).join('');
+      const hint = papeis.length
+        ? 'Link pessoal desta pessoa (traz o identificador dela). Definido pela função no cadastro.'
+        : 'Sem função definida no cadastro — mostrando todos os acessos. Defina a função do prestador em Cadastros p/ restringir.';
+      const msgWa = `Olá ${p.nome||''}! Este é o seu acesso pessoal da produção (Etapa 2):\n\n` +
+        mostrar.map(r=>`${r.charAt(0).toUpperCase()+r.slice(1)}: ${urlFor[r]}`).join('\n');
+      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
       return `<div class="team-card">
         <div class="tc-head">
           <div class="tc-av">${esc(iniciais(p.nome))}</div>
@@ -329,12 +351,8 @@ async function initEquipe(){
             <div class="tc-meta">${p.funcao ? esc(p.funcao) : 'Prestador'}${tel ? ' · '+esc(tel) : ''}</div>
           </div>
         </div>
-        <div class="tc-hint">Cada link abaixo é o acesso PESSOAL desta pessoa (traz o identificador dela).</div>
-        <div class="tc-links">
-          ${linkRow('camera',    'Fotógrafo · Upload',   lf, 'Link do fotógrafo copiado')}
-          ${linkRow('wand-2',    'Editor · Fila',        le, 'Link do editor copiado')}
-          ${linkRow('scan-line', 'Operador · Check-in',  lo, 'Link do operador copiado')}
-        </div>
+        <div class="tc-hint">${hint}</div>
+        <div class="tc-links">${linksHtml}</div>
         <div class="tc-foot">
           ${wa
             ? `<a class="icon-btn wa" href="${esc(waHref)}" target="_blank" rel="noopener"><i data-lucide="message-circle"></i> Enviar por WhatsApp</a>`
