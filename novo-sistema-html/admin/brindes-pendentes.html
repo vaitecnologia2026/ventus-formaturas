@@ -123,6 +123,7 @@ async function carregarPendentes() {
     <td><div class="row-actions">
       <input type="date" class="date-inline" id="dt-${it.aluno_id}-${it.turma_brinde_id}" value="${hoje()}" max="${hoje()}">
       <button class="btn btn-primary btn-sm" onclick="entregar(${it.aluno_id},${it.turma_brinde_id})"><i data-lucide="check" class="w-4 h-4"></i> Marcar entregue</button>
+      <button class="btn btn-secondary btn-sm" title="Este aluno não vai receber este brinde" onclick="naoRecebe(${it.aluno_id},${it.turma_brinde_id},'${esc(it.aluno).replace(/'/g,"\\'")}')"><i data-lucide="x-circle" class="w-4 h-4"></i> Não receberá</button>
     </div></td>
   </tr>`).join('');
   lucide.createIcons();
@@ -189,6 +190,20 @@ window.entregar = async function(alunoId, tbId) {
     $('#cnt').textContent = Math.max(0, Number($('#cnt').textContent)-1);
     if (!$('#tbody').children.length) carregarPendentes();
   } else vtAlert('Erro ao marcar entrega.');
+};
+
+window.naoRecebe = async function(alunoId, tbId, nome) {
+  if (!(await vtConfirm(`Marcar que <b>${nome}</b> NÃO vai receber este brinde? Ele sai da lista de pendentes.`, {title:'Não receberá', okText:'Confirmar'}))) return;
+  const r = await fetch(apiUrl(`/api/aluno/${alunoId}/brindes/${tbId}/entrega`), {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({dispensado:true})
+  });
+  if (r.ok) {
+    const row = document.getElementById(`row-${alunoId}-${tbId}`); if (row) row.remove();
+    $('#cnt').textContent = Math.max(0, Number($('#cnt').textContent)-1);
+    if (typeof showToast==='function') showToast(`${nome} marcado como "não receberá".`);
+    if (!$('#tbody').children.length) carregarPendentes();
+  } else vtAlert('Erro ao dispensar o aluno.');
 };
 
 $('#fil-turma').onchange = e => { TURMA = e.target.value; carregar(); };
