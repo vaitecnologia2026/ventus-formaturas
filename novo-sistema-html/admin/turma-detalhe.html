@@ -135,6 +135,58 @@
     .form-actions{flex-direction:column;align-items:stretch;}
     .form-actions .btn{width:100%;justify-content:center;}
   }
+
+  /* ---------- Modal Config financeira ---------- */
+  .cfg-overlay{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:24px 16px;
+    background:rgba(10,37,64,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .cfg-card{background:var(--surface);border-radius:var(--radius-lg);width:min(880px,100%);max-height:88vh;display:flex;flex-direction:column;
+    box-shadow:0 24px 64px -16px rgba(10,37,64,.55);border:1px solid var(--gray-200);overflow:hidden;}
+  .cfg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--gray-200);flex:none;}
+  .cfg-head h2{margin:0;font-size:16px;font-weight:800;color:var(--gray-900);line-height:1.3;}
+  .cfg-head .cfg-sub{display:block;font-size:12.5px;font-weight:500;color:var(--gray-500);margin-top:2px;}
+  .cfg-body{padding:20px 22px;overflow:auto;flex:1 1 auto;}
+  .cfg-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--gray-200);flex:none;background:var(--surface);}
+
+  .cfg-section{border:1px solid var(--gray-200);border-radius:var(--radius);background:var(--gray-50);padding:16px;margin-bottom:16px;}
+  .cfg-section:last-child{margin-bottom:0;}
+  .cfg-section > .cfg-sec-title{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gray-500);margin:0 0 14px;}
+  .cfg-section > .cfg-sec-title svg{width:15px;height:15px;color:var(--primary-600);}
+
+  .cfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .cfg-fld{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .cfg-fld.cfg-span{grid-column:1/-1;}
+  .cfg-fld > label{font-size:12.5px;font-weight:600;color:var(--gray-600);line-height:1.3;}
+  .cfg-fld > label .cfg-hint{font-weight:400;color:var(--gray-400);}
+  .cfg-fld input,.cfg-fld select{height:40px;width:100%;padding:0 12px;border:1px solid var(--gray-300);border-radius:10px;
+    background:var(--surface);color:var(--gray-900);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
+  .cfg-fld input:focus,.cfg-fld select:focus{border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100);}
+  .cfg-fld input[type=date]{padding-right:8px;}
+
+  .cfg-meios-wrap{border:1px solid var(--gray-200);border-radius:10px;background:var(--surface);overflow:hidden;}
+  .cfg-meios-scroll{overflow-x:auto;}
+  table.cfg-tbl{width:100%;border-collapse:collapse;font-size:14px;}
+  table.cfg-tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);font-weight:700;
+    padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--gray-200);white-space:nowrap;}
+  table.cfg-tbl td{padding:9px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-700);vertical-align:middle;}
+  table.cfg-tbl tr:last-child td{border-bottom:none;}
+  table.cfg-tbl td.nome{font-weight:600;color:var(--gray-900);white-space:nowrap;}
+  table.cfg-tbl th.col-ativo,table.cfg-tbl td.col-ativo{text-align:center;width:64px;}
+  table.cfg-tbl th.col-qt,table.cfg-tbl td.col-qt{width:170px;}
+  table.cfg-tbl .cfg-desc{width:100%;height:38px;padding:0 10px;border:1px solid var(--gray-300);border-radius:8px;
+    background:var(--surface);color:var(--gray-900);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
+  table.cfg-tbl .cfg-qt{width:100%;height:38px;padding:0 8px;border:1px solid var(--gray-300);border-radius:8px;
+    background:var(--surface);color:var(--gray-900);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
+  table.cfg-tbl .cfg-desc:focus,table.cfg-tbl .cfg-qt:focus{border-color:var(--primary-500);box-shadow:0 0 0 3px var(--primary-100);}
+
+  @media (max-width:640px){
+    .cfg-card{max-height:92vh;}
+    .cfg-body{padding:16px;}
+    .cfg-section{padding:14px;}
+    .cfg-grid{grid-template-columns:1fr;}
+    .cfg-foot{flex-direction:column-reverse;}
+    .cfg-foot .btn{width:100%;justify-content:center;}
+    table.cfg-tbl{min-width:520px;}
+  }
 </style>
 </head>
 <body>
@@ -935,46 +987,67 @@ window.excluirPlano=async function(pid){ if(!await vtConfirm('Excluir este plano
 /* -------- Config financeira do plano (modal) -------- */
 window.abrirConfig=async function(pid,nome){
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`)); const resp=await r.json(); const c=resp.config; const modalidades=resp.modalidades||[];
-  const modal=document.createElement('div'); modal.id='cfg-modal';
-  modal.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:300;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:28px 16px;';
+  const modal=document.createElement('div'); modal.id='cfg-modal'; modal.className='cfg-overlay';
   const sel=(arr,cur)=>optPair(arr,cur);
   const qtParc=cur=>`<option value="0" ${!cur?'selected':''}>NÃO</option>`+Array.from({length:72},(_,i)=>`<option value="${i+1}" ${cur==i+1?'selected':''}>${i+1} PARCELA(S)</option>`).join('');
   const meioRow=m=>`<tr data-meio="${m.meio}">
       <td class="nome">${m.label}</td>
-      <td><label class="switch"><input type="checkbox" class="cfg-ativo" ${m.ativo?'checked':''}><span class="track"></span></label></td>
-      <td><input type="text" class="cfg-desc" value="${(m.descricao||'').replace(/"/g,'&quot;')}" placeholder="Mensagem p/ o cliente" style="width:100%;padding:7px 9px;border:1px solid var(--gray-300);border-radius:8px;"></td>
-      <td><select class="cfg-qt" style="padding:7px;border:1px solid var(--gray-300);border-radius:8px;">${qtParc(m.qt_parcela)}</select></td>
+      <td class="col-ativo"><label class="switch"><input type="checkbox" class="cfg-ativo" ${m.ativo?'checked':''}><span class="track"></span></label></td>
+      <td><input type="text" class="cfg-desc" value="${(m.descricao||'').replace(/"/g,'&quot;')}" placeholder="Mensagem p/ o cliente"></td>
+      <td class="col-qt"><select class="cfg-qt">${qtParc(m.qt_parcela)}</select></td>
     </tr>`;
-  modal.innerHTML=`<div style="background:var(--surface);border-radius:16px;max-width:960px;width:100%;box-shadow:0 20px 60px -20px rgba(0,0,0,.5);">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--gray-100);">
-      <h2 style="margin:0;font-size:16px;font-weight:800;color:var(--gray-900);">Config financeira — ${nome}</h2>
-      <button class="icon-btn" onclick="document.getElementById('cfg-modal').remove()"><i data-lucide="x" style="width:16px;height:16px;"></i></button></div>
-    <div style="padding:20px 22px;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:16px;">
-        <div class="med-fld"><label>Dia de vencimento</label><select id="cfg-dia"><option value="">—</option>${(PLOPC.dias_vencimento||[]).map(d=>`<option ${c.dia_vencimento==d?'selected':''}>${d}</option>`).join('')}</select></div>
-        <div class="med-fld"><label>1ª parcela 01</label><input type="date" id="cfg-p1" value="${c.primeira_parcela_01||''}"></div>
-        <div class="med-fld"><label>1ª parcela 02</label><input type="date" id="cfg-p2" value="${c.primeira_parcela_02||''}"></div>
-        <div class="med-fld"><label>1ª parcela 03</label><input type="date" id="cfg-p3" value="${c.primeira_parcela_03||''}"></div>
-        <div class="med-fld"><label>Última parcela</label><input type="date" id="cfg-pu" value="${c.ultima_parcela||''}"></div>
-        <div class="med-fld"><label>Modelo Documento (contrato)</label><select id="cfg-modelo"><option value="">—</option>${optObj(PLOPC.modelos_documento,c.modelo_documento_id)}</select></div>
-      </div>
-      <div style="font-weight:700;font-size:13px;margin:6px 0 8px;color:var(--gray-700);">Meios de pagamento</div>
-      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Meio</th><th>Ativo</th><th>Mensagem</th><th>Parcelas</th></tr></thead>
-        <tbody id="cfg-meios">${c.meios.map(meioRow).join('')}</tbody></table></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:16px;">
-        <div class="med-fld"><label>Taxa de boleto</label><select id="cfg-taxa"><option value="false" ${!c.taxa_boleto?'selected':''}>NÃO</option><option value="true" ${c.taxa_boleto?'selected':''}>SIM</option></select></div>
-        <div class="med-fld"><label>Valor da taxa (R$/parcela)</label><input type="number" step="0.01" id="cfg-vtaxa" value="${c.valor_taxa||''}"></div>
-        <div class="med-fld"><label>Emissão de carnê</label><select id="cfg-carne">${sel(PLOPC.emissao_carne,c.emissao_carne)}</select></div>
-        <div class="med-fld" style="grid-column:1/-1;"><label>Forma de pagamento especial <span style="font-weight:400;color:var(--gray-400);">(modalidade de pagamento)</span></label><select id="cfg-modalidade"><option value="">— nenhuma (padrão) —</option>${modalidades.map(m=>`<option value="${m.id}" ${c.modalidade_pagamento_id==m.id?'selected':''}>${m.nome} (${m.percentual_entrada}% durante)</option>`).join('')}</select></div>
-        <div class="med-fld"><label>Multa (%)</label><input type="number" step="0.01" id="cfg-multa" value="${c.multa||''}"></div>
-        <div class="med-fld"><label>Juros (% a.m.)</label><input type="number" step="0.01" id="cfg-juros" value="${c.juros||''}"></div>
-        <div class="med-fld"><label>Desconto pix antecipado (%)</label><input type="number" step="0.01" id="cfg-descpix" value="${c.desconto_pix_antecipado||''}"></div>
-      </div>
+  modal.innerHTML=`<div class="cfg-card">
+    <div class="cfg-head">
+      <h2>Config financeira<span class="cfg-sub">${nome}</span></h2>
+      <button class="icon-btn" onclick="document.getElementById('cfg-modal').remove()" aria-label="Fechar"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
     </div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--gray-100);">
+    <div class="cfg-body">
+
+      <section class="cfg-section">
+        <p class="cfg-sec-title"><i data-lucide="calendar-clock"></i> Parcelas e vencimentos</p>
+        <div class="cfg-grid">
+          <div class="cfg-fld"><label>Dia de vencimento</label><select id="cfg-dia"><option value="">—</option>${(PLOPC.dias_vencimento||[]).map(d=>`<option ${c.dia_vencimento==d?'selected':''}>${d}</option>`).join('')}</select></div>
+          <div class="cfg-fld"><label>1ª parcela 01</label><input type="date" id="cfg-p1" value="${c.primeira_parcela_01||''}"></div>
+          <div class="cfg-fld"><label>1ª parcela 02</label><input type="date" id="cfg-p2" value="${c.primeira_parcela_02||''}"></div>
+          <div class="cfg-fld"><label>1ª parcela 03</label><input type="date" id="cfg-p3" value="${c.primeira_parcela_03||''}"></div>
+          <div class="cfg-fld"><label>Última parcela</label><input type="date" id="cfg-pu" value="${c.ultima_parcela||''}"></div>
+          <div class="cfg-fld"><label>Modelo Documento <span class="cfg-hint">(contrato)</span></label><select id="cfg-modelo"><option value="">—</option>${optObj(PLOPC.modelos_documento,c.modelo_documento_id)}</select></div>
+        </div>
+      </section>
+
+      <section class="cfg-section">
+        <p class="cfg-sec-title"><i data-lucide="credit-card"></i> Meios de pagamento</p>
+        <div class="cfg-meios-wrap"><div class="cfg-meios-scroll">
+          <table class="cfg-tbl"><thead><tr><th>Meio</th><th class="col-ativo">Ativo</th><th>Mensagem p/ o cliente</th><th class="col-qt">Parcelas</th></tr></thead>
+          <tbody id="cfg-meios">${c.meios.map(meioRow).join('')}</tbody></table>
+        </div></div>
+      </section>
+
+      <section class="cfg-section">
+        <p class="cfg-sec-title"><i data-lucide="percent"></i> Taxas, juros e descontos</p>
+        <div class="cfg-grid">
+          <div class="cfg-fld"><label>Taxa de boleto</label><select id="cfg-taxa"><option value="false" ${!c.taxa_boleto?'selected':''}>NÃO</option><option value="true" ${c.taxa_boleto?'selected':''}>SIM</option></select></div>
+          <div class="cfg-fld"><label>Valor da taxa <span class="cfg-hint">(R$/parcela)</span></label><input type="number" step="0.01" id="cfg-vtaxa" value="${c.valor_taxa||''}"></div>
+          <div class="cfg-fld"><label>Emissão de carnê</label><select id="cfg-carne">${sel(PLOPC.emissao_carne,c.emissao_carne)}</select></div>
+          <div class="cfg-fld"><label>Multa <span class="cfg-hint">(%)</span></label><input type="number" step="0.01" id="cfg-multa" value="${c.multa||''}"></div>
+          <div class="cfg-fld"><label>Juros <span class="cfg-hint">(% a.m.)</span></label><input type="number" step="0.01" id="cfg-juros" value="${c.juros||''}"></div>
+          <div class="cfg-fld"><label>Desconto pix antecipado <span class="cfg-hint">(%)</span></label><input type="number" step="0.01" id="cfg-descpix" value="${c.desconto_pix_antecipado||''}"></div>
+        </div>
+      </section>
+
+      <section class="cfg-section">
+        <p class="cfg-sec-title"><i data-lucide="star"></i> Forma de pagamento especial</p>
+        <div class="cfg-grid">
+          <div class="cfg-fld cfg-span"><label>Modalidade de pagamento <span class="cfg-hint">(condição diferenciada aplicada ao plano)</span></label><select id="cfg-modalidade"><option value="">— nenhuma (padrão) —</option>${modalidades.map(m=>`<option value="${m.id}" ${c.modalidade_pagamento_id==m.id?'selected':''}>${m.nome} (${m.percentual_entrada}% durante)</option>`).join('')}</select></div>
+        </div>
+      </section>
+
+    </div>
+    <div class="cfg-foot">
       <button class="btn btn-secondary" onclick="document.getElementById('cfg-modal').remove()">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarConfig(${pid})"><i data-lucide="check" class="w-4 h-4"></i> Salvar config</button>
-    </div></div>`;
+    </div>
+  </div>`;
   document.body.appendChild(modal); lucide.createIcons();
 };
 window.salvarConfig=async function(pid){

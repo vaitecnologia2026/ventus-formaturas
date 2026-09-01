@@ -103,6 +103,15 @@ function renderAdminSidebar() {
       ],
     },
     {
+      title: 'Etapa 2 · Produção',
+      items: [
+        { href: '../fotografo/upload.html', icon: 'camera',         label: 'Fotógrafo · Upload', blank: true },
+        { href: '../editor/fila.html',      icon: 'wand-2',         label: 'Editor · Fila', blank: true },
+        { href: '../operador/checkin.html', icon: 'scan-line',      label: 'Operador · Check-in', blank: true },
+        { href: '../aluno/inicio.html?id=1', icon: 'graduation-cap', label: 'Formando (prévia)', blank: true },
+      ],
+    },
+    {
       title: 'Comercial',
       items: [
         { href: 'planos.html',            icon: 'package-2',        label: 'Planos' },
