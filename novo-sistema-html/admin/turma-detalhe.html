@@ -36,7 +36,8 @@
   .add-bar input, .add-bar select { height:40px; padding:0 12px; border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; outline:none; transition:.15s; }
   .add-bar input[type=time]{ padding:0 10px; }
   .add-bar input[type=date], .add-bar input[type=time]{ min-height:40px; }
-  .add-bar .ms-search{ height:auto; padding:2px; }
+  /* inputs de busca DENTRO das caixas .ms/.ss não herdam borda/altura de .add-bar input (senão vira caixa dentro de caixa) */
+  .add-bar .ms-search, .add-bar .ss-search{ border:none!important; height:auto; min-height:0; padding:0 2px; background:transparent; box-shadow:none!important; border-radius:0; }
   .add-bar .fld .btn { height:40px; }
   /* campo com switch: alinha o toggle na área do input (sem distorcer o switch) */
   .add-bar .fld > .switch { margin-top:7px; }
