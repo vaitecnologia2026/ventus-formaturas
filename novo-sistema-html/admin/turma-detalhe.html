@@ -535,15 +535,15 @@ function montarEvForm() {
     <div class="fld"><label>Previsão</label><input type="date" id="ev-data" onchange="checarAgenda()"><div id="ev-data-nota" style="font-size:12px;margin-top:5px;"></div></div>
     <div class="fld"><label>Início</label><input type="time" id="ev-ini" style="width:110px;"></div>
     <div class="fld"><label>Fim</label><input type="time" id="ev-fim" style="width:110px;"></div>
-    <div class="fld grow"><label>Local</label><input type="text" id="ev-local" placeholder="Local do evento"></div>
     <div class="fld"><label>Situação</label><select id="ev-situacao">${optSit('previsto')}</select></div>
-    <div class="fld grow"><label>Galeria</label><select id="ev-album">${optAlbum('')}</select></div>
     <div class="fld"><label>Confirmado</label><label class="switch"><input type="checkbox" id="ev-confirmado"><span class="track"></span></label></div>
-    <div class="fld grow"><label>Prestadores</label>${OPC.prestadores.length?`<div class="ms" id="ev-prestadores">
+    <div class="fld grow"><label>Local</label><input type="text" id="ev-local" placeholder="Local do evento"></div>
+    <div class="fld grow"><label>Galeria</label><select id="ev-album">${optAlbum('')}</select></div>
+    <div class="fld" style="min-width:280px;"><label>Prestadores</label>${OPC.prestadores.length?`<div class="ms" id="ev-prestadores">
         <div class="ms-box" id="ev-prest-box"><input type="text" class="ms-search" id="ev-prest-search" placeholder="Buscar prestador…" autocomplete="off"></div>
         <div class="ms-list" id="ev-prest-list"></div>
       </div>`:'<div class="ms" id="ev-prestadores"><span style="font-size:12.5px;color:var(--gray-400);">Nenhum prestador cadastrado.</span></div>'}</div>
-    <div class="fld"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
+    <div class="fld" style="align-self:flex-end;"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
   initPrestMulti();
   lucide.createIcons();
   enhanceSelects(['ev-evento_id','ev-album']);
