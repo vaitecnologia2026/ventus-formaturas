@@ -31,6 +31,13 @@
   --danger:   #DC2626;
   --info:     #0EA5E9;
 
+  /* Status — pares fundo (bg) + texto (fg) de badges/pills/chips.
+     Consolidam tints antes repetidos crus em ~10 telas. */
+  --success-bg: #DCFCE7;  --success-fg: #166534;
+  --warning-bg: #FEF3C7;  --warning-fg: #92400E;
+  --danger-bg:  #FEE2E2;  --danger-fg:  #991B1B;
+  --purple-bg:  #EDE9FE;  --purple-fg:  #5B21B6;
+
   /* Pulseiras */
   --band-vip:        #FBBF24; /* dourado */
   --band-comum:      #2563EB;

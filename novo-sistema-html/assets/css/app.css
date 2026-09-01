@@ -38,8 +38,8 @@ body {
 }
 .sidebar-brand-mark {
   width: 36px; height: 36px;
-  background: white;
-  color: var(--primary-900);
+  background: transparent;
+  color: #fff;
   border-radius: 10px;
   display: grid; place-items: center;
   font-weight: 800;
@@ -193,11 +193,11 @@ i[data-lucide] { display: inline-block; width: 1em; height: 1em; vertical-align:
   font-size: 12px; font-weight: 600;
   background: var(--gray-100); color: var(--gray-700);
 }
-.badge-success { background: #DCFCE7; color: #166534; }
-.badge-warning { background: #FEF3C7; color: #92400E; }
-.badge-danger  { background: #FEE2E2; color: #991B1B; }
+.badge-success { background: var(--success-bg); color: var(--success-fg); }
+.badge-warning { background: var(--warning-bg); color: var(--warning-fg); }
+.badge-danger  { background: var(--danger-bg); color: var(--danger-fg); }
 .badge-info    { background: var(--primary-100); color: var(--primary-800); }
-.badge-purple  { background: #EDE9FE; color: #5B21B6; }
+.badge-purple  { background: var(--purple-bg); color: var(--purple-fg); }
 
 /* Tables */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -388,10 +388,10 @@ i[data-lucide] { display: inline-block; width: 1em; height: 1em; vertical-align:
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.tag-EDICAO { background: #EDE9FE; color: #5B21B6; }
+.tag-EDICAO { background: var(--purple-bg); color: var(--purple-fg); }
 .tag-MARKETING { background: #FCE7F3; color: #9D174D; }
-.tag-FINANCEIRO { background: #DCFCE7; color: #166534; }
-.tag-CERIMONIAL { background: #FEF3C7; color: #92400E; }
+.tag-FINANCEIRO { background: var(--success-bg); color: var(--success-fg); }
+.tag-CERIMONIAL { background: var(--warning-bg); color: var(--warning-fg); }
 .tag-COMERCIAL { background: var(--primary-100); color: var(--primary-800); }
 .tag-ADMINISTRATIVO { background: #E0F2FE; color: #075985; }
 .tag-DIRETORIA { background: #1E293B; color: white; }
@@ -455,7 +455,7 @@ body.nav-open { overflow: hidden; }   /* trava o scroll do fundo com o menu aber
 
 /* Sidebar mais refinada */
 .sidebar { background: linear-gradient(180deg, #1B316E 0%, #101B3D 100%); }
-.sidebar-brand-mark { background: linear-gradient(135deg, #ffffff, #DBEAFE); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.sidebar-brand-mark { background: transparent; box-shadow: none; }
 .sidebar-link { border-radius: 10px; }
 .sidebar-link.active {
   background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
@@ -585,3 +585,35 @@ body { background: var(--gray-50); color: var(--gray-800); }
 .app-content .add-bar .fld input:focus,
 .app-content .add-bar .fld select:focus,
 .app-content .add-bar .fld textarea:focus { border-color: var(--primary-500); box-shadow: 0 0 0 3px var(--primary-100); }
+
+/* ===== Campos de DATA/HORA — padronizados e bonitos (global) ===== */
+input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"]{
+  -webkit-appearance:none; -moz-appearance:none; appearance:none;
+  font-family:inherit; font-size:14px; color:var(--gray-900);
+  padding:11px 13px; border:1px solid var(--gray-300); border-radius:11px;
+  background:var(--surface); outline:none; min-height:44px;
+  transition:border-color .15s, box-shadow .15s;
+}
+input[type="date"]:hover, input[type="time"]:hover,
+input[type="datetime-local"]:hover, input[type="month"]:hover{ border-color:var(--gray-400); }
+input[type="date"]:focus, input[type="time"]:focus,
+input[type="datetime-local"]:focus, input[type="month"]:focus{
+  border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100);
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+  cursor:pointer; width:17px; height:17px; padding:3px; margin-left:6px;
+  border-radius:7px; opacity:.5; transition:.15s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover{ opacity:1; background:var(--primary-50); }
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit{ color:var(--gray-800); padding:0; }
+input[type="date"]:required:invalid::-webkit-datetime-edit,
+input[type="date"]:not(:focus):invalid::-webkit-datetime-edit{ color:var(--gray-400); }
+/* tema escuro: ícone do calendário visível */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator{ filter:invert(1) brightness(1.2); }

@@ -16,7 +16,7 @@
 .tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
 .tab:hover { color:var(--gray-700); }
 .tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
-.placeholder-pill { display:inline-block; padding:3px 8px; background:#FEF3C7; color:#92400E; border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; }
+.placeholder-pill { display:inline-block; padding:3px 8px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; }
 .placeholder-pill:hover { background:#FDE68A; }
 .editor-fake { min-height:280px; padding:20px; background:white; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; line-height:1.7; color:var(--gray-700); }
 </style>
@@ -40,9 +40,9 @@
 
     <div class="grid grid-cols-4 gap-4 mb-6">
       <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="file-signature" class="w-5 h-5"></i></div><div class="kpi-label">Contratos ativos</div><div class="kpi-value">198</div><div class="kpi-trend up">+ 14 este mês</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Em assinatura</div><div class="kpi-value">12</div><div class="kpi-trend" style="color:var(--gray-500);">aguardando ZapSign</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Assinados (mês)</div><div class="kpi-value">22</div><div class="kpi-trend up">tempo médio: 18h</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="file-x" class="w-5 h-5"></i></div><div class="kpi-label">Cancelados</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">1.5% taxa</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Em assinatura</div><div class="kpi-value">12</div><div class="kpi-trend" style="color:var(--gray-500);">aguardando ZapSign</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Assinados (mês)</div><div class="kpi-value">22</div><div class="kpi-trend up">tempo médio: 18h</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="file-x" class="w-5 h-5"></i></div><div class="kpi-label">Cancelados</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">1.5% taxa</div></div>
     </div>
 
     <div class="tabs">

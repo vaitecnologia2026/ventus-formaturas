@@ -7,112 +7,235 @@
 <meta name="theme-color" content="#0A2540">
 
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Check-in ao vivo — Ventus</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<style>
+  /* ===== Cabeçalho da página (padrão admin, igual dashboard) ===== */
+  .page-head { display:flex; align-items:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+  .page-head .chip { width:52px; height:52px; border-radius:15px; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--primary-500),var(--primary-700)); color:#fff; box-shadow:0 8px 20px -8px rgba(37,99,235,.6); }
+  .page-head .chip svg { width:26px; height:26px; }
+  .page-head .ph-txt { min-width:0; }
+  .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
+  .page-head .actions { margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; }
+  /* Badge "AO VIVO" verde com pontinho pulsante */
+  .badge-live { display:inline-flex; align-items:center; gap:7px; padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.03em; background:var(--success-bg); color:var(--success-fg); }
+
+  /* ===== KPIs (padrão dashboard: 4 → 2 → 1, fileira sempre cheia) ===== */
+  .kpis { display:grid; gap:16px; margin-bottom:20px; grid-template-columns:repeat(4,1fr); }
+  @media (max-width:1024px){ .kpis { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:640px){ .kpis { grid-template-columns:1fr; } }
+  .kpi { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:18px 20px; box-shadow:var(--shadow-sm); }
+  .kpi .top { display:flex; align-items:center; justify-content:space-between; }
+  .kpi .ic { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:var(--primary-50); color:var(--primary-700); }
+  .kpi .l { font-size:12.5px; color:var(--gray-500); font-weight:600; margin-top:12px; }
+  .kpi .v { font-size:30px; font-weight:800; letter-spacing:-.02em; color:var(--gray-900); margin-top:2px; }
+  .kpi .s { font-size:12px; color:var(--gray-400); margin-top:2px; }
+  .kpi.verde .ic{background:var(--success-bg);color:#16A34A;} .kpi.verde .v{color:#16A34A;}
+  .kpi.laranja .ic{background:var(--warning-bg);color:#D97706;} .kpi.laranja .v{color:#D97706;}
+
+  /* ===== Corpo em 2 colunas (2fr 1fr → 1fr no mobile) ===== */
+  .cols { display:grid; grid-template-columns:2fr 1fr; gap:18px; align-items:start; }
+  .col { display:flex; flex-direction:column; gap:18px; min-width:0; }
+  @media (max-width:900px){ .cols{grid-template-columns:1fr;} }
+
+  /* Painéis (mesmos tokens do dashboard) */
+  .panel { background:var(--surface); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+  .panel-head { padding:15px 20px; border-bottom:1px solid var(--gray-100); font-size:14.5px; font-weight:700; color:var(--gray-900); display:flex; align-items:center; justify-content:space-between; gap:9px; }
+  .panel-head .ph-l { display:flex; align-items:center; gap:9px; }
+  .panel-body { padding:20px; }
+
+  /* Tabela de últimos check-ins */
+  table.tbl { width:100%; border-collapse:collapse; font-size:14px; }
+  table.tbl td { padding:13px 20px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); vertical-align:middle; }
+  table.tbl tr:last-child td { border-bottom:none; }
+  table.tbl tbody tr:hover td { background:var(--gray-50); }
+  table.tbl td.nome { font-weight:600; color:var(--gray-900); }
+  table.tbl td.nome small { display:block; font-size:12px; color:var(--gray-400); font-weight:400; margin-top:2px; }
+  table.tbl td.cat { text-align:right; white-space:nowrap; }
+  table.tbl td.hora { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; font-size:13px; color:var(--gray-500); }
+  table.tbl td.hora.ok { color:#16A34A; font-weight:600; } table.tbl td.hora.err { color:var(--danger); font-weight:600; }
+
+  /* Distribuição por categoria — barras com token de cor */
+  .dist { display:flex; flex-direction:column; gap:14px; }
+  .dist-row .dist-top { display:flex; align-items:center; justify-content:space-between; font-size:13.5px; color:var(--gray-600); margin-bottom:6px; }
+  .dist-row .dist-top b { color:var(--gray-900); font-variant-numeric:tabular-nums; }
+  .dist-bar { height:7px; background:var(--gray-100); border-radius:999px; overflow:hidden; }
+  .dist-bar > span { display:block; height:100%; border-radius:999px; }
+
+  /* Pontos de acesso — lista com status */
+  .pop { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--gray-100); font-size:14px; }
+  .pop:last-child{ border-bottom:none; }
+  .pop .n { font-weight:600; color:var(--gray-700); display:flex; align-items:center; gap:9px; }
+  .pop .n svg { width:16px; height:16px; color:var(--gray-400); flex:none; }
+  .pop .b { font-size:12px; font-weight:700; color:var(--success-fg); background:var(--success-bg); padding:4px 11px; border-radius:999px; white-space:nowrap; }
+
+  /* Responsivo — mesmos ajustes do dashboard */
+  @media (max-width:640px){
+    .app-content{padding:16px;}
+    .page-head{gap:12px;margin-bottom:18px;} .page-head .chip{width:44px;height:44px;border-radius:13px;} .page-head .chip svg{width:22px;height:22px;} .page-head h1{font-size:20px;}
+    .page-head .actions{width:100%;} .page-head .actions .btn{flex:1;justify-content:center;}
+    .kpis{gap:12px;} .kpi{padding:14px 16px;} .kpi .v{font-size:24px;}
+    .panel-head{padding:14px 16px;} .panel-body{padding:16px;}
+    table.tbl td{padding:11px 14px;}
+  }
+</style>
 </head>
 <body>
 <aside id="admin-sidebar" class="sidebar"></aside>
 
 <div class="app-shell">
   <header class="topbar">
-    <div class="flex items-center gap-3" style="flex:1;">
-      <strong>BAILE + AFTER · MEDICINA T84 - UNIMONTES</strong>
-      <span class="badge badge-info">Em andamento</span>
-    </div>
-    <div class="flex gap-2 items-center">
-      <span class="live-dot"></span>
-      <span class="text-sm" style="color:var(--success);font-weight:600;">AO VIVO</span>
-    </div>
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" placeholder="Buscar convidado, categoria, formando…"></div>
   </header>
 
-  <main class="app-content" style="background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%); margin:-28px -32px 0; padding: 28px 32px; min-height:calc(100vh - 64px); color:white;">
+  <main class="app-content">
 
-    <div class="grid gap-6 mb-6" style="grid-template-columns: 2fr 1fr;">
-      <div>
-        <div class="text-sm" style="opacity:.6;">Espaço Ventus · 22/04/2026 · 21:30</div>
-        <h1 class="text-3xl font-bold mt-1">Check-in ao vivo</h1>
+    <!-- Cabeçalho da página -->
+    <div class="page-head">
+      <div class="chip"><i data-lucide="scan-line"></i></div>
+      <div class="ph-txt">
+        <h1>Check-in ao vivo <span class="badge-live"><span class="live-dot"></span> AO VIVO</span></h1>
+        <p>Baile + After · Medicina T84 — Unimontes · Espaço Ventus · 22/04/2026 · 21:30</p>
       </div>
-      <div class="flex gap-2">
-        <button class="btn" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);"><i data-lucide="printer" class="w-4 h-4"></i> Status impressora</button>
-        <button class="btn" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+      <div class="actions">
+        <button class="btn btn-secondary"><i data-lucide="printer" class="w-4 h-4"></i> Status impressora</button>
+        <button class="btn btn-secondary"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
       </div>
     </div>
 
     <!-- KPIs ao vivo -->
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:24px;backdrop-filter:blur(20px);">
-        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;">Convidados</div>
-        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;">418</div>
+    <div class="kpis">
+      <div class="kpi">
+        <div class="top"><div class="ic"><i data-lucide="users-round"></i></div></div>
+        <div class="l">Convidados / Capacidade</div>
+        <div class="v">418</div>
+        <div class="s">capacidade do espaço: 450</div>
       </div>
-      <div style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:14px;padding:24px;">
-        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#6EE7B7;">Já entraram</div>
-        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#A7F3D0;">317</div>
-        <div style="font-size:11px;opacity:.7;margin-top:4px;">76% do total</div>
+      <div class="kpi verde">
+        <div class="top"><div class="ic"><i data-lucide="user-check"></i></div></div>
+        <div class="l">Check-ins realizados</div>
+        <div class="v">317</div>
+        <div class="s">76% dos convidados</div>
       </div>
-      <div style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:14px;padding:24px;">
-        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#FCD34D;">Confirmados pendentes</div>
-        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#FDE68A;">68</div>
+      <div class="kpi">
+        <div class="top"><div class="ic"><i data-lucide="badge-check"></i></div></div>
+        <div class="l">Confirmados na porta</div>
+        <div class="v">314</div>
+        <div class="s">QR válido lido</div>
       </div>
-      <div style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:14px;padding:24px;">
-        <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.7;color:#FCA5A5;">Negados</div>
-        <div style="font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;color:#FECACA;">3</div>
-        <div style="font-size:11px;opacity:.7;margin-top:4px;">QR já usado</div>
+      <div class="kpi laranja">
+        <div class="top"><div class="ic"><i data-lucide="clock"></i></div></div>
+        <div class="l">Pendentes</div>
+        <div class="v">68</div>
+        <div class="s">confirmados que ainda não entraram</div>
       </div>
     </div>
 
-    <div class="grid gap-6" style="grid-template-columns: 2fr 1fr;">
-      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:0;backdrop-filter:blur(20px);overflow:hidden;">
-        <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.08);" class="flex justify-between items-center">
-          <strong style="font-size:15px;">Últimos check-ins</strong>
-          <span class="live-dot"></span>
+    <!-- Corpo em 2 colunas -->
+    <div class="cols">
+      <!-- Esquerda: últimos check-ins -->
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="ph-l"><i data-lucide="list" style="width:17px;height:17px;color:var(--primary-600);"></i> Últimos check-ins</span>
+            <span class="badge badge-success"><span class="live-dot"></span> Tempo real</span>
+          </div>
+          <table class="tbl">
+            <tbody>
+              <tr>
+                <td class="nome">Marcos Silva<small>Convidado · Camila Almeida</small></td>
+                <td class="cat"><span class="badge badge-info">Comum</span></td>
+                <td class="hora ok">há 2s</td>
+              </tr>
+              <tr>
+                <td class="nome">Ana Paula Mendes<small>Familiar · Pedro Henrique</small></td>
+                <td class="cat"><span class="badge badge-warning">VIP</span></td>
+                <td class="hora ok">há 14s</td>
+              </tr>
+              <tr>
+                <td class="nome">Luis Augusto<small>Imprensa</small></td>
+                <td class="cat"><span class="badge">Imprensa</span></td>
+                <td class="hora ok">há 32s</td>
+              </tr>
+              <tr>
+                <td class="nome">Júlia Ribeiro<small>Comissão · representante</small></td>
+                <td class="cat"><span class="badge badge-danger">Comissão</span></td>
+                <td class="hora ok">há 1min</td>
+              </tr>
+              <tr>
+                <td class="nome">Fernanda Costa<small>Familiar · Júlia Ribeiro</small></td>
+                <td class="cat"><span class="badge badge-info">Comum</span></td>
+                <td class="hora ok">há 1min</td>
+              </tr>
+              <tr>
+                <td class="nome">Roberto Almeida<small>Familiar · Camila Almeida</small></td>
+                <td class="cat"><span class="badge badge-info">Comum</span></td>
+                <td class="hora ok">há 2min</td>
+              </tr>
+              <tr>
+                <td class="nome">Tentativa não autorizada<small>QR já usado · 10:23</small></td>
+                <td class="cat"><span class="badge badge-danger">Negado</span></td>
+                <td class="hora err">há 3min</td>
+              </tr>
+              <tr>
+                <td class="nome">Carlos Eduardo Lima<small>Funcionário · Ventus</small></td>
+                <td class="cat"><span class="badge badge-success">Funcionário</span></td>
+                <td class="hora ok">há 4min</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <table style="width:100%;">
-          <tbody style="font-size:14px;">
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Marcos Silva</strong><div style="font-size:12px;opacity:.5;">convidado · Camila Almeida</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 2s</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Ana Paula Mendes</strong><div style="font-size:12px;opacity:.5;">familiar · Pedro Henrique</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-vip" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">VIP</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 14s</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Luis Augusto</strong><div style="font-size:12px;opacity:.5;">imprensa</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-imprensa" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">IMPRENSA</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 32s</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Júlia Ribeiro</strong><div style="font-size:12px;opacity:.5;">comissão · representante</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comissao" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMISSÃO</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 1min</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Fernanda Costa</strong><div style="font-size:12px;opacity:.5;">familiar · Júlia Ribeiro</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 1min</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Roberto Almeida</strong><div style="font-size:12px;opacity:.5;">familiar · Camila Almeida</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-comum" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">COMUM</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 2min</td></tr>
-            <tr><td style="padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.04);"><strong>Tentativa não autorizada</strong><div style="font-size:12px;opacity:.5;">QR já usado · 10:23</div></td><td style="padding:14px 22px;text-align:right;"></td><td style="padding:14px 22px;text-align:right;color:#FCA5A5;font-size:13px;">há 3min</td></tr>
-            <tr><td style="padding:14px 22px;"><strong>Carlos Eduardo Lima</strong><div style="font-size:12px;opacity:.5;">funcionário · Ventus</div></td><td style="padding:14px 22px;text-align:right;"><span class="band-funcionario" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">FUNC.</span></td><td style="padding:14px 22px;text-align:right;color:#86EFAC;font-size:13px;">há 4min</td></tr>
-          </tbody>
-        </table>
       </div>
 
-      <div>
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;backdrop-filter:blur(20px);margin-bottom:16px;">
-          <strong>Distribuição por categoria</strong>
-          <div style="margin-top:16px;">
-            <div class="flex justify-between mb-1" style="font-size:13px;"><span>VIP</span><strong>42</strong></div>
-            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:50%;height:100%;background:#FBBF24;"></div></div>
-            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Comum</span><strong>248</strong></div>
-            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:78%;height:100%;background:#2563EB;"></div></div>
-            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Comissão</span><strong>14</strong></div>
-            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:60%;height:100%;background:#DC2626;"></div></div>
-            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Imprensa</span><strong>8</strong></div>
-            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:80%;height:100%;background:#6B7280;"></div></div>
-            <div class="flex justify-between mb-1 mt-3" style="font-size:13px;"><span>Funcionário</span><strong>5</strong></div>
-            <div style="height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:90%;height:100%;background:#10B981;"></div></div>
+      <!-- Direita: distribuição + pontos de acesso -->
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><span class="ph-l"><i data-lucide="pie-chart" style="width:17px;height:17px;color:var(--primary-600);"></i> Distribuição por categoria</span></div>
+          <div class="panel-body">
+            <div class="dist">
+              <div class="dist-row">
+                <div class="dist-top"><span>VIP</span><b>42</b></div>
+                <div class="dist-bar"><span style="width:50%;background:var(--band-vip);"></span></div>
+              </div>
+              <div class="dist-row">
+                <div class="dist-top"><span>Comum</span><b>248</b></div>
+                <div class="dist-bar"><span style="width:78%;background:var(--band-comum);"></span></div>
+              </div>
+              <div class="dist-row">
+                <div class="dist-top"><span>Comissão</span><b>14</b></div>
+                <div class="dist-bar"><span style="width:28%;background:var(--band-comissao);"></span></div>
+              </div>
+              <div class="dist-row">
+                <div class="dist-top"><span>Imprensa</span><b>8</b></div>
+                <div class="dist-bar"><span style="width:16%;background:var(--gray-400);"></span></div>
+              </div>
+              <div class="dist-row">
+                <div class="dist-top"><span>Funcionário</span><b>5</b></div>
+                <div class="dist-bar"><span style="width:10%;background:var(--success);"></span></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;backdrop-filter:blur(20px);">
-          <strong>Pontos de acesso</strong>
-          <div style="margin-top:16px;">
-            <div class="flex justify-between" style="padding:8px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);">
-              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Portaria principal</span>
-              <strong style="color:#86EFAC;">218 entradas</strong>
+        <div class="panel">
+          <div class="panel-head"><span class="ph-l"><i data-lucide="door-open" style="width:17px;height:17px;color:var(--primary-600);"></i> Pontos de acesso</span></div>
+          <div class="panel-body">
+            <div class="pop">
+              <span class="n"><i data-lucide="qr-code"></i> Portaria principal</span>
+              <span class="b">218 entradas</span>
             </div>
-            <div class="flex justify-between" style="padding:8px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);">
-              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Portaria lateral</span>
-              <strong style="color:#86EFAC;">88 entradas</strong>
+            <div class="pop">
+              <span class="n"><i data-lucide="qr-code"></i> Portaria lateral</span>
+              <span class="b">88 entradas</span>
             </div>
-            <div class="flex justify-between" style="padding:8px 0;font-size:13px;">
-              <span><i data-lucide="qr-code" class="inline w-4 h-4 mr-1"></i> Acesso VIP</span>
-              <strong style="color:#86EFAC;">11 entradas</strong>
+            <div class="pop">
+              <span class="n"><i data-lucide="qr-code"></i> Acesso VIP</span>
+              <span class="b">11 entradas</span>
             </div>
           </div>
         </div>
@@ -120,8 +243,8 @@
     </div>
   </main>
 </div>
-<script>lucide.createIcons();</script>
 
 <script src="../assets/js/app.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>

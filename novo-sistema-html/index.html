@@ -1397,7 +1397,10 @@
     if (ok) {
       showHub();
     } else {
-      showGate();
+      // Código de acesso removido — vai direto para a tela de login normal.
+      window.location.replace('/admin/login.html');
+      return;
+      // (código legado do gate abaixo — desativado)
       // Listener do form
       let gateBusy = false;
       document.getElementById('gate-form').addEventListener('submit', async (e) => {

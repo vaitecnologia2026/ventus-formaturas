@@ -9,6 +9,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Configurações — Ventus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 </head>
@@ -166,9 +167,66 @@
         </div>
       </div>
     </div>
+
+    <!-- Numeração de contratos -->
+    <div class="card mt-6">
+      <div class="card-header"><div class="card-title">Numeração de contratos</div></div>
+      <div class="card-body">
+        <div style="max-width:520px;">
+          <label class="label" for="nr-contrato-inicial">Número inicial do contrato</label>
+          <div class="flex items-center gap-3">
+            <input class="input" id="nr-contrato-inicial" type="number" min="1" step="1" inputmode="numeric" placeholder="Automático (001)" style="width:180px;">
+            <button class="btn btn-primary" id="btn-salvar-nr-contrato">Salvar</button>
+          </div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:10px;">
+            Os contratos passam a ser gerados a partir deste número (ex.: 100 → 100/2026F, 101/2026F…). Deixe em branco para automático (começa em 001).
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 <script>lucide.createIcons();</script>
+
+<script>
+/* ================== Numeração de contratos ================== */
+(function () {
+  var CHAVE = 'nr_contrato_inicial';
+  var input = document.getElementById('nr-contrato-inicial');
+  var btn = document.getElementById('btn-salvar-nr-contrato');
+  if (!input || !btn) return;
+
+  function feedback(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+    else alert(msg);
+  }
+
+  // Carrega o valor atual ao abrir a página
+  fetch(apiUrl('/api/config/' + CHAVE))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (data && data.valor != null) input.value = data.valor;
+    })
+    .catch(function () { /* silencioso: mantém input vazio */ });
+
+  // Salva ao clicar
+  btn.addEventListener('click', function () {
+    var valor = (input.value || '').trim();
+    btn.disabled = true;
+    fetch(apiUrl('/api/config/' + CHAVE), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valor: valor })
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('falha');
+        feedback('Salvo');
+      })
+      .catch(function () { feedback('Erro ao salvar. Tente novamente.'); })
+      .finally(function () { btn.disabled = false; });
+  });
+})();
+</script>
 
 <script src="../assets/js/app.js"></script>
 </body>

@@ -12,6 +12,21 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
+<style>
+  @keyframes scan { 0%{top:calc(50% - 140px);} 100%{top:calc(50% + 140px);} }
+  .ck-select{background:#0F172A;color:white;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px;font-size:14px;width:100%;}
+  .ck-search{background:#0F172A;color:white;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px 10px 38px;font-size:14px;width:100%;}
+  .ck-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.05);}
+  .ck-row.on{background:rgba(22,163,74,.12);border-color:rgba(34,197,94,.35);}
+  .ck-toggle{border:none;cursor:pointer;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:.15s;}
+  .ck-toggle.absent{background:rgba(255,255,255,.10);color:rgba(255,255,255,.85);}
+  .ck-toggle.absent:hover{background:rgba(255,255,255,.18);}
+  .ck-toggle.present{background:#16A34A;color:white;}
+  .ck-toggle.present:hover{background:#15803D;}
+  .ck-toggle:disabled{opacity:.5;cursor:wait;}
+  .ck-empty{text-align:center;padding:48px 20px;opacity:.7;}
+</style>
 </head>
 <body style="background:#0F172A;color:white;height:100vh;overflow:hidden;">
 
@@ -20,113 +35,332 @@
   <!-- Header tablet -->
   <header style="background:#1E293B;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);">
     <div class="flex items-center gap-3">
-      <div style="width:36px;height:36px;border-radius:10px;background:white;color:var(--primary-900);display:grid;place-items:center;font-weight:800;">V</div>
+      <div style="width:36px;height:36px;border-radius:10px;background:transparent;display:grid;place-items:center;overflow:hidden;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div>
       <div>
-        <strong style="font-size:14px;">BAILE + AFTER · MEDICINA T84</strong>
-        <div style="font-size:11px;opacity:.6;">Espaço Ventus · Portaria principal</div>
+        <strong id="hdrEvento" style="font-size:14px;">CHECK-IN DE FORMANDOS</strong>
+        <div id="hdrLocal" style="font-size:11px;opacity:.6;">Selecione um evento para começar</div>
       </div>
     </div>
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2"><span class="live-dot"></span><span style="font-size:13px;color:#86EFAC;font-weight:600;">ONLINE</span></div>
-      <div style="font-size:13px;opacity:.7;">Operador: Carlos Lima</div>
+      <div style="font-size:13px;opacity:.7;">Operador</div>
       <a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="x" class="w-5 h-5"></i></a>
     </div>
   </header>
 
-  <!-- Body principal: 2 colunas (câmera + último check-in) -->
+  <!-- Body principal: 2 colunas (lista de formandos + resumo) -->
   <div style="flex:1;display:grid;grid-template-columns:2fr 1fr;gap:0;overflow:hidden;">
 
-    <!-- Câmera -->
-    <div style="background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:40px;">
-      <div style="position:absolute;inset:40px;border:2px solid rgba(255,255,255,.2);border-radius:24px;">
-        <!-- Marcador QR -->
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:280px;border:3px solid var(--primary-600);border-radius:20px;"></div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:280px;background:linear-gradient(180deg,transparent,var(--primary-500),transparent);height:3px;animation:scan 2s linear infinite;"></div>
-        <style>@keyframes scan { 0%{top:calc(50% - 140px);} 100%{top:calc(50% + 140px);} }</style>
+    <!-- Coluna esquerda: seletor + busca + lista -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;">
+
+      <!-- Barra de controles -->
+      <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Evento</label>
+          <select id="selEvento" class="ck-select">
+            <option value="">Carregando eventos…</option>
+          </select>
+        </div>
+        <div style="position:relative;">
+          <i data-lucide="search" class="w-4 h-4" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;"></i>
+          <input id="busca" class="ck-search" type="text" placeholder="Buscar formando por nome…" autocomplete="off" disabled>
+        </div>
       </div>
-      <div style="position:absolute;top:64px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:8px 16px;border-radius:999px;font-size:13px;backdrop-filter:blur(8px);">
-        <i data-lucide="qr-code" class="inline w-4 h-4"></i> Aproxime o QR da pulseira
-      </div>
-      <div style="position:absolute;bottom:64px;left:50%;transform:translateX(-50%);text-align:center;">
-        <button class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.2);"><i data-lucide="search" class="w-4 h-4"></i> Buscar manualmente</button>
+
+      <!-- Lista de formandos -->
+      <div id="lista" style="flex:1;padding:18px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+        <div class="ck-empty">
+          <i data-lucide="users" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i>
+          <div>Escolha um evento no seletor acima.</div>
+        </div>
       </div>
     </div>
 
-    <!-- Painel direito -->
+    <!-- Painel direito: resumo -->
     <div style="background:#1E293B;display:flex;flex-direction:column;">
 
-      <!-- Último check-in (sucesso) -->
-      <div style="background:linear-gradient(135deg,#16A34A,#15803D);padding:32px 24px;text-align:center;">
+      <!-- Último check-in -->
+      <div id="ultimoCheckin" style="background:linear-gradient(135deg,#16A34A,#15803D);padding:32px 24px;text-align:center;display:none;">
         <div style="display:inline-flex;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.2);align-items:center;justify-content:center;margin-bottom:12px;">
           <i data-lucide="check" class="w-8 h-8" style="stroke-width:3;"></i>
         </div>
-        <div style="font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.06em;">VALIDADO</div>
-        <strong style="font-size:24px;display:block;margin-top:6px;letter-spacing:-0.01em;">Marcos Silva</strong>
-        <div style="font-size:13px;opacity:.85;margin-top:4px;">Convidado de Camila Almeida</div>
-        <span class="band-comum" style="display:inline-block;margin-top:12px;padding:6px 16px;border-radius:999px;font-size:13px;font-weight:700;">PULSEIRA COMUM</span>
-        <div style="font-size:11px;opacity:.7;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <i data-lucide="printer" class="w-3 h-3"></i> Pulseira impressa em 1,8s
+        <div style="font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.06em;">PRESENÇA CONFIRMADA</div>
+        <strong id="ucNome" style="font-size:24px;display:block;margin-top:6px;letter-spacing:-0.01em;">—</strong>
+        <div id="ucCurso" style="font-size:13px;opacity:.85;margin-top:4px;">—</div>
+        <div id="ucHora" style="font-size:11px;opacity:.7;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <i data-lucide="clock" class="w-3 h-3"></i> <span></span>
         </div>
+      </div>
+      <!-- Placeholder quando nada selecionado -->
+      <div id="resumoVazio" style="background:rgba(255,255,255,.03);padding:32px 24px;text-align:center;">
+        <i data-lucide="clipboard-check" class="w-8 h-8" style="opacity:.4;margin:0 auto 10px;"></i>
+        <div style="font-size:13px;opacity:.6;">O resumo do evento aparece aqui.</div>
       </div>
 
       <!-- KPIs ao vivo -->
       <div style="padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);">
         <div class="grid grid-cols-2 gap-3 text-center">
           <div style="background:rgba(255,255,255,.04);padding:14px;border-radius:10px;">
-            <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Entraram</div>
-            <div style="font-size:24px;font-weight:800;color:#86EFAC;letter-spacing:-0.02em;margin-top:2px;">218</div>
+            <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Presentes</div>
+            <div id="kpiPresentes" style="font-size:24px;font-weight:800;color:#86EFAC;letter-spacing:-0.02em;margin-top:2px;">—</div>
           </div>
           <div style="background:rgba(255,255,255,.04);padding:14px;border-radius:10px;">
-            <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Pendentes</div>
-            <div style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;">82</div>
+            <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;">Ausentes</div>
+            <div id="kpiAusentes" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;">—</div>
           </div>
         </div>
         <div class="flex justify-between mt-3" style="font-size:13px;">
-          <span style="opacity:.7;">Total esperado:</span>
-          <strong>300 convidados</strong>
+          <span style="opacity:.7;">Total de formandos:</span>
+          <strong id="kpiTotal">—</strong>
         </div>
       </div>
 
-      <!-- Históricos -->
+      <!-- Últimos check-ins -->
       <div style="flex:1;padding:20px 24px;overflow-y:auto;">
         <div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Últimos check-ins</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="flex items-center gap-3" style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;">
-            <i data-lucide="check-circle" class="w-5 h-5" style="color:#86EFAC;flex-shrink:0;"></i>
-            <div style="flex:1;font-size:13px;"><strong>Ana Paula Mendes</strong> <span style="opacity:.6;font-size:11px;">há 32s</span></div>
-            <span class="band-vip" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;">VIP</span>
-          </div>
-          <div class="flex items-center gap-3" style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;">
-            <i data-lucide="check-circle" class="w-5 h-5" style="color:#86EFAC;flex-shrink:0;"></i>
-            <div style="flex:1;font-size:13px;"><strong>Luis Augusto</strong> <span style="opacity:.6;font-size:11px;">há 1min</span></div>
-            <span class="band-imprensa" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;">IMPRENSA</span>
-          </div>
-          <div class="flex items-center gap-3" style="padding:10px;background:rgba(220,38,38,.1);border-radius:8px;">
-            <i data-lucide="x-circle" class="w-5 h-5" style="color:#FCA5A5;flex-shrink:0;"></i>
-            <div style="flex:1;font-size:13px;"><strong style="color:#FECACA;">QR já usado</strong> <span style="opacity:.6;font-size:11px;">há 2min</span></div>
-          </div>
-          <div class="flex items-center gap-3" style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;">
-            <i data-lucide="check-circle" class="w-5 h-5" style="color:#86EFAC;flex-shrink:0;"></i>
-            <div style="flex:1;font-size:13px;"><strong>Júlia Ribeiro</strong> <span style="opacity:.6;font-size:11px;">há 3min</span></div>
-            <span class="band-comissao" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;">COMISSÃO</span>
-          </div>
+        <div id="historico" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:13px;opacity:.5;">Nenhum check-in ainda.</div>
         </div>
       </div>
 
       <!-- Footer -->
       <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,.06);background:#0F172A;display:flex;justify-content:space-between;align-items:center;">
         <div class="flex items-center gap-2" style="font-size:11px;opacity:.6;">
-          <i data-lucide="printer" class="w-3 h-3"></i> Zebra ZD510 · OK
+          <i data-lucide="clipboard-list" class="w-3 h-3"></i> Check-in manual
         </div>
         <div class="flex items-center gap-2" style="font-size:11px;opacity:.6;">
-          <i data-lucide="wifi" class="w-3 h-3"></i> Modo offline pronto
+          <i data-lucide="wifi" class="w-3 h-3"></i> Ventus Operador
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+const $ = id => document.getElementById(id);
+let opcoes = null;      // {turmas, eventos}
+let eventoAtual = null; // objeto evento
+let itens = [];         // formandos do evento atual
+let historico = [];     // últimos check-ins (client-side)
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function fmtData(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d)) return '';
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+function fmtHora(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d)) return '';
+  return d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+async function carregarOpcoes(){
+  try{
+    const r = await fetch(apiUrl('/api/checkin/opcoes'));
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    opcoes = await r.json();
+  }catch(err){
+    $('selEvento').innerHTML = '<option value="">Erro ao carregar</option>';
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="wifi-off" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Não foi possível carregar os eventos.<br><span style="opacity:.7;font-size:13px;">Verifique a conexão e recarregue a página.</span></div></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  const eventos = (opcoes && opcoes.eventos) || [];
+  const turmas = {};
+  ((opcoes && opcoes.turmas) || []).forEach(t => turmas[t.id] = t.nome);
+
+  if(!eventos.length){
+    $('selEvento').innerHTML = '<option value="">Nenhum evento cadastrado</option>';
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="calendar-plus" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Nenhum evento cadastrado ainda.<br><span style="opacity:.7;font-size:13px;">Cadastre um evento no painel administrativo para liberar o check-in.</span></div></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  let html = '<option value="">Selecione um evento…</option>';
+  eventos.forEach(ev => {
+    const turma = turmas[ev.turma_id] ? ' · ' + turmas[ev.turma_id] : '';
+    const data = ev.data ? ' · ' + fmtData(ev.data) : '';
+    html += `<option value="${esc(ev.id)}">${esc(ev.nome)}${esc(turma)}${esc(data)}</option>`;
+  });
+  $('selEvento').innerHTML = html;
+
+  // Pré-seleção via ?evento=<id>
+  const params = new URLSearchParams(location.search);
+  const preId = params.get('evento');
+  if(preId && eventos.some(ev => String(ev.id) === String(preId))){
+    $('selEvento').value = preId;
+    carregarEvento(preId);
+  }
+}
+
+async function carregarEvento(id){
+  if(!id){
+    eventoAtual = null; itens = []; historico = [];
+    $('hdrEvento').textContent = 'CHECK-IN DE FORMANDOS';
+    $('hdrLocal').textContent = 'Selecione um evento para começar';
+    $('busca').disabled = true; $('busca').value = '';
+    $('resumoVazio').style.display = 'block';
+    $('ultimoCheckin').style.display = 'none';
+    $('kpiPresentes').textContent = $('kpiAusentes').textContent = $('kpiTotal').textContent = '—';
+    $('historico').innerHTML = '<div style="font-size:13px;opacity:.5;">Nenhum check-in ainda.</div>';
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="users" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Escolha um evento no seletor acima.</div></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="loader" class="w-8 h-8" style="opacity:.5;margin:0 auto 12px;"></i><div>Carregando formandos…</div></div>`;
+  lucide.createIcons();
+
+  let data;
+  try{
+    const r = await fetch(apiUrl('/api/checkin/' + encodeURIComponent(id)));
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    data = await r.json();
+  }catch(err){
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="alert-triangle" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Não foi possível carregar este evento.<br><span style="opacity:.7;font-size:13px;">Tente selecionar novamente.</span></div></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  eventoAtual = data.evento || {id};
+  itens = data.itens || [];
+  historico = itens.filter(i => i.presente && i.checkin_em)
+                   .sort((a,b)=> new Date(b.checkin_em) - new Date(a.checkin_em));
+
+  const turmaNome = (opcoes.turmas || []).find(t => String(t.id) === String(eventoAtual.turma_id));
+  $('hdrEvento').textContent = (eventoAtual.nome || 'Evento').toUpperCase();
+  $('hdrLocal').textContent = [eventoAtual.local, turmaNome ? turmaNome.nome : '', fmtData(eventoAtual.data)].filter(Boolean).join(' · ') || 'Check-in de formandos';
+
+  $('busca').disabled = false;
+  $('resumoVazio').style.display = 'none';
+
+  atualizarContadores(data.total, data.presentes, data.ausentes);
+  renderLista();
+  renderHistorico();
+}
+
+function atualizarContadores(total, presentes, ausentes){
+  // Se vier do servidor usa; senão calcula a partir dos itens.
+  if(total == null) total = itens.length;
+  if(presentes == null) presentes = itens.filter(i=>i.presente).length;
+  if(ausentes == null) ausentes = total - presentes;
+  $('kpiTotal').textContent = total;
+  $('kpiPresentes').textContent = presentes;
+  $('kpiAusentes').textContent = ausentes;
+}
+
+function recalcContadores(){
+  const presentes = itens.filter(i=>i.presente).length;
+  atualizarContadores(itens.length, presentes, itens.length - presentes);
+}
+
+function renderLista(){
+  const termo = $('busca').value.trim().toLowerCase();
+  const filtrados = termo ? itens.filter(i => (i.nome||'').toLowerCase().includes(termo)) : itens;
+
+  if(!itens.length){
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="user-x" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Este evento ainda não tem formandos vinculados.</div></div>`;
+    lucide.createIcons();
+    return;
+  }
+  if(!filtrados.length){
+    $('lista').innerHTML = `<div class="ck-empty"><i data-lucide="search-x" class="w-10 h-10" style="opacity:.4;margin:0 auto 12px;"></i><div>Nenhum formando encontrado para “${esc(termo)}”.</div></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  $('lista').innerHTML = filtrados.map(i => {
+    const on = !!i.presente;
+    const hora = on && i.checkin_em ? `<div style="font-size:11px;color:#86EFAC;margin-top:2px;display:flex;align-items:center;gap:4px;"><i data-lucide="clock" class="w-3 h-3"></i> ${esc(fmtHora(i.checkin_em))}</div>` : '';
+    return `<div class="ck-row ${on?'on':''}" data-aluno="${esc(i.aluno_id)}">
+      <div style="width:40px;height:40px;border-radius:50%;background:${on?'rgba(34,197,94,.2)':'rgba(255,255,255,.06)'};display:grid;place-items:center;flex-shrink:0;">
+        <i data-lucide="${on?'user-check':'user'}" class="w-5 h-5" style="color:${on?'#86EFAC':'rgba(255,255,255,.6)'};"></i>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <strong style="font-size:15px;">${esc(i.nome)}</strong>
+        <div style="font-size:12px;opacity:.6;">${esc(i.curso||'')}</div>
+        ${hora}
+      </div>
+      <button class="ck-toggle ${on?'present':'absent'}" data-aluno="${esc(i.aluno_id)}">
+        <i data-lucide="${on?'check':'plus'}" class="w-4 h-4"></i> ${on?'Presente':'Marcar'}
+      </button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+
+  $('lista').querySelectorAll('.ck-toggle').forEach(btn => {
+    btn.addEventListener('click', () => toggleAluno(btn.dataset.aluno, btn));
+  });
+}
+
+function renderHistorico(){
+  const recentes = historico.slice(0, 8);
+  if(!recentes.length){
+    $('historico').innerHTML = '<div style="font-size:13px;opacity:.5;">Nenhum check-in ainda.</div>';
+    return;
+  }
+  $('historico').innerHTML = recentes.map(i => `
+    <div class="flex items-center gap-3" style="padding:10px;background:rgba(255,255,255,.03);border-radius:8px;">
+      <i data-lucide="check-circle" class="w-5 h-5" style="color:#86EFAC;flex-shrink:0;"></i>
+      <div style="flex:1;font-size:13px;min-width:0;"><strong>${esc(i.nome)}</strong> <span style="opacity:.6;font-size:11px;">${esc(fmtHora(i.checkin_em))}</span></div>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+async function toggleAluno(alunoId, btn){
+  const item = itens.find(i => String(i.aluno_id) === String(alunoId));
+  if(!item) return;
+  const novoValor = !item.presente;
+  btn.disabled = true;
+
+  try{
+    const r = await fetch(apiUrl(`/api/checkin/${encodeURIComponent(eventoAtual.id)}/aluno/${encodeURIComponent(alunoId)}`), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({presente: novoValor})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const res = await r.json();
+
+    item.presente = (res.presente != null) ? !!res.presente : novoValor;
+    item.checkin_em = res.checkin_em != null ? res.checkin_em : (item.presente ? new Date().toISOString() : null);
+
+    // Atualiza histórico
+    historico = historico.filter(h => String(h.aluno_id) !== String(alunoId));
+    if(item.presente){
+      historico.unshift(item);
+      mostrarUltimo(item);
+    }
+    historico.sort((a,b)=> new Date(b.checkin_em) - new Date(a.checkin_em));
+
+    recalcContadores();
+    renderLista();
+    renderHistorico();
+  }catch(err){
+    btn.disabled = false;
+    alert('Não foi possível registrar o check-in. Tente novamente.');
+  }
+}
+
+function mostrarUltimo(item){
+  $('ultimoCheckin').style.display = 'block';
+  $('ucNome').textContent = item.nome || '—';
+  $('ucCurso').textContent = item.curso || '';
+  $('ucHora').querySelector('span').textContent = 'Check-in às ' + fmtHora(item.checkin_em);
+  lucide.createIcons();
+}
+
+$('selEvento').addEventListener('change', e => carregarEvento(e.target.value));
+$('busca').addEventListener('input', renderLista);
+
+carregarOpcoes();
+lucide.createIcons();
+</script>
 
 </body>
 </html>

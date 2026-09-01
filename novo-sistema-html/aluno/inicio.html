@@ -10,6 +10,7 @@
 <title>Início — Camila · Ventus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 </head>
@@ -18,24 +19,25 @@
 <div class="phone-frame">
   <div class="mobile-header">
     <div>
-      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Bem-vinda,</div>
-      <strong style="font-size:18px;">Camila Almeida</strong>
+      <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Bem-vindo(a),</div>
+      <strong style="font-size:18px;" id="hdr-nome">Carregando…</strong>
     </div>
     <div class="flex gap-3 items-center">
       <i data-lucide="bell" class="w-5 h-5" style="opacity:.8;"></i>
-      <div class="avatar" style="background:rgba(255,255,255,.18);">CA</div>
+      <div class="avatar" id="hdr-avatar" style="background:rgba(255,255,255,.18);">··</div>
     </div>
   </div>
 
-  <!-- Hero countdown -->
+  <!-- Hero -->
   <div style="background:linear-gradient(135deg,#1E3A8A,#7C3AED);color:white;padding:24px 20px 32px;text-align:center;">
     <div style="font-size:13px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Sua formatura</div>
-    <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin:0 0 4px;">MEDICINA T85 - UNIMONTES</h1>
-    <p style="font-size:14px;opacity:.8;margin:0 0 20px;">Colação oficial em 15 de Julho de 2026</p>
-    <div class="flex justify-center gap-3">
-      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;min-width:60px;"><div style="font-size:24px;font-weight:800;letter-spacing:-0.02em;">76</div><div style="font-size:10px;opacity:.7;text-transform:uppercase;">dias</div></div>
-      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;min-width:60px;"><div style="font-size:24px;font-weight:800;letter-spacing:-0.02em;">14</div><div style="font-size:10px;opacity:.7;text-transform:uppercase;">horas</div></div>
-      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;min-width:60px;"><div style="font-size:24px;font-weight:800;letter-spacing:-0.02em;">22</div><div style="font-size:10px;opacity:.7;text-transform:uppercase;">min</div></div>
+    <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin:0 0 4px;" id="hero-turma">…</h1>
+    <p style="font-size:14px;opacity:.8;margin:0;" id="hero-sub">Área do formando</p>
+    <div id="hero-comissao" class="flex justify-center gap-3" style="margin-top:16px;display:none;">
+      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px 18px;">
+        <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;">Comissão</div>
+        <div style="font-size:16px;font-weight:800;letter-spacing:-0.01em;margin-top:2px;" id="hero-cargo">—</div>
+      </div>
     </div>
   </div>
 
@@ -45,77 +47,109 @@
       <div class="grid grid-cols-3 gap-3 text-center">
         <div>
           <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Pago</div>
-          <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:2px;">R$ 1.458</div>
-          <div style="font-size:10px;color:var(--gray-500);">5/21 parcelas</div>
+          <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:2px;" id="qs-pago">—</div>
+          <div style="font-size:10px;color:var(--gray-500);" id="qs-parcelas">— parcelas</div>
         </div>
         <div style="border-left:1px solid var(--gray-200);border-right:1px solid var(--gray-200);">
           <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Fotos</div>
-          <div style="font-size:18px;font-weight:700;color:var(--primary-700);margin-top:2px;">42</div>
-          <div style="font-size:10px;color:var(--gray-500);">disponíveis</div>
+          <div style="font-size:18px;font-weight:700;color:var(--primary-700);margin-top:2px;" id="qs-fotos">—</div>
+          <div style="font-size:10px;color:var(--gray-500);">do plano</div>
         </div>
         <div>
-          <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Convidados</div>
-          <div style="font-size:18px;font-weight:700;margin-top:2px;color:#7C3AED;">3/8</div>
-          <div style="font-size:10px;color:var(--gray-500);">convidados</div>
+          <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Restante</div>
+          <div style="font-size:18px;font-weight:700;margin-top:2px;color:#7C3AED;" id="qs-restante">—</div>
+          <div style="font-size:10px;color:var(--gray-500);">a pagar</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Próximos eventos -->
-  <div style="padding:24px 20px 0;">
-    <div class="flex justify-between items-center mb-3">
-      <strong style="font-size:16px;color:var(--gray-900);">Próximos eventos</strong>
-      <a href="#" style="font-size:13px;color:var(--primary-600);text-decoration:none;font-weight:600;">Ver todos</a>
+  <!-- Estado de erro / sem id -->
+  <div id="estado-msg" style="display:none;padding:24px 20px 0;">
+    <div style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:20px;text-align:center;">
+      <div style="width:44px;height:44px;border-radius:12px;background:#FEF3C7;color:#92400E;display:grid;place-items:center;margin:0 auto 12px;"><i data-lucide="info"></i></div>
+      <strong style="display:block;color:var(--gray-900);margin-bottom:4px;" id="estado-titulo">Não foi possível carregar</strong>
+      <div style="font-size:13px;color:var(--gray-600);" id="estado-texto">Acesse pelo seu link ou pela página de login.</div>
     </div>
+  </div>
 
-    <a href="#" style="display:block;background:white;border-radius:14px;padding:16px;margin-bottom:12px;text-decoration:none;color:inherit;border:1px solid var(--gray-200);">
+  <!-- Card PLANO -->
+  <div id="card-plano" style="padding:24px 20px 0;display:none;">
+    <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:12px;">Meu plano</strong>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid var(--gray-200);">
       <div class="flex justify-between items-start">
         <div style="flex:1;">
-          <div style="font-size:11px;color:var(--primary-600);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">DAQUI A 6 DIAS</div>
-          <strong style="display:block;margin-top:4px;color:var(--gray-900);">BAILE + AFTER</strong>
-          <div style="font-size:13px;color:var(--gray-600);margin-top:2px;">Espaço Ventus · 03/05 · 21h</div>
+          <strong style="display:block;color:var(--gray-900);font-size:16px;" id="pl-nome">—</strong>
+          <div style="font-size:13px;color:var(--gray-600);margin-top:2px;" id="pl-tipo">—</div>
         </div>
-        <div style="background:#A855F7;color:white;border-radius:10px;padding:8px 12px;text-align:center;">
-          <div style="font-size:10px;opacity:.85;">MAI</div>
-          <div style="font-size:18px;font-weight:800;">03</div>
-        </div>
+        <div style="background:#EDE9FE;color:#7C3AED;border-radius:10px;padding:8px 12px;text-align:center;font-weight:800;font-size:15px;white-space:nowrap;" id="pl-valor">—</div>
       </div>
       <div class="divider" style="margin:12px 0 8px;"></div>
       <div class="flex justify-between" style="font-size:12px;">
-        <span style="color:var(--gray-600);">Convidados confirmados: <strong style="color:var(--gray-900);">2/8</strong></span>
-        <span style="color:var(--primary-600);font-weight:600;">Convidar →</span>
+        <span style="color:var(--gray-600);">Entrega: <strong style="color:var(--gray-900);" id="pl-entrega">—</strong></span>
+        <span style="color:var(--gray-600);" id="pl-fotos">—</span>
       </div>
-    </a>
+    </div>
+  </div>
 
-    <a href="#" style="display:block;background:white;border-radius:14px;padding:16px;margin-bottom:12px;text-decoration:none;color:inherit;border:1px solid var(--gray-200);">
-      <div class="flex justify-between items-start">
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--gray-500);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">EM 38 DIAS</div>
-          <strong style="display:block;margin-top:4px;color:var(--gray-900);">POSICIONAMENTO DE IMAGEM</strong>
-          <div style="font-size:13px;color:var(--gray-600);margin-top:2px;">Estúdio Ventus · 10/06 · 14h</div>
+  <!-- Card FINANCEIRO -->
+  <div id="card-financeiro" style="padding:24px 20px 0;display:none;">
+    <div class="flex justify-between items-center mb-3">
+      <strong style="font-size:16px;color:var(--gray-900);">Financeiro</strong>
+      <a href="pagamento.html" id="fin-link" style="font-size:13px;color:var(--primary-600);text-decoration:none;font-weight:600;">Ver pagamentos</a>
+    </div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid var(--gray-200);">
+      <div class="flex justify-between items-end mb-2">
+        <div>
+          <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Pago</div>
+          <div style="font-size:20px;font-weight:800;color:var(--success);letter-spacing:-0.02em;" id="fin-pago">—</div>
         </div>
-        <div style="background:#0EA5E9;color:white;border-radius:10px;padding:8px 12px;text-align:center;">
-          <div style="font-size:10px;opacity:.85;">JUN</div>
-          <div style="font-size:18px;font-weight:800;">10</div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;">Restante</div>
+          <div style="font-size:20px;font-weight:800;color:var(--gray-900);letter-spacing:-0.02em;" id="fin-restante">—</div>
         </div>
+      </div>
+      <div style="height:8px;background:var(--gray-200);border-radius:999px;overflow:hidden;">
+        <div id="fin-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#16A34A,#22C55E);border-radius:999px;transition:width .5s ease;"></div>
+      </div>
+      <div class="flex justify-between" style="font-size:12px;color:var(--gray-500);margin-top:6px;">
+        <span id="fin-total">Total: —</span>
+        <span id="fin-progresso">—</span>
+      </div>
+      <div id="fin-parcelas" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Card ENCARTE -->
+  <div id="card-encarte" style="padding:24px 20px 0;display:none;">
+    <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:12px;">Meu encarte</strong>
+    <a href="../encarte.html" id="encarte-box" style="display:block;background:white;border-radius:14px;padding:16px;text-decoration:none;color:inherit;border:1px solid var(--gray-200);">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div id="encarte-icon" style="width:40px;height:40px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;display:grid;place-items:center;flex:none;"><i data-lucide="book-image"></i></div>
+          <div>
+            <strong style="display:block;font-size:14px;color:var(--gray-900);" id="encarte-titulo">Preencher meu encarte</strong>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="encarte-sub">Dados que vão no seu álbum</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" style="color:var(--gray-400);"></i>
       </div>
     </a>
   </div>
 
   <!-- Atalhos -->
-  <div style="padding:16px 20px;">
+  <div id="card-atalhos" style="padding:16px 20px;display:none;">
     <strong style="font-size:16px;color:var(--gray-900);display:block;margin-bottom:12px;">Atalhos</strong>
     <div class="grid grid-cols-2 gap-3">
       <a href="galeria.html" style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:18px;text-decoration:none;color:inherit;">
         <div style="width:40px;height:40px;border-radius:10px;background:#EDE9FE;color:#7C3AED;display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="image"></i></div>
         <strong style="display:block;font-size:14px;">Minhas fotos</strong>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">42 prontas para selecionar</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="atalho-fotos">Galeria da turma</div>
       </a>
       <a href="pagamento.html" style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:18px;text-decoration:none;color:inherit;">
         <div style="width:40px;height:40px;border-radius:10px;background:#DCFCE7;color:#166534;display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="credit-card"></i></div>
         <strong style="display:block;font-size:14px;">Pagamento</strong>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Próx. parcela: 02/05</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="atalho-pagamento">Ver parcelas</div>
       </a>
       <a href="convidados.html" style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:18px;text-decoration:none;color:inherit;">
         <div style="width:40px;height:40px;border-radius:10px;background:#FEE2E2;color:#991B1B;display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="users"></i></div>
@@ -125,7 +159,7 @@
       <a href="contrato.html" style="background:white;border:1px solid var(--gray-200);border-radius:14px;padding:18px;text-decoration:none;color:inherit;">
         <div style="width:40px;height:40px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;display:grid;place-items:center;margin-bottom:10px;"><i data-lucide="file-text"></i></div>
         <strong style="display:block;font-size:14px;">Contrato</strong>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Pacote Ouro · assinado</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="atalho-contrato">Meu plano e assinatura</div>
       </a>
     </div>
   </div>
@@ -139,7 +173,151 @@
   <a href="#" class="bottom-nav-item"><i data-lucide="user"></i>Perfil</a>
 </nav>
 
-<script>lucide.createIcons();</script>
+<script>
+lucide.createIcons();
+
+const $ = s => document.querySelector(s);
+const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const iniciais = nome => (nome||'··').trim().split(/\s+/).slice(0,2).map(p=>p[0]||'').join('').toUpperCase() || '··';
+const dtBR = s => { if(!s) return null; const d=String(s).split('T')[0].split('-'); return d.length===3 ? `${d[2]}/${d[1]}/${d[0]}` : s; };
+
+// ---- Identificação do formando (login adiado) ----
+function resolverId(){
+  const q = new URLSearchParams(location.search).get('id');
+  if(q){ try{ localStorage.setItem('ventus.aluno_id', q); }catch(e){} return q; }
+  try{ return localStorage.getItem('ventus.aluno_id'); }catch(e){ return null; }
+}
+
+function mostrarEstado(titulo, texto){
+  const el = $('#estado-msg');
+  if(titulo) $('#estado-titulo').textContent = titulo;
+  if(texto) $('#estado-texto').textContent = texto;
+  el.style.display = 'block';
+  $('#hero-turma').textContent = 'Ventus Formaturas';
+  $('#hero-sub').textContent = 'Área do formando';
+  $('#hdr-nome').textContent = 'Olá!';
+  lucide.createIcons();
+}
+
+const ALUNO_ID = resolverId();
+
+if(!ALUNO_ID){
+  mostrarEstado('Acesse pelo seu link', 'Abra a área do formando pelo link que você recebeu ou pela página de login.');
+} else {
+  carregar(ALUNO_ID);
+}
+
+async function carregar(id){
+  let a;
+  try{
+    const r = await fetch(apiUrl('/api/aluno/'+encodeURIComponent(id)));
+    if(r.status === 404){ mostrarEstado('Formando não encontrado', 'Confira seu link de acesso ou fale com a comissão.'); return; }
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    a = await r.json();
+  }catch(e){
+    mostrarEstado('Não foi possível carregar', 'Verifique sua conexão e tente novamente.');
+    return;
+  }
+
+  // ---- Header + hero ----
+  const primeiro = (a.nome||'').trim().split(/\s+/)[0] || 'Formando(a)';
+  $('#hdr-nome').textContent = a.nome || 'Formando(a)';
+  $('#hdr-avatar').textContent = iniciais(a.nome);
+  $('#hero-turma').textContent = a.turma || 'Sua formatura';
+  $('#hero-sub').textContent = 'Olá, ' + primeiro + ' 👋';
+  if(a.cargo_comissao){
+    $('#hero-cargo').textContent = a.cargo_comissao;
+    $('#hero-comissao').style.display = 'flex';
+  }
+
+  // ---- Quick stats ----
+  const rp = a.resumo_pagamento || {};
+  $('#qs-pago').textContent = brl(rp.pago);
+  $('#qs-restante').textContent = brl(rp.restante);
+  $('#qs-fotos').textContent = (a.qt_fotos!=null && a.qt_fotos!=='') ? a.qt_fotos : '—';
+
+  // ---- Card PLANO ----
+  $('#pl-nome').textContent = a.plano || 'Plano não definido';
+  $('#pl-valor').textContent = a.plano_valor ? brl(a.plano_valor) : '—';
+  $('#pl-tipo').textContent = a.tipo_contrato || 'Contrato do formando';
+  $('#pl-entrega').textContent = a.forma_entrega || '—';
+  $('#pl-fotos').textContent = (a.qt_fotos!=null && a.qt_fotos!=='') ? (a.qt_fotos + ' fotos') : '';
+  $('#card-plano').style.display = 'block';
+
+  // ---- Card FINANCEIRO ----
+  const total = Number(rp.total||0), pago = Number(rp.pago||0);
+  const pct = total>0 ? Math.min(100, Math.round(pago/total*100)) : 0;
+  $('#fin-pago').textContent = brl(pago);
+  $('#fin-restante').textContent = brl(rp.restante);
+  $('#fin-total').textContent = 'Total: ' + brl(total);
+  $('#fin-progresso').textContent = pct + '% quitado';
+  $('#fin-bar').style.width = pct + '%';
+  $('#card-financeiro').style.display = 'block';
+
+  // ---- Card ENCARTE ----
+  const dataEnc = dtBR(a.data_encarte);
+  if(dataEnc){
+    $('#encarte-titulo').textContent = 'Encarte preenchido';
+    $('#encarte-sub').textContent = 'Enviado em ' + dataEnc;
+    $('#encarte-icon').style.background = '#DCFCE7';
+    $('#encarte-icon').style.color = '#166534';
+    $('#encarte-icon').innerHTML = '<i data-lucide="check-circle-2"></i>';
+  } else {
+    $('#encarte-titulo').textContent = 'Preencher meu encarte';
+    $('#encarte-sub').textContent = 'Dados que vão no seu álbum';
+  }
+  $('#card-encarte').style.display = 'block';
+
+  // ---- Atalhos ----
+  $('#atalho-contrato').textContent = a.plano ? (a.plano + (a.tipo_contrato ? ' · ' + a.tipo_contrato : '')) : 'Meu plano e assinatura';
+  $('#card-atalhos').style.display = 'block';
+
+  lucide.createIcons();
+
+  // ---- Parcelas (parse defensivo) ----
+  carregarParcelas(id);
+}
+
+async function carregarParcelas(id){
+  let data;
+  try{
+    const r = await fetch(apiUrl('/api/aluno/'+encodeURIComponent(id)+'/pagamentos'));
+    if(!r.ok) return; // resumo_pagamento já cobre o essencial
+    data = await r.json();
+  }catch(e){ return; }
+
+  // Shape esperado: {itens, resumo, formas}. Mas seja tolerante.
+  const itens = Array.isArray(data) ? data
+    : (Array.isArray(data.itens) ? data.itens
+    : (Array.isArray(data.parcelas) ? data.parcelas : []));
+  if(!itens.length) return;
+
+  const pagas = itens.filter(p => p.pago === true || p.pago === 1 || p.status === 'pago').length;
+  $('#qs-parcelas').textContent = `${pagas}/${itens.length} parcelas`;
+  $('#atalho-pagamento').textContent = `${itens.length - pagas} parcela(s) em aberto`;
+
+  // Próximas parcelas não pagas, ordenadas por vencimento
+  const abertas = itens
+    .filter(p => !(p.pago === true || p.pago === 1 || p.status === 'pago'))
+    .map(p => ({ ...p, _venc: p.vencimento || p.data_vencimento || p.data || null }))
+    .sort((x,y) => String(x._venc||'').localeCompare(String(y._venc||'')))
+    .slice(0,3);
+
+  if(abertas.length){
+    const proxima = abertas[0]._venc;
+    if(proxima) $('#atalho-pagamento').textContent = 'Próx. venc.: ' + (dtBR(proxima) || '—');
+    $('#fin-parcelas').innerHTML =
+      '<div style="border-top:1px solid var(--gray-200);margin-top:2px;padding-top:10px;">'
+      + '<div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">Próximas parcelas</div>'
+      + abertas.map(p => `<div class="flex justify-between" style="font-size:13px;padding:4px 0;">
+          <span style="color:var(--gray-600);">${dtBR(p._venc) || 'Sem data'}</span>
+          <strong style="color:var(--gray-900);">${brl(p.valor)}</strong>
+        </div>`).join('')
+      + '</div>';
+  }
+  lucide.createIcons();
+}
+</script>
 
 </body>
 </html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mapa de Telas — Ventus</title>
+<style>
+:root{--bg:#0A2540;--card:#0f2f4d;--line:rgba(255,255,255,.09);--sub:#9db2cd}
+*{box-sizing:border-box} html,body{margin:0} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#e6edf6;-webkit-text-size-adjust:100%}
+header{padding:18px clamp(16px,4vw,40px);border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
+h1{margin:0;font-size:clamp(18px,4vw,24px);letter-spacing:.01em}
+.lead{margin:6px 0 0;color:var(--sub);font-size:13px}
+.filters{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
+.filters button{background:var(--card);border:1px solid var(--line);color:#cfe0f5;font:inherit;font-size:12.5px;padding:6px 13px;border-radius:999px;cursor:pointer}
+.filters button.on{background:#2563EB;border-color:#2563EB;color:#fff;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:clamp(16px,4vw,26px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.shot{position:relative;height:190px;background:#fff;cursor:zoom-in;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block;transition:transform .2s}
+.shot:hover img{transform:scale(1.03)}
+.shot.ph{background:#0b2137;cursor:default} .noimg{color:#8aa0bd;font-size:12.5px;text-align:center;line-height:1.5;padding:0 12px}
+.tag{position:absolute;top:8px;left:8px;z-index:2;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;color:#fff}
+.t-old{background:rgba(100,116,139,.92)} .t-new{background:rgba(37,99,235,.95)}
+.meta{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.mod{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#7aa2d6;font-weight:700}
+.meta strong{font-size:15px;color:#fff} .meta code{font-size:11.5px;color:var(--sub);word-break:break-word}
+.open{margin-top:8px;align-self:flex-start;background:#2563EB;color:#fff;text-decoration:none;font-size:13px;font-weight:700;padding:9px 15px;border-radius:9px;display:inline-flex;align-items:center;gap:6px}
+.open:hover{background:#1d4ed8}
+.lb{position:fixed;inset:0;background:rgba(4,10,20,.82);z-index:60;display:none;align-items:center;justify-content:center;padding:clamp(14px,5vw,52px)}
+.lb.on{display:flex}
+.box{background:#fff;border-radius:14px;width:min(960px,100%);max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.bh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid #e5e9f0;background:#f7f9fc}
+.bh .ti{min-width:0} .bh strong{display:block;color:#0A2540;font-size:15px} .bh code{font-size:11.5px;color:#64748b}
+.bh .acts{display:flex;gap:8px;flex:none}
+.bh a{background:#2563EB;color:#fff;text-decoration:none} .bh button{background:#eef1f6;color:#0A2540}
+.bh a,.bh button{border:none;font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pic{overflow:auto;background:#fff} .pic img{width:100%;height:auto;display:block} .pic .noimg2{padding:48px 20px;text-align:center;color:#64748b}
+</style></head><body>
+<header>
+  <h1>MAPA DE TELAS</h1>
+  <p class="lead">Onde existe, o print do sistema <b>legado</b> (referência do “antes”). Telas novas do Ventus aparecem já com a nossa versão. Use “Abrir no site” para ver ao vivo.</p>
+  <div class="filters" id="filters"></div>
+</header>
+<div class="grid" id="grid"><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="0" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image1.png" loading="lazy" alt="Instituição"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Instituição</strong><code>Cadastros › Instituição</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=instituicao" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="1" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image2.png" loading="lazy" alt="Curso"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Curso</strong><code>Cadastros › Curso</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=curso" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="2" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image3.png" loading="lazy" alt="Evento"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Evento</strong><code>Cadastros › Evento</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=evento" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="3" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image4.png" loading="lazy" alt="Brinde"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Brinde</strong><code>Cadastros › Brinde</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=brinde" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="4" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image5.png" loading="lazy" alt="Vendedor"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Vendedor</strong><code>Cadastros › Vendedor</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=vendedor" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="5" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image6.png" loading="lazy" alt="Produtos e Serviços"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Produtos e Serviços</strong><code>Cadastros › Produtos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=produto" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="6" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image7.png" loading="lazy" alt="Tabela de Produtos"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Tabela de Produtos</strong><code>Cadastros › Tabela de Produtos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-preco" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="7" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image8.png" loading="lazy" alt="Tabela de Produtos — itens"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Tabela de Produtos — itens</strong><code>Cadastros › Tabela (itens)</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-preco" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="8" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image9.png" loading="lazy" alt="Tabela de Cerimonial"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Tabela de Cerimonial</strong><code>Cadastros › Cerimonial</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-cerimonial" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="9" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image10.png" loading="lazy" alt="Tabela de Cerimonial — itens"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Tabela de Cerimonial — itens</strong><code>Cadastros › Cerimonial (itens)</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-cerimonial" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="10" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image11.png" loading="lazy" alt="Tipo de Foto"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Tipo de Foto</strong><code>Cadastros › Tipo de Foto</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=tipo-foto" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="11" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image12.png" loading="lazy" alt="Forma de Entrega"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Forma de Entrega</strong><code>Cadastros › Forma de Entrega</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=forma-entrega" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="12" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image13.png" loading="lazy" alt="Prestador / Responsável"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Prestador / Responsável</strong><code>Cadastros › Prestadores</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=prestador" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="13" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image14.png" loading="lazy" alt="Modelo de Documento"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Modelo de Documento</strong><code>Cadastros › Modelos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=modelo-documento" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Cadastro">
+  <div class="shot" data-i="14" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/cadastro-hub.png" loading="lazy" alt="Hub de Cadastros"></div>
+  <div class="meta"><span class="mod">Cadastro</span><strong>Hub de Cadastros</strong><code>Cadastros (todos os módulos)</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/cadastros.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="15" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image16.png" loading="lazy" alt="Cadastro de Turma"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Cadastro de Turma</strong><code>Turmas › Cadastro</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turmas.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="16" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image17.png" loading="lazy" alt="Cerimonial da Turma"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Cerimonial da Turma</strong><code>Turmas › Cerimonial</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="17" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image18.png" loading="lazy" alt="Eventos Fotográficos"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Eventos Fotográficos</strong><code>Turmas › Eventos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="18" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image19.png" loading="lazy" alt="Brindes da Turma"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Brindes da Turma</strong><code>Turmas › Brindes</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="19" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image20.png" loading="lazy" alt="Cursos da Turma (turno + previsão)"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Cursos da Turma (turno + previsão)</strong><code>Turmas › Cursos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turmas.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="20" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image23.png" loading="lazy" alt="Planos"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Planos</strong><code>Turmas › Planos</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="21" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image21.png" loading="lazy" alt="Config do Plano (financeiro)"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Config do Plano (financeiro)</strong><code>Turmas › Config Plano</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="22" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image22.png" loading="lazy" alt="Histórico da Turma"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Histórico da Turma</strong><code>Turmas › Histórico</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="23" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/turma-comissao.png" loading="lazy" alt="Comissão da Turma"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Comissão da Turma</strong><code>Turmas › Comissão</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Turma">
+  <div class="shot" data-i="24" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/turma-lista.png" loading="lazy" alt="Lista de Turmas"></div>
+  <div class="meta"><span class="mod">Turma</span><strong>Lista de Turmas</strong><code>Turmas › Lista</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/turmas.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Painel">
+  <div class="shot" data-i="25" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image24.png" loading="lazy" alt="Painel / Monitoramento"></div>
+  <div class="meta"><span class="mod">Painel</span><strong>Painel / Monitoramento</strong><code>Painel</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/dashboard.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Aluno">
+  <div class="shot" data-i="26" title="Clique para ampliar"><span class="tag t-old">Legado</span><img src="mockups/image25.png" loading="lazy" alt="Ficha do Aluno"></div>
+  <div class="meta"><span class="mod">Aluno</span><strong>Ficha do Aluno</strong><code>Alunos › Ficha</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/aluno-detalhe.html?id=5" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Serviços">
+  <div class="shot" data-i="27" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/os-ordens.png" loading="lazy" alt="Ordens de Serviço"></div>
+  <div class="meta"><span class="mod">Serviços</span><strong>Ordens de Serviço</strong><code>Serviços</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/os.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Brindes">
+  <div class="shot" data-i="28" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/brindes-pendentes.png" loading="lazy" alt="Brindes pendentes"></div>
+  <div class="meta"><span class="mod">Brindes</span><strong>Brindes pendentes</strong><code>Brindes</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/brindes-pendentes.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Relatórios">
+  <div class="shot" data-i="29" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/relatorios.png" loading="lazy" alt="Relatórios"></div>
+  <div class="meta"><span class="mod">Relatórios</span><strong>Relatórios</strong><code>Relatórios</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/relatorios.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Formando">
+  <div class="shot" data-i="30" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/inscricao-publica.png" loading="lazy" alt="Inscrição / Checkout (e-commerce)"></div>
+  <div class="meta"><span class="mod">Formando</span><strong>Inscrição / Checkout (e-commerce)</strong><code>Link do formando</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/inscricao.html?t=ZQ88k7kJTNdbLE_n8C9O9g" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Etapa 2">
+  <div class="shot" data-i="31" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/etapa2-formando.png" loading="lazy" alt="Formando — Início"></div>
+  <div class="meta"><span class="mod">Etapa 2</span><strong>Formando — Início</strong><code>formatura › aluno/inicio</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/aluno/inicio.html?id=1" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Etapa 2">
+  <div class="shot" data-i="32" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/etapa2-fotografo.png" loading="lazy" alt="Fotógrafo — Upload"></div>
+  <div class="meta"><span class="mod">Etapa 2</span><strong>Fotógrafo — Upload</strong><code>formatura › fotografo/upload</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/fotografo/upload.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Etapa 2">
+  <div class="shot" data-i="33" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/etapa2-editor.png" loading="lazy" alt="Editor — Fila"></div>
+  <div class="meta"><span class="mod">Etapa 2</span><strong>Editor — Fila</strong><code>formatura › editor/fila</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/editor/fila.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Etapa 2">
+  <div class="shot" data-i="34" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/etapa2-operador.png" loading="lazy" alt="Operador — Check-in"></div>
+  <div class="meta"><span class="mod">Etapa 2</span><strong>Operador — Check-in</strong><code>formatura › operador/checkin</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/operador/checkin.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div><div class="card" data-mod="Etapa 2">
+  <div class="shot" data-i="35" title="Clique para ampliar"><span class="tag t-new">Ventus</span><img src="../mapa/telas/etapa2-login.png" loading="lazy" alt="Login (novo)"></div>
+  <div class="meta"><span class="mod">Etapa 2</span><strong>Login (novo)</strong><code>Entrada do sistema</code>
+    <a class="open" href="https://ventus-fotos.vercel.app/admin/login.html" target="_blank" rel="noopener">Abrir no site ↗</a></div>
+</div></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true">
+  <div class="box">
+    <div class="bh"><div class="ti"><strong id="lb-tit"></strong><code id="lb-cam"></code></div>
+      <div class="acts"><a id="lb-open" target="_blank" rel="noopener">Abrir no site ↗</a><button id="lb-close">Fechar ✕</button></div></div>
+    <div class="pic" id="lb-pic"></div>
+  </div>
+</div>
+<script>
+const DATA=[{"tit": "Instituição", "cam": "Cadastros › Instituição", "src": "mockups/image1.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=instituicao"}, {"tit": "Curso", "cam": "Cadastros › Curso", "src": "mockups/image2.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=curso"}, {"tit": "Evento", "cam": "Cadastros › Evento", "src": "mockups/image3.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=evento"}, {"tit": "Brinde", "cam": "Cadastros › Brinde", "src": "mockups/image4.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=brinde"}, {"tit": "Vendedor", "cam": "Cadastros › Vendedor", "src": "mockups/image5.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=vendedor"}, {"tit": "Produtos e Serviços", "cam": "Cadastros › Produtos", "src": "mockups/image6.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=produto"}, {"tit": "Tabela de Produtos", "cam": "Cadastros › Tabela de Produtos", "src": "mockups/image7.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-preco"}, {"tit": "Tabela de Produtos — itens", "cam": "Cadastros › Tabela (itens)", "src": "mockups/image8.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-preco"}, {"tit": "Tabela de Cerimonial", "cam": "Cadastros › Cerimonial", "src": "mockups/image9.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-cerimonial"}, {"tit": "Tabela de Cerimonial — itens", "cam": "Cadastros › Cerimonial (itens)", "src": "mockups/image10.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/tabela.html?tipo=tabela-cerimonial"}, {"tit": "Tipo de Foto", "cam": "Cadastros › Tipo de Foto", "src": "mockups/image11.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=tipo-foto"}, {"tit": "Forma de Entrega", "cam": "Cadastros › Forma de Entrega", "src": "mockups/image12.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=forma-entrega"}, {"tit": "Prestador / Responsável", "cam": "Cadastros › Prestadores", "src": "mockups/image13.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=prestador"}, {"tit": "Modelo de Documento", "cam": "Cadastros › Modelos", "src": "mockups/image14.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/cadastro.html?entidade=modelo-documento"}, {"tit": "Hub de Cadastros", "cam": "Cadastros (todos os módulos)", "src": "../mapa/telas/cadastro-hub.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/cadastros.html"}, {"tit": "Cadastro de Turma", "cam": "Turmas › Cadastro", "src": "mockups/image16.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turmas.html"}, {"tit": "Cerimonial da Turma", "cam": "Turmas › Cerimonial", "src": "mockups/image17.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Eventos Fotográficos", "cam": "Turmas › Eventos", "src": "mockups/image18.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Brindes da Turma", "cam": "Turmas › Brindes", "src": "mockups/image19.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Cursos da Turma (turno + previsão)", "cam": "Turmas › Cursos", "src": "mockups/image20.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turmas.html"}, {"tit": "Planos", "cam": "Turmas › Planos", "src": "mockups/image23.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Config do Plano (financeiro)", "cam": "Turmas › Config Plano", "src": "mockups/image21.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Histórico da Turma", "cam": "Turmas › Histórico", "src": "mockups/image22.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Comissão da Turma", "cam": "Turmas › Comissão", "src": "../mapa/telas/turma-comissao.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/turma-detalhe.html?id=2"}, {"tit": "Lista de Turmas", "cam": "Turmas › Lista", "src": "../mapa/telas/turma-lista.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/turmas.html"}, {"tit": "Painel / Monitoramento", "cam": "Painel", "src": "mockups/image24.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/dashboard.html"}, {"tit": "Ficha do Aluno", "cam": "Alunos › Ficha", "src": "mockups/image25.png", "tag": "Legado", "url": "https://ventus-fotos.vercel.app/admin/aluno-detalhe.html?id=5"}, {"tit": "Ordens de Serviço", "cam": "Serviços", "src": "../mapa/telas/os-ordens.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/os.html"}, {"tit": "Brindes pendentes", "cam": "Brindes", "src": "../mapa/telas/brindes-pendentes.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/brindes-pendentes.html"}, {"tit": "Relatórios", "cam": "Relatórios", "src": "../mapa/telas/relatorios.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/relatorios.html"}, {"tit": "Inscrição / Checkout (e-commerce)", "cam": "Link do formando", "src": "../mapa/telas/inscricao-publica.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/inscricao.html?t=ZQ88k7kJTNdbLE_n8C9O9g"}, {"tit": "Formando — Início", "cam": "formatura › aluno/inicio", "src": "../mapa/telas/etapa2-formando.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/aluno/inicio.html?id=1"}, {"tit": "Fotógrafo — Upload", "cam": "formatura › fotografo/upload", "src": "../mapa/telas/etapa2-fotografo.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/fotografo/upload.html"}, {"tit": "Editor — Fila", "cam": "formatura › editor/fila", "src": "../mapa/telas/etapa2-editor.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/editor/fila.html"}, {"tit": "Operador — Check-in", "cam": "formatura › operador/checkin", "src": "../mapa/telas/etapa2-operador.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/operador/checkin.html"}, {"tit": "Login (novo)", "cam": "Entrada do sistema", "src": "../mapa/telas/etapa2-login.png", "tag": "Ventus", "url": "https://ventus-fotos.vercel.app/admin/login.html"}];
+const $=s=>document.getElementById(s), lb=$('lb');
+function open_(i){const d=DATA[i]; if(!d.src) return; $('lb-tit').textContent=d.tit; $('lb-cam').textContent=d.cam; $('lb-open').href=d.url;
+  $('lb-pic').innerHTML=`<img src="${d.src}" alt="${d.tag}">`; lb.classList.add('on'); document.body.style.overflow='hidden';}
+function close_(){lb.classList.remove('on'); $('lb-pic').innerHTML=''; document.body.style.overflow='';}
+document.querySelectorAll('.shot').forEach(s=>s.addEventListener('click',()=>{ if(s.classList.contains('ph'))return; open_(+s.dataset.i); }));
+$('lb-close').addEventListener('click',close_);
+lb.addEventListener('click',ev=>{if(ev.target===lb)close_()});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&lb.classList.contains('on'))close_()});
+const cards=[...document.querySelectorAll('.card')], fb=$('filters');
+function mk(l,fn,on){const b=document.createElement('button');b.textContent=l;if(on)b.className='on';b.onclick=()=>{fb.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn();};fb.appendChild(b);}
+mk('Todas ('+cards.length+')',()=>cards.forEach(c=>c.style.display=''),true);
+[...new Set(cards.map(c=>c.dataset.mod))].forEach(mm=>{const n=cards.filter(c=>c.dataset.mod===mm).length;mk(mm+' ('+n+')',()=>cards.forEach(c=>c.style.display=c.dataset.mod===mm?'':'none'));});
+</script></body></html>

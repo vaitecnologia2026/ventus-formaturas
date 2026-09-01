@@ -43,7 +43,7 @@
   table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
   table.tbl td.num, table.tbl th.num { text-align:right; font-variant-numeric:tabular-nums; } table.tbl td.nome{font-weight:600;color:var(--gray-900);}
   .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
-  .b-pago{background:#DCFCE7;color:#166534;} .b-pend{background:#FEF3C7;color:#92400E;} .b-ok{background:var(--primary-50);color:var(--primary-700);}
+  .b-pago{background:var(--success-bg);color:var(--success-fg);} .b-pend{background:var(--warning-bg);color:var(--warning-fg);} .b-ok{background:var(--primary-50);color:var(--primary-700);}
   .row-actions { display:flex; gap:6px; justify-content:flex-end; }
   .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
   .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); } .icon-btn.danger:hover{border-color:#FCA5A5;color:#DC2626;background:#FEF2F2;}
@@ -317,7 +317,7 @@ async function carregarGaleria(){
         <b style="color:var(--gray-900);">${g.evento}</b>
         <span style="font-size:13px;"><span class="badge b-pago">${g.selecionadas} selecionadas</span> <span class="badge b-pend">${g.nao_selecionadas} não selecionadas</span> <span style="color:var(--gray-400);">de ${g.total}</span></span>
       </div>
-      ${g.total? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${g.fotos.map(f=>`<span title="${f.arquivo}" style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid ${f.selecionada?'#86EFAC':'var(--gray-200)'};background:${f.selecionada?'#DCFCE7':'var(--gray-50)'};color:${f.selecionada?'#166534':'var(--gray-500)'};">${f.selecionada?'✓ ':''}${f.arquivo.length>22?f.arquivo.slice(0,20)+'…':f.arquivo}</span>`).join('')}</div>`
+      ${g.total? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${g.fotos.map(f=>`<span title="${f.arquivo}" style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid ${f.selecionada?'#86EFAC':'var(--gray-200)'};background:${f.selecionada?'var(--success-bg)':'var(--gray-50)'};color:${f.selecionada?'var(--success-fg)':'var(--gray-500)'};">${f.selecionada?'✓ ':''}${f.arquivo.length>22?f.arquivo.slice(0,20)+'…':f.arquivo}</span>`).join('')}</div>`
         : `<div style="font-size:13px;color:var(--gray-500);">Álbum ainda sem fotos.</div>`}
     </div>`).join('');
   lucide.createIcons();

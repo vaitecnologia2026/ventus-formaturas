@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<meta name="theme-color" content="#0A2540">
+<title>Cadastro da Turma — Ventus</title>
+<script src="/assets/js/config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--azul:#2563EB;--azul-950:#172554;--ink:#0F172A;--cinza:#64748B;--linha:#E2E8F0;--bg:#F1F5F9;}
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+  .top{background:linear-gradient(135deg,var(--azul-950),var(--azul));color:#fff;padding:18px 20px;}
+  .top-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .logo-wrap{background:transparent;padding:0;display:inline-flex;}
+  .logo-wrap img{height:32px;display:block;} .logo-fallback{font-weight:900;font-size:19px;color:#fff;}
+  .wrap{max-width:560px;margin:0 auto;padding:26px 20px;}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -22px rgba(15,23,42,.28);padding:28px 24px;}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;}
+  .sub{color:var(--cinza);font-size:14px;margin:0 0 22px;line-height:1.5;}
+  .turma-nome{font-weight:800;color:var(--azul-950);}
+  label{display:block;font-size:13px;font-weight:600;color:#334155;margin:0 0 6px;}
+  .fld{margin-bottom:16px;}
+  input{width:100%;padding:13px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;outline:none;}
+  input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  .btn{width:100%;background:var(--azul);color:#fff;border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .erro{color:#B91C1C;font-size:13.5px;margin-top:10px;min-height:18px;}
+  .ok{text-align:center;padding:10px 0;}
+  .ok .big{font-size:44px;} .ok h2{margin:8px 0 4px;font-size:19px;} .ok p{color:var(--cinza);font-size:14px;margin:0 0 18px;}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <span class="logo-wrap"><img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'Ventus'}))"></span>
+  <div style="font-size:13px;opacity:.9;">Cadastro da<br><b style="font-size:15px;">sua formatura</b></div>
+</div></div>
+<div class="wrap"><div class="card" id="card">
+  <div style="text-align:center;color:#94a3b8;padding:30px;">Carregando…</div>
+</div></div>
+<script>
+const token = new URLSearchParams(location.search).get('t');
+const card = document.getElementById('card');
+async function init(){
+  if(!token){ card.innerHTML='<h1>Link inválido</h1><p class="sub">Peça o link à comissão da sua turma.</p>'; return; }
+  const r = await fetch(apiUrl('/api/cadastro-turma/'+token));
+  if(!r.ok){ card.innerHTML='<h1>Link inválido</h1><p class="sub">Este link de cadastro não é válido. Peça um novo à comissão.</p>'; return; }
+  const d = await r.json();
+  card.innerHTML = `
+    <h1>Olá! 👋</h1>
+    <p class="sub">Você está se cadastrando na turma <span class="turma-nome">${d.turma.nome}</span>${d.turma.instituicao?` — ${d.turma.instituicao}`:''}.<br>Preencha seus dados para começar.</p>
+    <div class="fld"><label>Seu nome completo *</label><input id="c-nome" placeholder="Nome e sobrenome"></div>
+    <div class="fld"><label>Seu WhatsApp</label><input id="c-cel" placeholder="(00) 00000-0000" inputmode="tel"></div>
+    <button class="btn" id="c-btn" onclick="enviar()">Começar meu cadastro →</button>
+    <div class="erro" id="c-erro"></div>`;
+}
+async function enviar(){
+  const nome=document.getElementById('c-nome').value.trim();
+  const erro=document.getElementById('c-erro'); erro.textContent='';
+  if(!nome){ erro.textContent='Informe seu nome.'; return; }
+  const btn=document.getElementById('c-btn'); btn.disabled=true; btn.textContent='Criando…';
+  try{
+    const r=await fetch(apiUrl('/api/cadastro-turma/'+token),{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nome, celular:document.getElementById('c-cel').value.trim()})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||'Falha ao cadastrar.');
+    card.innerHTML=`<div class="ok"><div class="big">✅</div><h2>Cadastro iniciado!</h2><p>Agora escolha seu plano e finalize.</p><button class="btn" onclick="location.href='${d.link}'">Continuar →</button></div>`;
+  }catch(e){ erro.textContent=e.message; btn.disabled=false; btn.textContent='Começar meu cadastro →'; }
+}
+init();
+</script>
+</body>
+</html>

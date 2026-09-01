@@ -40,10 +40,10 @@
     <p class="text-sm mb-6" style="color:var(--gray-600);">Logs de auditoria · sessões ativas · LGPD · backup automático</p>
 
     <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="shield-check" class="w-5 h-5"></i></div><div class="kpi-label">Status sistema</div><div class="kpi-value" style="font-size:20px;">SEGURO</div><div class="kpi-trend up">0 incidentes 30d</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="shield-check" class="w-5 h-5"></i></div><div class="kpi-label">Status sistema</div><div class="kpi-value" style="font-size:20px;">SEGURO</div><div class="kpi-trend up">0 incidentes 30d</div></div>
       <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1E40AF;"><i data-lucide="users" class="w-5 h-5"></i></div><div class="kpi-label">Sessões ativas</div><div class="kpi-value">8</div><div class="kpi-trend" style="color:var(--gray-500);">3 admin · 5 op</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="key-round" class="w-5 h-5"></i></div><div class="kpi-label">2FA habilitado</div><div class="kpi-value">94%</div><div class="kpi-trend up">17 de 18 usuários</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#EDE9FE;color:#5B21B6;"><i data-lucide="hard-drive" class="w-5 h-5"></i></div><div class="kpi-label">Último backup</div><div class="kpi-value" style="font-size:20px;">há 2h</div><div class="kpi-trend up">automático · S3</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="key-round" class="w-5 h-5"></i></div><div class="kpi-label">2FA habilitado</div><div class="kpi-value">94%</div><div class="kpi-trend up">17 de 18 usuários</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--purple-bg);color:var(--purple-fg);"><i data-lucide="hard-drive" class="w-5 h-5"></i></div><div class="kpi-label">Último backup</div><div class="kpi-value" style="font-size:20px;">há 2h</div><div class="kpi-trend up">automático · S3</div></div>
     </div>
 
     <div class="tabs">
@@ -64,15 +64,15 @@
           <thead><tr><th>Quando</th><th>Usuário</th><th>Ação</th><th>IP</th></tr></thead>
           <tbody>
             <tr><td>há 2min</td><td><strong>Bruno Sena</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso admin</td><td class="num">177.9.x.42</td></tr>
-            <tr><td>há 14min</td><td><strong>Elison Perini</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">EDIT</span> Tabela de preços</td><td class="num">177.9.x.18</td></tr>
+            <tr><td>há 14min</td><td><strong>Elison Perini</strong></td><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-fg);">EDIT</span> Tabela de preços</td><td class="num">177.9.x.18</td></tr>
             <tr><td>há 32min</td><td><strong>Debora D.</strong></td><td><span class="badge badge-warning">EXPORT</span> Financeiro CSV</td><td class="num">177.9.x.74</td></tr>
             <tr><td>há 1h</td><td><strong>Renato S.</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso fotógrafo</td><td class="num">189.122.x.5</td></tr>
-            <tr><td>há 2h</td><td><strong>Marcos Vieira A.</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">EDIT</span> Contrato #4291</td><td class="num">177.9.x.18</td></tr>
+            <tr><td>há 2h</td><td><strong>Marcos Vieira A.</strong></td><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-fg);">EDIT</span> Contrato #4291</td><td class="num">177.9.x.18</td></tr>
             <tr><td>há 3h</td><td><strong>Bruno Sena</strong></td><td><span class="badge badge-danger">DELETE</span> Foto #88412</td><td class="num">177.9.x.42</td></tr>
             <tr><td>há 5h</td><td><strong>Sistema</strong></td><td><span class="badge badge-success">BACKUP</span> Snapshot S3 OK</td><td class="num">internal</td></tr>
             <tr><td>há 8h</td><td><strong>Fernando G.</strong></td><td><span class="badge badge-info">LOGIN</span> Acesso pai/coord.</td><td class="num">200.144.x.12</td></tr>
             <tr><td>há 14h</td><td><strong>(falha)</strong></td><td><span class="badge badge-danger">LOGIN</span> Senha inválida 5x</td><td class="num">45.227.x.99</td></tr>
-            <tr><td>há 18h</td><td><strong>Sistema</strong></td><td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">CRON</span> VAI WhatsApp diário</td><td class="num">internal</td></tr>
+            <tr><td>há 18h</td><td><strong>Sistema</strong></td><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-fg);">CRON</span> VAI WhatsApp diário</td><td class="num">internal</td></tr>
           </tbody>
         </table>
         <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 423 eventos hoje · <a href="#" style="color:var(--primary-700);">ver tudo</a></div>

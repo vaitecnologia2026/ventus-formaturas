@@ -38,6 +38,26 @@
   .add-bar .prestadores { display:flex; flex-wrap:wrap; gap:6px; max-width:340px; }
   .chip-check { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border:1px solid var(--gray-300); border-radius:999px; font-size:12.5px; font-weight:600; color:var(--gray-600); cursor:pointer; background:var(--surface); }
   .chip-check.on { border-color:var(--primary-500); background:var(--primary-50); color:var(--primary-700); }
+  /* #36 — fotos por evento */
+  .fe-list { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .fe-row { display:flex; align-items:center; gap:12px; padding:9px 13px; border:1px solid var(--gray-200); border-radius:10px; background:var(--surface); }
+  .fe-row .fe-nome { flex:1; font-size:13.5px; font-weight:600; color:var(--gray-700); }
+  .fe-row .fe-qt { width:110px; }
+
+  /* Multi-select de prestadores (busca + tags) */
+  .ms { position:relative; max-width:340px; }
+  .ms-box { border:1px solid var(--gray-300); border-radius:10px; background:var(--surface); padding:6px 8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-height:42px; }
+  .ms-box:focus-within { border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+  .ms-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; font-size:12.5px; font-weight:600; background:var(--primary-50); color:var(--primary-700); border:1px solid var(--primary-500); }
+  .ms-tag button { border:none; background:none; color:inherit; cursor:pointer; font-size:14px; line-height:1; padding:0; display:grid; place-items:center; }
+  .ms-search { flex:1; min-width:90px; border:none; outline:none; background:transparent; font-family:inherit; font-size:13.5px; color:var(--gray-900); padding:3px 2px; }
+  .ms-list { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; box-shadow:var(--shadow-lg,0 10px 30px rgba(0,0,0,.15)); max-height:220px; overflow-y:auto; z-index:50; display:none; }
+  .ms-list.open { display:block; }
+  .ms-opt { padding:9px 12px; font-size:13.5px; color:var(--gray-700); cursor:pointer; display:flex; align-items:center; gap:8px; }
+  .ms-opt:hover, .ms-opt.active { background:var(--primary-50); color:var(--primary-700); }
+  .ms-opt.sel { color:var(--gray-400); }
+  .ms-opt.sel::after { content:'✓'; margin-left:auto; font-weight:700; color:var(--primary-600); }
+  .ms-empty { padding:10px 12px; font-size:12.5px; color:var(--gray-400); }
 
   .switch { position:relative; display:inline-block; width:46px; height:27px; }
   .switch input { position:absolute; opacity:0; width:0; height:0; }
@@ -52,9 +72,9 @@
   table.tbl tr:last-child td { border-bottom:none; } table.tbl tbody tr:hover td { background:var(--gray-50); }
   table.tbl td.nome { font-weight:600; color:var(--gray-900); }
   .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; display:inline-block; }
-  .b-previsto{background:#FEF3C7;color:#92400E;} .b-confirmado{background:var(--primary-50);color:var(--primary-700);}
-  .b-realizado{background:#DCFCE7;color:#166534;} .b-cancelado{background:#FEE2E2;color:#991B1B;}
-  .b-todos{background:var(--primary-50);color:var(--primary-700);} .b-comissao{background:#EDE9FE;color:#5B21B6;}
+  .b-previsto{background:var(--warning-bg);color:var(--warning-fg);} .b-confirmado{background:var(--primary-50);color:var(--primary-700);}
+  .b-realizado{background:var(--success-bg);color:var(--success-fg);} .b-cancelado{background:var(--danger-bg);color:var(--danger-fg);}
+  .b-todos{background:var(--primary-50);color:var(--primary-700);} .b-comissao{background:var(--purple-bg);color:var(--purple-fg);}
   .row-actions { display:flex; gap:6px; justify-content:flex-end; }
   .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
   .icon-btn:hover { border-color:var(--gray-400); color:var(--gray-900); background:var(--gray-50); } .icon-btn.danger:hover{border-color:#FCA5A5;color:#DC2626;background:#FEF2F2;}
@@ -212,6 +232,18 @@
         </div>
       </div>
 
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head"><h2><i data-lucide="link" style="width:16px;height:16px;color:var(--primary-600);"></i> Link único de cadastro da turma</h2></div>
+        <div class="panel-body">
+          <p style="margin:0 0 10px;font-size:13px;color:var(--gray-500);">Gere um link e compartilhe com a turma — cada formando se cadastra sozinho (sem importar planilha nem gerar um a um).</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-primary" id="lk-gerar"><i data-lucide="link" class="w-4 h-4"></i> Gerar link</button>
+            <input id="lk-url" readonly placeholder="clique em Gerar link" style="flex:1;min-width:240px;padding:10px 12px;border:1px solid var(--gray-300);border-radius:10px;font-size:13px;background:var(--gray-50);color:var(--gray-700);">
+            <button class="btn btn-secondary" id="lk-copiar"><i data-lucide="copy" class="w-4 h-4"></i> Copiar</button>
+          </div>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="panel-head"><h2><i data-lucide="upload" style="width:16px;height:16px;color:var(--primary-600);"></i> Importar alunos (nome + WhatsApp)</h2></div>
         <div class="panel-body">
@@ -293,10 +325,18 @@ async function init() {
   montarEvForm(); montarBrForm(); montarCeForm(); montarPlForm();
   carregarEventos(); carregarBrindes(); carregarCerim(); carregarPlanos();
   $('#al-importar').onclick = importarAlunos;
+  const bg = $('#lk-gerar'); if (bg) bg.onclick = gerarLinkPublico;
+  const bc = $('#lk-copiar'); if (bc) bc.onclick = () => { const u=$('#lk-url'); if(u.value){ navigator.clipboard.writeText(u.value); toast('Link copiado!'); } };
   $('#al-add').onclick = addAluno;
 }
 const SITE = location.origin;
 function linkAluno(a){ return SITE + a.link; }
+async function gerarLinkPublico(){
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/link-publico`), {method:'POST'});
+  const d = await r.json();
+  if (r.ok && d.path) { $('#lk-url').value = SITE + d.path; toast('Link gerado!'); }
+  else alert(d.detail || 'Erro ao gerar link.');
+}
 
 function trocarAba(aba) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab===aba));
@@ -377,17 +417,57 @@ function montarEvForm() {
     <div class="fld"><label>Situação</label><select id="ev-situacao">${optSit('previsto')}</select></div>
     <div class="fld grow"><label>Galeria</label><select id="ev-album">${optAlbum('')}</select></div>
     <div class="fld"><label>Confirmado</label><label class="switch"><input type="checkbox" id="ev-confirmado"><span class="track"></span></label></div>
-    <div class="fld grow"><label>Prestadores</label><div class="prestadores" id="ev-prestadores">${OPC.prestadores.map(p=>`<label class="chip-check"><input type="checkbox" value="${p.id}"> ${p.nome}</label>`).join('') || '<span style="font-size:12.5px;color:var(--gray-400);">Nenhum prestador cadastrado.</span>'}</div></div>
+    <div class="fld grow"><label>Prestadores</label>${OPC.prestadores.length?`<div class="ms" id="ev-prestadores">
+        <div class="ms-box" id="ev-prest-box"><input type="text" class="ms-search" id="ev-prest-search" placeholder="Buscar prestador…" autocomplete="off"></div>
+        <div class="ms-list" id="ev-prest-list"></div>
+      </div>`:'<div class="ms" id="ev-prestadores"><span style="font-size:12.5px;color:var(--gray-400);">Nenhum prestador cadastrado.</span></div>'}</div>
     <div class="fld"><button class="btn btn-primary" id="ev-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="ev-btn">Adicionar</span></button></div>`;
-  $('#ev-prestadores').querySelectorAll('input').forEach(i=>i.onchange=()=>i.closest('.chip-check').classList.toggle('on',i.checked));
+  initPrestMulti();
   lucide.createIcons();
   $('#ev-salvar').onclick = salvarEvento;
 }
-function evPrest() { return [...$('#ev-prestadores').querySelectorAll('input:checked')].map(i=>+i.value); }
+/* ---- Multi-select de prestadores (busca + tags) ---- */
+let evPrestSel = [];
+function prestRenderTags(){
+  const box=$('#ev-prest-box'), search=$('#ev-prest-search');
+  if(!box||!search) return;
+  box.querySelectorAll('.ms-tag').forEach(t=>t.remove());
+  evPrestSel.forEach(pid=>{
+    const p=OPC.prestadores.find(x=>x.id===pid); if(!p) return;
+    const tag=document.createElement('span'); tag.className='ms-tag';
+    tag.innerHTML=`${p.nome}<button type="button" title="Remover" data-id="${p.id}">×</button>`;
+    box.insertBefore(tag, search);
+    tag.querySelector('button').onclick=()=>{ evPrestSel=evPrestSel.filter(x=>x!==p.id); prestRenderTags(); prestRenderList(); };
+  });
+}
+function prestRenderList(){
+  const search=$('#ev-prest-search'), list=$('#ev-prest-list');
+  if(!search||!list) return;
+  const q=(search.value||'').toLowerCase().trim();
+  const opts=OPC.prestadores.filter(p=>!q||p.nome.toLowerCase().includes(q));
+  list.innerHTML = opts.length ? opts.map(p=>`<div class="ms-opt ${evPrestSel.includes(p.id)?'sel':''}" data-id="${p.id}">${p.nome}</div>`).join('') : '<div class="ms-empty">Nenhum prestador encontrado.</div>';
+  list.querySelectorAll('.ms-opt').forEach(o=>o.onclick=()=>{
+    const pid=+o.dataset.id;
+    if(evPrestSel.includes(pid)) evPrestSel=evPrestSel.filter(x=>x!==pid); else evPrestSel.push(pid);
+    search.value=''; prestRenderTags(); prestRenderList(); search.focus();
+  });
+}
+function initPrestMulti(){
+  evPrestSel = [];
+  const box=$('#ev-prest-box'), search=$('#ev-prest-search'), list=$('#ev-prest-list');
+  if(!box||!search||!list) return;
+  search.onfocus=()=>{ prestRenderList(); list.classList.add('open'); };
+  search.oninput=()=>{ prestRenderList(); list.classList.add('open'); };
+  box.onclick=(e)=>{ if(e.target===box) search.focus(); };
+  document.addEventListener('click',(e)=>{ if(!$('#ev-prestadores')?.contains(e.target)) list.classList.remove('open'); });
+  prestRenderTags(); prestRenderList();
+}
+function setPrestSel(ids){ evPrestSel=(ids||[]).map(Number); prestRenderTags(); prestRenderList(); }
+function evPrest() { return [...evPrestSel]; }
 function limparEv() {
   evEdit=null; $('#ev-evento_id').value=''; $('#ev-data').value=''; $('#ev-ini').value=''; $('#ev-fim').value='';
   $('#ev-local').value=''; $('#ev-situacao').value='previsto'; $('#ev-confirmado').checked=false; $('#ev-album').value='';
-  $('#ev-prestadores').querySelectorAll('input').forEach(i=>{i.checked=false;i.closest('.chip-check').classList.remove('on');});
+  setPrestSel([]);
   if($('#ev-data-nota')) $('#ev-data-nota').innerHTML='';
   $('#ev-btn').textContent='Adicionar'; $('#ev-form-title').textContent='Novo evento fotográfico';
 }
@@ -445,7 +525,7 @@ window.editarEvento = function(e){
   evEdit=e.id; $('#ev-evento_id').value=e.evento_id||''; $('#ev-data').value=e.data_prevista||'';
   $('#ev-ini').value=e.hora_inicio||''; $('#ev-fim').value=e.hora_fim||''; $('#ev-local').value=e.local||'';
   $('#ev-situacao').value=e.situacao; $('#ev-confirmado').checked=!!e.confirmado; $('#ev-album').value=e.album_id||'';
-  $('#ev-prestadores').querySelectorAll('input').forEach(i=>{const on=e.prestador_ids.includes(+i.value);i.checked=on;i.closest('.chip-check').classList.toggle('on',on);});
+  setPrestSel(e.prestador_ids||[]);
   $('#ev-btn').textContent='Atualizar'; $('#ev-form-title').textContent='Editar evento'; window.scrollTo({top:0,behavior:'smooth'});
 };
 window.excluirEvento = async function(eid){ if(!confirm('Excluir este evento?'))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok)carregarEventos(); };
@@ -496,6 +576,19 @@ window.excluirBrinde = async function(bid){ if(!confirm('Excluir este brinde?'))
 let CEDATA = { bases:[], catalogo_eventos:[], catalogo_itens:[] };
 const escAttr = s => String(s==null?'':s).replace(/"/g,'&quot;');
 function baseLabel(v){ return (CEDATA.bases.find(b=>b[0]===v)||[])[1] || v; }
+/* Qtd efetiva de um item de cerimonial conforme a base de cálculo e as contagens do evento */
+function qtdCerimItem(it, ev){
+  const conv=+ev.qtd_convidados||0, alu=+ev.qtd_alunos||0;
+  let base;
+  switch(it.base_calculo){
+    case 'por_convidado': base=conv; break;
+    case 'por_formando': case 'por_aluno': base=alu; break;
+    case 'por_participante': base=conv+alu; break;
+    case 'por_evento': default: base=1; break;
+  }
+  const q=+it.quantidade||1;
+  return base*(q>1?q:1);
+}
 function optBase(cur){ return CEDATA.bases.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join(''); }
 
 function montarCeForm(){
@@ -530,11 +623,13 @@ async function carregarCerim(){
 function cardEvento(ev){
   const cat = CEDATA.catalogo_itens||[];
   const optItens = `<option value="">Selecione um item…</option>` + cat.map(it=>`<option value="${escAttr(it.descricao)}" data-base="${it.base_calculo}" data-custo="${it.custo}">${it.descricao} · ${baseLabel(it.base_calculo)} · ${brl(it.custo)}</option>`).join('');
-  const linhas = ev.itens.length ? ev.itens.map(it=>`<tr>
+  const linhas = ev.itens.length ? ev.itens.map(it=>{
+    const qtdEfetiva = qtdCerimItem(it, ev);
+    return `<tr>
       <td class="nome">${it.descricao}</td><td><span class="badge b-todos">${baseLabel(it.base_calculo)}</span></td>
-      <td class="num">${it.quantidade}</td><td class="num">${brl(it.custo)}</td><td class="num">${brl(it.total)}</td>
+      <td class="num">${qtdEfetiva}</td><td class="num">${brl(it.custo)}</td><td class="num">${brl(qtdEfetiva*(it.custo||0))}</td>
       <td><div class="row-actions"><button class="icon-btn danger" title="Excluir" onclick="excluirItemCerim(${it.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td>
-    </tr>`).join('') : `<tr><td colspan="6" style="color:var(--gray-500);padding:14px 22px;">Nenhum item neste evento ainda.</td></tr>`;
+    </tr>`;}).join('') : `<tr><td colspan="6" style="color:var(--gray-500);padding:14px 22px;">Nenhum item neste evento ainda.</td></tr>`;
   return `<div style="border:1px solid var(--gray-200);border-radius:14px;margin-bottom:16px;overflow:hidden;">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);">
       <div style="font-weight:800;color:var(--gray-900);font-size:15px;flex:1;min-width:140px;">${ev.evento}</div>
@@ -581,6 +676,10 @@ function montarPlForm(){
     <div class="fld grow"><label>Nome do plano *</label><input type="text" id="pl-nome" placeholder="Ex.: Plano Ouro"></div>
     <div class="fld"><label>Tipo de contrato</label><select id="pl-tipocontrato"><option value="">—</option>${optPair(PLOPC.tipos_contrato)}</select></div>
     <div class="fld"><label>QT fotos</label><input type="number" id="pl-qtfotos" placeholder="ex.: 10" style="width:100px;"></div>
+    <div class="fld full" id="pl-fe-wrap" style="display:none;">
+      <label>Fotos por evento <span style="font-weight:400;color:var(--gray-400);">— quantas fotos o plano cobre em cada evento fotográfico</span></label>
+      <div id="pl-fe-list" class="fe-list"></div>
+    </div>
     <div class="fld"><label>Valor fotografia (R$)</label><input type="number" step="0.01" id="pl-vfoto" placeholder="0,00" style="width:140px;"></div>
     <div class="fld"><label>Valor cerimonial (R$)</label><input type="number" step="0.01" id="pl-vcerim" placeholder="0,00" style="width:140px;"></div>
     <div class="fld"><label>Foto excedente (R$)</label><input type="number" step="0.01" id="pl-vexc" placeholder="0,00" style="width:130px;" title="Preço por foto que passar do limite do contrato"></div>
@@ -601,12 +700,39 @@ function montarPlForm(){
     <div class="fld"><label>Ativo</label><label class="switch"><input type="checkbox" id="pl-ativo" checked><span class="track"></span></label></div>
     <div class="fld"><button class="btn btn-primary" id="pl-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="pl-btn">Criar plano</span></button></div>`;
   $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>i.onchange=()=>i.closest('.chip-check').classList.toggle('on',i.checked));
+  $('#pl-tipocontrato').onchange = toggleFotosEventos;
   lucide.createIcons(); $('#pl-salvar').onclick = salvarPlano;
+}
+
+// #36 — bloco "fotos por evento" (contrato limitado por evento)
+function toggleFotosEventos(){
+  const por = $('#pl-tipocontrato').value === 'fotos_por_evento';
+  $('#pl-fe-wrap').style.display = por ? '' : 'none';
+  const qt = $('#pl-qtfotos').closest('.fld');
+  if(qt) qt.style.opacity = por ? '.5' : '';
+  if(por) montarFotosEventos();
+}
+function montarFotosEventos(sel){
+  const map={}; (sel||[]).forEach(fe=>map[fe.evento_id]=fe.qt_fotos);
+  const evs = PLOPC.eventos||[];
+  if(!evs.length){ $('#pl-fe-list').innerHTML='<div style="font-size:13px;color:var(--gray-400);padding:6px 0;">Nenhum evento fotográfico cadastrado. Crie na aba <b>Eventos fotográficos</b> primeiro.</div>'; return; }
+  $('#pl-fe-list').innerHTML = evs.map(e=>`<div class="fe-row" data-eid="${e.id}">
+    <span class="fe-nome">${e.nome}</span>
+    <input type="number" class="fe-qt" min="0" placeholder="fotos" value="${map[e.id]??''}">
+  </div>`).join('');
+}
+function fotosEventosSelecionados(){
+  if($('#pl-tipocontrato').value!=='fotos_por_evento') return [];
+  return [...document.querySelectorAll('#pl-fe-list .fe-row')].map(r=>({
+    evento_id:+r.dataset.eid,
+    qt_fotos: r.querySelector('.fe-qt').value!=='' ? +r.querySelector('.fe-qt').value : null,
+  })).filter(fe=>fe.qt_fotos!==null);
 }
 function limparPl(){ plEdit=null;
   ['pl-nome','pl-qtfotos','pl-vfoto','pl-vcerim','pl-vexc','pl-vagas','pl-fpag','pl-desc','pl-obs','pl-limite'].forEach(k=>$('#'+k).value='');
   $('#pl-tipocontrato').value=''; $('#pl-fentrega').value=''; $('#pl-parc').value='1'; $('#pl-ativo').checked=true;
   $('#pl-form').querySelectorAll('.chip-check input').forEach(i=>{i.checked=false;i.closest('.chip-check').classList.remove('on');});
+  toggleFotosEventos();
   $('#pl-btn').textContent='Criar plano'; $('#pl-form-title').textContent='Novo plano';
 }
 async function salvarPlano(){
@@ -617,7 +743,7 @@ async function salvarPlano(){
     valor_fotografia:$('#pl-vfoto').value||0, valor_cerimonial:$('#pl-vcerim').value||0, valor_foto_excedente:$('#pl-vexc').value||0,
     forma_entrega_id:$('#pl-fentrega').value?+$('#pl-fentrega').value:null, limite_ingresso:$('#pl-limite').value||null,
     inclui_cerimonial:inc('cerimonial'), inclui_eventos:inc('eventos'), inclui_produto:inc('produto'),
-    inclui_servico:inc('servico'), inclui_brinde:inc('brinde') };
+    inclui_servico:inc('servico'), inclui_brinde:inc('brinde'), fotos_eventos:fotosEventosSelecionados() };
   if(!body.nome.trim()){ alert('Informe o nome do plano.'); return; }
   const url = plEdit ? apiUrl('/api/turma-formatura/planos/'+plEdit) : apiUrl(`/api/turma-formatura/${id}/planos`);
   const r=await fetch(url,{method:plEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -644,18 +770,22 @@ async function carregarPlanos(){
     </div></td></tr>`).join('');
   lucide.createIcons();
 }
-window.editarPlano=function(p){ plEdit=p.id;
+window.editarPlano=async function(p){ plEdit=p.id;
   $('#pl-nome').value=p.nome; $('#pl-fpag').value=p.forma_pagamento||''; $('#pl-parc').value=p.max_parcelas; $('#pl-ativo').checked=!!p.ativo; $('#pl-desc').value=p.descricao||'';
   $('#pl-tipocontrato').value=p.tipo_contrato||''; $('#pl-qtfotos').value=p.qt_fotos||''; $('#pl-vagas').value=p.vagas_ingresso||''; $('#pl-vfoto').value=p.valor_fotografia||''; $('#pl-vcerim').value=p.valor_cerimonial||''; $('#pl-vexc').value=p.valor_foto_excedente||'';
   $('#pl-fentrega').value=p.forma_entrega_id||''; $('#pl-limite').value=p.limite_ingresso||''; $('#pl-obs').value=p.observacao||'';
   [['cerimonial',p.inclui_cerimonial],['eventos',p.inclui_eventos],['produto',p.inclui_produto],['servico',p.inclui_servico],['brinde',p.inclui_brinde]]
     .forEach(([k,v])=>{const el=$('#pl-inc-'+k);el.checked=!!v;el.closest('.chip-check').classList.toggle('on',!!v);});
+  toggleFotosEventos();
+  if(p.tipo_contrato==='fotos_por_evento'){
+    try{ const rd=await fetch(apiUrl('/api/turma-formatura/planos/'+p.id)); const full=await rd.json(); montarFotosEventos(full.fotos_eventos||[]); }catch(e){}
+  }
   $('#pl-btn').textContent='Atualizar plano'; $('#pl-form-title').textContent='Editar plano'; window.scrollTo({top:0,behavior:'smooth'}); };
 window.excluirPlano=async function(pid){ if(!confirm('Excluir este plano e seus itens?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid),{method:'DELETE'}); if(r.ok)carregarPlanos(); };
 
 /* -------- Config financeira do plano (modal) -------- */
 window.abrirConfig=async function(pid,nome){
-  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`)); const {config:c}=await r.json();
+  const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`)); const resp=await r.json(); const c=resp.config; const modalidades=resp.modalidades||[];
   const modal=document.createElement('div'); modal.id='cfg-modal';
   modal.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:300;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:28px 16px;';
   const sel=(arr,cur)=>optPair(arr,cur);
@@ -677,8 +807,6 @@ window.abrirConfig=async function(pid,nome){
         <div class="med-fld"><label>1ª parcela 02</label><input type="date" id="cfg-p2" value="${c.primeira_parcela_02||''}"></div>
         <div class="med-fld"><label>1ª parcela 03</label><input type="date" id="cfg-p3" value="${c.primeira_parcela_03||''}"></div>
         <div class="med-fld"><label>Última parcela</label><input type="date" id="cfg-pu" value="${c.ultima_parcela||''}"></div>
-        <div class="med-fld"><label>Nota fiscal</label><select id="cfg-nf"><option value="false" ${!c.nota_fiscal?'selected':''}>NÃO</option><option value="true" ${c.nota_fiscal?'selected':''}>SIM</option></select></div>
-        <div class="med-fld"><label>Tipo NF</label><select id="cfg-tiponf">${sel(PLOPC.tipo_nf,c.tipo_nota_fiscal)}</select></div>
         <div class="med-fld"><label>Modelo Documento (contrato)</label><select id="cfg-modelo"><option value="">—</option>${optObj(PLOPC.modelos_documento,c.modelo_documento_id)}</select></div>
       </div>
       <div style="font-weight:700;font-size:13px;margin:6px 0 8px;color:var(--gray-700);">Meios de pagamento</div>
@@ -688,6 +816,7 @@ window.abrirConfig=async function(pid,nome){
         <div class="med-fld"><label>Taxa de boleto</label><select id="cfg-taxa"><option value="false" ${!c.taxa_boleto?'selected':''}>NÃO</option><option value="true" ${c.taxa_boleto?'selected':''}>SIM</option></select></div>
         <div class="med-fld"><label>Valor da taxa (R$/parcela)</label><input type="number" step="0.01" id="cfg-vtaxa" value="${c.valor_taxa||''}"></div>
         <div class="med-fld"><label>Emissão de carnê</label><select id="cfg-carne">${sel(PLOPC.emissao_carne,c.emissao_carne)}</select></div>
+        <div class="med-fld" style="grid-column:1/-1;"><label>Forma de pagamento especial <span style="font-weight:400;color:var(--gray-400);">(modalidade de pagamento)</span></label><select id="cfg-modalidade"><option value="">— nenhuma (padrão) —</option>${modalidades.map(m=>`<option value="${m.id}" ${c.modalidade_pagamento_id==m.id?'selected':''}>${m.nome} (${m.percentual_entrada}% durante)</option>`).join('')}</select></div>
         <div class="med-fld"><label>Multa (%)</label><input type="number" step="0.01" id="cfg-multa" value="${c.multa||''}"></div>
         <div class="med-fld"><label>Juros (% a.m.)</label><input type="number" step="0.01" id="cfg-juros" value="${c.juros||''}"></div>
         <div class="med-fld"><label>Desconto pix antecipado (%)</label><input type="number" step="0.01" id="cfg-descpix" value="${c.desconto_pix_antecipado||''}"></div>
@@ -705,9 +834,10 @@ window.salvarConfig=async function(pid){
     descricao:tr.querySelector('.cfg-desc').value, qt_parcela:+tr.querySelector('.cfg-qt').value }));
   const body={ dia_vencimento:$('#cfg-dia').value||null, primeira_parcela_01:$('#cfg-p1').value||null,
     primeira_parcela_02:$('#cfg-p2').value||null, primeira_parcela_03:$('#cfg-p3').value||null, ultima_parcela:$('#cfg-pu').value||null,
-    nota_fiscal:$('#cfg-nf').value==='true', tipo_nota_fiscal:$('#cfg-tiponf').value, modelo_documento_id:$('#cfg-modelo').value?+$('#cfg-modelo').value:null,
+    modelo_documento_id:$('#cfg-modelo').value?+$('#cfg-modelo').value:null,
     taxa_boleto:$('#cfg-taxa').value==='true', valor_taxa:$('#cfg-vtaxa').value||0, emissao_carne:$('#cfg-carne').value,
-    multa:$('#cfg-multa').value||0, juros:$('#cfg-juros').value||0, desconto_pix_antecipado:$('#cfg-descpix').value||0, meios };
+    multa:$('#cfg-multa').value||0, juros:$('#cfg-juros').value||0, desconto_pix_antecipado:$('#cfg-descpix').value||0,
+    modalidade_pagamento_id:$('#cfg-modalidade').value||null, meios };
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/config`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(r.ok){ document.getElementById('cfg-modal').remove(); toast('Config financeira salva.'); carregarPlanos(); } else alert('Erro ao salvar config.');
 };
@@ -724,8 +854,9 @@ window.abrirDescontos=async function(pid,nome){
     <div class="add-bar" style="padding:16px 22px;">
       <div class="fld"><label>CPF</label><input type="text" id="dc-cpf" placeholder="000.000.000-00" style="width:160px;"></div>
       <div class="fld grow"><label>Nome (opcional)</label><input type="text" id="dc-nome" placeholder="Formando"></div>
-      <div class="fld"><label>Desc. fotografia (R$)</label><input type="number" step="0.01" id="dc-foto" placeholder="0,00" style="width:140px;"></div>
-      <div class="fld"><label>Desc. cerimonial (R$)</label><input type="number" step="0.01" id="dc-cerim" placeholder="0,00" style="width:140px;"></div>
+      <div class="fld"><label>Tipo</label><select id="dc-tipo" style="width:150px;"><option value="valor">R$ (valor)</option><option value="percentual">% (percentual)</option></select></div>
+      <div class="fld"><label>Desc. fotografia (R$ ou %)</label><input type="number" step="0.01" id="dc-foto" placeholder="0,00" style="width:150px;"></div>
+      <div class="fld"><label>Desc. cerimonial (R$ ou %)</label><input type="number" step="0.01" id="dc-cerim" placeholder="0,00" style="width:150px;"></div>
       <div class="fld"><button class="btn btn-primary" onclick="salvarDesconto(${pid})"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>
     </div>
     <div class="tbl-wrap" style="padding:0 8px 16px;"><table class="tbl">
@@ -739,14 +870,15 @@ window.abrirDescontos=async function(pid,nome){
 async function carregarDescontos(pid){
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/descontos`)); const {itens}=await r.json();
   if(!itens.length){ $('#dc-tbody').innerHTML=`<tr><td colspan="5"><div class="empty" style="padding:24px;"><i data-lucide="percent"></i>Nenhum CPF com desconto.</div></td></tr>`; lucide.createIcons(); return; }
+  const fmtDesc=(v,tipo)=> tipo==='percentual' ? (Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2})+'%') : brl(v);
   $('#dc-tbody').innerHTML = itens.map(d=>`<tr>
     <td class="nome">${maskCpf(d.cpf)}</td><td>${d.nome||'—'}</td>
-    <td class="num">${brl(d.desconto_fotografia)}</td><td class="num">${brl(d.desconto_cerimonial)}</td>
+    <td class="num">${fmtDesc(d.desconto_fotografia,d.desconto_tipo)}</td><td class="num">${fmtDesc(d.desconto_cerimonial,d.desconto_tipo)}</td>
     <td><div class="row-actions"><button class="icon-btn danger" title="Excluir" onclick="excluirDesconto(${d.id},${pid})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></div></td></tr>`).join('');
   lucide.createIcons();
 }
 window.salvarDesconto=async function(pid){
-  const body={ cpf:$('#dc-cpf').value, nome:$('#dc-nome').value, desconto_fotografia:$('#dc-foto').value||0, desconto_cerimonial:$('#dc-cerim').value||0 };
+  const body={ cpf:$('#dc-cpf').value, nome:$('#dc-nome').value, desconto_tipo:$('#dc-tipo').value, desconto_fotografia:$('#dc-foto').value||0, desconto_cerimonial:$('#dc-cerim').value||0 };
   const r=await fetch(apiUrl(`/api/turma-formatura/planos/${pid}/descontos`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const d=await r.json(); if(!r.ok){alert(d.detail||'Erro');return;}
   $('#dc-cpf').value='';$('#dc-nome').value='';$('#dc-foto').value='';$('#dc-cerim').value=''; carregarDescontos(pid);
@@ -755,16 +887,57 @@ window.excluirDesconto=async function(did,pid){ if(!confirm('Excluir este descon
 
 /* itens do plano */
 const optTipo=(cur)=>PLOPC.tipos.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('');
+/* Catálogo de itens configurados na turma (produtos/servicos/cerimonial) para preencher a descrição */
+let ITENS_TABELA = null;
+async function carregarItensTabela(){
+  if(ITENS_TABELA) return ITENS_TABELA;
+  try{ const r=await fetch(apiUrl('/api/turma-formatura/'+id+'/itens-tabela')); ITENS_TABELA = r.ok ? await r.json() : {}; }
+  catch(e){ ITENS_TABELA = {}; }
+  return ITENS_TABELA;
+}
+/* Mapeia o "tipo" do item do plano para a lista correspondente na tabela da turma */
+function listaTabelaPorTipo(tipo){
+  const t=ITENS_TABELA||{};
+  if(tipo==='produto') return t.produtos||[];
+  if(tipo==='servico') return t.servicos||[];
+  if(tipo==='cerimonial') return t.cerimonial||[];
+  return [];
+}
+/* (Re)monta o select de descrição conforme o tipo. Se não há catálogo p/ o tipo, usa só texto livre. */
+function montarPiDescSelect(tipo, descAtual){
+  const wrap=$('#pi-desc-wrap'); if(!wrap) return;
+  const lista=listaTabelaPorTipo(tipo);
+  if(!lista.length){
+    wrap.innerHTML=`<input type="text" id="pi-desc" placeholder="O que o cliente recebe" value="${escAttr(descAtual||'')}">`;
+    return;
+  }
+  const encontrada = descAtual && lista.some(it=>it.descricao===descAtual);
+  const modoTexto = descAtual && !encontrada; // descrição livre que não está no catálogo
+  const opts = `<option value="">Selecione…</option>` + lista.map(it=>`<option value="${escAttr(it.descricao)}" data-valor="${it.valor!=null?it.valor:''}" ${encontrada&&it.descricao===descAtual?'selected':''}>${it.descricao}${it.valor!=null?` · ${brl(it.valor)}`:''}</option>`).join('') + `<option value="__outro__" ${modoTexto?'selected':''}>Outro (digitar)…</option>`;
+  wrap.innerHTML=`<select id="pi-desc-sel" onchange="onPiDescSelect(this)" style="width:100%;">${opts}</select>`
+    + `<input type="text" id="pi-desc" placeholder="O que o cliente recebe" value="${escAttr(modoTexto?descAtual:'')}" style="margin-top:6px;display:${modoTexto?'block':'none'};">`;
+}
+window.onPiDescSelect=function(sel){
+  const inp=$('#pi-desc'); const o=sel.options[sel.selectedIndex];
+  if(sel.value==='__outro__'){ inp.style.display='block'; inp.value=''; inp.focus(); return; }
+  if(sel.value){ inp.style.display='none'; inp.value=sel.value; const v=o?.dataset.valor; if(v!==''&&v!=null) $('#pi-valor').value=v; }
+  else { inp.style.display='none'; inp.value=''; }
+};
+/* Descrição efetiva enviada ao backend (do input livre ou do select) */
+function piDescValor(){ const inp=$('#pi-desc'); return inp?inp.value:''; }
 function montarPiForm(){
   $('#pi-form').innerHTML = `
-    <div class="fld"><label>Tipo</label><select id="pi-tipo">${optTipo('produto')}</select></div>
-    <div class="fld grow"><label>Descrição *</label><input type="text" id="pi-desc" placeholder="O que o cliente recebe"></div>
+    <div class="fld"><label>Tipo</label><select id="pi-tipo" onchange="onPiTipoChange()">${optTipo('produto')}</select></div>
+    <div class="fld grow"><label>Descrição *</label><div id="pi-desc-wrap"><input type="text" id="pi-desc" placeholder="O que o cliente recebe"></div></div>
     <div class="fld"><label>Qtd</label><input type="number" id="pi-qtd" value="1" style="width:90px;"></div>
     <div class="fld"><label>Valor (R$)</label><input type="number" step="0.01" id="pi-valor" placeholder="0,00" style="width:130px;"></div>
     <div class="fld"><button class="btn btn-primary" id="pi-salvar"><i data-lucide="plus" class="w-4 h-4"></i> <span id="pi-btn">Adicionar item</span></button></div>`;
   lucide.createIcons(); $('#pi-salvar').onclick = salvarItem;
+  montarPiDescSelect($('#pi-tipo').value, '');
 }
+window.onPiTipoChange=function(){ montarPiDescSelect($('#pi-tipo').value, ''); };
 window.abrirPlano=async function(pid){
+  await carregarItensTabela();
   montarPiForm(); planoAtual=pid; piEdit=null;
   $('#planos-lista').hidden=true; $('#planos-detalhe').hidden=false;
   const r=await fetch(apiUrl('/api/turma-formatura/planos/'+pid)); const p=await r.json();
@@ -772,9 +945,9 @@ window.abrirPlano=async function(pid){
   pintarItens(p.itens); window.scrollTo({top:0,behavior:'smooth'});
 };
 window.voltarPlanos=function(){ $('#planos-detalhe').hidden=true; $('#planos-lista').hidden=false; carregarPlanos(); };
-function limparPi(){ piEdit=null; $('#pi-tipo').value='produto'; $('#pi-desc').value=''; $('#pi-qtd').value='1'; $('#pi-valor').value=''; $('#pi-btn').textContent='Adicionar item'; }
+function limparPi(){ piEdit=null; $('#pi-tipo').value='produto'; montarPiDescSelect('produto',''); $('#pi-qtd').value='1'; $('#pi-valor').value=''; $('#pi-btn').textContent='Adicionar item'; }
 async function salvarItem(){
-  const body={ tipo:$('#pi-tipo').value, descricao:$('#pi-desc').value, quantidade:$('#pi-qtd').value||1, valor:$('#pi-valor').value||0 };
+  const body={ tipo:$('#pi-tipo').value, descricao:piDescValor(), quantidade:$('#pi-qtd').value||1, valor:$('#pi-valor').value||0 };
   if(!body.descricao.trim()){ alert('Informe a descrição.'); return; }
   const url = piEdit ? apiUrl('/api/turma-formatura/planos-itens/'+piEdit) : apiUrl(`/api/turma-formatura/planos/${planoAtual}/itens`);
   const r=await fetch(url,{method:piEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -796,7 +969,7 @@ function pintarItens(itens){
       </div></td></tr>`;}).join('');
   lucide.createIcons();
 }
-window.editarItem=function(i){ piEdit=i.id; $('#pi-tipo').value=i.tipo; $('#pi-desc').value=i.descricao; $('#pi-qtd').value=i.quantidade; $('#pi-valor').value=i.valor; $('#pi-btn').textContent='Atualizar item'; window.scrollTo({top:0,behavior:'smooth'}); };
+window.editarItem=function(i){ piEdit=i.id; $('#pi-tipo').value=i.tipo; montarPiDescSelect(i.tipo, i.descricao); $('#pi-qtd').value=i.quantidade; $('#pi-valor').value=i.valor; $('#pi-btn').textContent='Atualizar item'; window.scrollTo({top:0,behavior:'smooth'}); };
 window.excluirItem=async function(iid){ if(!confirm('Excluir este item?'))return; const r=await fetch(apiUrl('/api/turma-formatura/planos-itens/'+iid),{method:'DELETE'}); if(r.ok)recarregarItens(); };
 
 /* ---------------- PRÉ-CADASTRO / ALUNOS ---------------- */

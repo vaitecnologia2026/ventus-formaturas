@@ -11,10 +11,11 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
 </head>
 <body>
 <aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Fotógrafo</div></div></div>
+  <div class="sidebar-brand"><div class="sidebar-brand-mark" style="background:transparent;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Fotógrafo</div></div></div>
   <a href="upload.html" class="sidebar-link active"><i data-lucide="upload"></i>Upload em massa</a>
   <a href="#" class="sidebar-link"><i data-lucide="folder"></i>Minhas galerias</a>
   <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Histórico</a>
@@ -33,45 +34,35 @@
     <div class="grid gap-6" style="grid-template-columns: 1fr 320px;">
       <div>
         <div class="card mb-6">
-          <div class="card-header"><div class="card-title">Sessão de upload</div><span class="badge badge-info">412 / 1.430 fotos</span></div>
+          <div class="card-header"><div class="card-title">Sessão de upload</div><span id="badgeContagem" class="badge badge-info">0 fotos enviadas</span></div>
           <div class="card-body">
             <div class="grid grid-cols-2 gap-4 mb-4">
-              <div><label class="label">Galeria de destino</label><select class="select"><option>COLAÇÃO OFICIAL · ENG. FLORESTAL UFMG (atual)</option><option>+ Criar nova galeria</option></select></div>
-              <div><label class="label">Evento da turma</label><select class="select"><option>Colação Oficial · 18/04/2026</option></select></div>
+              <div><label class="label">Turma de destino</label><select id="selTurma" class="select"><option value="">Carregando…</option></select></div>
+              <div><label class="label">Evento da turma</label><select id="selEvento" class="select" disabled><option value="">Selecione a turma primeiro</option></select></div>
             </div>
 
+            <!-- Feedback global (erros de carregamento) -->
+            <div id="avisoGlobal" style="display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;"></div>
+
             <!-- Drop zone -->
-            <div style="border:2px dashed var(--gray-300);border-radius:14px;padding:48px 24px;text-align:center;background:var(--gray-50);">
+            <div id="dropZone" style="border:2px dashed var(--gray-300);border-radius:14px;padding:48px 24px;text-align:center;background:var(--gray-50);cursor:pointer;transition:border-color .15s,background .15s;">
               <div style="display:inline-flex;width:64px;height:64px;border-radius:16px;background:var(--primary-100);color:var(--primary-700);align-items:center;justify-content:center;margin-bottom:16px;">
                 <i data-lucide="upload-cloud" class="w-8 h-8"></i>
               </div>
               <h3 style="font-size:18px;font-weight:700;color:var(--gray-900);margin-bottom:6px;">Arraste arquivos aqui</h3>
-              <p style="font-size:14px;color:var(--gray-600);margin-bottom:20px;">JPG, RAW · até 5GB por sessão · upload simultâneo via R2</p>
-              <button class="btn btn-primary"><i data-lucide="folder-open" class="w-4 h-4"></i> Selecionar arquivos</button>
+              <p style="font-size:14px;color:var(--gray-600);margin-bottom:20px;">JPG, PNG, WEBP ou PDF · até 5MB por arquivo · armazenado no Cloudflare R2</p>
+              <button type="button" id="btnSelecionar" class="btn btn-primary"><i data-lucide="folder-open" class="w-4 h-4"></i> Selecionar arquivos</button>
+              <input type="file" id="inputArquivos" accept="image/jpeg,image/png,image/webp,application/pdf" multiple style="display:none;">
             </div>
 
-            <!-- Progress -->
-            <div style="margin-top:24px;">
-              <div class="flex justify-between mb-2" style="font-size:13px;">
-                <span><strong>Enviando lote 4 / 6</strong> · 412 de 1.430 fotos</span>
-                <span style="color:var(--gray-500);">≈ 4min restantes</span>
-              </div>
-              <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;"><div style="width:28.8%;height:100%;background:var(--primary-600);"></div></div>
+            <!-- Miniaturas / fila de envio -->
+            <div id="filaVazia" style="margin-top:24px;text-align:center;color:var(--gray-500);font-size:13px;padding:8px;">Nenhuma foto enviada ainda. Selecione ou arraste arquivos acima.</div>
+            <div id="grade" class="grid grid-cols-4 gap-3" style="margin-top:24px;"></div>
 
-              <div class="grid grid-cols-3 gap-3 mt-4" style="font-size:13px;">
-                <div style="background:var(--gray-50);padding:12px;border-radius:10px;">
-                  <div style="color:var(--gray-500);font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Lote atual</div>
-                  <div style="font-weight:700;font-size:18px;margin-top:2px;">120 fotos</div>
-                </div>
-                <div style="background:var(--gray-50);padding:12px;border-radius:10px;">
-                  <div style="color:var(--gray-500);font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Velocidade</div>
-                  <div style="font-weight:700;font-size:18px;margin-top:2px;">42 MB/s</div>
-                </div>
-                <div style="background:var(--gray-50);padding:12px;border-radius:10px;">
-                  <div style="color:var(--gray-500);font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Storage R2</div>
-                  <div style="font-weight:700;font-size:18px;margin-top:2px;">~5,8 GB</div>
-                </div>
-              </div>
+            <!-- Ação: enviar para edição -->
+            <div class="flex items-center justify-between" style="margin-top:24px;gap:12px;">
+              <div id="statusEnvio" style="font-size:13px;color:var(--gray-500);"></div>
+              <button type="button" id="btnEnviarEdicao" class="btn btn-primary" disabled><i data-lucide="send" class="w-4 h-4"></i> Enviar para edição</button>
             </div>
           </div>
         </div>
@@ -113,13 +104,13 @@
         <div class="card mb-4">
           <div class="card-header"><div class="card-title" style="font-size:14px;">Galeria</div></div>
           <div class="card-body" style="padding:18px;">
-            <strong>COLAÇÃO OFICIAL</strong>
-            <p style="font-size:13px;color:var(--gray-600);margin-top:4px;">ENG. FLORESTAL - UFMG · 18/04/2026</p>
+            <strong id="resumoTurma">Selecione uma turma</strong>
+            <p id="resumoEvento" style="font-size:13px;color:var(--gray-600);margin-top:4px;">Nenhum evento selecionado</p>
             <div class="divider"></div>
             <div style="font-size:13px;color:var(--gray-600);">
-              <div class="flex justify-between"><span>Turma</span><strong>72 alunos</strong></div>
-              <div class="flex justify-between mt-2"><span>Coleção Rekognition</span><span style="font-family:var(--font-mono);font-size:11px;">turma-uf-7c2a</span></div>
-              <div class="flex justify-between mt-2"><span>Threshold facial</span><strong>80%</strong></div>
+              <div class="flex justify-between"><span>Fotos enviadas</span><strong id="resumoFotos">0</strong></div>
+              <div class="flex justify-between mt-2"><span>Destino</span><span style="font-family:var(--font-mono);font-size:11px;">fila do editor</span></div>
+              <div class="flex justify-between mt-2"><span>Tipo de O.S.</span><strong>Edição</strong></div>
             </div>
           </div>
         </div>
@@ -135,6 +126,290 @@
   </main>
 </div>
 <script>lucide.createIcons();</script>
+
+<script>
+(function () {
+  "use strict";
+
+  // Estado
+  var EVENTOS = [];              // todos os eventos vindos da API
+  var enviadas = [];             // { url, nome } das fotos já no R2
+  var enviando = false;          // trava o botão durante criação da OS
+
+  // Elementos
+  var selTurma = document.getElementById("selTurma");
+  var selEvento = document.getElementById("selEvento");
+  var dropZone = document.getElementById("dropZone");
+  var btnSelecionar = document.getElementById("btnSelecionar");
+  var inputArquivos = document.getElementById("inputArquivos");
+  var grade = document.getElementById("grade");
+  var filaVazia = document.getElementById("filaVazia");
+  var btnEnviarEdicao = document.getElementById("btnEnviarEdicao");
+  var statusEnvio = document.getElementById("statusEnvio");
+  var badgeContagem = document.getElementById("badgeContagem");
+  var avisoGlobal = document.getElementById("avisoGlobal");
+  var resumoTurma = document.getElementById("resumoTurma");
+  var resumoEvento = document.getElementById("resumoEvento");
+  var resumoFotos = document.getElementById("resumoFotos");
+
+  var MAX_BYTES = 5 * 1024 * 1024;
+  var TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+  function aviso(msg, tipo) {
+    if (!msg) { avisoGlobal.style.display = "none"; return; }
+    var cor = tipo === "erro"
+      ? "background:#FEE2E2;color:#991B1B;"
+      : (tipo === "ok" ? "background:#DCFCE7;color:#166534;" : "background:#FEF3C7;color:#92400E;");
+    avisoGlobal.setAttribute("style", "margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;" + cor);
+    avisoGlobal.textContent = msg;
+  }
+
+  // ---- Carregar opções (turmas + eventos) ----
+  function carregarOpcoes() {
+    fetch(apiUrl("/api/os/opcoes"))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        EVENTOS = d.eventos || [];
+        var turmas = d.turmas || [];
+        if (!turmas.length) {
+          selTurma.innerHTML = '<option value="">Nenhuma turma cadastrada</option>';
+          aviso("Nenhuma turma cadastrada ainda. Cadastre uma turma para começar o upload.", "info");
+          return;
+        }
+        selTurma.innerHTML = '<option value="">Selecione a turma…</option>' +
+          turmas.map(function (t) { return '<option value="' + t.id + '">' + esc(t.nome) + '</option>'; }).join("");
+      })
+      .catch(function () {
+        selTurma.innerHTML = '<option value="">Erro ao carregar</option>';
+        aviso("Não foi possível carregar turmas e eventos. Verifique se o servidor está no ar.", "erro");
+      });
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ---- Turma escolhida -> popular eventos filtrados ----
+  selTurma.addEventListener("change", function () {
+    var turmaId = selTurma.value;
+    resumoTurma.textContent = turmaId
+      ? (selTurma.options[selTurma.selectedIndex].text)
+      : "Selecione uma turma";
+    if (!turmaId) {
+      selEvento.innerHTML = '<option value="">Selecione a turma primeiro</option>';
+      selEvento.disabled = true;
+      resumoEvento.textContent = "Nenhum evento selecionado";
+      atualizarBotao();
+      return;
+    }
+    var doTurma = EVENTOS.filter(function (e) { return String(e.turma_id) === String(turmaId); });
+    if (!doTurma.length) {
+      selEvento.innerHTML = '<option value="">Nenhum evento para esta turma</option>';
+      selEvento.disabled = true;
+    } else {
+      selEvento.innerHTML = '<option value="">Selecione o evento…</option>' +
+        doTurma.map(function (e) { return '<option value="' + e.id + '">' + esc(e.nome) + '</option>'; }).join("");
+      selEvento.disabled = false;
+    }
+    resumoEvento.textContent = "Nenhum evento selecionado";
+    atualizarBotao();
+  });
+
+  selEvento.addEventListener("change", function () {
+    resumoEvento.textContent = selEvento.value
+      ? selEvento.options[selEvento.selectedIndex].text
+      : "Nenhum evento selecionado";
+    atualizarBotao();
+  });
+
+  // ---- Seleção / drag&drop de arquivos ----
+  btnSelecionar.addEventListener("click", function (e) { e.stopPropagation(); inputArquivos.click(); });
+  dropZone.addEventListener("click", function () { inputArquivos.click(); });
+  inputArquivos.addEventListener("change", function () {
+    processarArquivos(inputArquivos.files);
+    inputArquivos.value = "";
+  });
+
+  ["dragenter", "dragover"].forEach(function (ev) {
+    dropZone.addEventListener(ev, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.style.borderColor = "var(--primary-600)";
+      dropZone.style.background = "var(--primary-50)";
+    });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    dropZone.addEventListener(ev, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.style.borderColor = "var(--gray-300)";
+      dropZone.style.background = "var(--gray-50)";
+    });
+  });
+  dropZone.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files) processarArquivos(e.dataTransfer.files);
+  });
+
+  function processarArquivos(fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    filaVazia.style.display = "none";
+    files.forEach(function (file) { enviarUm(file); });
+  }
+
+  // ---- Upload individual -> POST /api/upload ----
+  function enviarUm(file) {
+    // validação local
+    if (TIPOS_OK.indexOf(file.type) === -1) {
+      addCard(file, { erro: "Tipo não permitido (JPG, PNG, WEBP ou PDF)." });
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      addCard(file, { erro: "Arquivo muito grande (máx. 5 MB)." });
+      return;
+    }
+
+    var card = addCard(file, { enviando: true });
+    var fd = new FormData();
+    fd.append("file", file);
+
+    fetch(apiUrl("/api/upload"), { method: "POST", body: fd })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (data) {
+          if (!r.ok) {
+            var msg = data && data.detail
+              ? data.detail
+              : (r.status === 503 ? "Armazenamento (R2) não configurado no servidor." : "Falha no upload (HTTP " + r.status + ").");
+            throw new Error(msg);
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        enviadas.push({ url: data.url, nome: file.name });
+        marcarCardOk(card, data.url);
+        atualizarContagens();
+        atualizarBotao();
+      })
+      .catch(function (err) {
+        marcarCardErro(card, err.message || "Falha no upload.");
+      });
+  }
+
+  // ---- Cards de miniatura ----
+  function addCard(file, opts) {
+    opts = opts || {};
+    var card = document.createElement("div");
+    card.style.cssText = "border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;background:#fff;position:relative;";
+    var thumb = "";
+    if (file.type && file.type.indexOf("image/") === 0) {
+      var url = URL.createObjectURL(file);
+      thumb = '<div style="height:90px;background:#000 center/cover no-repeat url(' + url + ');"></div>';
+    } else {
+      thumb = '<div style="height:90px;display:grid;place-items:center;background:var(--gray-100);color:var(--gray-500);"><i data-lucide="file-text" class="w-6 h-6"></i></div>';
+    }
+    var estado = opts.erro
+      ? '<span style="color:#991B1B;">' + esc(opts.erro) + '</span>'
+      : '<span style="color:var(--gray-500);">Enviando…</span>';
+    card.innerHTML = thumb +
+      '<div style="padding:8px;font-size:11px;">' +
+      '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + esc(file.name) + '">' + esc(file.name) + '</div>' +
+      '<div class="estado" style="margin-top:2px;">' + estado + '</div>' +
+      '</div>';
+    grade.appendChild(card);
+    if (window.lucide) lucide.createIcons();
+    return card;
+  }
+
+  function marcarCardOk(card, url) {
+    var est = card.querySelector(".estado");
+    est.innerHTML = '<a href="' + esc(url) + '" target="_blank" style="color:var(--success);display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle" class="w-3 h-3"></i> Enviada</a>';
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function marcarCardErro(card, msg) {
+    var est = card.querySelector(".estado");
+    est.innerHTML = '<span style="color:#991B1B;">' + esc(msg) + '</span>';
+    card.style.borderColor = "#FCA5A5";
+  }
+
+  function atualizarContagens() {
+    var n = enviadas.length;
+    badgeContagem.textContent = n + (n === 1 ? " foto enviada" : " fotos enviadas");
+    resumoFotos.textContent = n;
+  }
+
+  function atualizarBotao() {
+    var ok = selTurma.value && selEvento.value && enviadas.length > 0 && !enviando;
+    btnEnviarEdicao.disabled = !ok;
+    if (enviando) {
+      statusEnvio.textContent = "Criando ordem de serviço…";
+    } else if (!selTurma.value || !selEvento.value) {
+      statusEnvio.textContent = "Escolha turma e evento para habilitar o envio.";
+    } else if (enviadas.length === 0) {
+      statusEnvio.textContent = "Envie ao menos 1 foto para habilitar.";
+    } else {
+      statusEnvio.textContent = enviadas.length + " foto(s) prontas para a fila do editor.";
+    }
+  }
+
+  // ---- Criar OS na fila do editor ----
+  btnEnviarEdicao.addEventListener("click", function () {
+    if (!selTurma.value || !selEvento.value) { aviso("Selecione turma e evento antes de enviar.", "erro"); return; }
+    if (!enviadas.length) { aviso("Envie ao menos 1 foto antes de criar a ordem de serviço.", "erro"); return; }
+
+    enviando = true;
+    atualizarBotao();
+    aviso("");
+
+    var nomeEvento = selEvento.options[selEvento.selectedIndex].text;
+    var n = enviadas.length;
+    var obs = "Fotos enviadas (" + n + "):\n" + enviadas.map(function (f, i) {
+      return (i + 1) + ". " + f.url;
+    }).join("\n");
+
+    var body = {
+      titulo: "Fotos " + nomeEvento + " (" + n + " fotos)",
+      tipo: "edicao",
+      turma_id: Number(selTurma.value),
+      evento_id: Number(selEvento.value),
+      observacoes: obs
+    };
+
+    fetch(apiUrl("/api/os"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (data) {
+          if (!r.ok) throw new Error(data && data.detail ? data.detail : "Falha ao criar a O.S. (HTTP " + r.status + ").");
+          return data;
+        });
+      })
+      .then(function (os) {
+        aviso("Enviado para edição! O.S. #" + os.id + " criada na fila do editor com " + n + " foto(s).", "ok");
+        // limpar a fila de envio
+        enviadas = [];
+        grade.innerHTML = "";
+        filaVazia.style.display = "";
+        atualizarContagens();
+      })
+      .catch(function (err) {
+        aviso(err.message || "Não foi possível criar a ordem de serviço.", "erro");
+      })
+      .finally(function () {
+        enviando = false;
+        atualizarBotao();
+      });
+  });
+
+  // Init
+  atualizarContagens();
+  atualizarBotao();
+  carregarOpcoes();
+})();
+</script>
 
 </body>
 </html>

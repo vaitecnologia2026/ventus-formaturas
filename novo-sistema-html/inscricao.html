@@ -9,277 +9,820 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root{ --azul:#2563EB; --azul-esc:#1E3A8A; --ink:#0F172A; --cinza:#64748B; --linha:#E2E8F0; --bg:#F1F5F9; }
-  *{box-sizing:border-box;} body{margin:0;font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);}
-  .top{background:linear-gradient(135deg,var(--azul-esc),var(--azul));color:#fff;padding:26px 20px;text-align:center;}
-  .top img{height:30px;display:block;margin:0 auto 10px;}
-  .top .marca{font-size:13px;opacity:.85;letter-spacing:.02em;}
-  .wrap{max-width:560px;margin:-30px auto 40px;padding:0 16px;}
-  .card{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -18px rgba(15,23,42,.25);padding:28px 26px;}
+  :root{
+    --azul:#2563EB; --azul-esc:#1E3A8A; --azul-950:#172554;
+    --ink:#0F172A; --cinza:#64748B; --cinza2:#475569; --linha:#E2E8F0;
+    --bg:#F1F5F9; --branco:#fff; --verde:#16A34A; --verde-bg:#DCFCE7;
+    --vermelho:#B91C1C; --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+  /* ===== Header com logo (contraste garantido) ===== */
+  .top{background:linear-gradient(135deg,var(--azul-950),var(--azul));color:#fff;padding:18px 20px;}
+  .top-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .top .logo-wrap{background:transparent;padding:0;display:inline-flex;align-items:center;}
+  .top .logo-wrap img{height:34px;display:block;}
+  .top .logo-fallback{font-weight:900;font-size:20px;letter-spacing:-.02em;color:#fff;}
+  .top .marca{font-size:13px;opacity:.9;letter-spacing:.02em;line-height:1.3;}
+  .top .marca b{display:block;font-size:15px;font-weight:700;opacity:1;}
+
+  /* ===== Progress bar (etapas) ===== */
+  .steps{background:#fff;border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:20;}
+  .steps-in{max-width:1080px;margin:0 auto;padding:14px 20px;display:flex;gap:6px;overflow-x:auto;}
+  .step{display:flex;align-items:center;gap:8px;flex:0 0 auto;color:var(--cinza);font-size:13px;font-weight:600;white-space:nowrap;}
+  .step .num{width:26px;height:26px;border-radius:50%;background:var(--linha);color:var(--cinza2);display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto;transition:.2s;}
+  .step.active{color:var(--azul-esc);}
+  .step.active .num{background:var(--azul);color:#fff;}
+  .step.done{color:var(--verde);}
+  .step.done .num{background:var(--verde);color:#fff;}
+  .step .bar{width:24px;height:2px;background:var(--linha);border-radius:2px;}
+  @media(max-width:640px){ .step .lbl{display:none;} .step .bar{width:16px;} .steps-in{gap:4px;justify-content:center;} }
+
+  /* ===== Layout ===== */
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 20px 120px;display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;}
+  @media(max-width:900px){ .wrap{grid-template-columns:1fr;padding-bottom:24px;} }
+  .main{min-width:0;}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -22px rgba(15,23,42,.28);padding:26px 24px;}
+  @media(max-width:640px){ .card{padding:22px 18px;border-radius:16px;} }
+
   h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;}
-  .sub{color:var(--cinza);font-size:14px;margin:0 0 22px;}
+  .sub{color:var(--cinza);font-size:14px;margin:0 0 20px;line-height:1.45;}
+  .sec-title{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:0 0 3px;}
+  .sec-hint{font-size:13px;color:var(--cinza);margin:0 0 16px;}
+
   label{display:block;font-size:13px;font-weight:600;color:#334155;margin:0 0 6px;}
   .fld{margin-bottom:16px;}
-  input{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:.15s;}
-  input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
-  .planos{display:grid;gap:12px;margin:6px 0 22px;}
-  .plano{border:1.5px solid var(--linha);border-radius:14px;padding:16px;cursor:pointer;transition:.15s;position:relative;}
-  .plano:hover{border-color:#CBD5E1;}
-  .plano.on{border-color:var(--azul);background:#EFF6FF;}
-  .plano input{position:absolute;opacity:0;}
-  .plano .nome{font-weight:700;font-size:16px;}
-  .plano .desc{font-size:13px;color:var(--cinza);margin-top:3px;}
-  .plano .valor{font-size:20px;font-weight:800;color:var(--azul-esc);margin-top:8px;}
-  .plano .pag{font-size:12px;color:var(--cinza);}
-  .btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--azul);color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;}
-  .btn:hover{background:var(--azul-esc);}
-  .ok{text-align:center;padding:20px 0;}
-  .ok .ic{width:72px;height:72px;border-radius:50%;background:#DCFCE7;color:#16A34A;display:grid;place-items:center;margin:0 auto 14px;}
-  .ok .ic svg{width:38px;height:38px;}
-  .muted{color:var(--cinza);font-size:13px;text-align:center;margin-top:14px;}
-  .erro{color:#B91C1C;font-size:13px;font-weight:600;margin:0 0 12px;display:none;}
-  .sec{margin:22px 0 6px;padding-top:18px;border-top:1px solid var(--linha);}
-  .sec h2{font-size:15px;font-weight:800;margin:0 0 3px;}
-  .sec .hint{font-size:12.5px;color:var(--cinza);margin:0 0 12px;}
-  .ev{border:1px solid var(--linha);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
-  .ev .nome{font-weight:700;font-size:14px;margin-bottom:8px;}
-  .qtd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  @media(max-width:420px){.qtd-grid{grid-template-columns:1fr;}}
-  .qtd-grid .mini label{font-size:12px;margin-bottom:4px;}
-  .qtd-grid input{padding:9px 11px;}
-  .add{display:flex;align-items:center;gap:12px;border:1px solid var(--linha);border-radius:12px;padding:10px 14px;margin-bottom:8px;}
-  .add .info{flex:1;min-width:0;}
-  .add .info .n{font-weight:600;font-size:14px;}
-  .add .info .v{font-size:12.5px;color:var(--azul-esc);font-weight:700;}
-  .add input{width:64px;text-align:center;padding:8px;}
-  select{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;outline:none;}
-  select:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  input,select,textarea{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:.15s;background:#fff;color:var(--ink);}
+  input:focus,select:focus,textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  input[readonly]{background:#F8FAFC;color:var(--cinza2);}
+  textarea{resize:vertical;min-height:64px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  @media(max-width:480px){ .grid2,.grid3{grid-template-columns:1fr;} }
+
+  /* ===== Cards de plano (produto) ===== */
+  .produtos{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:760px){ .produtos{grid-template-columns:1fr;} }
+  .prod{position:relative;border:1.5px solid var(--linha);border-radius:16px;padding:18px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;background:#fff;}
+  .prod:hover{border-color:#93C5FD;box-shadow:0 8px 24px -16px rgba(37,99,235,.4);}
+  .prod.on{border-color:var(--azul);background:#EFF6FF;box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  .prod.bloq{opacity:.6;pointer-events:none;filter:grayscale(.3);}
+  .prod input{position:absolute;opacity:0;pointer-events:none;}
+  .prod .badge{position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;}
+  .prod .badge.vaga{background:var(--verde-bg);color:#166534;}
+  .prod .badge.esgot{background:#FEE2E2;color:var(--vermelho);}
+  .prod .p-nome{font-weight:800;font-size:17px;letter-spacing:-.01em;padding-right:70px;}
+  .prod .p-tag{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--azul-esc);background:#DBEAFE;padding:3px 8px;border-radius:6px;}
+  .prod .p-desc{font-size:13px;color:var(--cinza);margin-top:10px;line-height:1.45;}
+  .prod ul.p-inc{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:6px;}
+  .prod ul.p-inc li{font-size:13px;color:var(--cinza2);display:flex;gap:7px;align-items:flex-start;}
+  .prod ul.p-inc li svg{width:15px;height:15px;color:var(--verde);flex:0 0 auto;margin-top:1px;}
+  .prod .p-preco-wrap{margin-top:auto;padding-top:14px;}
+  .prod .p-preco{font-size:24px;font-weight:900;color:var(--azul-950);letter-spacing:-.02em;}
+  .prod .p-sub{font-size:12px;color:var(--cinza);margin-top:2px;}
+  .prod .p-check{margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:var(--azul);border:1.5px solid #BFDBFE;border-radius:10px;padding:8px;transition:.15s;}
+  .prod.on .p-check{background:var(--azul);color:#fff;border-color:var(--azul);}
+
+  /* ===== Meios de pagamento ===== */
+  .meios{display:grid;gap:10px;margin-top:6px;}
+  .meio{position:relative;border:1.5px solid var(--linha);border-radius:12px;padding:13px 15px;cursor:pointer;transition:.15s;}
+  .meio:hover{border-color:#93C5FD;}
+  .meio.on{border-color:var(--azul);background:#EFF6FF;}
+  .meio input{position:absolute;opacity:0;pointer-events:none;}
+  .meio .m-nome{font-weight:700;font-size:14px;}
+  .meio .m-desc{font-size:12.5px;color:var(--cinza);margin-top:3px;}
+
+  /* ===== Contrato ===== */
+  .contrato-box{border:1px solid var(--linha);border-radius:12px;padding:14px 16px;font-size:13px;color:#334155;max-height:280px;overflow:auto;white-space:pre-wrap;line-height:1.5;background:#F8FAFC;}
+  .aceite{display:flex;gap:11px;align-items:flex-start;margin-top:14px;font-size:14px;cursor:pointer;line-height:1.4;}
+  .aceite input{width:20px;height:20px;flex:0 0 auto;margin-top:1px;accent-color:var(--azul);}
+
+  /* ===== Adicionais ===== */
+  .add{display:flex;align-items:center;gap:14px;border:1px solid var(--linha);border-radius:12px;padding:12px 15px;margin-bottom:10px;}
+  .add .a-info{flex:1;min-width:0;}
+  .add .a-n{font-weight:600;font-size:14px;}
+  .add .a-v{font-size:12.5px;color:var(--azul-esc);font-weight:700;margin-top:2px;}
+  .add .q-add{width:64px;text-align:center;padding:9px;}
+  .ev{border:1px solid var(--linha);border-radius:12px;padding:14px 15px;margin-bottom:12px;}
+  .ev .ev-n{font-weight:700;font-size:14px;margin-bottom:10px;}
+
+  .empty-note{background:#F8FAFC;border:1px dashed var(--linha);border-radius:12px;padding:20px;text-align:center;color:var(--cinza);font-size:14px;}
+
+  /* ===== Navegação ===== */
+  .nav{display:flex;gap:12px;margin-top:24px;}
+  .btn{flex:1;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;}
+  .btn-primary{background:var(--azul);color:#fff;}
+  .btn-primary:hover{background:var(--azul-esc);}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+  .btn-ghost{flex:0 0 auto;padding:14px 22px;background:#fff;color:var(--cinza2);border:1.5px solid var(--linha);}
+  .btn-ghost:hover{border-color:#CBD5E1;background:#F8FAFC;}
+
+  .erro{color:var(--vermelho);font-size:13px;font-weight:600;margin:0 0 14px;display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;}
+
+  /* ===== Resumo / carrinho ===== */
+  .resumo{background:#fff;border:1px solid var(--linha);border-radius:20px;box-shadow:0 12px 40px -24px rgba(15,23,42,.28);padding:22px 20px;position:sticky;top:78px;}
+  @media(max-width:900px){ .resumo{position:static;margin-top:20px;} }
+  .resumo h3{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--cinza2);margin:0 0 16px;display:flex;align-items:center;gap:8px;}
+  .resumo h3 svg{width:18px;height:18px;color:var(--azul);}
+  .r-line{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:9px 0;border-bottom:1px dashed var(--linha);}
+  .r-line .l{color:var(--cinza2);}
+  .r-line .v{font-weight:700;text-align:right;}
+  .r-empty{color:var(--cinza);font-size:14px;text-align:center;padding:14px 0;}
+  .r-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;padding-top:14px;border-top:2px solid var(--ink);}
+  .r-total .l{font-size:15px;font-weight:800;}
+  .r-total .v{font-size:24px;font-weight:900;color:var(--azul-950);letter-spacing:-.02em;}
+  .r-desc{background:var(--verde-bg);color:#166534;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:12px;}
+
+  /* ===== Estados globais ===== */
+  .ok{text-align:center;padding:24px 6px;}
+  .ok .ic{width:76px;height:76px;border-radius:50%;background:var(--verde-bg);color:var(--verde);display:grid;place-items:center;margin:0 auto 16px;}
+  .ok .ic svg{width:40px;height:40px;}
+  .muted{color:var(--cinza);font-size:13px;text-align:center;margin-top:16px;line-height:1.5;}
+  .center-card{max-width:520px;margin:40px auto;}
+  .hide{display:none !important;}
+
+  /* Chip pagamento na tela final */
+  .final-box{border:1px solid var(--linha);border-radius:16px;background:#F8FAFC;padding:20px;margin-top:20px;text-align:left;}
+  .final-box .fb-t{font-weight:800;font-size:15px;margin-bottom:12px;}
+  .pay-hint{display:flex;gap:12px;align-items:center;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px 16px;margin-top:18px;}
+  .pay-hint svg{width:26px;height:26px;color:var(--azul);flex:0 0 auto;}
+  .pay-hint .ph-t{font-size:14px;color:var(--azul-esc);line-height:1.4;}
 </style>
 </head>
 <body>
 <div class="top">
-  <img src="/assets/img/logo.png" alt="Ventus" onerror="this.style.display='none'">
-  <div class="marca">Cadastro da sua Formatura</div>
+  <div class="top-in">
+    <span class="logo-wrap">
+      <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" onerror="this.onerror=null;this.outerHTML='<span class=&quot;logo-fallback&quot;>Ventus</span>'">
+    </span>
+    <div class="marca"><b>Cadastro da sua Formatura</b>Preencha em poucos passos</div>
+  </div>
 </div>
-<div class="wrap"><div class="card" id="card">
-  <p class="muted">Carregando…</p>
-</div></div>
+
+<!-- Barra de etapas -->
+<div class="steps hide" id="steps">
+  <div class="steps-in" id="steps-in"></div>
+</div>
+
+<div class="wrap" id="wrap">
+  <div class="main">
+    <div class="card" id="card"><p class="muted">Carregando…</p></div>
+  </div>
+  <aside class="resumo hide" id="resumo"></aside>
+</div>
 
 <script>
 const token = new URLSearchParams(location.search).get('t');
 const card = document.getElementById('card');
+const stepsEl = document.getElementById('steps');
+const stepsIn = document.getElementById('steps-in');
+const resumoEl = document.getElementById('resumo');
 const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-if (!token) card.innerHTML = '<h1>Link inválido</h1><p class="sub">Peça um novo link de cadastro à comissão.</p>';
-else carregar();
+const esc = s => String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const maskCpf = v => { const x=String(v||'').replace(/\D/g,'').slice(0,11); return x.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
 
 let DADOS = null;
-const esc = s => String(s||'').replace(/"/g,'&quot;');
-const maskCpf = v => { const x=String(v||'').replace(/\D/g,'').slice(0,11); return x.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
-const planoSel = () => DADOS.planos.find(p => p.id == (document.querySelector('.plano input:checked')||{}).value);
+let STEP = 0;                 // etapa atual (0..4)
+const TOTAL_STEPS = 5;
+let DESC = null;             // último desconto aplicado {desconto_fotografia, desconto_cerimonial, nome}
+let CUPOM = null;            // cupom aplicado {codigo, tipo:'valor'|'percentual', valor, descricao}
+
+// ---- estado do formulário (persiste entre etapas) ----
+const F = {
+  nome:'', celular:'', email:'', cpf:'', curso:'', ano_formatura:'',
+  altura:'', peso:'', calcado:'',
+  plano_id:null, meio_pagamento:null, forma_pagamento:null, parcelas:null,
+  aceite_contrato:false, observacoes:'',
+  participacoes:[],   // {evento_fotografico_id, qtd_familiares, qtd_convidados}
+  adicionais:[],      // {descricao, valor, quantidade}
+};
+
+const STEP_LABELS = ['Dados','Plano & Pagamento','Adicionais','Contrato','Confirmação'];
+
+if (!token) {
+  card.innerHTML = '<h1>Link inválido</h1><p class="sub">Peça um novo link de cadastro à comissão.</p>';
+} else {
+  carregar();
+}
+
+const planoById = id => (DADOS && DADOS.planos.find(p => String(p.id)===String(id))) || null;
+const planoSel = () => planoById(F.plano_id);
+
+// desconto do cupom, calculado sobre a base (valor da fotografia se houver, senão o total do plano+adicionais)
+function cupomDesconto(baseFotografia, baseTotal){
+  if(!CUPOM) return 0;
+  const base = (CUPOM.tipo==='percentual')
+    ? (baseFotografia != null && baseFotografia > 0 ? baseFotografia : baseTotal)
+    : 0;
+  let d = 0;
+  if(CUPOM.tipo==='percentual') d = base * (Number(CUPOM.valor)||0) / 100;
+  else d = Number(CUPOM.valor)||0; // tipo 'valor'
+  return Math.max(0, d);
+}
 
 async function carregar(){
   const r = await fetch(apiUrl('/api/inscricao/'+token));
   if(!r.ok){ card.innerHTML = '<h1>Link inválido</h1><p class="sub">Este link de cadastro não é válido. Peça um novo à comissão.</p>'; return; }
-  DADOS = await r.json(); const d = DADOS; const a = d.aluno;
+  DADOS = await r.json();
+  const a = DADOS.aluno || {};
+  // hidrata estado com o que já veio do backend
+  F.nome = a.nome || '';
+  F.celular = a.celular || '';
+  F.email = a.email || '';
+  F.cpf = a.cpf ? maskCpf(a.cpf) : '';
+  F.curso = a.curso || '';
+  F.ano_formatura = a.ano_formatura || '';
+  F.altura = a.altura || '';
+  F.peso = a.peso || '';
+  F.calcado = a.calcado || '';
+  F.plano_id = a.plano_id != null ? a.plano_id : null;
+  F.meio_pagamento = a.meio_pagamento || null;
+  F.forma_pagamento = a.forma_pagamento || null;
+  F.parcelas = a.parcelas_escolhidas || null;
+  F.aceite_contrato = !!a.aceite_contrato;
+  F.observacoes = a.observacoes || '';
+  // adicionais já escolhidos
+  (DADOS.adicionais||[]).forEach(x=>{ F.adicionais.push({descricao:x.descricao, valor:+x.valor||0, quantidade:+x.quantidade||0}); });
+  // participações já escolhidas (por evento)
+  stepsEl.classList.remove('hide');
+  resumoEl.classList.remove('hide');
+  STEP = 0;
+  render();
+}
 
-  const planosHtml = d.planos.length ? `
-    <div class="sec"><h2>Escolha seu plano</h2>
-    <div class="planos">${d.planos.map(p=>{
-      const bloq = p.lotado && a.plano_id!=p.id;
-      return `
-      <label class="plano" data-id="${p.id}" style="${bloq?'opacity:.55;pointer-events:none;':''}">
-        <input type="radio" name="plano" value="${p.id}" ${a.plano_id==p.id?'checked':''} ${bloq?'disabled':''}>
-        <div class="nome">${p.nome}${p.vagas!=null?(bloq?' — <span style="color:#B91C1C;">Esgotado</span>':` <span style="font-size:12px;color:#16A34A;font-weight:600;">(${p.vagas_restantes} vaga(s))</span>`):''}</div>
-        ${p.tipo_contrato_label?`<div class="desc">${p.tipo_contrato_label}${p.qt_fotos?` · ${p.qt_fotos} fotos`:''}${p.forma_entrega?` · ${p.forma_entrega}`:''}</div>`:''}
-        ${p.descricao?`<div class="desc">${p.descricao}</div>`:''}
-        <div class="valor">${brl(p.valor)}</div>
-        ${(p.valor_fotografia||p.valor_cerimonial)?`<div class="pag">Fotografia ${brl(p.valor_fotografia)}${p.valor_cerimonial?` · Cerimonial ${brl(p.valor_cerimonial)}`:''}</div>`:''}
-      </label>`;}).join('')}</div></div>` : '';
+/* =================== RENDER PRINCIPAL =================== */
+function render(){
+  renderSteps();
+  renderResumo();
+  const views = [viewDados, viewPlano, viewAdicionais, viewContrato, viewFinal];
+  views[STEP]();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 
-  const eventos = d.eventos || [];
-  const eventosHtml = eventos.length ? `
-    <div class="sec"><h2>Familiares e convidados</h2>
-    <p class="hint">Informe quantas pessoas você levará em cada evento.</p>
-    ${eventos.map(e=>`
-      <div class="ev" data-ev="${e.id}">
-        <div class="nome">${e.nome}</div>
-        <div class="qtd-grid">
-          ${e.pede_familiares?`<div class="mini"><label>Familiares</label><input type="number" min="0" class="q-fam" value="${e.qtd_familiares||0}"></div>`:''}
-          ${e.pede_convidados?`<div class="mini"><label>Convidados</label><input type="number" min="0" class="q-conv" value="${e.qtd_convidados||0}"></div>`:''}
+function renderSteps(){
+  stepsIn.innerHTML = STEP_LABELS.map((lbl,i)=>{
+    const cls = i===STEP ? 'active' : (i<STEP ? 'done' : '');
+    const num = i<STEP ? '✓' : (i+1);
+    return `<div class="step ${cls}"><span class="num">${num}</span><span class="lbl">${lbl}</span></div>${i<STEP_LABELS.length-1?'<span class="bar"></span>':''}`;
+  }).join('');
+}
+
+/* =================== RESUMO / CARRINHO =================== */
+function renderResumo(){
+  const p = planoSel();
+  const addTotal = F.adicionais.reduce((s,x)=> s + (x.valor||0)*(x.quantidade||0), 0);
+  const planoVal = p ? (p.valor||0) : 0;
+  const descTotal = DESC ? ((DESC.desconto_fotografia||0)+(DESC.desconto_cerimonial||0)) : 0;
+  const subTotal = planoVal + addTotal;
+  const cupomVal = cupomDesconto(p ? (p.valor_fotografia||0) : 0, subTotal);
+  const total = Math.max(0, subTotal - descTotal - cupomVal);
+
+  let inner = `<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Seu pedido</h3>`;
+
+  if(!p && !addTotal){
+    inner += `<p class="r-empty">Escolha um plano para ver o resumo.</p>`;
+  } else {
+    if(p){
+      inner += `<div class="r-line"><span class="l">${esc(p.nome)}</span><span class="v">${brl(planoVal)}</span></div>`;
+      if(F.meio_pagamento || F.forma_pagamento){
+        const meioLbl = meioLabel(p, F.meio_pagamento) || formaLabel(F.forma_pagamento) || '';
+        if(meioLbl) inner += `<div class="r-line"><span class="l">Pagamento</span><span class="v" style="font-weight:600;">${esc(meioLbl)}${F.parcelas&&F.parcelas>1?` · ${F.parcelas}x`:''}</span></div>`;
+      }
+    }
+    F.adicionais.filter(x=>x.quantidade>0).forEach(x=>{
+      inner += `<div class="r-line"><span class="l">${esc(x.descricao)} × ${x.quantidade}</span><span class="v">${brl(x.valor*x.quantidade)}</span></div>`;
+    });
+    if(descTotal>0){
+      inner += `<div class="r-desc">✓ Desconto aplicado${DESC && DESC.nome?` (${esc(DESC.nome)})`:''}: −${brl(descTotal)}</div>`;
+    }
+    if(cupomVal>0 && CUPOM){
+      inner += `<div class="r-desc">🏷️ Cupom ${esc(CUPOM.codigo)} — desconto ${brl(cupomVal)}</div>`;
+    }
+    inner += `<div class="r-total"><span class="l">Total</span><span class="v">${brl(total)}</span></div>`;
+  }
+  resumoEl.innerHTML = inner;
+}
+
+function meioLabel(p, meio){
+  if(!p || !meio || !p.meios_pagamento) return null;
+  const m = p.meios_pagamento.find(x=>x.meio===meio);
+  return m ? m.label : null;
+}
+function formaLabel(forma){
+  if(!forma) return null;
+  const fp = (DADOS.formas_pagamento||[]).find(f=>f[0]===forma);
+  return fp ? fp[1] : forma;
+}
+
+function showErro(msg){
+  const e = document.getElementById('erro');
+  if(e){ e.textContent = msg; e.style.display = 'block'; }
+}
+function clearErro(){ const e=document.getElementById('erro'); if(e) e.style.display='none'; }
+
+/* =================== ETAPA 1: DADOS =================== */
+function viewDados(){
+  const a = DADOS.aluno || {};
+  const nomeReadonly = !!(a.nome && a.nome.trim());
+  card.innerHTML = `
+    <h1>Olá, ${esc((F.nome||'você').split(' ')[0])}! 👋</h1>
+    <p class="sub">Confirme seus dados para a turma <b>${esc(DADOS.turma?DADOS.turma.nome:'')}</b>${DADOS.turma&&DADOS.turma.instituicao?` · ${esc(DADOS.turma.instituicao)}`:''}.</p>
+    <p class="erro" id="erro"></p>
+
+    <div class="fld"><label>Nome completo</label>
+      <input id="i-nome" value="${esc(F.nome)}" ${nomeReadonly?'readonly':'placeholder="Seu nome completo"'}></div>
+
+    <div class="grid2">
+      <div class="fld"><label>CPF</label><input id="i-cpf" value="${esc(F.cpf)}" inputmode="numeric" placeholder="000.000.000-00"></div>
+      <div class="fld"><label>WhatsApp</label><input id="i-cel" value="${esc(F.celular)}" placeholder="(38) 99999-0000"></div>
+    </div>
+    <div class="fld"><label>E-mail</label><input id="i-email" type="email" value="${esc(F.email)}" placeholder="voce@email.com"></div>
+    <div class="grid2">
+      <div class="fld"><label>Curso</label><input id="i-curso" value="${esc(F.curso)}" placeholder="Ex.: Medicina"></div>
+      <div class="fld"><label>Ano de formatura</label><input id="i-ano" type="number" value="${esc(F.ano_formatura)}" placeholder="2026"></div>
+    </div>
+
+    <p class="sec-title" style="margin-top:8px;">Suas medidas</p>
+    <p class="sec-hint">Para a beca e produtos personalizados.</p>
+    <div class="grid3">
+      <div class="fld"><label>Altura</label><input id="i-altura" value="${esc(F.altura)}" placeholder="1,72"></div>
+      <div class="fld"><label>Peso</label><input id="i-peso" value="${esc(F.peso)}" placeholder="68 kg"></div>
+      <div class="fld"><label>Calçado</label><input id="i-calcado" value="${esc(F.calcado)}" placeholder="40"></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-primary" id="btn-next">Continuar</button>
+    </div>`;
+
+  const cpfEl = document.getElementById('i-cpf');
+  cpfEl.value = maskCpf(cpfEl.value);
+  cpfEl.oninput = () => { cpfEl.value = maskCpf(cpfEl.value); };
+
+  document.getElementById('btn-next').onclick = () => {
+    saveDados();
+    const nome = F.nome.trim();
+    if(!nome){ showErro('Informe seu nome.'); return; }
+    clearErro();
+    // aplica desconto por CPF ao avançar (mantém comportamento existente)
+    checarDesconto();
+    STEP = 1; render();
+  };
+}
+
+function saveDados(){
+  F.nome = document.getElementById('i-nome').value.trim();
+  F.celular = document.getElementById('i-cel').value;
+  F.email = document.getElementById('i-email').value;
+  F.cpf = document.getElementById('i-cpf').value;
+  F.curso = document.getElementById('i-curso').value;
+  F.ano_formatura = document.getElementById('i-ano').value || '';
+  F.altura = document.getElementById('i-altura').value;
+  F.peso = document.getElementById('i-peso').value;
+  F.calcado = document.getElementById('i-calcado').value;
+}
+
+/* =================== ETAPA 2: PLANO + PAGAMENTO =================== */
+function viewPlano(){
+  const a = DADOS.aluno || {};
+  const planos = DADOS.planos || [];
+  const cardsHtml = planos.length ? planos.map(p=>{
+    const bloq = p.lotado && String(a.plano_id)!==String(p.id);
+    const on = String(F.plano_id)===String(p.id);
+    let badge='';
+    if(p.vagas!=null){
+      badge = bloq ? `<span class="badge esgot">Esgotado</span>` : `<span class="badge vaga">${p.vagas_restantes} vaga(s)</span>`;
+    }
+    const incl = [];
+    if(p.qt_fotos) incl.push(`${p.qt_fotos} fotos`);
+    if(p.forma_entrega) incl.push(esc(p.forma_entrega));
+    if(p.valor_fotografia) incl.push(`Fotografia ${brl(p.valor_fotografia)}`);
+    if(p.valor_cerimonial) incl.push(`Cerimonial ${brl(p.valor_cerimonial)}`);
+    const inclHtml = incl.length ? `<ul class="p-inc">${incl.map(t=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>${t}</li>`).join('')}</ul>` : '';
+    return `
+      <label class="prod ${on?'on':''} ${bloq?'bloq':''}" data-id="${p.id}">
+        <input type="radio" name="plano" value="${p.id}" ${on?'checked':''} ${bloq?'disabled':''}>
+        ${badge}
+        <div class="p-nome">${esc(p.nome)}</div>
+        ${p.tipo_contrato_label?`<span class="p-tag">${esc(p.tipo_contrato_label)}</span>`:''}
+        ${p.descricao?`<div class="p-desc">${esc(p.descricao)}</div>`:''}
+        ${inclHtml}
+        <div class="p-preco-wrap">
+          <div class="p-preco">${brl(p.valor)}</div>
+          <div class="p-sub">${bloq?'Vagas esgotadas':'Valor do plano'}</div>
+          <div class="p-check">${on?'Selecionado ✓':'Escolher plano'}</div>
         </div>
-      </div>`).join('')}</div>` : '';
-
-  const cat = d.adicionais_catalogo || [];
-  const jaEsc = {}; (d.adicionais||[]).forEach(x=>{ jaEsc[x.descricao.toLowerCase()] = x.quantidade; });
-  const addHtml = cat.length ? `
-    <div class="sec"><h2>Produtos e serviços adicionais</h2>
-    <p class="hint">Opcional — o que você quiser além do plano.</p>
-    ${cat.map((it)=>`
-      <div class="add" data-desc="${esc(it.descricao)}" data-valor="${it.valor}">
-        <div class="info"><div class="n">${it.descricao}</div><div class="v">${brl(it.valor)}</div></div>
-        <input type="number" min="0" class="q-add" value="${jaEsc[it.descricao.toLowerCase()]||0}">
-      </div>`).join('')}</div>` : '';
+      </label>`;
+  }).join('') : '<div class="empty-note">Nenhum plano disponível no momento. Fale com a comissão.</div>';
 
   card.innerHTML = `
-    <h1>Olá, ${a.nome.split(' ')[0]}! 👋</h1>
-    <p class="sub">Confirme seus dados para a turma <b>${d.turma.nome}</b>${d.turma.instituicao?` · ${d.turma.instituicao}`:''}.</p>
+    <h1>Escolha seu plano</h1>
+    <p class="sub">Selecione o plano da sua formatura e a forma de pagamento.</p>
     <p class="erro" id="erro"></p>
-    <div class="sec" style="border-top:none;padding-top:0;"><h2>Seus dados</h2>
-      <div class="fld"><label>Nome completo</label><input id="i-nome" value="${esc(a.nome)}"></div>
-      <div class="qtd-grid">
-        <div class="mini"><label>CPF</label><input id="i-cpf" value="${esc(a.cpf?maskCpf(a.cpf):'')}" placeholder="000.000.000-00"></div>
-        <div class="mini"><label>WhatsApp</label><input id="i-cel" value="${esc(a.celular)}" placeholder="(38) 99999-0000"></div>
-      </div>
-      <div class="fld"><label>E-mail</label><input id="i-email" value="${esc(a.email)}" placeholder="voce@email.com"></div>
-      <div class="qtd-grid">
-        <div class="mini"><label>Curso</label><input id="i-curso" value="${esc(a.curso)}" placeholder="Ex.: Medicina"></div>
-        <div class="mini"><label>Ano de formatura</label><input id="i-ano" type="number" value="${a.ano_formatura||''}" placeholder="2026"></div>
-      </div>
-    </div>
-    <div class="sec"><h2>Medidas</h2>
-      <p class="hint">Para a beca/produtos.</p>
-      <div class="qtd-grid">
-        <div class="mini"><label>Altura</label><input id="i-altura" value="${esc(a.altura)}" placeholder="1,72"></div>
-        <div class="mini"><label>Peso</label><input id="i-peso" value="${esc(a.peso)}" placeholder="68 kg"></div>
-        <div class="mini"><label>Calçado</label><input id="i-calcado" value="${esc(a.calcado)}" placeholder="40"></div>
-      </div>
-    </div>
-    <div class="sec"><h2>Encarte</h2>
-      <p class="hint">Dados que vão no seu encarte (página de fotos).</p>
-      <div class="qtd-grid">
-        <div class="mini"><label>Data de nascimento</label><input type="date" id="i-nasc" value="${esc(a.data_nascimento)}"></div>
-        <div class="mini"><label>Foto do encarte</label><input id="i-nomefot" value="${esc(a.nome_fotografia)}" placeholder="Nº ou nome da foto"></div>
-        <div class="mini"><label>Nome da mãe</label><input id="i-mae" value="${esc(a.nome_mae)}"></div>
-        <div class="mini"><label>Nome do pai</label><input id="i-pai" value="${esc(a.nome_pai)}"></div>
-      </div>
-      <div class="fld"><label>Mensagem do encarte</label><textarea id="i-msg" style="width:100%;min-height:64px;padding:12px 14px;border:1px solid var(--linha);border-radius:12px;font-family:inherit;font-size:15px;outline:none;resize:vertical;" placeholder="Uma mensagem/dedicatória…">${esc(a.mensagem)}</textarea></div>
-    </div>
-    ${planosHtml}
-    <div id="pag-sec"></div>
-    ${eventosHtml}
-    ${addHtml}
-    <button class="btn" id="enviar">Confirmar meu cadastro</button>
-    <p class="muted">Seus dados ficam disponíveis para a comissão e a Ventus.</p>`;
+    <div class="produtos">${cardsHtml}</div>
+    <div id="pag-sec" style="margin-top:22px;"></div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="btn-back">Voltar</button>
+      <button class="btn btn-primary" id="btn-next">Continuar</button>
+    </div>`;
 
-  document.querySelectorAll('.plano').forEach(el => el.onclick = () => {
-    document.querySelectorAll('.plano').forEach(x=>x.classList.remove('on'));
-    el.classList.add('on'); el.querySelector('input').checked = true;
-    renderPagamento();
+  document.querySelectorAll('.prod').forEach(el=>{
+    if(el.classList.contains('bloq')) return;
+    el.onclick = () => {
+      F.plano_id = el.dataset.id;
+      // reset de pagamento ao trocar de plano
+      F.meio_pagamento = null; F.forma_pagamento = null; F.parcelas = null;
+      renderPagamento();
+      // re-marcar visual
+      document.querySelectorAll('.prod').forEach(x=>{
+        const isOn = x.dataset.id===F.plano_id;
+        x.classList.toggle('on', isOn);
+        const chk = x.querySelector('.p-check'); if(chk) chk.textContent = isOn?'Selecionado ✓':'Escolher plano';
+        const inp = x.querySelector('input'); if(inp) inp.checked = isOn;
+      });
+      checarDesconto();
+      renderResumo();
+    };
   });
-  document.querySelectorAll('.plano input:checked').forEach(i=>i.closest('.plano').classList.add('on'));
-  const cpfEl = document.getElementById('i-cpf');
-  cpfEl.oninput = () => { cpfEl.value = maskCpf(cpfEl.value); checarDesconto(); };
+
   renderPagamento();
-  document.getElementById('enviar').onclick = enviar;
+
+  document.getElementById('btn-back').onclick = () => { STEP=0; render(); };
+  document.getElementById('btn-next').onclick = () => {
+    savePagamento();
+    if(!F.plano_id){ showErro('Escolha um plano para continuar.'); return; }
+    if(!F.meio_pagamento && !F.forma_pagamento){ showErro('Selecione a forma de pagamento.'); return; }
+    clearErro();
+    STEP = 2; render();
+  };
 }
 
 function renderPagamento(){
   const sec = document.getElementById('pag-sec'); if(!sec) return;
   const p = planoSel();
   if(!p){ sec.innerHTML = ''; return; }
-  const a = DADOS.aluno;
   let meiosHtml;
   if(p.meios_pagamento && p.meios_pagamento.length){
-    meiosHtml = p.meios_pagamento.map(m=>`
-      <label class="plano" data-meio="${m.meio}" style="padding:12px 14px;">
-        <input type="radio" name="meio" value="${m.meio}" data-qt="${m.qt_parcela}" ${a.meio_pagamento===m.meio?'checked':''}>
-        <div class="nome" style="font-size:14px;">${m.label}${m.qt_parcela>1?` · até ${m.qt_parcela}x`:''}</div>
-        ${m.descricao?`<div class="desc">${m.descricao}</div>`:''}
-      </label>`).join('');
+    meiosHtml = `<div class="meios">${p.meios_pagamento.map(m=>{
+      const on = F.meio_pagamento===m.meio;
+      return `
+        <label class="meio ${on?'on':''}" data-meio="${esc(m.meio)}" data-qt="${m.qt_parcela||1}">
+          <input type="radio" name="meio" value="${esc(m.meio)}" ${on?'checked':''}>
+          <div class="m-nome">${esc(m.label)}${m.qt_parcela>1?` · até ${m.qt_parcela}x`:''}</div>
+          ${m.descricao?`<div class="m-desc">${esc(m.descricao)}</div>`:''}
+        </label>`;
+    }).join('')}</div>`;
   } else {
     const formas = DADOS.formas_pagamento || [];
-    meiosHtml = `<div class="fld"><select id="i-forma"><option value="">Selecione…</option>${formas.map(f=>`<option value="${f[0]}" ${a.forma_pagamento===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>`;
+    meiosHtml = `<div class="fld"><select id="i-forma"><option value="">Selecione…</option>${formas.map(f=>`<option value="${esc(f[0])}" ${F.forma_pagamento===f[0]?'selected':''}>${esc(f[1])}</option>`).join('')}</select></div>`;
   }
-  const contratoHtml = p.contrato ? `
-    <div class="sec"><h2>Contrato</h2>
-      <div style="border:1px solid var(--linha);border-radius:12px;padding:12px 14px;font-size:13px;color:#334155;max-height:180px;overflow:auto;white-space:pre-wrap;">${esc(p.contrato.conteudo)||('Contrato: '+esc(p.contrato.nome))}</div>
-      <label class="chip-aceite" style="display:flex;gap:10px;align-items:center;margin-top:12px;font-size:14px;cursor:pointer;">
-        <input type="checkbox" id="i-aceite" ${a.aceite_contrato?'checked':''}> Li e aceito o contrato <b>${esc(p.contrato.nome)}</b>.</label>
-    </div>` : '';
   sec.innerHTML = `
-    <div class="sec"><h2>Forma de pagamento</h2>
-      <div class="planos">${meiosHtml}</div>
-      <div id="desc-note" style="margin-top:10px;font-size:13px;"></div>
-      <div id="parc-box" style="margin-top:12px;"></div>
-    </div>${contratoHtml}`;
-  document.querySelectorAll('#pag-sec .plano').forEach(el=>el.onclick=()=>{
-    document.querySelectorAll('#pag-sec .plano').forEach(x=>x.classList.remove('on'));
-    el.classList.add('on'); el.querySelector('input').checked=true; renderParcelas();
+    <p class="sec-title">Forma de pagamento</p>
+    <p class="sec-hint">Como você prefere pagar seu plano.</p>
+    ${meiosHtml}
+    <div id="desc-note" style="margin-top:10px;font-size:13px;"></div>
+    <div id="parc-box" style="margin-top:12px;"></div>
+    <div id="cupom-box" style="margin-top:16px;"></div>`;
+
+  renderCupom();
+
+  // meios (radios visuais)
+  document.querySelectorAll('#pag-sec .meio').forEach(el=>{
+    el.onclick = () => {
+      F.meio_pagamento = el.dataset.meio;
+      F.forma_pagamento = el.dataset.meio; // espelha (backend usa forma_pagamento)
+      F.parcelas = null;
+      document.querySelectorAll('#pag-sec .meio').forEach(x=>x.classList.toggle('on', x===el));
+      const inp = el.querySelector('input'); if(inp) inp.checked = true;
+      renderParcelas(+el.dataset.qt);
+      renderResumo();
+    };
   });
-  document.querySelectorAll('#pag-sec .plano input:checked').forEach(i=>{i.closest('.plano').classList.add('on');});
-  renderParcelas(); checarDesconto();
+  // select (formas_pagamento fallback)
+  const formaSel = document.getElementById('i-forma');
+  if(formaSel){
+    formaSel.onchange = () => {
+      F.forma_pagamento = formaSel.value || null;
+      F.meio_pagamento = null;
+      renderResumo();
+    };
+  }
+
+  // re-render de parcelas se já havia meio escolhido
+  const selMeio = p.meios_pagamento && F.meio_pagamento ? p.meios_pagamento.find(m=>m.meio===F.meio_pagamento) : null;
+  if(selMeio) renderParcelas(selMeio.qt_parcela||1);
+
+  checarDesconto();
 }
 
-function renderParcelas(){
+function renderParcelas(qt){
   const box = document.getElementById('parc-box'); if(!box) return;
-  const sel = document.querySelector('#pag-sec input[name="meio"]:checked');
-  const qt = sel ? +sel.dataset.qt : 0;
+  qt = +qt || 0;
   if(qt > 1){
-    box.innerHTML = `<div class="fld"><label>Parcelas</label><select id="i-parc">${Array.from({length:qt},(_,i)=>`<option value="${i+1}">${i+1}x</option>`).join('')}</select></div>`;
-  } else { box.innerHTML = ''; }
+    const cur = F.parcelas || 1;
+    box.innerHTML = `<div class="fld"><label>Parcelas</label><select id="i-parc">${Array.from({length:qt},(_,i)=>`<option value="${i+1}" ${cur==(i+1)?'selected':''}>${i+1}x</option>`).join('')}</select></div>`;
+    const pel = document.getElementById('i-parc');
+    F.parcelas = +pel.value;
+    pel.onchange = () => { F.parcelas = +pel.value; renderResumo(); };
+  } else {
+    box.innerHTML = '';
+    F.parcelas = null;
+  }
+}
+
+function savePagamento(){
+  const parcEl = document.getElementById('i-parc');
+  if(parcEl) F.parcelas = +parcEl.value;
+  const formaSel = document.getElementById('i-forma');
+  if(formaSel && formaSel.value) F.forma_pagamento = formaSel.value;
 }
 
 async function checarDesconto(){
-  const note = document.getElementById('desc-note'); if(!note) return;
-  const p = planoSel(); const cpf = (document.getElementById('i-cpf')||{}).value || '';
-  const cpfNum = cpf.replace(/\D/g,'');
-  if(!p || cpfNum.length !== 11){ note.innerHTML=''; return; }
+  const note = document.getElementById('desc-note');
+  const p = planoSel();
+  const cpfNum = (F.cpf||'').replace(/\D/g,'');
+  if(!p || cpfNum.length !== 11){ DESC=null; if(note) note.innerHTML=''; renderResumo(); return; }
   try{
     const r = await fetch(apiUrl(`/api/inscricao/${token}/desconto?plano_id=${p.id}&cpf=${cpfNum}`));
     const dd = await r.json();
     if(dd.tem_desconto && (dd.desconto_fotografia || dd.desconto_cerimonial)){
+      DESC = dd;
       const totalDesc = (dd.desconto_fotografia||0)+(dd.desconto_cerimonial||0);
       const final = Math.max(0, (p.valor||0) - totalDesc);
-      note.innerHTML = `<div style="background:#DCFCE7;color:#166534;border-radius:10px;padding:10px 12px;font-weight:600;">✓ Desconto aplicado${dd.nome?` (${dd.nome})`:''}: ${dd.desconto_fotografia?`fotografia ${brl(dd.desconto_fotografia)}`:''}${dd.desconto_cerimonial?`${dd.desconto_fotografia?' · ':''}cerimonial ${brl(dd.desconto_cerimonial)}`:''}. Total: <b>${brl(final)}</b></div>`;
-    } else { note.innerHTML=''; }
-  }catch(e){ note.innerHTML=''; }
+      if(note) note.innerHTML = `<div style="background:#DCFCE7;color:#166534;border-radius:10px;padding:10px 12px;font-weight:600;">✓ Desconto aplicado${dd.nome?` (${esc(dd.nome)})`:''}: ${dd.desconto_fotografia?`fotografia ${brl(dd.desconto_fotografia)}`:''}${dd.desconto_cerimonial?`${dd.desconto_fotografia?' · ':''}cerimonial ${brl(dd.desconto_cerimonial)}`:''}. Total do plano: <b>${brl(final)}</b></div>`;
+    } else {
+      DESC=null; if(note) note.innerHTML='';
+    }
+  }catch(e){ DESC=null; if(note) note.innerHTML=''; }
+  renderResumo();
 }
 
-async function enviar(){
-  const nome = document.getElementById('i-nome').value.trim();
-  const erro = document.getElementById('erro');
-  if(!nome){ erro.textContent='Informe seu nome.'; erro.style.display='block'; return; }
-  const p = planoSel();
-  const meioRadio = document.querySelector('#pag-sec input[name="meio"]:checked');
-  const formaSel = document.getElementById('i-forma');
-  const aceiteEl = document.getElementById('i-aceite');
-  if(p && p.contrato && aceiteEl && !aceiteEl.checked){ erro.textContent='É necessário aceitar o contrato.'; erro.style.display='block'; window.scrollTo(0,document.body.scrollHeight); return; }
-  const parcEl = document.getElementById('i-parc');
-  const participacoes = [...document.querySelectorAll('.ev')].map(el=>({
+/* =================== CUPOM DE DESCONTO =================== */
+function renderCupom(){
+  const box = document.getElementById('cupom-box'); if(!box) return;
+  if(CUPOM){
+    box.innerHTML = `
+      <p class="sec-title" style="margin-bottom:8px;">Cupom de desconto</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#DCFCE7;color:#166534;border:1px solid #86EFAC;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;">
+        <span>🏷️ Cupom <b>${esc(CUPOM.codigo)}</b> aplicado${CUPOM.descricao?` — ${esc(CUPOM.descricao)}`:''}</span>
+        <button type="button" id="cupom-remove" style="background:none;border:none;color:#166534;font-weight:700;cursor:pointer;text-decoration:underline;font-size:13px;padding:0;width:auto;">Remover</button>
+      </div>`;
+    document.getElementById('cupom-remove').onclick = removerCupom;
+  } else {
+    box.innerHTML = `
+      <p class="sec-title" style="margin-bottom:8px;">Cupom de desconto</p>
+      <div style="display:flex;gap:8px;">
+        <input id="i-cupom" placeholder="Digite seu cupom" style="text-transform:uppercase;" autocomplete="off">
+        <button type="button" class="btn btn-primary" id="cupom-aplicar" style="flex:0 0 auto;padding:12px 20px;font-size:14px;">Aplicar</button>
+      </div>
+      <div id="cupom-msg" style="margin-top:8px;font-size:13px;"></div>`;
+    const inp = document.getElementById('i-cupom');
+    inp.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); aplicarCupom(); } };
+    document.getElementById('cupom-aplicar').onclick = aplicarCupom;
+  }
+}
+
+async function aplicarCupom(){
+  const inp = document.getElementById('i-cupom');
+  const msg = document.getElementById('cupom-msg');
+  const codigo = (inp && inp.value || '').trim().toUpperCase();
+  if(!codigo){ if(msg) msg.innerHTML = `<span style="color:var(--vermelho);font-weight:600;">Digite um cupom.</span>`; return; }
+  const btn = document.getElementById('cupom-aplicar');
+  if(btn){ btn.disabled = true; btn.textContent = '…'; }
+  try{
+    const r = await fetch(apiUrl(`/api/cupom/validar?codigo=${encodeURIComponent(codigo)}&aplica_em=fotografia`));
+    const dd = await r.json();
+    if(dd && dd.valido){
+      CUPOM = { codigo: dd.codigo || codigo, tipo: dd.tipo, valor: dd.valor, aplica_em: dd.aplica_em, descricao: dd.descricao || '' };
+      renderCupom();
+      renderResumo();
+    } else {
+      if(msg) msg.innerHTML = `<span style="color:var(--vermelho);font-weight:600;">${esc((dd&&dd.motivo)||'Cupom inválido.')}</span>`;
+      if(btn){ btn.disabled = false; btn.textContent = 'Aplicar'; }
+    }
+  }catch(e){
+    if(msg) msg.innerHTML = `<span style="color:var(--vermelho);font-weight:600;">Não foi possível validar o cupom. Tente de novo.</span>`;
+    if(btn){ btn.disabled = false; btn.textContent = 'Aplicar'; }
+  }
+}
+
+function removerCupom(){
+  CUPOM = null;
+  renderCupom();
+  renderResumo();
+}
+
+/* =================== ETAPA 3: ADICIONAIS =================== */
+function viewAdicionais(){
+  const cat = DADOS.adicionais_catalogo || [];
+  const eventos = DADOS.eventos || [];
+  const jaEsc = {}; F.adicionais.forEach(x=>{ jaEsc[x.descricao.toLowerCase()] = x.quantidade; });
+
+  const addHtml = cat.length ? cat.map(it=>`
+      <div class="add" data-desc="${esc(it.descricao)}" data-valor="${it.valor}">
+        <div class="a-info"><div class="a-n">${esc(it.descricao)}</div><div class="a-v">${brl(it.valor)}</div></div>
+        <input type="number" min="0" class="q-add" value="${jaEsc[it.descricao.toLowerCase()]||0}">
+      </div>`).join('') : '';
+
+  const evHtml = eventos.length ? eventos.map(e=>{
+    const prev = F.participacoes.find(x=>x.evento_fotografico_id==e.id) || {};
+    const fam = prev.qtd_familiares != null ? prev.qtd_familiares : (e.qtd_familiares||0);
+    const conv = prev.qtd_convidados != null ? prev.qtd_convidados : (e.qtd_convidados||0);
+    return `
+      <div class="ev" data-ev="${e.id}">
+        <div class="ev-n">${esc(e.nome)}</div>
+        <div class="grid2">
+          ${e.pede_familiares?`<div><label>Familiares</label><input type="number" min="0" class="q-fam" value="${fam}"></div>`:''}
+          ${e.pede_convidados?`<div><label>Convidados</label><input type="number" min="0" class="q-conv" value="${conv}"></div>`:''}
+        </div>
+      </div>`;
+  }).join('') : '';
+
+  const temAlgo = cat.length || eventos.length;
+
+  card.innerHTML = `
+    <h1>Adicionais</h1>
+    <p class="sub">Produtos, serviços e convidados — tudo opcional.</p>
+    <p class="erro" id="erro"></p>
+    ${eventos.length?`<p class="sec-title">Familiares e convidados</p><p class="sec-hint">Informe quantas pessoas você levará em cada evento.</p>${evHtml}`:''}
+    ${cat.length?`<p class="sec-title" style="margin-top:${eventos.length?'20px':'0'};">Produtos e serviços</p><p class="sec-hint">O que você quiser além do plano.</p>${addHtml}`:''}
+    ${!temAlgo?`<div class="empty-note">Nenhum adicional disponível para sua turma. Você pode seguir para a próxima etapa.</div>`:''}
+    <div class="nav">
+      <button class="btn btn-ghost" id="btn-back">Voltar</button>
+      <button class="btn btn-primary" id="btn-next">Continuar</button>
+    </div>`;
+
+  // atualiza resumo ao vivo
+  document.querySelectorAll('.q-add').forEach(inp=>{ inp.oninput = () => { saveAdicionais(); renderResumo(); }; });
+
+  document.getElementById('btn-back').onclick = () => { STEP=1; render(); };
+  document.getElementById('btn-next').onclick = () => {
+    saveAdicionais();
+    clearErro();
+    STEP = 3; render();
+  };
+}
+
+function saveAdicionais(){
+  F.adicionais = [...document.querySelectorAll('.add')].map(el=>({
+    descricao: el.dataset.desc,
+    valor: +el.dataset.valor,
+    quantidade: +(el.querySelector('.q-add')?.value || 0),
+  })).filter(x=>x.quantidade>0);
+  F.participacoes = [...document.querySelectorAll('.ev')].map(el=>({
     evento_fotografico_id: +el.dataset.ev,
     qtd_familiares: +(el.querySelector('.q-fam')?.value || 0),
     qtd_convidados: +(el.querySelector('.q-conv')?.value || 0),
   })).filter(x=>x.qtd_familiares>0 || x.qtd_convidados>0);
-  const adicionais = [...document.querySelectorAll('.add')].map(el=>({
-    descricao: el.dataset.desc, valor: +el.dataset.valor,
-    quantidade: +(el.querySelector('.q-add')?.value || 0),
-  })).filter(x=>x.quantidade>0);
-  const body = {
-    nome, celular: document.getElementById('i-cel').value, email: document.getElementById('i-email').value,
-    cpf: document.getElementById('i-cpf').value, curso: document.getElementById('i-curso').value,
-    ano_formatura: document.getElementById('i-ano').value || null,
-    altura: document.getElementById('i-altura').value, peso: document.getElementById('i-peso').value, calcado: document.getElementById('i-calcado').value,
-    plano_id: p ? p.id : null,
-    meio_pagamento: meioRadio ? meioRadio.value : null,
-    forma_pagamento: formaSel ? formaSel.value : (meioRadio ? meioRadio.value : null),
-    parcelas: parcEl ? +parcEl.value : null,
-    aceite_contrato: aceiteEl ? aceiteEl.checked : false,
-    data_nascimento: document.getElementById('i-nasc').value || null,
-    nome_fotografia: document.getElementById('i-nomefot').value,
-    nome_mae: document.getElementById('i-mae').value,
-    nome_pai: document.getElementById('i-pai').value,
-    mensagem: document.getElementById('i-msg').value,
-    participacoes, adicionais,
+}
+
+/* =================== ETAPA 4: CONTRATO =================== */
+function viewContrato(){
+  const p = planoSel();
+  const contrato = p ? p.contrato : null;
+
+  let inner;
+  if(contrato){
+    inner = `
+      <p class="sec-title">Contrato — ${esc(contrato.nome)}</p>
+      <p class="sec-hint">Leia com atenção e marque o aceite para continuar.</p>
+      <div class="contrato-box">${esc(contrato.conteudo) || ('Contrato: '+esc(contrato.nome))}</div>
+      <label class="aceite">
+        <input type="checkbox" id="i-aceite" ${F.aceite_contrato?'checked':''}>
+        <span>Li e aceito o contrato <b>${esc(contrato.nome)}</b> e concordo com os termos da minha formatura.</span>
+      </label>`;
+  } else {
+    inner = `<div class="empty-note">Este plano não possui contrato a ser assinado nesta etapa. Você pode seguir para a confirmação.</div>`;
+  }
+
+  card.innerHTML = `
+    <h1>Assinatura do contrato</h1>
+    <p class="sub">Confirme o aceite dos termos do seu plano.</p>
+    <p class="erro" id="erro"></p>
+    ${inner}
+    <div class="nav">
+      <button class="btn btn-ghost" id="btn-back">Voltar</button>
+      <button class="btn btn-primary" id="btn-next">Continuar</button>
+    </div>`;
+
+  const ac = document.getElementById('i-aceite');
+  if(ac) ac.onchange = () => { F.aceite_contrato = ac.checked; };
+
+  document.getElementById('btn-back').onclick = () => { STEP=2; render(); };
+  document.getElementById('btn-next').onclick = () => {
+    if(ac){ F.aceite_contrato = ac.checked; }
+    if(contrato && !F.aceite_contrato){ showErro('É necessário aceitar o contrato para continuar.'); return; }
+    clearErro();
+    STEP = 4; render();
   };
-  const btn = document.getElementById('enviar'); btn.textContent='Enviando…'; btn.disabled=true;
-  const r = await fetch(apiUrl('/api/inscricao/'+token), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!r.ok){ erro.textContent='Erro ao enviar. Tente de novo.'; erro.style.display='block'; btn.textContent='Confirmar meu cadastro'; btn.disabled=false; return; }
+}
+
+/* =================== ETAPA 5: CONFIRMAÇÃO / LINK DE PAGAMENTO =================== */
+function viewFinal(){
+  const p = planoSel();
+  const addTotal = F.adicionais.reduce((s,x)=> s + (x.valor||0)*(x.quantidade||0), 0);
+  const descTotal = DESC ? ((DESC.desconto_fotografia||0)+(DESC.desconto_cerimonial||0)) : 0;
+  const subTotal = (p?(p.valor||0):0) + addTotal;
+  const cupomVal = cupomDesconto(p ? (p.valor_fotografia||0) : 0, subTotal);
+  const total = Math.max(0, subTotal - descTotal - cupomVal);
+  const meioLbl = p ? (meioLabel(p, F.meio_pagamento) || formaLabel(F.forma_pagamento) || '—') : '—';
+
+  const linhas = [];
+  if(p) linhas.push(`<div class="r-line"><span class="l">Plano</span><span class="v">${esc(p.nome)} · ${brl(p.valor)}</span></div>`);
+  linhas.push(`<div class="r-line"><span class="l">Pagamento</span><span class="v">${esc(meioLbl)}${F.parcelas&&F.parcelas>1?` · ${F.parcelas}x`:''}</span></div>`);
+  F.adicionais.filter(x=>x.quantidade>0).forEach(x=>{
+    linhas.push(`<div class="r-line"><span class="l">${esc(x.descricao)} × ${x.quantidade}</span><span class="v">${brl(x.valor*x.quantidade)}</span></div>`);
+  });
+  if(descTotal>0) linhas.push(`<div class="r-line"><span class="l">Desconto</span><span class="v" style="color:#166534;">−${brl(descTotal)}</span></div>`);
+  if(cupomVal>0 && CUPOM) linhas.push(`<div class="r-line"><span class="l">Cupom ${esc(CUPOM.codigo)}</span><span class="v" style="color:#166534;">−${brl(cupomVal)}</span></div>`);
+
+  card.innerHTML = `
+    <h1>Confirme seu pedido</h1>
+    <p class="sub">Revise tudo antes de finalizar. Seu link de pagamento será gerado após a confirmação.</p>
+    <p class="erro" id="erro"></p>
+
+    <div class="final-box">
+      <div class="fb-t">Resumo</div>
+      ${linhas.join('')}
+      <div class="r-total"><span class="l">Total</span><span class="v">${brl(total)}</span></div>
+    </div>
+
+    <div class="pay-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <div class="ph-t">Assim que você confirmar, <b>seu link de pagamento será gerado</b> e enviado no seu WhatsApp (${esc(F.celular||'—')}).</div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" id="btn-back">Voltar</button>
+      <button class="btn btn-primary" id="btn-enviar">Confirmar cadastro</button>
+    </div>
+    <p class="muted">Seus dados ficam disponíveis para a comissão e a Ventus.</p>`;
+
+  document.getElementById('btn-back').onclick = () => { STEP=3; render(); };
+  document.getElementById('btn-enviar').onclick = enviar;
+}
+
+/* =================== SUBMISSÃO =================== */
+async function enviar(){
+  const btn = document.getElementById('btn-enviar');
+  const p = planoSel();
+
+  if(!F.nome){ showErro('Informe seu nome.'); STEP=0; setTimeout(render,50); return; }
+  if(!F.plano_id){ showErro('Escolha um plano.'); STEP=1; setTimeout(render,50); return; }
+  if(p && p.contrato && !F.aceite_contrato){ showErro('É necessário aceitar o contrato.'); STEP=3; setTimeout(render,50); return; }
+
+  const body = {
+    nome: F.nome,
+    celular: F.celular,
+    email: F.email,
+    cpf: F.cpf,
+    curso: F.curso,
+    ano_formatura: F.ano_formatura || null,
+    altura: F.altura,
+    peso: F.peso,
+    calcado: F.calcado,
+    plano_id: p ? p.id : null,
+    meio_pagamento: F.meio_pagamento || null,
+    forma_pagamento: F.forma_pagamento || F.meio_pagamento || null,
+    parcelas: F.parcelas || null,
+    aceite_contrato: !!F.aceite_contrato,
+    observacoes: F.observacoes || '',
+    participacoes: F.participacoes,
+    adicionais: F.adicionais,
+  };
+
+  btn.textContent = 'Enviando…'; btn.disabled = true;
+  let r;
+  try{
+    r = await fetch(apiUrl('/api/inscricao/'+token), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  }catch(e){ r = {ok:false}; }
+  if(!r.ok){
+    showErro('Erro ao enviar. Tente de novo.');
+    btn.textContent = 'Confirmar cadastro'; btn.disabled = false; return;
+  }
+
+  // registra uso do cupom (não bloqueia o fluxo se falhar)
+  if(CUPOM && CUPOM.codigo){
+    try{
+      await fetch(apiUrl('/api/cupom/usar'), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo: CUPOM.codigo})});
+    }catch(e){ /* ignora */ }
+  }
+
+  stepsEl.classList.add('hide');
+  resumoEl.classList.add('hide');
+  document.getElementById('wrap').style.gridTemplateColumns = '1fr';
+  card.classList.add('center-card');
   card.innerHTML = `<div class="ok">
     <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
     <h1>Cadastro confirmado!</h1>
-    <p class="sub">Prontinho, ${nome.split(' ')[0]}. ${p&&p.contrato&&body.aceite_contrato?'Contrato aceito. ':''}A comissão já vê seu cadastro. Em breve enviamos o pagamento no seu WhatsApp.</p>
+    <p class="sub">Prontinho, ${esc((F.nome||'').split(' ')[0])}. ${p&&p.contrato&&F.aceite_contrato?'Contrato aceito. ':''}A comissão já vê seu cadastro.</p>
+    <div class="pay-hint" style="margin-top:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <div class="ph-t">Em breve enviamos o <b>link de pagamento</b> no seu WhatsApp.</div>
+    </div>
   </div>`;
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 </script>
 </body>

@@ -36,7 +36,7 @@
   table.tbl td { padding:13px 22px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); } table.tbl tr:last-child td{border-bottom:none;} table.tbl tbody tr:hover td{background:var(--gray-50);}
   table.tbl td.nome{font-weight:600;color:var(--gray-900);}
   .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
-  .b-aberta{background:#FEF3C7;color:#92400E;} .b-em_andamento{background:var(--primary-50);color:var(--primary-700);} .b-concluida{background:#DCFCE7;color:#166534;} .b-entregue{background:#EDE9FE;color:#5B21B6;}
+  .b-aberta{background:var(--warning-bg);color:var(--warning-fg);} .b-em_andamento{background:var(--primary-50);color:var(--primary-700);} .b-concluida{background:var(--success-bg);color:var(--success-fg);} .b-entregue{background:var(--purple-bg);color:var(--purple-fg);}
   .b-tipo{background:var(--gray-100);color:var(--gray-600);}
   .row-actions { display:flex; gap:6px; justify-content:flex-end; }
   .icon-btn { width:33px; height:33px; border:1px solid var(--gray-200); background:var(--surface); border-radius:9px; display:grid; place-items:center; cursor:pointer; color:var(--gray-500); transition:.15s; }
@@ -121,15 +121,38 @@ async function init(){
   carregar();
 }
 const optArr=(arr,cur,vazio)=>(vazio?`<option value="">${vazio}</option>`:'')+arr.map(o=>{const[v,l]=Array.isArray(o)?o:[o.id,o.nome];return `<option value="${v}" ${cur==v?'selected':''}>${l}</option>`}).join('');
-const optFiltrado=(arr,turmaId,cur)=>`<option value="">—</option>`+(arr||[]).filter(x=>!turmaId||x.turma_id==turmaId).map(x=>`<option value="${x.id}" ${cur==x.id?'selected':''}>${x.nome}</option>`).join('');
-window.refiltrarTurma=function(alunoCur,eventoCur){ const tid=$('#o-turma').value; $('#o-aluno').innerHTML=optFiltrado(OPC.alunos,tid,alunoCur); $('#o-evento').innerHTML=optFiltrado(OPC.eventos,tid,eventoCur); };
+// Placeholder enquanto nenhuma turma estiver selecionada (Aluno/Evento amarrados à turma).
+const PH_SEM_TURMA='Selecione a turma primeiro';
+const optLista=(itens,cur)=>`<option value="">— todos —</option>`+(itens||[]).map(x=>`<option value="${x.id}" ${cur==x.id?'selected':''}>${esc(x.nome)}</option>`).join('');
+function _selVazio(sel,texto){ if(!sel)return; sel.innerHTML=`<option value="">${texto}</option>`; sel.value=''; sel.disabled=true; }
+// Ao trocar a turma: reseta Aluno/Evento e carrega apenas os DAQUELA turma via fetch.
+window.refiltrarTurma=async function(alunoCur,eventoCur){
+  const tid=$('#o-turma').value;
+  const selA=$('#o-aluno'), selE=$('#o-evento');
+  if(!tid){ _selVazio(selA,PH_SEM_TURMA); _selVazio(selE,PH_SEM_TURMA); return; }
+  _selVazio(selA,'Carregando…'); _selVazio(selE,'Carregando…');
+  try{
+    const [ra,re]=await Promise.all([
+      fetch(apiUrl('/api/turma-formatura/'+tid+'/alunos')),
+      fetch(apiUrl('/api/turma-formatura/'+tid+'/detalhe-opcoes'))
+    ]);
+    const da=ra.ok?await ra.json():{}; const de=re.ok?await re.json():{};
+    const alunos=da.itens||[]; const eventos=de.eventos||[];
+    selA.innerHTML=optLista(alunos,alunoCur); selA.disabled=false;
+    selE.innerHTML=optLista(eventos,eventoCur); selE.disabled=false;
+    if(alunoCur!=null) selA.value=alunoCur||'';
+    if(eventoCur!=null) selE.value=eventoCur||'';
+  }catch(e){
+    _selVazio(selA,'Erro ao carregar'); _selVazio(selE,'Erro ao carregar');
+  }
+};
 
 function montarForm(){
   $('#os-form').innerHTML = `
     <div class="fld grow"><label>Título *</label><input type="text" id="o-tit" placeholder="Ex.: Edição do álbum do Baile"></div>
     <div class="fld"><label>Turma</label><select id="o-turma" onchange="refiltrarTurma()">${optArr(OPC.turmas,'','—')}</select></div>
-    <div class="fld"><label>Aluno (cliente)</label><select id="o-aluno">${optFiltrado(OPC.alunos,'')}</select></div>
-    <div class="fld"><label>Evento</label><select id="o-evento">${optFiltrado(OPC.eventos,'')}</select></div>
+    <div class="fld"><label>Aluno (cliente)</label><select id="o-aluno" disabled><option value="">${PH_SEM_TURMA}</option></select></div>
+    <div class="fld"><label>Evento</label><select id="o-evento" disabled><option value="">${PH_SEM_TURMA}</option></select></div>
     <div class="fld"><label>Setor solicitante</label><select id="o-setor">${optArr(OPC.setores||[],'','—')}</select></div>
     <div class="fld"><label>Tipo de O.S.</label><select id="o-tipoos">${optArr(OPC.tipos_os||[],'','—')}</select></div>
     <div class="fld"><label>Situação O.S.</label><select id="o-situacao">${optArr(OPC.situacoes||[],'','—')}</select></div>
@@ -148,6 +171,8 @@ function montarForm(){
 }
 function limpar(){ editId=null;
   ['o-tit','o-turma','o-aluno','o-evento','o-setor','o-tipoos','o-situacao','o-solic','o-prio','o-resp','o-dini','o-dfim','o-prazo','o-chamado','o-obs'].forEach(k=>{const el=$('#'+k);if(el)el.value='';});
+  // Sem turma → Aluno/Evento voltam vazios e desabilitados.
+  _selVazio($('#o-aluno'),PH_SEM_TURMA); _selVazio($('#o-evento'),PH_SEM_TURMA);
   $('#o-tipo').value='edicao'; $('#o-status').value='aberta'; $('#o-btn').textContent='Criar OS'; }
 async function salvar(){
   const body={ titulo:$('#o-tit').value, tipo:$('#o-tipo').value, turma_id:$('#o-turma').value||null, aluno_id:$('#o-aluno').value||null, evento_id:$('#o-evento').value||null,

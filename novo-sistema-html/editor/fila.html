@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#0A2540">
 
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fila do Editor — Ventus</title>
+<script src="/assets/js/config.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
@@ -21,7 +22,7 @@
 </head>
 <body>
 <aside class="sidebar">
-  <div class="sidebar-brand"><div class="sidebar-brand-mark">V</div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Editor</div></div></div>
+  <div class="sidebar-brand"><div class="sidebar-brand-mark" style="background:transparent;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Editor</div></div></div>
   <a href="fila.html" class="sidebar-link active"><i data-lucide="palette"></i>Fila de edição</a>
   <a href="#" class="sidebar-link"><i data-lucide="check-circle"></i>Finalizadas</a>
   <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Minha produtividade</a>
@@ -38,103 +39,206 @@
     <div class="text-sm" style="color:var(--gray-500);">Editor / Fila de edição</div>
     <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Fila de edição</h1>
 
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Aguardando</div><div class="kpi-value">87</div><div class="kpi-trend" style="color:var(--gray-500);">12 pacotes · 7 turmas</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FCE7F3;color:#9D174D;"><i data-lucide="palette" class="w-5 h-5"></i></div><div class="kpi-label">Em edição (você)</div><div class="kpi-value">23</div><div class="kpi-trend" style="color:var(--gray-500);">3 pacotes</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check" class="w-5 h-5"></i></div><div class="kpi-label">Finalizadas hoje</div><div class="kpi-value">45</div><div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +18% vs ontem</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Atrasadas</div><div class="kpi-value" style="color:var(--danger);">8</div><div class="kpi-trend down">>5 dias</div></div>
-    </div>
+    <!-- Contadores por etapa (a partir de resumo) -->
+    <div id="kpis" class="grid grid-cols-4 gap-4 mb-6"></div>
 
-    <div class="grid gap-4" style="grid-template-columns: repeat(2, 1fr);">
-
-      <!-- Pacote em edição -->
-      <div class="card">
-        <div style="background:linear-gradient(135deg, var(--primary-900), #7C3AED);color:white;padding:18px;border-radius:12px 12px 0 0;">
-          <div class="flex justify-between items-start">
-            <div>
-              <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;">Em edição</div>
-              <strong style="font-size:18px;display:block;margin-top:2px;">Pacote · Camila Almeida</strong>
-              <div style="font-size:13px;opacity:.85;margin-top:2px;">MEDICINA T85 · BAILE + AFTER (40 fotos)</div>
-            </div>
-            <span class="badge" style="background:rgba(255,255,255,.2);color:white;">Você</span>
-          </div>
-          <div class="flex gap-4 mt-3" style="font-size:12px;opacity:.85;">
-            <span><i data-lucide="clock" class="inline w-3 h-3"></i> Pegou há 2h</span>
-            <span><i data-lucide="calendar" class="inline w-3 h-3"></i> Vence em 4 dias</span>
-            <span><i data-lucide="image" class="inline w-3 h-3"></i> 23 / 40 finalizadas</span>
-          </div>
+    <!-- Erro amigável de carregamento -->
+    <div id="filaErro" class="card mt-2" style="display:none;border-color:var(--danger);">
+      <div class="card-body" style="padding:18px;display:flex;align-items:center;gap:12px;">
+        <div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;flex:none;"><i data-lucide="wifi-off" class="w-5 h-5"></i></div>
+        <div style="flex:1;">
+          <strong style="color:var(--gray-900);">Não foi possível carregar a fila</strong>
+          <div class="text-sm" style="color:var(--gray-500);" id="filaErroMsg">Verifique sua conexão e tente novamente.</div>
         </div>
-        <div class="card-body" style="padding:14px;">
-          <div class="photo-grid" style="grid-template-columns:repeat(8,1fr);gap:6px;">
-            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="upload" class="w-4 h-4"></i> Subir versões</button>
-            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="check" class="w-4 h-4"></i> Marcar finalizado</button>
-          </div>
-        </div>
+        <button class="btn btn-secondary btn-sm" onclick="carregarFila()"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Tentar de novo</button>
       </div>
-
-      <div class="card">
-        <div style="background:linear-gradient(135deg, var(--primary-900), #7C3AED);color:white;padding:18px;border-radius:12px 12px 0 0;">
-          <div class="flex justify-between items-start">
-            <div>
-              <div style="font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.08em;">Em edição</div>
-              <strong style="font-size:18px;display:block;margin-top:2px;">Pacote · Pedro Henrique</strong>
-              <div style="font-size:13px;opacity:.85;margin-top:2px;">MEDICINA T85 · FOTO CONVITE (30 fotos)</div>
-            </div>
-            <span class="badge" style="background:rgba(255,255,255,.2);color:white;">Você</span>
-          </div>
-          <div class="flex gap-4 mt-3" style="font-size:12px;opacity:.85;">
-            <span><i data-lucide="clock" class="inline w-3 h-3"></i> Pegou há 1d</span>
-            <span><i data-lucide="calendar" class="inline w-3 h-3"></i> Vence amanhã</span>
-            <span><i data-lucide="image" class="inline w-3 h-3"></i> 14 / 30</span>
-          </div>
-        </div>
-        <div class="card-body" style="padding:14px;">
-          <div class="photo-grid" style="grid-template-columns:repeat(8,1fr);gap:6px;">
-            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t2" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t3" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t4" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile" style="aspect-ratio:1;border-radius:6px;"></div>
-            <div class="photo-tile tile t5" style="aspect-ratio:1;border-radius:6px;"></div>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="upload" class="w-4 h-4"></i> Subir versões</button>
-            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;"><i data-lucide="check" class="w-4 h-4"></i> Marcar finalizado</button>
-          </div>
-        </div>
-      </div>
-
     </div>
 
-    <div class="card mt-6">
-      <div class="card-header"><div class="card-title">Aguardando · disponíveis para pegar</div><span class="badge">12 pacotes</span></div>
-      <table class="table">
-        <thead><tr><th>Pacote</th><th>Turma</th><th>Evento</th><th class="num">Fotos</th><th>Vence em</th><th>Prioridade</th><th></th></tr></thead>
-        <tbody>
-          <tr><td><strong>Júlia Ribeiro</strong></td><td>MEDICINA T85</td><td>BAILE + AFTER</td><td class="num">40</td><td>5 dias</td><td><span class="badge badge-danger">Alta</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
-          <tr><td><strong>Tiago Moreira Mendes</strong></td><td>MEDICINA T85</td><td>FOTOS FAMÍLIA</td><td class="num">20</td><td>5 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
-          <tr><td><strong>Igor Martins Rocha</strong></td><td>DIREITO UNIMONTES</td><td>FAMILY DAY (10 fotos)</td><td class="num">10</td><td>3 dias</td><td><span class="badge badge-danger">Alta</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
-          <tr><td><strong>Fernanda Alves Lopes</strong></td><td>LETRAS UNIMONTES</td><td>POSICIONAMENTO IMAGEM</td><td class="num">15</td><td>4 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
-          <tr><td><strong>Beatriz Lima</strong></td><td>UNIFICADA - IPATINGA</td><td>COLAÇÃO OFICIAL (30)</td><td class="num">30</td><td>6 dias</td><td><span class="badge">Média</span></td><td><button class="btn btn-secondary btn-sm">Pegar pacote</button></td></tr>
-          <tr><td><strong>João Vinícius</strong></td><td>ENG. FLORESTAL UFMG</td><td>COLAÇÃO OFICIAL (30)</td><td class="num">30</td><td>2 dias</td><td><span class="badge badge-danger">Urgente</span></td><td><button class="btn btn-primary btn-sm">Pegar pacote</button></td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Colunas kanban por status -->
+    <div id="kanban" class="grid gap-4" style="grid-template-columns:repeat(4,1fr);align-items:start;"></div>
   </main>
 </div>
-<script>lucide.createIcons();</script>
+<script>
+lucide.createIcons();
+
+// ---- Estado ----
+var STATUS_ORDER = ["aberta", "em_andamento", "concluida", "entregue"];
+var statusLabels = {}; // preenchido por /api/os/opcoes (fallback abaixo)
+var tiposLabels = {};
+var STATUS_FALLBACK = [["aberta","Aberta"],["em_andamento","Em andamento"],["concluida","Concluída"],["entregue","Entregue"]];
+
+// Ícone/cor de cada etapa (visual, sem depender da API)
+var STATUS_META = {
+  aberta:       { icon:"clock",        bg:"#FEF3C7", fg:"#92400E" },
+  em_andamento: { icon:"palette",      bg:"#FCE7F3", fg:"#9D174D" },
+  concluida:    { icon:"check",        bg:"#DCFCE7", fg:"#166534" },
+  entregue:     { icon:"package-check",bg:"#DBEAFE", fg:"#1E40AF" }
+};
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function labelStatus(st){ return statusLabels[st] || st; }
+function labelTipo(t){ return tiposLabels[t] || (t||""); }
+
+function prioridadeBadge(p){
+  var v = (p||"").toLowerCase();
+  if (v.indexOf("urg") >= 0) return '<span class="badge badge-danger">Urgente</span>';
+  if (v.indexOf("alta") >= 0) return '<span class="badge badge-danger">Alta</span>';
+  if (v.indexOf("baixa") >= 0) return '<span class="badge">Baixa</span>';
+  if (v) return '<span class="badge">' + esc(p) + '</span>';
+  return "";
+}
+
+function fmtPrazo(iso){
+  if (!iso) return null;
+  var d = new Date(iso);
+  if (isNaN(d)) return esc(iso);
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var alvo = new Date(d); alvo.setHours(0,0,0,0);
+  var dias = Math.round((alvo - hoje) / 86400000);
+  if (dias < 0) return "Atrasado " + Math.abs(dias) + "d";
+  if (dias === 0) return "Vence hoje";
+  if (dias === 1) return "Vence amanhã";
+  return "Vence em " + dias + "d";
+}
+
+function proxStatus(st){ var i = STATUS_ORDER.indexOf(st); return (i>=0 && i<STATUS_ORDER.length-1) ? STATUS_ORDER[i+1] : null; }
+function antStatus(st){ var i = STATUS_ORDER.indexOf(st); return i>0 ? STATUS_ORDER[i-1] : null; }
+
+// ---- Fetch ----
+function carregarOpcoes(){
+  return fetch(apiUrl('/api/os/opcoes'))
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(op){
+      var st = (op && op.status && op.status.length) ? op.status : STATUS_FALLBACK;
+      statusLabels = {}; st.forEach(function(p){ statusLabels[p[0]] = p[1]; });
+      tiposLabels = {}; (op && op.tipos || []).forEach(function(p){ tiposLabels[p[0]] = p[1]; });
+    })
+    .catch(function(){
+      // Fallback: rótulos padrão do contrato
+      statusLabels = {}; STATUS_FALLBACK.forEach(function(p){ statusLabels[p[0]] = p[1]; });
+    });
+}
+
+function carregarFila(){
+  document.getElementById('filaErro').style.display = 'none';
+  var kanban = document.getElementById('kanban');
+  kanban.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-500);"><i data-lucide="loader" class="w-5 h-5"></i> Carregando fila…</div>';
+  lucide.createIcons();
+
+  return fetch(apiUrl('/api/os'))
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(data){
+      render(data.itens || [], data.resumo || {});
+    })
+    .catch(function(err){
+      kanban.innerHTML = '';
+      var box = document.getElementById('filaErro');
+      box.style.display = '';
+      document.getElementById('filaErroMsg').textContent = 'Não foi possível falar com o servidor (' + (err && err.message || 'erro') + ').';
+      document.getElementById('kpis').innerHTML = '';
+      lucide.createIcons();
+    });
+}
+
+// ---- Render ----
+function renderKpis(resumo){
+  var el = document.getElementById('kpis');
+  el.innerHTML = STATUS_ORDER.map(function(st){
+    var m = STATUS_META[st] || { icon:"folder", bg:"#F3F4F6", fg:"#374151" };
+    var n = resumo[st] != null ? resumo[st] : 0;
+    return '<div class="kpi">' +
+      '<div class="kpi-icon" style="background:'+m.bg+';color:'+m.fg+';"><i data-lucide="'+m.icon+'" class="w-5 h-5"></i></div>' +
+      '<div class="kpi-label">'+esc(labelStatus(st))+'</div>' +
+      '<div class="kpi-value">'+n+'</div>' +
+      '<div class="kpi-trend" style="color:var(--gray-500);">'+(n===1?'1 ordem':n+' ordens')+'</div>' +
+    '</div>';
+  }).join('');
+  lucide.createIcons();
+}
+
+function cardOS(os){
+  var linhas = [];
+  if (os.turma && os.turma.nome) linhas.push('<span><i data-lucide="graduation-cap" class="inline w-3 h-3"></i> '+esc(os.turma.nome)+'</span>');
+  else if (os.aluno && os.aluno.nome) linhas.push('<span><i data-lucide="user" class="inline w-3 h-3"></i> '+esc(os.aluno.nome)+'</span>');
+  if (os.tipo) linhas.push('<span><i data-lucide="tag" class="inline w-3 h-3"></i> '+esc(labelTipo(os.tipo))+'</span>');
+  if (os.responsavel) linhas.push('<span><i data-lucide="user-check" class="inline w-3 h-3"></i> '+esc(os.responsavel)+'</span>');
+  var prazo = fmtPrazo(os.prazo);
+  if (prazo) linhas.push('<span><i data-lucide="calendar" class="inline w-3 h-3"></i> '+esc(prazo)+'</span>');
+  if (os.dias_na_etapa != null) linhas.push('<span><i data-lucide="clock" class="inline w-3 h-3"></i> '+esc(os.dias_na_etapa)+'d nesta etapa</span>');
+
+  var prox = proxStatus(os.status);
+  var ant = antStatus(os.status);
+  var acoes = '';
+  if (ant) acoes += '<button class="btn btn-secondary btn-sm" title="Voltar para '+esc(labelStatus(ant))+'" onclick="moverOS(\''+esc(os.id)+'\',\''+ant+'\',this)"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>';
+  if (prox) acoes += '<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="moverOS(\''+esc(os.id)+'\',\''+prox+'\',this)"><i data-lucide="arrow-right" class="w-4 h-4"></i> '+esc(labelStatus(prox))+'</button>';
+  if (!prox && !ant) acoes = '<span class="text-sm" style="color:var(--gray-500);">Sem próxima etapa</span>';
+
+  return '<div class="card" style="margin-bottom:12px;">' +
+    '<div class="card-body" style="padding:14px;">' +
+      '<div class="flex justify-between items-start" style="gap:8px;">' +
+        '<strong style="font-size:14px;color:var(--gray-900);">'+esc(os.titulo||'Ordem de serviço')+'</strong>' +
+        (prioridadeBadge(os.prioridade)) +
+      '</div>' +
+      '<div class="flex flex-col gap-1 mt-2" style="font-size:12px;color:var(--gray-600);">'+linhas.join('')+'</div>' +
+      (os.observacoes ? '<div class="text-sm mt-2" style="color:var(--gray-500);">'+esc(os.observacoes)+'</div>' : '') +
+      '<div class="flex gap-2 mt-3">'+acoes+'</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function render(itens, resumo){
+  renderKpis(resumo);
+  var kanban = document.getElementById('kanban');
+
+  if (!itens.length){
+    kanban.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--gray-500);">' +
+      '<i data-lucide="inbox" style="width:48px;height:48px;opacity:.4;"></i>' +
+      '<div style="margin-top:12px;font-weight:600;color:var(--gray-700);">Nenhuma ordem de serviço na fila</div>' +
+      '<div class="text-sm">Quando novas ordens chegarem, elas aparecem aqui.</div>' +
+    '</div>';
+    lucide.createIcons();
+    return;
+  }
+
+  var porStatus = {};
+  STATUS_ORDER.forEach(function(st){ porStatus[st] = []; });
+  itens.forEach(function(os){ (porStatus[os.status] || (porStatus[os.status]=[])).push(os); });
+
+  kanban.innerHTML = STATUS_ORDER.map(function(st){
+    var lista = porStatus[st] || [];
+    var m = STATUS_META[st] || {};
+    var cards = lista.length
+      ? lista.map(cardOS).join('')
+      : '<div class="text-sm" style="color:var(--gray-400);padding:8px 2px;">Vazio</div>';
+    return '<div>' +
+      '<div class="flex justify-between items-center mb-3" style="padding:0 2px;">' +
+        '<strong style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-700);">'+esc(labelStatus(st))+'</strong>' +
+        '<span class="badge">'+lista.length+'</span>' +
+      '</div>' + cards +
+    '</div>';
+  }).join('');
+  lucide.createIcons();
+}
+
+// ---- Ações ----
+function moverOS(id, novoStatus, btn){
+  if (btn){ btn.disabled = true; btn.style.opacity = '.6'; }
+  fetch(apiUrl('/api/os/'+encodeURIComponent(id)+'/status'), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: novoStatus })
+  })
+  .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+  .then(function(){ carregarFila(); })
+  .catch(function(err){
+    if (btn){ btn.disabled = false; btn.style.opacity = ''; }
+    alert('Não foi possível mover a ordem de serviço (' + (err && err.message || 'erro') + ').');
+  });
+}
+
+// ---- Boot ----
+carregarOpcoes().then(carregarFila);
+</script>
 
 </body>
 </html>

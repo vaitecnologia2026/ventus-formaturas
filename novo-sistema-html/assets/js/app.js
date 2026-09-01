@@ -90,7 +90,7 @@ function renderAdminSidebar() {
         { href: 'dashboard.html',         icon: 'layout-dashboard', label: 'Painel' },
         { href: 'turmas.html',            icon: 'users-round',      label: 'Turmas' },
         { href: 'eventos.html',           icon: 'calendar',         label: 'Eventos' },
-        { href: 'modo-tv.html',           icon: 'tv',               label: 'Modo TV' },
+        { href: 'modo-tv.html',           icon: 'tv',               label: 'Modo TV', blank: true },
       ],
     },
     {
@@ -138,7 +138,7 @@ function renderAdminSidebar() {
 
   let html = `
     <div class="sidebar-brand">
-      <div class="sidebar-brand-mark"><img src="/assets/img/icon-app.png" alt="Ventus"></div>
+      <div class="sidebar-brand-mark"><img src="/assets/img/icon-branco.png" alt="Ventus"></div>
       <div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Formaturas</div></div>
     </div>
   `;
@@ -151,6 +151,9 @@ function renderAdminSidebar() {
         // Link "Em breve" — não navega; o click interceptor mostra toast
         html += `<a href="#" class="sidebar-link sidebar-link-coming" data-coming-label="${it.label}" style="opacity:.55;"
                     title="Em breve"><i data-lucide="${it.icon}"></i>${it.label}<span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(251,191,36,.18);color:#FCD34D;padding:2px 6px;border-radius:4px;">EM BREVE</span></a>`;
+      } else if (it.blank) {
+        // Abre em JANELA/ABA NOVA (ex.: Modo TV — pra jogar no telão)
+        html += `<a href="${it.href}" class="sidebar-link ${active}" target="_blank" rel="noopener"><i data-lucide="${it.icon}"></i>${it.label}<span style="margin-left:auto;opacity:.5;font-size:13px;">↗</span></a>`;
       } else {
         html += `<a href="${it.href}" class="sidebar-link ${active}"><i data-lucide="${it.icon}"></i>${it.label}</a>`;
       }

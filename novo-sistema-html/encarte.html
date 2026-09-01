@@ -35,7 +35,7 @@
 </head>
 <body>
 <div class="top">
-  <img src="/assets/img/logo.png" alt="Ventus" onerror="this.style.display='none'">
+  <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" onerror="this.style.display='none'">
   <div class="marca">Meu Encarte</div>
 </div>
 <div class="wrap"><div class="card" id="card"><p class="muted">Carregando…</p></div></div>
@@ -62,7 +62,7 @@ async function carregar(){
       <div class="fld"><label>Nome da mãe</label><input id="e-mae" value="${esc(a.nome_mae)}"></div>
       <div class="fld"><label>Nome do pai</label><input id="e-pai" value="${esc(a.nome_pai)}"></div>
     </div>
-    <div class="fld"><label>Mensagem / dedicatória</label><textarea id="e-msg" placeholder="Uma mensagem que vai no seu encarte…">${esc(a.mensagem)}</textarea></div>
+    <div class="fld"><label>Mensagem / dedicatória <span style="font-weight:400;color:#94a3b8;">(máx. 2000)</span></label><textarea id="e-msg" maxlength="2000" oninput="document.getElementById('e-msg-c').textContent=this.value.length+'/2000'" placeholder="Uma mensagem que vai no seu encarte…">${esc(a.mensagem)}</textarea><div id="e-msg-c" style="font-size:12px;color:#94a3b8;text-align:right;margin-top:4px;">${(a.mensagem||'').length}/2000</div></div>
     <button class="btn" id="enviar">Salvar meu encarte</button>
     <p class="muted">Você pode voltar e editar quando quiser.</p>`;
   document.getElementById('enviar').onclick = enviar;

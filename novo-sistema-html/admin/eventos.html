@@ -23,8 +23,8 @@
 .cal-evt { display:block; font-size:11px; padding:3px 6px; border-radius:4px; margin-top:4px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
 .cal-evt.cer { background:#DBEAFE; color:#1E40AF; }
 .cal-evt.fes { background:#FCE7F3; color:#9D174D; }
-.cal-evt.fot { background:#EDE9FE; color:#5B21B6; }
-.cal-evt.ens { background:#DCFCE7; color:#166534; }
+.cal-evt.fot { background:var(--purple-bg); color:var(--purple-fg); }
+.cal-evt.ens { background:var(--success-bg); color:var(--success-fg); }
 </style>
 </head>
 <body>
@@ -53,9 +53,9 @@
 
     <div class="grid grid-cols-4 gap-4 mb-6">
       <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="calendar" class="w-5 h-5"></i></div><div class="kpi-label">Eventos no mês</div><div class="kpi-value">17</div><div class="kpi-trend" style="color:var(--gray-500);">+ 5 vs abr</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#DCFCE7;color:#166534;"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Confirmados</div><div class="kpi-value">12</div><div class="kpi-trend up">71%</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEF3C7;color:#92400E;"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Hoje</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">2 fotografias · 1 baile</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:#FEE2E2;color:#991B1B;"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Conflitos detectados</div><div class="kpi-value">1</div><div class="kpi-trend down">15/07 · 2 turmas</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Confirmados</div><div class="kpi-value">12</div><div class="kpi-trend up">71%</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Hoje</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">2 fotografias · 1 baile</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Conflitos detectados</div><div class="kpi-value">1</div><div class="kpi-trend down">15/07 · 2 turmas</div></div>
     </div>
 
     <div class="card mb-6">
@@ -69,8 +69,8 @@
         <div class="flex gap-2 items-center" style="font-size:12px;color:var(--gray-600);">
           <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#DBEAFE;border-radius:3px;"></span> Cerimônia</span>
           <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#FCE7F3;border-radius:3px;"></span> Festa</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#EDE9FE;border-radius:3px;"></span> Fotografia</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#DCFCE7;border-radius:3px;"></span> Ensaio</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--purple-bg);border-radius:3px;"></span> Fotografia</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--success-bg);border-radius:3px;"></span> Ensaio</span>
         </div>
       </div>
       <div class="card-body">

@@ -19,15 +19,29 @@
   .page-head .chip svg { width:26px; height:26px; }
   .page-head h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; color:var(--gray-900); }
   .page-head p { margin:3px 0 0; color:var(--gray-500); font-size:13.5px; }
-  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:20px; }
+  /* KPI grids — colunas explícitas por breakpoint para NUNCA deixar card órfão.
+     Resumo (5 cards): 5 → 3 (3+2) → 1. Pula o 2-col (evita 2+2+1). */
+  .kpis { display:grid; gap:16px; margin-bottom:20px; }
+  .kpis.kpis-5 { grid-template-columns:repeat(5,1fr); }
+  @media (max-width:1180px){ .kpis.kpis-5 { grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:640px){ .kpis.kpis-5 { grid-template-columns:1fr; } }
+  /* Indicadores — dois grupos rotulados. Grupo de 4: 4 → 2 → 1. Grupo de 3: 3 → 1 (pula 2, evita 2+1). */
+  .kpis.kpis-4 { grid-template-columns:repeat(4,1fr); }
+  @media (max-width:1024px){ .kpis.kpis-4 { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:640px){ .kpis.kpis-4 { grid-template-columns:1fr; } }
+  .kpis.kpis-3 { grid-template-columns:repeat(3,1fr); }
+  @media (max-width:640px){ .kpis.kpis-3 { grid-template-columns:1fr; } }
+  /* Sub-cabeçalho discreto dos grupos de indicadores */
+  .ind-group + .ind-group { margin-top:20px; }
+  .ind-label { font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--gray-400); font-weight:700; margin:0 0 12px; }
   .kpi { background:var(--surface); border:1px solid var(--gray-200); border-radius:16px; padding:18px 20px; box-shadow:var(--shadow-sm); }
   .kpi .top { display:flex; align-items:center; justify-content:space-between; }
   .kpi .ic { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:var(--primary-50); color:var(--primary-700); }
   .kpi .l { font-size:12.5px; color:var(--gray-500); font-weight:600; margin-top:12px; }
   .kpi .v { font-size:26px; font-weight:800; letter-spacing:-.02em; color:var(--gray-900); margin-top:2px; }
   .kpi .s { font-size:12px; color:var(--gray-400); margin-top:2px; }
-  .kpi.verde .ic{background:#DCFCE7;color:#16A34A;} .kpi.verde .v{color:#16A34A;}
-  .kpi.laranja .ic{background:#FEF3C7;color:#D97706;} .kpi.laranja .v{color:#D97706;}
+  .kpi.verde .ic{background:var(--success-bg);color:#16A34A;} .kpi.verde .v{color:#16A34A;}
+  .kpi.laranja .ic{background:var(--warning-bg);color:#D97706;} .kpi.laranja .v{color:#D97706;}
   .cols { display:grid; grid-template-columns:1.6fr 1fr; gap:18px; align-items:start; }
   .col { display:flex; flex-direction:column; gap:18px; min-width:0; }
   @media (max-width:900px){ .cols{grid-template-columns:1fr;} }
@@ -65,25 +79,54 @@
   @media (max-width:640px){
     .app-content{padding:16px;}
     .page-head{gap:12px;margin-bottom:18px;} .page-head .chip{width:44px;height:44px;border-radius:13px;} .page-head .chip svg{width:22px;height:22px;} .page-head h1{font-size:20px;}
-    .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+    .kpis{gap:12px;}
     .kpi{padding:14px 16px;} .kpi .v{font-size:22px;}
     .fin-big{font-size:24px;}
     .panel-head{padding:14px 16px;} .panel-body{padding:16px;}
     table.tbl th, table.tbl td{padding:11px 14px;}
   }
   /* Barra de filtros compacta (campos modestos, botões agrupados à direita e iguais) */
-  .filtros{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; padding:16px 20px; }
-  .filtros .f{ display:flex; flex-direction:column; gap:6px; }
-  .filtros .f label{ font-size:12px; font-weight:600; color:var(--gray-600); }
-  .filtros .f input, .filtros .f select{ padding:9px 11px; border:1px solid var(--gray-300); border-radius:9px; font-size:13.5px; font-family:inherit; background:var(--surface); color:var(--gray-900); outline:none; transition:.15s; }
+  .filtros{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:14px 16px; align-items:end; padding:18px 20px; }
+  .filtros .f{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .filtros .f label{ font-size:12px; font-weight:600; color:var(--gray-600); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .filtros .f input, .filtros .f select{ width:100%; height:40px; min-height:40px; padding:0 12px; border:1px solid var(--gray-300); border-radius:9px; font-size:13.5px; font-family:inherit; background:var(--surface); color:var(--gray-900); outline:none; transition:.15s; }
   .filtros .f input:focus, .filtros .f select:focus{ border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
-  .filtros .f input[type=date]{ width:158px; }
-  .filtros .f select{ min-width:158px; }
-  .filtros .acoes{ display:flex; gap:8px; margin-left:auto; }
-  .filtros .acoes .btn{ min-width:112px; justify-content:center; }
+  /* botões numa linha própria, alinhados à direita */
+  .filtros .acoes{ grid-column:1 / -1; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid var(--gray-100); padding-top:16px; margin-top:2px; }
+  .filtros .acoes .btn{ min-width:120px; height:42px; justify-content:center; }
   @media (max-width:640px){
-    .filtros .f{ flex:1 1 45%; } .filtros .f input, .filtros .f select{ width:100%; min-width:0; }
-    .filtros .acoes{ margin-left:0; width:100%; } .filtros .acoes .btn{ flex:1; }
+    .filtros{ grid-template-columns:repeat(2, 1fr); }
+    .filtros .acoes{ flex-direction:row; } .filtros .acoes .btn{ flex:1; min-width:0; }
+  }
+  /* Modal de detalhamento da turma */
+  .modal-ov{ position:fixed; inset:0; z-index:1000; background:rgba(10,37,64,.55); backdrop-filter:blur(2px); display:none; align-items:center; justify-content:center; padding:32px 20px; overflow-y:auto; }
+  .modal-ov.open{ display:flex; }
+  .modal{ background:var(--surface); border:1px solid var(--gray-200); border-radius:18px; box-shadow:0 24px 60px -20px rgba(10,37,64,.5); width:100%; max-width:640px; margin:auto; overflow:hidden; animation:modalIn .18s ease; }
+  @keyframes modalIn{ from{ opacity:0; transform:translateY(12px) scale(.98);} to{ opacity:1; transform:none;} }
+  .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 22px; border-bottom:1px solid var(--gray-100); }
+  .modal-head .mh-t{ font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--gray-900); }
+  .modal-head .mh-s{ font-size:12.5px; color:var(--gray-500); margin-top:2px; }
+  .modal-close{ width:34px; height:34px; flex:none; border-radius:9px; border:1px solid var(--gray-200); background:var(--surface); color:var(--gray-500); display:grid; place-items:center; cursor:pointer; transition:.15s; }
+  .modal-close:hover{ background:var(--gray-50); color:var(--gray-900); }
+  .modal-body{ padding:20px 22px; max-height:min(70vh,640px); overflow-y:auto; }
+  .md-sec{ margin-bottom:20px; } .md-sec:last-child{ margin-bottom:0; }
+  .md-sec-t{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-400); font-weight:700; margin-bottom:10px; }
+  .md-rows{ display:flex; flex-direction:column; }
+  .md-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; font-size:14px; border-bottom:1px solid var(--gray-100); }
+  .md-row:last-child{ border-bottom:none; }
+  .md-row .k{ color:var(--gray-600); display:flex; align-items:center; gap:8px; } .md-row .k small{ color:var(--gray-400); font-size:11.5px; font-weight:500; }
+  .md-row .v{ color:var(--gray-900); font-weight:700; font-variant-numeric:tabular-nums; }
+  .md-row.tot{ margin-top:2px; padding-top:12px; border-top:1px solid var(--gray-200); border-bottom:none; } .md-row.tot .v{ font-size:16px; }
+  .md-row.tot .k{ font-weight:700; color:var(--gray-900); }
+  .md-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .md-card{ background:var(--gray-50); border:1px solid var(--gray-100); border-radius:12px; padding:12px 14px; }
+  .md-card .cl{ font-size:11.5px; color:var(--gray-500); font-weight:600; } .md-card .cv{ font-size:18px; font-weight:800; color:var(--gray-900); margin-top:3px; letter-spacing:-.01em; }
+  .md-loading{ text-align:center; color:var(--gray-400); padding:30px 0; font-size:13px; }
+  @media (max-width:640px){
+    .modal-ov{ padding:12px; align-items:flex-start; }
+    .modal{ max-width:none; border-radius:16px; }
+    .modal-body{ max-height:none; }
+    .md-grid{ grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -103,6 +146,7 @@
       <div class="filtros">
         <div class="f"><label>Previsão formatura (de)</label><input type="date" id="fil-di"></div>
         <div class="f"><label>Previsão formatura (até)</label><input type="date" id="fil-df"></div>
+        <div class="f"><label>Turma</label><select id="fil-turma"><option value="">Todas as turmas</option></select></div>
         <div class="f"><label>Situação da turma</label><select id="fil-sit"><option value="">Todas</option><option value="ativa">Ativa</option><option value="inativa">Inativa</option></select></div>
         <div class="f"><label>Situação eventos</label><select id="fil-sev"><option value="">Todas</option><option value="previsto">Previsto</option><option value="confirmado">Confirmado</option><option value="realizado">Realizado</option><option value="cancelado">Cancelado</option></select></div>
         <div class="f"><label>Possui cerimonial</label><select id="fil-cer"><option value="">Todas</option><option value="1">Sim</option><option value="0">Não</option></select></div>
@@ -117,11 +161,20 @@
       </div>
     </div>
 
-    <div class="kpis" id="kpis"></div>
+    <div class="kpis kpis-5" id="kpis"></div>
 
     <div class="panel" style="margin-bottom:18px;">
       <div class="panel-head"><span style="display:flex;align-items:center;gap:9px;"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--primary-600);"></i> Indicadores <span style="font-size:12px;color:var(--gray-400);font-weight:500;">(referência: data de assinatura)</span></span></div>
-      <div class="panel-body"><div class="kpis" id="indicadores"></div></div>
+      <div class="panel-body">
+        <div class="ind-group">
+          <p class="ind-label">Faturamento</p>
+          <div class="kpis kpis-4" id="indicadores-fat"></div>
+        </div>
+        <div class="ind-group">
+          <p class="ind-label">Médias &amp; indicadores</p>
+          <div class="kpis kpis-3" id="indicadores-med"></div>
+        </div>
+      </div>
     </div>
 
     <div class="cols">
@@ -162,6 +215,21 @@
   </main>
 </div>
 
+<div class="modal-ov" id="turma-modal" onclick="if(event.target===this)fecharTurma()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tm-titulo">
+    <div class="modal-head">
+      <div>
+        <div class="mh-t" id="tm-titulo">Detalhamento da turma</div>
+        <div class="mh-s" id="tm-sub">—</div>
+      </div>
+      <button class="modal-close" onclick="fecharTurma()" aria-label="Fechar"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="modal-body" id="tm-body">
+      <div class="md-loading">Carregando…</div>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/app.js"></script>
 <script>
 lucide.createIcons();
@@ -173,13 +241,15 @@ async function initPainel(){
   try{ const r=await fetch(apiUrl('/api/painel/opcoes')); const o=await r.json();
     document.getElementById('fil-vend').innerHTML='<option value="">Todos</option>'+(o.vendedores||[]).map(v=>`<option value="${v.id}">${v.nome}</option>`).join('');
     document.getElementById('fil-tb').innerHTML='<option value="">Tipo de boleto (todos)</option>'+(o.tipos_boleto||[]).map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('');
+    document.getElementById('fil-turma').innerHTML='<option value="">Todas as turmas</option>'+(o.turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
   }catch(e){}
   carregar();
 }
-window.limparFiltros = () => { ['fil-di','fil-df','fil-sit','fil-sev','fil-cer','fil-vend','fil-tb','fil-ai','fil-af'].forEach(k=>document.getElementById(k).value=''); carregar(); };
+window.limparFiltros = () => { ['fil-di','fil-df','fil-turma','fil-sit','fil-sev','fil-cer','fil-vend','fil-tb','fil-ai','fil-af'].forEach(k=>document.getElementById(k).value=''); carregar(); };
 function queryFiltros(){
   const p = new URLSearchParams();
   const G=id=>document.getElementById(id);
+  if(G('fil-turma').value) p.set('turma_id',G('fil-turma').value);
   if(G('fil-di').value) p.set('previsao_inicio',G('fil-di').value);
   if(G('fil-df').value) p.set('previsao_fim',G('fil-df').value);
   if(G('fil-sit').value) p.set('situacao',G('fil-sit').value);
@@ -204,11 +274,14 @@ async function carregar(){
 
   // indicadores (doc Revisão 2)
   const ind = d.indicadores || {};
-  document.getElementById('indicadores').innerHTML = `
+  // Faturamento (4 cards → fileira cheia no desktop)
+  document.getElementById('indicadores-fat').innerHTML = `
     ${kpi('','shopping-cart','Vendas', brl(ind.vendas), 'contratos + produtos/serviços')}
     ${kpi('','file-signature','Contratos', brl(ind.contratos_valor), `${ind.contratos_qtd||0} contrato(s)`)}
     ${kpi('','utensils','Cerimonial', brl(ind.cerimonial), '')}
-    ${kpi('','package','Produtos/Serviços', brl(ind.produtos_servicos), '')}
+    ${kpi('','package','Produtos/Serviços', brl(ind.produtos_servicos), '')}`;
+  // Médias & indicadores (3 cards → fileira cheia no desktop)
+  document.getElementById('indicadores-med').innerHTML = `
     ${kpi('','receipt','Ticket médio/contrato', brl(ind.ticket_medio_contrato), '')}
     ${kpi('','trending-up','LTV', (ind.ltv_meses||0).toFixed(1)+'x', 'prazo médio (parcelas)')}
     ${kpi('','credit-card','Ticket médio/parcela', brl(ind.ticket_medio_parcela), '')}`;
@@ -218,7 +291,8 @@ async function carregar(){
   const tb = document.getElementById('turmas-tbody');
   tb.innerHTML = d.turmas_lista.length ? d.turmas_lista.map(t=>{
     const pct = t.alunos ? Math.round(t.preenchidos/t.alunos*100) : 0;
-    return `<tr onclick="location.href='turma-detalhe.html?id=${t.id}'" style="cursor:pointer;">
+    const nomeAttr = String(t.nome||'').replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    return `<tr onclick="abrirTurma(${t.id}, '${nomeAttr}')" style="cursor:pointer;" title="Ver detalhamento">
       <td class="nome">${t.nome}<div style="font-size:12px;color:var(--gray-400);font-weight:400;">${t.instituicao||''}</div></td>
       <td class="num">${t.alunos}</td>
       <td><div style="display:flex;align-items:center;gap:8px;"><div class="prog"><div style="width:${pct}%"></div></div><span style="font-size:12px;color:var(--gray-500);">${t.preenchidos}/${t.alunos}</span></div></td>
@@ -248,6 +322,121 @@ async function carregar(){
     `<div class="pop"><span class="n">${p.nome}</span><span class="b">${p.escolhas} formando(s)</span></div>`).join('') : `<div class="empty">Nenhum plano escolhido ainda.</div>`;
 }
 function kpi(cls,ic,l,v,s){ return `<div class="kpi ${cls}"><div class="top"><div class="ic"><i data-lucide="${ic}"></i></div></div><div class="l">${l}</div><div class="v">${v}</div>${s?`<div class="s">${s}</div>`:''}</div>`; }
+
+// ---- Drilldown de turma (modal) ----
+window.abrirTurma = async (id, nome) => {
+  const ov = document.getElementById('turma-modal');
+  document.getElementById('tm-titulo').textContent = nome || 'Detalhamento da turma';
+  document.getElementById('tm-sub').textContent = 'Composição dos valores desta turma';
+  document.getElementById('tm-body').innerHTML = '<div class="md-loading">Carregando…</div>';
+  ov.classList.add('open'); document.body.style.overflow = 'hidden';
+  try{
+    const r = await fetch(apiUrl('/api/painel?turma_id='+encodeURIComponent(id)));
+    const d = await r.json();
+    renderTurmaDetalhe(d, nome);
+  }catch(e){
+    document.getElementById('tm-body').innerHTML = '<div class="md-loading">Não foi possível carregar o detalhamento.</div>';
+  }
+  lucide.createIcons();
+};
+window.fecharTurma = () => {
+  document.getElementById('turma-modal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.addEventListener('keydown', e => { if(e.key==='Escape') fecharTurma(); });
+
+function renderTurmaDetalhe(d, nome){
+  const f = d.financeiro || {}, al = d.alunos || {}, ind = d.indicadores || {};
+  const total = al.total||0, preench = al.preenchidos||0, pend = Math.max(total - preench, 0);
+  const row = (k,v,sub)=>`<div class="md-row"><span class="k">${k}${sub?` <small>${sub}</small>`:''}</span><span class="v">${v}</span></div>`;
+  const rowTot = (k,v)=>`<div class="md-row tot"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  const card = (l,v)=>`<div class="md-card"><div class="cl">${l}</div><div class="cv">${v}</div></div>`;
+  document.getElementById('tm-body').innerHTML = `
+    <div class="md-sec">
+      <div class="md-sec-t">Escopo</div>
+      <div class="md-grid">
+        ${card('Turmas', d.turmas!=null?d.turmas:1)}
+        ${card('Formandos', total)}
+      </div>
+    </div>
+    <div class="md-sec">
+      <div class="md-sec-t">Formandos — o que compõe</div>
+      <div class="md-rows">
+        ${row('Total de formandos', total)}
+        ${row('Preenchidos', preench, 'com cadastro completo')}
+        ${row('Pendentes', pend, 'faltam preencher')}
+      </div>
+    </div>
+    <div class="md-sec">
+      <div class="md-sec-t">Financeiro — o que compõe o total</div>
+      <div class="md-rows">
+        ${row('Recebido', brl(f.recebido), 'parcelas pagas')}
+        ${row('A receber', brl(f.a_receber), 'parcelas em aberto')}
+        ${rowTot('Contratado (total)', brl(f.contratado))}
+      </div>
+    </div>
+    <div class="md-sec">
+      <div class="md-sec-t">Indicadores desta turma</div>
+      <div class="md-rows">
+        ${row('Vendas', brl(ind.vendas), 'contratos + produtos/serviços')}
+        ${row('Contratos', brl(ind.contratos_valor), `${ind.contratos_qtd||0} contrato(s)`)}
+        ${row('Cerimonial', brl(ind.cerimonial))}
+        ${row('Produtos/Serviços', brl(ind.produtos_servicos))}
+        ${row('Ticket médio/contrato', brl(ind.ticket_medio_contrato))}
+        ${row('LTV', (ind.ltv_meses||0).toFixed(1)+'x', 'prazo médio (parcelas)')}
+        ${row('Ticket médio/parcela', brl(ind.ticket_medio_parcela))}
+      </div>
+    </div>`;
+}
+</script>
+
+<!-- ===== Pop-up de Novidades (aparece 1x ao logar, por versão) ===== -->
+<div id="novidades" style="position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(10,37,64,.55);backdrop-filter:blur(3px);">
+  <div style="background:#fff;width:min(460px,100%);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(15,23,42,.6);animation:novUp .35s cubic-bezier(.2,.8,.2,1);">
+    <div style="background:linear-gradient(135deg,#0A2540,#2563EB);padding:22px 24px;color:#fff;position:relative;">
+      <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);"></div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85;">✨ Novidades</div>
+      <div style="font-size:20px;font-weight:800;margin-top:4px;">Novos ajustes no sistema</div>
+      <div style="font-size:13px;opacity:.85;margin-top:3px;">Confira o que mudou nesta atualização.</div>
+    </div>
+    <div style="padding:18px 22px 6px;">
+      <ul id="nov-lista" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px;"></ul>
+    </div>
+    <div style="padding:14px 22px 20px;">
+      <button id="nov-ok" style="width:100%;background:#2563EB;color:#fff;border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;">Entendi 👍</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes novUp{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+#nov-lista li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:#334155;line-height:1.45;}
+#nov-lista li b{color:#0F172A;}
+#nov-lista li .ic{flex:none;width:22px;height:22px;border-radius:7px;background:#EFF6FF;color:#2563EB;display:grid;place-items:center;font-size:12px;margin-top:1px;}
+</style>
+<script>
+(function(){
+  // BUMP a versão sempre que houver novidades novas → o pop-up reaparece p/ todos.
+  const VERSAO = '2026-08-31';
+  const NOVIDADES = [
+    ['📄','<b>Nº de contrato automático</b> — 001/2026F, 002/2026F… e o de cerimonial com final C.'],
+    ['🎓','<b>Cursos por turma</b> agora com <b>turno</b> e <b>previsão de formatura</b> individuais.'],
+    ['📸','<b>Planos por evento</b> — dá pra definir o nº de fotos que o plano cobre em cada evento.'],
+    ['💳','<b>Forma de pagamento especial</b> (50%/80% durante + restante no último ano).'],
+    ['🛒','<b>Inscrição do formando repaginada</b> com cara de e-commerce (encartes agora à parte).'],
+    ['🧑‍🤝‍🧑','<b>Telas da Etapa 2 no ar</b>: Formando, Fotógrafo, Editor e Operador (check-in).'],
+    ['🎨','<b>Novo login</b> e identidade visual atualizada.'],
+  ];
+  try{ if(localStorage.getItem('ventus.novidades') === VERSAO) return; }catch(e){}
+  const el = document.getElementById('novidades');
+  document.getElementById('nov-lista').innerHTML = NOVIDADES
+    .map(([ic,txt])=>`<li><span class="ic">${ic}</span><span>${txt}</span></li>`).join('');
+  function fechar(){ el.style.display='none'; try{ localStorage.setItem('ventus.novidades', VERSAO); }catch(e){} }
+  document.getElementById('nov-ok').onclick = fechar;
+  el.addEventListener('click', ev=>{ if(ev.target===el) fechar(); });
+  document.addEventListener('keydown', ev=>{ if(ev.key==='Escape' && el.style.display==='flex') fechar(); });
+  // mostra logo após carregar o painel
+  setTimeout(()=>{ el.style.display='flex'; }, 500);
+})();
 </script>
 </body>
 </html>
