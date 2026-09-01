@@ -20,7 +20,25 @@
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
 
   /* ===== Header com logo (contraste garantido) ===== */
-  .top{background:linear-gradient(135deg,var(--azul-950),var(--azul));color:#fff;padding:18px 20px;}
+  .top{position:relative;overflow:hidden;color:#fff;padding:18px 20px;
+    background:linear-gradient(150deg,#071a30 0%,#0A2540 45%,#1D4ED8 130%);
+    background-size:200% 200%;animation:bgShift 18s ease-in-out infinite;}
+  .top .aurora{position:absolute;inset:-45%;z-index:0;pointer-events:none;
+    background:conic-gradient(from 0deg,transparent 0%,rgba(59,130,246,.30) 16%,transparent 34%,rgba(147,197,253,.20) 55%,transparent 72%,rgba(37,99,235,.28) 90%,transparent 100%);
+    filter:blur(70px);opacity:.75;animation:spin 42s linear infinite;}
+  .top::before{content:"";position:absolute;z-index:1;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle,rgba(59,130,246,.40),transparent 65%);top:-320px;right:-120px;animation:floatA 15s ease-in-out infinite;}
+  .top::after{content:"";position:absolute;z-index:1;width:440px;height:440px;border-radius:50%;
+    background:radial-gradient(circle,rgba(147,197,253,.14),transparent 65%);bottom:-320px;left:-120px;animation:floatB 19s ease-in-out infinite;}
+  .top .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 48%,transparent 62%);background-size:250% 250%;animation:sheen 9s ease-in-out infinite;}
+  .top > *{position:relative;z-index:2;}
+  @keyframes bgShift{0%,100%{background-position:0% 0%;}50%{background-position:100% 100%;}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes floatA{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-46px,34px) scale(1.14);}}
+  @keyframes floatB{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(38px,-28px) scale(1.1);}}
+  @keyframes sheen{0%,100%{background-position:0% 0%;opacity:.35;}50%{background-position:100% 100%;opacity:.6;}}
+  @media (prefers-reduced-motion:reduce){.top,.top .aurora,.top::before,.top::after,.top .grain{animation:none;}}
   .top-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;}
   .top .logo-wrap{background:transparent;padding:0;display:inline-flex;align-items:center;}
   .top .logo-wrap img{height:34px;display:block;}
@@ -176,6 +194,7 @@
 </head>
 <body>
 <div class="top">
+  <span class="aurora"></span><span class="grain"></span>
   <div class="top-in">
     <span class="logo-wrap">
       <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" onerror="this.onerror=null;this.outerHTML='<span class=&quot;logo-fallback&quot;>Ventus</span>'">
@@ -1008,9 +1027,7 @@ async function enviar(){
     cpf: F.cpf,
     curso: F.curso,
     ano_formatura: F.ano_formatura || null,
-    altura: F.altura,
-    peso: F.peso,
-    calcado: F.calcado,
+    // medidas do doc: só plus size + medida da calça (sem elastano). Peso/calçado não são mais pedidos.
     plus_size: F.plus_size,
     num_calca: F.num_calca || '',
     plano_id: p ? p.id : null,

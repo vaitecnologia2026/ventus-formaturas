@@ -246,11 +246,31 @@ function montarCursos(sel) {
       <label class="curso-head"><input type="checkbox" value="${c.id}" ${d?'checked':''}> ${c.nome}</label>
       <div class="curso-det">
         <div><label>Turno</label><select class="c-turno">${optTurno(d?.turno)}</select></div>
-        <div><label>Previsão de formatura</label><input type="date" class="c-prev" value="${d?.previsao_formatura || ''}"></div>
+        <div><label>Previsão de formatura</label><select class="c-prev">${optPrevSem(d?.previsao_formatura)}</select></div>
       </div>
     </div>`;
   }).join('');
   $('#f-cursos').querySelectorAll('.curso-head input').forEach(i => i.onchange = () => i.closest('.curso-row').classList.toggle('on', i.checked));
+}
+// Previsão de formatura por SEMESTRE ("2026/1"). Aceita datas antigas e normaliza.
+function normSem(v){
+  if(!v) return '';
+  const s = String(v).trim();
+  const d = s.match(/^(\d{4})-(\d{2})-\d{2}/);        // data antiga "YYYY-MM-DD"
+  if(d) return `${d[1]}/${(+d[2])<=6?1:2}`;
+  const m = s.match(/^(\d{4})\D+(\d)/);                // "2026/1", "2026-1"
+  return (m && (m[2]==='1'||m[2]==='2')) ? `${m[1]}/${m[2]}` : '';
+}
+function optPrevSem(val){
+  const sel = normSem(val);
+  const y0 = new Date().getFullYear();
+  const opts = ['<option value="">—</option>'];
+  for(let y=y0; y<=y0+6; y++) for(const s of [1,2]){
+    const v = `${y}/${s}`;
+    opts.push(`<option value="${v}" ${sel===v?'selected':''}>${y} · ${s}º semestre</option>`);
+  }
+  if(sel && +sel.split('/')[0] < y0) opts.splice(1,0,`<option value="${sel}" selected>${sel}</option>`);
+  return opts.join('');
 }
 function cursosSelecionados() {
   return [...$('#f-cursos').querySelectorAll('.curso-row')].filter(r => r.querySelector('.curso-head input').checked).map(r => ({
