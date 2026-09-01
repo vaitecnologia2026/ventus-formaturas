@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Revisão 3 · Respostas + Etapa 2 — Ventus</title>
+<style>
+:root{--bg:#0A2540;--card:#0f2f4d;--line:rgba(255,255,255,.09);--sub:#9db2cd;--azul:#2563EB;--ok:#34D399;--warn:#FBBF24;--next:#93C5FD}
+*{box-sizing:border-box} html,body{margin:0} body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#e6edf6;-webkit-text-size-adjust:100%}
+header{padding:20px clamp(16px,4vw,40px);border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
+h1{margin:0;font-size:clamp(18px,4vw,24px);letter-spacing:.01em}
+.lead{margin:6px 0 0;color:var(--sub);font-size:13px;max-width:720px}
+.filters{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
+.filters button{background:var(--card);border:1px solid var(--line);color:#cfe0f5;font:inherit;font-size:12.5px;padding:6px 13px;border-radius:999px;cursor:pointer}
+.filters button.on{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
+.sec-title{padding:22px clamp(16px,4vw,40px) 4px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7aa2d6}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:10px clamp(16px,4vw,40px) 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:9px}
+.top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
+.badge{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:7px}
+.b-ok{background:rgba(52,211,153,.16);color:var(--ok)} .b-warn{background:rgba(251,191,36,.16);color:var(--warn)} .b-next{background:rgba(147,197,253,.16);color:var(--next)}
+.mod{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#7aa2d6;font-weight:700}
+.card strong{font-size:14.5px;color:#fff;line-height:1.35;font-weight:700}
+.card p{margin:0;font-size:12.5px;color:var(--sub);line-height:1.5}
+.open{margin-top:4px;align-self:flex-start;background:var(--azul);color:#fff;text-decoration:none;font-size:12.5px;font-weight:700;padding:8px 13px;border-radius:9px;display:inline-flex;align-items:center;gap:6px}
+.open:hover{background:#1d4ed8} .open.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.foot{padding:22px clamp(16px,4vw,40px) 44px;color:var(--sub);font-size:12px}
+</style></head><body>
+<header>
+  <h1>REVISÃO 3 · RESPOSTAS + ETAPA 2</h1>
+  <p class="lead">Cada ponto do PDF enviado, com o status atual e um link direto pra ver no sistema. Abaixo, o showcase da Etapa 2 (telas de perfil = protótipos de design + o módulo que gera os links personalizados).</p>
+  <div class="filters" id="filters"></div>
+</header>
+
+<div class="sec-title">Itens do PDF (Revisão 3)</div>
+<div class="grid" id="grid-pdf"></div>
+
+<div class="sec-title">Etapa 2 · Telas de perfil (design) + acesso</div>
+<div class="grid" id="grid-etapa2"></div>
+
+<div class="foot">✅ feito &nbsp;·&nbsp; 🟡 parcial / a refinar &nbsp;·&nbsp; 🔵 próximo (feature nova). As telas de perfil da Etapa 2 são protótipos de design de como cada uma será; o acesso real é por link personalizado gerado em <b>Etapa 2 · Links de acesso</b>.</div>
+
+<script>
+const BASE=location.origin;
+// [modulo, ponto do PDF, status(ok|warn|next), detalhe, urlRelativa]
+const PDF=[
+ ["Cadastros","Cupom de desconto com limites de uso (fotografia/cerimonial/avulsas)","ok","Cadastro de cupom com limite + aplicação no checkout.","/admin/cadastro.html?entidade=cupom"],
+ ["Turma","Itens do plano puxarem da tabela configurada no cadastro da turma","warn","Itens do plano vêm das tabelas da turma; conferir cobertura total.","/admin/turma-detalhe.html?id=2"],
+ ["Turma","Seleção de cursos com turno + previsão de formatura (2026/2, 2026/1…)","ok","Cada curso vinculado tem turno e previsão próprios.","/admin/turmas.html"],
+ ["Painel","Selecionar uma turma específica + abrir detalhamento dos valores","ok","Filtro por turma e drilldown de turmas/formandos/contratos.","/admin/dashboard.html"],
+ ["Encarte","Link de preenchimento pelo aluno · limite 2000 caracteres","ok","Link dedicado, textarea com limite de 2000.","/admin/encarte.html"],
+ ["Encarte","Fluxo por CPF (aluno digita CPF → habilita turma) + IA de correção do texto","next","A implementar: entrada por CPF e correção do texto por IA.","/admin/encarte.html"],
+ ["Brindes","Entregar para todos OU individual, com data de entrega diferente por aluno","warn","Entrega em massa e por aluno; refinar data individual.","/admin/brindes-pendentes.html"],
+ ["Aluno","Cadastro: curso por config; plus-size sim/não (sem peso); medidas de calça sem elastano (sem calçado); só se 'solicitar medidas'","next","Ajustar campos do cadastro do aluno conforme o PDF.","/inscricao.html?t=demo"],
+ ["Aluno","Campos obrigatórios + repetir e-mail (validação)","next","Tornar campos obrigatórios e confirmar e-mail.","/inscricao.html?t=demo"],
+ ["Aluno","Mostrar itens do plano, brindes (exclusivos da comissão se CPF for comissão), fotografia × cerimonial × total, descontos por CPF, nº de parcelas","next","Resumo e-commerce do que foi adquirido.","/inscricao.html?t=demo"],
+ ["Aluno","Quantidade com botão +/− (estilo e-commerce), não digitar número","next","Stepper +/− no lugar do input numérico.","/inscricao.html?t=demo"],
+ ["Fotógrafo","Identificar qual fotógrafo (do cadastro de prestadores) + nº do cartão de memória no upload","ok","Upload identifica o fotógrafo por link (?p) e registra o cartão na O.S.","/fotografo/upload.html?p=1"],
+ ["Etapa 2","Onde acessar as páginas da Etapa 2 / como compartilhar","ok","Módulo que gera o link pessoal de cada formando e de cada prestador.","/admin/etapa2.html"],
+ ["Etapa 2","Como configurar itens da Etapa 2 (ex.: check-in)","warn","Check-in usa os 'eventos fotográficos' da turma; deixar isso mais óbvio.","/admin/turma-detalhe.html?id=2"],
+];
+const ETAPA2=[
+ ["Formando","Área do formando (design)","Home do aluno: plano, financeiro, encarte, atalhos. Responsivo no desktop.","/aluno/inicio.html?id=1"],
+ ["Fotógrafo","Upload (design)","Identifica o fotógrafo + cartão de memória; envia p/ a fila do editor.","/fotografo/upload.html?p=1"],
+ ["Editor","Fila de edição (design)","Fila de O.S. por etapa (aberta → em andamento → concluída → entregue).","/editor/fila.html?p=1"],
+ ["Operador","Check-in ao vivo (design)","Marca presença dos formandos por evento, com contadores.","/operador/checkin.html"],
+ ["Etapa 2","Links de acesso (real)","Gera o link personalizado de cada pessoa (formando/fotógrafo/editor/operador).","/admin/etapa2.html"],
+];
+const glyph={ok:'✅',warn:'🟡',next:'🔵'};
+const cls={ok:'b-ok',warn:'b-warn',next:'b-next'};
+function card(mod,titulo,st,det,url){
+  return `<div class="card" data-mod="${mod}">
+    <div class="top"><span class="mod">${mod}</span><span class="badge ${cls[st]}">${glyph[st]} ${st==='ok'?'Feito':st==='warn'?'Parcial':'Próximo'}</span></div>
+    <strong>${titulo}</strong><p>${det}</p>
+    <a class="open ${st==='next'?'ghost':''}" href="${BASE}${url}" target="_blank" rel="noopener">Abrir no site ↗</a>
+  </div>`;
+}
+document.getElementById('grid-pdf').innerHTML = PDF.map(x=>card(...x)).join('');
+document.getElementById('grid-etapa2').innerHTML = ETAPA2.map(([m,t,d,u])=>card(m,t,'ok',d,u)).join('');
+// filtros por status
+const fb=document.getElementById('filters'), cards=[...document.querySelectorAll('#grid-pdf .card')];
+function mk(l,fn,on){const b=document.createElement('button');b.textContent=l;if(on)b.className='on';b.onclick=()=>{fb.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn();};fb.appendChild(b);}
+mk('Todos ('+cards.length+')',()=>cards.forEach(c=>c.style.display=''),true);
+[['ok','✅ Feito'],['warn','🟡 Parcial'],['next','🔵 Próximo']].forEach(([k,l])=>{
+  const arr=PDF.map((x,i)=>[x[2],i]); const n=arr.filter(a=>a[0]===k).length;
+  mk(l+' ('+n+')',()=>cards.forEach((c,i)=>c.style.display=PDF[i][2]===k?'':'none'));
+});
+</script></body></html>
