@@ -287,6 +287,19 @@ function brindesDoPlano(p){
   const raw = p.brindes || p.itens_inclusos || p.inclusos || p.brindes_inclusos || [];
   return (Array.isArray(raw)?raw:[]).map(b => (b && typeof b==='object') ? (b.nome||b.descricao||b.label||'') : String(b)).filter(Boolean);
 }
+// Eventos fotográficos contratados no plano (dedup por nome)
+function eventosDoPlano(p){
+  if(!p) return [];
+  const raw = p.eventos_fotograficos || p.eventos || [];
+  const vistos = new Set();
+  return (Array.isArray(raw)?raw:[])
+    .map(e => (e && typeof e==='object') ? { nome:(e.nome||e.evento||e.descricao||''), qt_fotos:e.qt_fotos } : { nome:String(e), qt_fotos:null })
+    .filter(x => {
+      const k = x.nome.trim().toLowerCase();
+      if(!x.nome || vistos.has(k)) return false;
+      vistos.add(k); return true;
+    });
+}
 // Itens exclusivos da comissão (só quando o CPF for da comissão e a API indicar)
 function itensComissao(p){
   if(!p || !cpfEhComissao()) return [];
@@ -972,13 +985,22 @@ function viewFinal(){
   if(taxa>0) linhas.push(`<div class="r-line"><span class="l">Taxa de boleto</span><span class="v">${brl(taxa)}</span></div>`);
   linhas.push(`<div class="r-line"><span class="l">Pagamento</span><span class="v">${esc(meioLbl)}${F.parcelas&&F.parcelas>1?` · ${F.parcelas}x`:''}</span></div>`);
 
-  // Brindes inclusos + itens exclusivos da comissão
+  // Eventos fotográficos contratados + brindes inclusos + itens exclusivos da comissão
   const brindes = brindesDoPlano(p);
+  const eventos = eventosDoPlano(p);
   const comissaoItens = itensComissao(p);
   const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#16A34A;flex:0 0 auto;margin-top:2px;"><path d="M20 6 9 17l-5-5"/></svg>';
+  const cam = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--azul);flex:0 0 auto;margin-top:2px;"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>';
+  let eventosHtml = '';
+  if(eventos.length){
+    eventosHtml = `<div class="fb-t" style="margin-top:16px;">Eventos fotográficos contratados</div>
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+      ${eventos.map(e=>`<li style="display:flex;gap:8px;font-size:13.5px;color:var(--cinza2);">${cam}<span>${esc(e.nome)}${e.qt_fotos?` <span style="color:var(--cinza);">· ${e.qt_fotos} fotos</span>`:''}</span></li>`).join('')}
+      </ul>`;
+  }
   let brindesHtml = '';
   if(brindes.length || comissaoItens.length){
-    brindesHtml = `<div class="fb-t" style="margin-top:16px;">Inclusos no seu plano</div>
+    brindesHtml = `<div class="fb-t" style="margin-top:16px;">Brindes inclusos</div>
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
       ${brindes.map(b=>`<li style="display:flex;gap:8px;font-size:13.5px;color:var(--cinza2);">${chk}<span>${esc(b)}</span></li>`).join('')}
       ${comissaoItens.map(b=>`<li style="display:flex;gap:8px;font-size:13.5px;color:var(--azul-esc);font-weight:600;">${chk}<span>${esc(b)} <span style="font-size:11px;background:#DBEAFE;color:var(--azul-esc);padding:1px 7px;border-radius:6px;">comissão</span></span></li>`).join('')}
@@ -1005,6 +1027,7 @@ function viewFinal(){
     <div class="final-box">
       <div class="fb-t">Resumo</div>
       ${linhas.join('')}
+      ${eventosHtml}
       ${brindesHtml}
       ${parcHtml}
       <div class="r-total"><span class="l">Total</span><span class="v">${brl(total)}</span></div>
