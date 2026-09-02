@@ -216,6 +216,16 @@
     </section>
 
     <section id="pane-contratos" hidden>
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head"><h2><i data-lucide="file-signature" style="width:16px;height:16px;color:var(--primary-600);"></i> Assinatura digital (ZapSign)</h2><span class="count" id="asg-badge">—</span></div>
+        <div style="padding:16px 22px;">
+          <div id="asg-info" style="font-size:14px;color:var(--gray-600);margin-bottom:14px;">Carregando…</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" id="asg-enviar" onclick="enviarAssinatura()"><i data-lucide="send" class="w-4 h-4"></i> Enviar contrato para assinatura</button>
+            <button class="btn btn-secondary btn-sm" onclick="carregarAssinatura(true)"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar status</button>
+          </div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-head"><h2><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo contrato</h2></div>
         <div class="add-bar" id="ct-form"></div>
@@ -275,7 +285,7 @@ async function init(){
 
   document.querySelectorAll('.tab').forEach(x => x.onclick = () => trocar(x.dataset.tab));
   montarPgForms(); montarCtForm(); montarEnForm();
-  carregarPagamentos(); carregarMedidas(); carregarLogs(); carregarContratos(); carregarEncartes();
+  carregarPagamentos(); carregarMedidas(); carregarLogs(); carregarContratos(); carregarEncartes(); carregarAssinatura(false);
   carregarEventos(); carregarBrindes(); carregarAdicionais(); carregarFotosStatus(); carregarGaleria();
   $('#lg-add').onclick = addLog; $('#med-salvar').onclick = salvarMedidas;
 }
@@ -557,6 +567,43 @@ async function carregarContratos(){
 }
 window.toggleContrato=async function(c){ const body={titulo:c.titulo,status:c.status==='assinado'?'pendente':'assinado',data:c.data,url:c.url}; const r=await fetch(apiUrl('/api/aluno/contratos/'+c.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); if(r.ok)carregarContratos(); };
 window.excluirContrato=async function(cid){ if(!await vtConfirm('Excluir este contrato?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/aluno/contratos/'+cid),{method:'DELETE'}); if(r.ok)carregarContratos(); };
+
+/* -------- Assinatura digital (ZapSign) -------- */
+const ASG_LABEL={pending:'Aguardando assinatura',signed:'Assinado',refused:'Recusado',cancelled:'Cancelado'};
+function escH(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function carregarAssinatura(sync){
+  const info=document.getElementById('asg-info'), badge=document.getElementById('asg-badge');
+  if(!info) return;
+  info.textContent = sync?'Consultando ZapSign…':'Carregando…';
+  try{
+    const r=await fetch(apiUrl(`/api/aluno/${id}/assinatura`+(sync?'?sync=true':'')));
+    const d=await r.json();
+    if(!d.tem_assinatura){ badge.textContent='—'; info.innerHTML='Nenhum contrato enviado para assinatura ainda. Clique abaixo para gerar e enviar.'; return; }
+    const lbl=ASG_LABEL[d.status]||d.status;
+    const cor=d.status==='signed'?'var(--success)':(d.status==='refused'?'#DC2626':'#D97706');
+    badge.textContent=lbl;
+    let html=`<div style="margin-bottom:8px;"><b style="color:${cor};">${lbl}</b>${d.modelo?` · ${escH(d.modelo)}`:''}${d.assinado_em?` · em ${new Date(d.assinado_em).toLocaleString('pt-BR')}`:''}</div>`;
+    if(d.sign_url && d.status==='pending'){
+      html+=`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <a href="${escH(d.sign_url)}" target="_blank" class="btn btn-secondary btn-sm"><i data-lucide="external-link" class="w-4 h-4"></i> Abrir link de assinatura</a>
+        <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${escH(d.sign_url)}').then(()=>toast('Link copiado.'))"><i data-lucide="copy" class="w-4 h-4"></i> Copiar link</button></div>`;
+    }
+    if(d.signed_file_url){ html+=`<div style="margin-top:8px;"><a href="${escH(d.signed_file_url)}" target="_blank" class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-4 h-4"></i> Documento assinado</a></div>`; }
+    info.innerHTML=html; if(window.lucide) lucide.createIcons();
+  }catch(e){ info.textContent='Erro ao carregar assinatura.'; }
+}
+window.carregarAssinatura=carregarAssinatura;
+window.enviarAssinatura=async function(){
+  const btn=document.getElementById('asg-enviar'); const orig=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML='Enviando…';
+  try{
+    const r=await fetch(apiUrl(`/api/aluno/${id}/enviar-assinatura`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+    const d=await r.json();
+    if(!r.ok){ await vtAlert(d.detail||'Não foi possível enviar para assinatura.',{title:'Ops'}); return; }
+    toast('Contrato enviado para assinatura.'); carregarAssinatura(false);
+  }catch(e){ await vtAlert('Erro ao enviar para assinatura.',{title:'Ops'}); }
+  finally{ btn.disabled=false; btn.innerHTML=orig; if(window.lucide) lucide.createIcons(); }
+};
 
 /* -------- Encartes -------- */
 let ENST = [];
