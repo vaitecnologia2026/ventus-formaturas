@@ -229,6 +229,30 @@ function trocarAba(aba) {
   if (aba === 'consultar') carregarTabela();
 }
 
+// Revisão de texto por IA (contrato, modelos, etc.) — usa /api/ia/revisar
+window.revisarIA = async function (nome, btn) {
+  const ta = document.getElementById('f-' + nome);
+  if (!ta) return;
+  const texto = (ta.value || '').trim();
+  const aviso = (m) => { if (typeof window.toast === 'function') window.toast(m); else if (typeof window.vtAlert === 'function') window.vtAlert(m); };
+  if (!texto) { aviso('Escreva um texto antes de revisar.'); return; }
+  const orig = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = 'Revisando…';
+  try {
+    const r = await fetch(apiUrl('/api/ia/revisar'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: texto, limite: 12000 }),
+    });
+    const d = await r.json();
+    if (d && d.texto_corrigido) { ta.value = d.texto_corrigido; aviso('Texto revisado pela IA.'); }
+    else aviso('Não foi possível revisar agora.');
+  } catch (e) {
+    aviso('Erro ao revisar. Tente de novo.');
+  } finally {
+    btn.disabled = false; btn.innerHTML = orig; if (window.lucide) lucide.createIcons();
+  }
+};
+
 function montarForm() {
   const campoHtml = c => {
     const req = c.obrigatorio ? '<span class="req">*</span>' : '';
@@ -237,7 +261,7 @@ function montarForm() {
     if (c.tipo === 'text') ctrl = `<input type="text" id="f-${c.nome}">`;
     else if (c.tipo === 'number') ctrl = `<input type="number" step="0.01" id="f-${c.nome}">`;
     else if (c.tipo === 'int') ctrl = `<input type="number" step="1" id="f-${c.nome}">`;
-    else if (c.tipo === 'textarea') ctrl = `<textarea id="f-${c.nome}"></textarea>`;
+    else if (c.tipo === 'textarea') ctrl = `<textarea id="f-${c.nome}"></textarea><button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="revisarIA('${c.nome}', this)"><i data-lucide="sparkles" class="w-4 h-4"></i> Revisar com IA</button>`;
     else if (c.tipo === 'select') ctrl = `<select id="f-${c.nome}">${(c.opcoes||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`;
     else if (c.tipo === 'bool') ctrl = `<label class="switch"><input type="checkbox" id="f-${c.nome}"><span class="track"></span></label>`;
     else if (c.tipo === 'imagem') ctrl = `<input type="hidden" id="f-${c.nome}"><input type="file" accept="image/png,image/jpeg" onchange="lerImagem(this,'${c.nome}')"><div id="prev-${c.nome}" style="margin-top:8px;"></div>`;
