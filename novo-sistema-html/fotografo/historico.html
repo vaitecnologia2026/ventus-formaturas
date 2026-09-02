@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Histórico — Ventus Fotógrafo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="sidebar-brand-mark" style="background:transparent;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Fotógrafo</div></div></div>
+  <a href="upload.html" class="sidebar-link" data-nav><i data-lucide="upload"></i>Upload em massa</a>
+  <a href="galerias.html" class="sidebar-link" data-nav><i data-lucide="folder"></i>Minhas galerias</a>
+  <a href="historico.html" class="sidebar-link active" data-nav><i data-lucide="bar-chart-2"></i>Histórico</a>
+  <div class="sidebar-footer"><div class="avatar" id="prestadorAvatar">FT</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;" id="prestadorNome">Fotógrafo</div><div style="font-size:11px;opacity:.6;" id="prestadorFuncao">Fotógrafo · Ventus</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
+</aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-search"><i data-lucide="search" class="w-4 h-4"></i><input type="text" id="busca" placeholder="Buscar por turma ou evento…" autocomplete="off"></div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);">Fotógrafo / Histórico</div>
+    <div class="flex items-center justify-between mt-1 mb-6">
+      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Histórico de envios</h1>
+      <div class="flex items-center gap-2">
+        <select id="fStatus" class="select" style="width:auto;">
+          <option value="">Todos os status</option>
+          <option value="aberta">Aberta</option>
+          <option value="em_andamento">Em edição</option>
+          <option value="concluida">Concluída</option>
+          <option value="entregue">Entregue</option>
+        </select>
+        <a href="upload.html" class="btn btn-primary" data-nav><i data-lucide="upload" class="w-4 h-4"></i> Novo upload</a>
+      </div>
+    </div>
+
+    <div id="avisoGlobal" style="display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;"></div>
+
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <table class="table" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:70px;">O.S.</th>
+              <th>Turma / Evento</th>
+              <th style="width:90px;text-align:center;">Fotos</th>
+              <th style="width:140px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--gray-500);padding:40px;">Carregando histórico…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var STATUS_LABEL = { aberta:"Aberta", em_andamento:"Em edição", concluida:"Concluída", entregue:"Entregue" };
+  var STATUS_BADGE = { aberta:"badge-warning", em_andamento:"badge-info", concluida:"badge-success", entregue:"badge-purple" };
+
+  var fotografoNome = "";
+  var ENVIOS = [];
+  var tbody = document.getElementById("tbody");
+  var busca = document.getElementById("busca");
+  var fStatus = document.getElementById("fStatus");
+  var avisoGlobal = document.getElementById("avisoGlobal");
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function iniciais(nome) {
+    var p = String(nome || "").trim().split(/\s+/).filter(Boolean);
+    if (!p.length) return "FT";
+    return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
+  }
+  function aviso(msg, tipo) {
+    if (!msg) { avisoGlobal.style.display = "none"; return; }
+    var cor = tipo === "erro" ? "background:#FEE2E2;color:#991B1B;" : "background:#FEF3C7;color:#92400E;";
+    avisoGlobal.setAttribute("style", "margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;" + cor);
+    avisoGlobal.textContent = msg;
+  }
+  function nFotos(o) {
+    var m = /\((\d+)\s*fotos?\)/i.exec(o.titulo || "");
+    if (m) return parseInt(m[1], 10);
+    var m2 = /Fotos enviadas \((\d+)\)/i.exec(o.observacoes || "");
+    if (m2) return parseInt(m2[1], 10);
+    var urls = (o.observacoes || "").match(/https?:\/\//g);
+    return urls ? urls.length : 0;
+  }
+  function cartaoDe(o) {
+    var m = /Cart[aã]o:\s*([^\n·]+)/i.exec(o.observacoes || "");
+    return m ? m[1].trim() : "";
+  }
+  function daFotografo(o) {
+    if (!fotografoNome) return true;
+    return new RegExp("Fot[oó]grafo:\\s*" + fotografoNome.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(o.observacoes || "");
+  }
+
+  function identificarPrestador(cb) {
+    var pid = new URLSearchParams(location.search).get("p");
+    if (!pid) { cb(); return; }
+    function aplicar(p) {
+      if (p && p.nome) {
+        fotografoNome = p.nome;
+        var n = document.getElementById("prestadorNome"), f = document.getElementById("prestadorFuncao"), a = document.getElementById("prestadorAvatar");
+        if (n) n.textContent = p.nome;
+        if (f) f.textContent = (p.funcao || "Fotógrafo") + " · Ventus";
+        if (a) a.textContent = iniciais(p.nome);
+      }
+      cb();
+    }
+    fetch(apiUrl("/api/cadastro/prestador/" + encodeURIComponent(pid)))
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(aplicar)
+      .catch(function () { cb(); });
+  }
+
+  function render() {
+    var termo = (busca.value || "").trim().toLowerCase();
+    var st = fStatus.value;
+    var lista = ENVIOS.filter(function (o) {
+      if (st && o.status !== st) return false;
+      if (termo && ((o.turma || "") + " " + (o.evento || "")).toLowerCase().indexOf(termo) === -1) return false;
+      return true;
+    });
+    if (!ENVIOS.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray-500);padding:48px;">' +
+        '<div style="display:inline-flex;width:56px;height:56px;border-radius:16px;background:var(--gray-100);color:var(--gray-400);align-items:center;justify-content:center;margin-bottom:12px;"><i data-lucide="history" class="w-7 h-7"></i></div>' +
+        '<div style="font-weight:600;color:var(--gray-700);">Nenhum envio ainda</div>' +
+        '<div style="margin-top:4px;">Seus uploads aparecem aqui assim que você enviar fotos para edição.</div></td></tr>';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+    if (!lista.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray-500);padding:32px;">Nenhum envio corresponde ao filtro.</td></tr>'; return; }
+    tbody.innerHTML = lista.map(function (o) {
+      var badge = STATUS_BADGE[o.status] || "badge-info";
+      var label = STATUS_LABEL[o.status] || o.status;
+      var cartao = cartaoDe(o);
+      return '<tr>' +
+        '<td style="font-family:var(--font-mono);color:var(--gray-500);">#' + o.id + '</td>' +
+        '<td>' +
+          '<div style="font-weight:600;color:var(--gray-900);">' + esc(o.turma || "Turma") + '</div>' +
+          '<div style="font-size:12px;color:var(--gray-500);">' + esc(o.evento || "Evento fotográfico") + (cartao ? ' · Cartão ' + esc(cartao) : "") + '</div>' +
+        '</td>' +
+        '<td style="text-align:center;font-weight:600;color:var(--gray-800);">' + nFotos(o) + '</td>' +
+        '<td><span class="badge ' + badge + '">' + esc(label) + '</span></td>' +
+      '</tr>';
+    }).join("");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function carregar() {
+    fetch(apiUrl("/api/os"))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        ENVIOS = (d.itens || []).filter(function (o) { return o.tipo === "edicao" && daFotografo(o); });
+        // /api/os já vem ordenado por id desc (mais recente primeiro)
+        render();
+      })
+      .catch(function () {
+        tbody.innerHTML = "";
+        aviso("Não foi possível carregar o histórico. Verifique se o servidor está no ar.", "erro");
+      });
+  }
+
+  (function () {
+    var qs = location.search || "";
+    if (!qs) return;
+    document.querySelectorAll("[data-nav]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (href && href.indexOf("?") === -1) a.setAttribute("href", href + qs);
+    });
+  })();
+
+  busca.addEventListener("input", render);
+  fStatus.addEventListener("change", render);
+
+  identificarPrestador(carregar);
+})();
+</script>
+</body>
+</html>

@@ -224,6 +224,8 @@ const resumoEl = document.getElementById('resumo');
 const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc = s => String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const maskCpf = v => { const x=String(v||'').replace(/\D/g,'').slice(0,11); return x.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); };
+// Altura em metros no formato 1,00 (1 dígito de metro + até 2 de cm)
+const maskAltura = v => { const d=String(v||'').replace(/\D/g,'').slice(0,3); return d.length<=1 ? d : d[0]+','+d.slice(1); };
 
 /* ===== Toast (aviso, sem alert nativo) ===== */
 function toast(msg, tipo){
@@ -455,8 +457,17 @@ function viewDados(){
           <label data-v="0" class="${F.plus_size===false?'on':''}"><input type="radio" name="plus" ${F.plus_size===false?'checked':''}>Não</label>
         </div>
       </div>
+      <div class="fld"><label>Altura</label>
+        <input id="i-altura" value="${esc(F.altura)}" inputmode="decimal" placeholder="Ex.: 1,75" maxlength="4">
+        <div class="sec-hint" style="margin-top:4px;">Em metros — de 1,00 a 3,00.</div>
+      </div>
+    </div>
+    <div class="grid2">
       <div class="fld"><label>Medida da calça (sem elastano)</label>
-        <input id="i-numcalca" value="${esc(F.num_calca)}" placeholder="Ex.: 42"></div>
+        <input id="i-numcalca" value="${esc(F.num_calca)}" inputmode="numeric" placeholder="Ex.: 42" maxlength="3">
+        <div class="sec-hint" style="margin-top:4px;">Número de 10 a 100.</div>
+      </div>
+      <div class="fld"></div>
     </div>` : '';
 
   card.innerHTML = `
@@ -502,6 +513,13 @@ function viewDados(){
     });
   }
 
+  // Altura: máscara 1,00 (metros) — 1 dígito de metro + 2 de cm
+  const altEl = document.getElementById('i-altura');
+  if(altEl){ altEl.value = maskAltura(altEl.value); altEl.oninput = () => { altEl.value = maskAltura(altEl.value); }; }
+  // Medida da calça: apenas números (até 3 dígitos)
+  const ncEl = document.getElementById('i-numcalca');
+  if(ncEl){ ncEl.oninput = () => { ncEl.value = ncEl.value.replace(/\D/g,'').slice(0,3); }; }
+
   document.getElementById('btn-next').onclick = () => {
     saveDados();
     if(!validarDados()) return;
@@ -528,7 +546,12 @@ function validarDados(){
   if(!(String(F.ano_formatura||'').trim())){ toast('Informe o ano de formatura.'); return false; }
   if(pedeMedidas()){
     if(F.plus_size === null){ toast('Informe se você usa plus size.'); return false; }
-    if(!(F.num_calca||'').trim()){ toast('Informe a medida da calça (sem elastano).'); return false; }
+    const alt = parseFloat(String(F.altura||'').replace(',','.'));
+    if(!(F.altura||'').trim() || isNaN(alt)){ toast('Informe sua altura (ex.: 1,75).'); return false; }
+    if(alt < 1 || alt > 3){ toast('A altura deve estar entre 1,00 e 3,00 m.'); return false; }
+    const calca = parseInt(String(F.num_calca||'').replace(/\D/g,''), 10);
+    if(!(F.num_calca||'').trim() || isNaN(calca)){ toast('Informe a medida da calça (sem elastano).'); return false; }
+    if(calca < 10 || calca > 100){ toast('A medida da calça deve estar entre 10 e 100.'); return false; }
   }
   return true;
 }
@@ -543,6 +566,8 @@ function saveDados(){
   F.ano_formatura = document.getElementById('i-ano').value || '';
   const nc = document.getElementById('i-numcalca');
   if(nc) F.num_calca = nc.value;
+  const al = document.getElementById('i-altura');
+  if(al) F.altura = al.value;
 }
 
 /* =================== ETAPA 2: PLANO + PAGAMENTO =================== */
@@ -613,8 +638,10 @@ function viewPlano(){
   document.getElementById('btn-back').onclick = () => { STEP=0; render(); };
   document.getElementById('btn-next').onclick = () => {
     savePagamento();
-    if(!F.plano_id){ showErro('Escolha um plano para continuar.'); toast('Escolha um plano para continuar.'); return; }
-    if(!F.meio_pagamento && !F.forma_pagamento){ showErro('Selecione a forma de pagamento.'); toast('Selecione a forma de pagamento.'); return; }
+    // Plano é OPCIONAL: se o formando não escolher um plano, ele segue mesmo assim
+    // e fica marcado como "sem plano" na base (a comissão define depois).
+    // A forma de pagamento só é exigida quando há um plano escolhido.
+    if(F.plano_id && !F.meio_pagamento && !F.forma_pagamento){ showErro('Selecione a forma de pagamento.'); toast('Selecione a forma de pagamento.'); return; }
     clearErro();
     STEP = 2; render();
   };
@@ -821,14 +848,13 @@ function viewAdicionais(){
       </div>`;
   }).join('') : '';
 
-  const temAlgo = cat.length || eventos.length;
+  const temAlgo = cat.length;
 
   card.innerHTML = `
     <h1>Adicionais</h1>
-    <p class="sub">Produtos, serviços e convidados — tudo opcional.</p>
+    <p class="sub">Produtos e serviços — tudo opcional.</p>
     <p class="erro" id="erro"></p>
-    ${eventos.length?`<p class="sec-title">Familiares e convidados</p><p class="sec-hint">Informe quantas pessoas você levará em cada evento.</p>${evHtml}`:''}
-    ${cat.length?`<p class="sec-title" style="margin-top:${eventos.length?'20px':'0'};">Produtos e serviços</p><p class="sec-hint">O que você quiser além do plano.</p>${addHtml}`:''}
+    ${cat.length?`<p class="sec-title">Produtos e serviços</p><p class="sec-hint">O que você quiser além do plano.</p>${addHtml}`:''}
     ${!temAlgo?`<div class="empty-note">Nenhum adicional disponível para sua turma. Você pode seguir para a próxima etapa.</div>`:''}
     <div class="nav">
       <button class="btn btn-ghost" id="btn-back">Voltar</button>
@@ -1027,7 +1053,8 @@ async function enviar(){
     cpf: F.cpf,
     curso: F.curso,
     ano_formatura: F.ano_formatura || null,
-    // medidas do doc: só plus size + medida da calça (sem elastano). Peso/calçado não são mais pedidos.
+    // medidas do doc: altura + plus size + medida da calça (sem elastano). Peso/calçado não são mais pedidos.
+    altura: F.altura || '',
     plus_size: F.plus_size,
     num_calca: F.num_calca || '',
     plano_id: p ? p.id : null,

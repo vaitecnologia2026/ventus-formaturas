@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Relatório de encartes — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
+<style>
+  @media print {
+    .sidebar, .topbar, #barra-controles, .no-print { display: none !important; }
+    .app-shell { margin-left: 0 !important; }
+    .app-content { padding: 0 !important; }
+    .card { box-shadow: none !important; border: 1px solid #ddd; }
+  }
+  .msg-cell { max-width: 320px; white-space: pre-wrap; color: var(--gray-700); font-size: 13px; }
+</style>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div style="flex:1"></div>
+    <button class="btn btn-secondary btn-sm no-print" id="btn-imprimir"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);">Operação / Relatório de encartes</div>
+    <h1 class="text-2xl font-bold mt-1 mb-1" style="color:var(--gray-900);">Relatório de encartes</h1>
+    <p class="mb-6" style="color:var(--gray-500);font-size:14px;">Todos os encartes preenchidos da turma — dedicatória, foto escolhida e data — para fechamento com a gráfica.</p>
+
+    <div id="barra-controles" class="card mb-6">
+      <div class="card-body" style="padding:16px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="flex:1;min-width:260px;">
+          <label class="label">Turma</label>
+          <select id="selTurma" class="select"><option value="">Carregando turmas…</option></select>
+        </div>
+        <div class="flex gap-4" id="resumo" style="display:none;">
+          <div><div style="font-size:12px;color:var(--gray-500);">Preenchidos</div><div style="font-size:22px;font-weight:800;color:var(--success);" id="stPreench">—</div></div>
+          <div><div style="font-size:12px;color:var(--gray-500);">Total</div><div style="font-size:22px;font-weight:800;color:var(--gray-900);" id="stTotal">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="aviso" style="display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;"></div>
+
+    <div class="card" id="tabela-card" style="display:none;">
+      <div class="card-header"><div class="card-title" id="tituloTurma">Encartes</div>
+        <label class="chk" style="font-size:13px;color:var(--gray-600);"><input type="checkbox" id="soPreenchidos"> só preenchidos</label>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="table" style="width:100%;">
+          <thead><tr>
+            <th style="width:180px;">Aluno</th>
+            <th style="width:130px;">Foto escolhida</th>
+            <th style="width:170px;">Nome da mãe</th>
+            <th style="width:170px;">Nome do pai</th>
+            <th>Dedicatória</th>
+            <th class="num" style="width:64px;">Carac.</th>
+            <th style="width:104px;">Preenchido</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="estado" style="text-align:center;color:var(--gray-500);font-size:14px;padding:48px 8px;">Selecione uma turma para ver os encartes.</div>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DADOS = null;
+  var selTurma = document.getElementById("selTurma");
+  var tbody = document.getElementById("tbody");
+  var estado = document.getElementById("estado");
+  var tabelaCard = document.getElementById("tabela-card");
+  var avisoEl = document.getElementById("aviso");
+  var soPreench = document.getElementById("soPreenchidos");
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function aviso(msg, tipo) {
+    if (!msg) { avisoEl.style.display = "none"; return; }
+    var cor = tipo === "erro" ? "background:#FEE2E2;color:#991B1B;" : "background:#FEF3C7;color:#92400E;";
+    avisoEl.setAttribute("style", "margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;" + cor);
+    avisoEl.textContent = msg;
+  }
+  function dataBR(iso) { return iso ? String(iso).split("-").reverse().join("/") : "—"; }
+
+  function carregarTurmas() {
+    fetch(apiUrl("/api/os/opcoes"))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        var turmas = d.turmas || [];
+        if (!turmas.length) { selTurma.innerHTML = '<option value="">Nenhuma turma</option>'; return; }
+        selTurma.innerHTML = '<option value="">Selecione a turma…</option>' +
+          turmas.map(function (t) { return '<option value="' + t.id + '">' + esc(t.nome) + '</option>'; }).join("");
+      })
+      .catch(function () { selTurma.innerHTML = '<option value="">Erro ao carregar</option>'; aviso("Não foi possível carregar as turmas.", "erro"); });
+  }
+
+  function carregarRelatorio(turmaId) {
+    if (!turmaId) { tabelaCard.style.display = "none"; document.getElementById("resumo").style.display = "none"; estado.style.display = ""; estado.textContent = "Selecione uma turma para ver os encartes."; return; }
+    estado.style.display = ""; estado.textContent = "Carregando encartes…";
+    tabelaCard.style.display = "none";
+    fetch(apiUrl("/api/encarte/relatorio?turma_id=" + encodeURIComponent(turmaId)))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) { DADOS = d; pintar(); })
+      .catch(function () { estado.style.display = "none"; aviso("Não foi possível carregar o relatório desta turma.", "erro"); });
+  }
+
+  function pintar() {
+    if (!DADOS) return;
+    aviso("");
+    document.getElementById("resumo").style.display = "flex";
+    document.getElementById("stPreench").textContent = DADOS.preenchidos;
+    document.getElementById("stTotal").textContent = DADOS.total;
+    document.getElementById("tituloTurma").textContent = "Encartes · " + (DADOS.turma ? DADOS.turma.nome : "");
+    var itens = DADOS.itens || [];
+    if (soPreench.checked) itens = itens.filter(function (i) { return i.preenchido; });
+    if (!itens.length) {
+      estado.style.display = ""; estado.textContent = soPreench.checked ? "Nenhum encarte preenchido nesta turma ainda." : "Esta turma não tem alunos cadastrados.";
+      tabelaCard.style.display = "none";
+      return;
+    }
+    estado.style.display = "none";
+    tabelaCard.style.display = "";
+    tbody.innerHTML = itens.map(function (i) {
+      var st = i.preenchido
+        ? '<span class="badge badge-success">' + dataBR(i.data_encarte) + '</span>'
+        : '<span class="badge badge-warning">Pendente</span>';
+      return '<tr>' +
+        '<td style="font-weight:600;color:var(--gray-900);">' + esc(i.nome) + '</td>' +
+        '<td style="color:var(--gray-600);">' + (esc(i.nome_fotografia) || "—") + '</td>' +
+        '<td style="color:var(--gray-600);">' + (esc(i.nome_mae) || "—") + '</td>' +
+        '<td style="color:var(--gray-600);">' + (esc(i.nome_pai) || "—") + '</td>' +
+        '<td class="msg-cell">' + (esc(i.mensagem) || '<span style="color:var(--gray-400);">—</span>') + '</td>' +
+        '<td class="num" style="color:var(--gray-500);">' + (i.caracteres || 0) + '</td>' +
+        '<td>' + st + '</td>' +
+      '</tr>';
+    }).join("");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  selTurma.addEventListener("change", function () { carregarRelatorio(selTurma.value); });
+  soPreench.addEventListener("change", pintar);
+  document.getElementById("btn-imprimir").addEventListener("click", function () { window.print(); });
+
+  if (window.lucide) lucide.createIcons();
+  carregarTurmas();
+})();
+</script>
+</body>
+</html>

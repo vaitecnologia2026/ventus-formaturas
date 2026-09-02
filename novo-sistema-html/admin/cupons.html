@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="/assets/img/icon.png">
+<link rel="apple-touch-icon" href="/assets/img/icon-app.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0A2540">
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cupons — Ventus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
+</head>
+<body>
+<aside id="admin-sidebar" class="sidebar"></aside>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div style="flex:1"></div>
+    <div class="flex gap-2">
+      <button class="btn btn-primary btn-sm" id="btn-novo"><i data-lucide="plus" class="w-4 h-4"></i> Novo cupom</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div class="text-sm" style="color:var(--gray-500);">Comercial / Cupons</div>
+    <h1 class="text-2xl font-bold mt-1 mb-1" style="color:var(--gray-900);">Cupons de desconto</h1>
+    <p class="mb-6" style="color:var(--gray-500);font-size:14px;">Crie cupons com limite de uso, aplicáveis a fotografia, cerimonial ou fotos avulsas. O aluno digita o código no checkout e o desconto entra no resumo.</p>
+
+    <div id="aviso" style="display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;"></div>
+
+    <!-- Formulário (novo/editar) -->
+    <div class="card mb-6" id="form-card" hidden>
+      <div class="card-header"><div class="card-title" id="form-titulo">Novo cupom</div></div>
+      <div class="card-body">
+        <div class="grid gap-4" style="grid-template-columns:repeat(2,1fr);">
+          <div><label class="label">Código *</label><input type="text" id="c-codigo" class="input" placeholder="EX: FORMANDO10" autocomplete="off" style="text-transform:uppercase;"></div>
+          <div><label class="label">Descrição</label><input type="text" id="c-descricao" class="input" placeholder="Opcional — para sua referência"></div>
+          <div><label class="label">Tipo de desconto</label>
+            <select id="c-tipo" class="select">
+              <option value="percentual">Percentual (%)</option>
+              <option value="valor">Valor fixo (R$)</option>
+            </select>
+          </div>
+          <div><label class="label">Valor</label><input type="number" step="0.01" id="c-valor" class="input" placeholder="0,00"></div>
+          <div><label class="label">Aplica em</label>
+            <select id="c-aplica" class="select">
+              <option value="qualquer">Qualquer item</option>
+              <option value="fotografia">Fotografia</option>
+              <option value="cerimonial">Cerimonial</option>
+              <option value="fotos_avulsas">Fotos avulsas</option>
+            </select>
+          </div>
+          <div><label class="label">Limite de uso</label><input type="number" id="c-limite" class="input" placeholder="Em branco = ilimitado"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:26px;">
+            <input type="checkbox" id="c-ativo" checked style="width:16px;height:16px;"><label for="c-ativo" style="font-size:14px;color:var(--gray-700);cursor:pointer;">Cupom ativo</label>
+          </div>
+        </div>
+        <div class="flex items-center gap-2" style="margin-top:16px;">
+          <button class="btn btn-primary" id="c-salvar"><i data-lucide="check" class="w-4 h-4"></i> <span id="c-btn-label">Criar cupom</span></button>
+          <button class="btn btn-ghost" id="c-cancelar">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Cupons cadastrados</div><span class="badge badge-info" id="contador">0</span></div>
+      <div class="card-body" style="padding:0;">
+        <table class="table" style="width:100%;">
+          <thead><tr>
+            <th>Código</th><th>Descrição</th><th>Desconto</th><th>Aplica em</th>
+            <th class="num">Usos</th><th>Status</th><th style="text-align:right;">Ações</th>
+          </tr></thead>
+          <tbody id="tbody">
+            <tr><td colspan="7" style="text-align:center;color:var(--gray-500);padding:40px;">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+(function () {
+  "use strict";
+  var APLICA_LABEL = { qualquer:"Qualquer item", fotografia:"Fotografia", cerimonial:"Cerimonial", fotos_avulsas:"Fotos avulsas" };
+  var CUPONS = [];
+  var editId = null;
+
+  var $ = function (s) { return document.querySelector(s); };
+  var tbody = document.getElementById("tbody");
+  var formCard = document.getElementById("form-card");
+  var avisoEl = document.getElementById("aviso");
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function brl(v) { return "R$ " + (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function aviso(msg, tipo) {
+    if (!msg) { avisoEl.style.display = "none"; return; }
+    var cor = tipo === "erro" ? "background:#FEE2E2;color:#991B1B;" : (tipo === "ok" ? "background:#DCFCE7;color:#166534;" : "background:#FEF3C7;color:#92400E;");
+    avisoEl.setAttribute("style", "margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:13px;" + cor);
+    avisoEl.textContent = msg;
+  }
+  function descontoLabel(c) {
+    return c.tipo === "percentual" ? ((Number(c.valor) || 0) + "%") : brl(c.valor);
+  }
+
+  function render() {
+    document.getElementById("contador").textContent = CUPONS.length + (CUPONS.length === 1 ? " cupom" : " cupons");
+    if (!CUPONS.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-500);padding:48px;">' +
+        '<div style="display:inline-flex;width:56px;height:56px;border-radius:16px;background:var(--gray-100);color:var(--gray-400);align-items:center;justify-content:center;margin-bottom:12px;"><i data-lucide="ticket-percent" class="w-7 h-7"></i></div>' +
+        '<div style="font-weight:600;color:var(--gray-700);">Nenhum cupom ainda</div>' +
+        '<div style="margin-top:4px;">Clique em “Novo cupom” para criar o primeiro.</div></td></tr>';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+    tbody.innerHTML = CUPONS.map(function (c) {
+      var esgotado = c.limite_uso != null && c.usos >= c.limite_uso;
+      var statusBadge = !c.ativo ? '<span class="badge badge-danger">Inativo</span>'
+        : (esgotado ? '<span class="badge badge-warning">Esgotado</span>' : '<span class="badge badge-success">Ativo</span>');
+      var usos = c.usos + (c.limite_uso != null ? " / " + c.limite_uso : " / ∞");
+      return '<tr>' +
+        '<td style="font-family:var(--font-mono);font-weight:700;color:var(--gray-900);">' + esc(c.codigo) + '</td>' +
+        '<td style="color:var(--gray-600);">' + (esc(c.descricao) || "—") + '</td>' +
+        '<td style="font-weight:600;color:var(--primary-700);">' + descontoLabel(c) + '</td>' +
+        '<td>' + esc(APLICA_LABEL[c.aplica_em] || c.aplica_em) + '</td>' +
+        '<td class="num">' + usos + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td style="text-align:right;white-space:nowrap;">' +
+          '<button class="btn btn-ghost btn-sm" onclick="editarCupom(' + c.id + ')" title="Editar"><i data-lucide="pencil" class="w-4 h-4"></i></button> ' +
+          '<button class="btn btn-ghost btn-sm" onclick="excluirCupom(' + c.id + ')" title="Excluir" style="color:#DC2626;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>' +
+        '</td>' +
+      '</tr>';
+    }).join("");
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function carregar() {
+    fetch(apiUrl("/api/cupom"))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) { CUPONS = d.itens || []; render(); })
+      .catch(function () { tbody.innerHTML = ""; aviso("Não foi possível carregar os cupons. Verifique se o servidor está no ar.", "erro"); });
+  }
+
+  function abrirForm(cupom) {
+    editId = cupom ? cupom.id : null;
+    document.getElementById("form-titulo").textContent = cupom ? "Editar cupom" : "Novo cupom";
+    document.getElementById("c-btn-label").textContent = cupom ? "Salvar alterações" : "Criar cupom";
+    $("#c-codigo").value = cupom ? cupom.codigo : "";
+    $("#c-descricao").value = cupom ? (cupom.descricao || "") : "";
+    $("#c-tipo").value = cupom ? cupom.tipo : "percentual";
+    $("#c-valor").value = cupom ? cupom.valor : "";
+    $("#c-aplica").value = cupom ? cupom.aplica_em : "qualquer";
+    $("#c-limite").value = cupom && cupom.limite_uso != null ? cupom.limite_uso : "";
+    $("#c-ativo").checked = cupom ? !!cupom.ativo : true;
+    formCard.hidden = false;
+    aviso("");
+    formCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#c-codigo").focus();
+  }
+  function fecharForm() { formCard.hidden = true; editId = null; }
+
+  function salvar() {
+    var body = {
+      codigo: ($("#c-codigo").value || "").trim().toUpperCase(),
+      descricao: ($("#c-descricao").value || "").trim(),
+      tipo: $("#c-tipo").value,
+      valor: parseFloat($("#c-valor").value || "0") || 0,
+      aplica_em: $("#c-aplica").value,
+      limite_uso: $("#c-limite").value === "" ? null : parseInt($("#c-limite").value, 10),
+      ativo: $("#c-ativo").checked,
+    };
+    if (!body.codigo) { aviso("Informe o código do cupom.", "erro"); $("#c-codigo").focus(); return; }
+    var url = editId ? apiUrl("/api/cupom/" + editId) : apiUrl("/api/cupom");
+    fetch(url, { method: editId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (data) {
+          if (!r.ok) throw new Error(data && data.detail ? data.detail : "Falha ao salvar (HTTP " + r.status + ").");
+          return data;
+        });
+      })
+      .then(function () { fecharForm(); aviso(editId ? "Cupom atualizado." : "Cupom criado.", "ok"); carregar(); })
+      .catch(function (err) { aviso(err.message || "Não foi possível salvar o cupom.", "erro"); });
+  }
+
+  window.editarCupom = function (id) { var c = CUPONS.find(function (x) { return x.id === id; }); if (c) abrirForm(c); };
+  window.excluirCupom = function (id) {
+    var c = CUPONS.find(function (x) { return x.id === id; });
+    var go = function () {
+      fetch(apiUrl("/api/cupom/" + id), { method: "DELETE" })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function () { aviso("Cupom excluído.", "ok"); carregar(); })
+        .catch(function () { aviso("Não foi possível excluir o cupom.", "erro"); });
+    };
+    if (typeof window.vtConfirm === "function") {
+      window.vtConfirm("Excluir o cupom “" + (c ? c.codigo : "") + "”? Esta ação não pode ser desfeita.", { title: "Confirmar exclusão" }).then(function (ok) { if (ok) go(); });
+    } else if (confirm("Excluir o cupom?")) { go(); }
+  };
+
+  document.getElementById("btn-novo").addEventListener("click", function () { abrirForm(null); });
+  document.getElementById("c-salvar").addEventListener("click", salvar);
+  document.getElementById("c-cancelar").addEventListener("click", fecharForm);
+
+  if (window.lucide) lucide.createIcons();
+  carregar();
+})();
+</script>
+</body>
+</html>

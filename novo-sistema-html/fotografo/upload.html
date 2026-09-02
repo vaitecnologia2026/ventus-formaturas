@@ -17,9 +17,9 @@
 <body>
 <aside class="sidebar">
   <div class="sidebar-brand"><div class="sidebar-brand-mark" style="background:transparent;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Fotógrafo</div></div></div>
-  <a href="upload.html" class="sidebar-link active"><i data-lucide="upload"></i>Upload em massa</a>
-  <a href="#" class="sidebar-link"><i data-lucide="folder"></i>Minhas galerias</a>
-  <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Histórico</a>
+  <a href="upload.html" class="sidebar-link active" data-nav><i data-lucide="upload"></i>Upload em massa</a>
+  <a href="galerias.html" class="sidebar-link" data-nav><i data-lucide="folder"></i>Minhas galerias</a>
+  <a href="historico.html" class="sidebar-link" data-nav><i data-lucide="bar-chart-2"></i>Histórico</a>
   <div class="sidebar-footer"><div class="avatar" id="prestadorAvatar">FT</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;" id="prestadorNome">Fotógrafo</div><div style="font-size:11px;opacity:.6;" id="prestadorFuncao">Fotógrafo · Ventus</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
 </aside>
 
@@ -40,6 +40,11 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div><label class="label">Turma de destino</label><select id="selTurma" class="select"><option value="">Carregando…</option></select></div>
               <div><label class="label">Evento da turma</label><select id="selEvento" class="select" disabled><option value="">Selecione a turma primeiro</option></select></div>
+            </div>
+            <div class="mb-4">
+              <label class="label">Fotógrafo</label>
+              <select id="selFotografo" class="select"><option value="">Carregando fotógrafos…</option></select>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">Quem está subindo as fotos — do cadastro de prestadores (tipo Fotógrafo). Vai registrado na O.S. de edição.</div>
             </div>
             <div class="mb-4">
               <label class="label">Cartão de memória</label>
@@ -159,6 +164,7 @@
   var resumoEvento = document.getElementById("resumoEvento");
   var resumoFotos = document.getElementById("resumoFotos");
   var inputCartao = document.getElementById("inputCartao");
+  var selFotografo = document.getElementById("selFotografo");
 
   var MAX_BYTES = 5 * 1024 * 1024;
   var TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -237,6 +243,55 @@
           })
           .catch(function () { /* silencioso: mantém rótulo genérico */ });
       });
+  }
+
+  // ---- Atualiza rótulo do prestador na sidebar ----
+  function aplicarLabelPrestador(nome, funcao) {
+    var elNome = document.getElementById("prestadorNome");
+    var elFunc = document.getElementById("prestadorFuncao");
+    var elAv = document.getElementById("prestadorAvatar");
+    if (nome) {
+      if (elNome) elNome.textContent = nome;
+      if (elFunc) elFunc.textContent = (funcao || "Fotógrafo") + " · Ventus";
+      if (elAv) elAv.textContent = iniciais(nome);
+    }
+  }
+
+  // ---- Seletor de fotógrafo (cadastro de prestadores, funções = fotografo) ----
+  function carregarFotografos() {
+    var pid = new URLSearchParams(location.search).get("p");
+    fetch(apiUrl("/api/cadastro/prestador"))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        var fotografos = ((d && d.itens) || []).filter(function (p) {
+          return p.ativo !== false && String(p.funcoes || "").indexOf("fotografo") !== -1;
+        });
+        if (!fotografos.length) {
+          selFotografo.innerHTML = '<option value="">Nenhum fotógrafo no cadastro de prestadores</option>';
+          return;
+        }
+        selFotografo.innerHTML = '<option value="">Selecione o fotógrafo…</option>' +
+          fotografos.map(function (p) {
+            var sel = pid && String(p.id) === String(pid) ? " selected" : "";
+            return '<option value="' + p.id + '" data-nome="' + esc(p.nome) + '"' + sel + ">" + esc(p.nome) + "</option>";
+          }).join("");
+        var opt = selFotografo.options[selFotografo.selectedIndex];
+        if (opt && opt.value) {
+          fotografoNome = opt.getAttribute("data-nome") || "";
+          aplicarLabelPrestador(fotografoNome, "Fotógrafo");
+        }
+        atualizarBotao();
+      })
+      .catch(function () {
+        selFotografo.innerHTML = '<option value="">Erro ao carregar fotógrafos</option>';
+      });
+
+    selFotografo.addEventListener("change", function () {
+      var opt = selFotografo.options[selFotografo.selectedIndex];
+      fotografoNome = opt && opt.value ? (opt.getAttribute("data-nome") || "") : "";
+      aplicarLabelPrestador(fotografoNome, "Fotógrafo");
+      atualizarBotao();
+    });
   }
 
   // ---- Turma escolhida -> popular eventos filtrados ----
@@ -388,12 +443,14 @@
   }
 
   function atualizarBotao() {
-    var ok = selTurma.value && selEvento.value && enviadas.length > 0 && !enviando;
+    var ok = selTurma.value && selEvento.value && fotografoNome && enviadas.length > 0 && !enviando;
     btnEnviarEdicao.disabled = !ok;
     if (enviando) {
       statusEnvio.textContent = "Criando ordem de serviço…";
     } else if (!selTurma.value || !selEvento.value) {
       statusEnvio.textContent = "Escolha turma e evento para habilitar o envio.";
+    } else if (!fotografoNome) {
+      statusEnvio.textContent = "Selecione o fotógrafo que está subindo as fotos.";
     } else if (enviadas.length === 0) {
       statusEnvio.textContent = "Envie ao menos 1 foto para habilitar.";
     } else {
@@ -462,8 +519,18 @@
       });
   });
 
+  // preserva ?p= na navegação lateral (galerias/histórico)
+  (function () {
+    var qs = location.search || "";
+    if (!qs) return;
+    document.querySelectorAll("[data-nav]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (href && href.indexOf("?") === -1) a.setAttribute("href", href + qs);
+    });
+  })();
+
   // Init
-  identificarPrestador();
+  carregarFotografos();     // seletor de fotógrafo (cadastro de prestadores) + rótulo via ?p=
   atualizarContagens();
   atualizarBotao();
   carregarOpcoes();

@@ -5,7 +5,7 @@
 <link rel="apple-touch-icon" href="/assets/img/icon-app.png">
 <meta name="theme-color" content="#0A2540">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Etapa 2 · Links de acesso — Ventus Formaturas</title>
+<title>Links de acesso — Ventus Formaturas</title>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="../assets/js/config.js"></script>
@@ -97,7 +97,7 @@
   <main class="app-content">
     <div class="page-head">
       <div class="chip"><i data-lucide="share-2"></i></div>
-      <div><h1>Etapa 2 · Links de acesso</h1><p>Gere e compartilhe o link pessoal de cada formando e de cada membro da produção.</p></div>
+      <div><h1>Links de acesso</h1><p>Gere e compartilhe o link pessoal de cada formando e de cada membro da produção.</p></div>
     </div>
 
     <!-- Seletor de turma -->
@@ -266,7 +266,7 @@ async function carregarAlunos(turmaId){
       const url = linkAluno(a.id);
       const cel = a.celular || '';
       const wa  = waNumero(cel);
-      const msgWa = `Olá ${a.nome||''}! Este é o seu link pessoal de acesso da formatura (Etapa 2): ${url}`;
+      const msgWa = `Olá ${a.nome||''}! Este é o seu link pessoal de acesso da formatura: ${url}`;
       const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msgWa)}` : '';
       return `<tr>
         <td class="nome">${esc(a.nome)||'—'}
@@ -327,7 +327,7 @@ async function initEquipe(){
     const pessoaRow = (p, role) => {
       const url = ROLE_META[role].link(p.id);
       const wa = waNumero(p.telefone||'');
-      const msg = `Olá ${p.nome||''}! Este é o seu link pessoal de acesso da Etapa 2 (${ROLE_META[role].titulo.slice(0,-2)}):\n\n${url}`;
+      const msg = `Olá ${p.nome||''}! Este é o seu link pessoal de acesso (${ROLE_META[role].titulo.slice(0,-2)}):\n\n${url}`;
       const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msg)}` : '';
       return `<div class="link-row">
         <div class="tc-av" style="width:34px;height:34px;font-size:12px;">${esc(iniciais(p.nome))}</div>

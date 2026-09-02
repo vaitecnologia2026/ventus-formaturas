@@ -1123,6 +1123,8 @@ function listaTabelaPorTipo(tipo){
   if(tipo==='produto') return t.produtos||[];
   if(tipo==='servico') return t.servicos||[];
   if(tipo==='cerimonial') return t.cerimonial||[];
+  if(tipo==='brinde') return t.brindes||[];
+  if(tipo==='evento_fotografico') return t.eventos||[];
   return [];
 }
 /* (Re)monta o select de descrição conforme o tipo. Se não há catálogo p/ o tipo, usa só texto livre. */
@@ -1200,7 +1202,10 @@ let CARGOS = [], VENDEDORES = [];
 async function carregarAlunos(){
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/alunos`)); const {itens,resumo,cargos,vendedores}=await r.json(); CARGOS=cargos||[]; VENDEDORES=vendedores||[];
   $('#al-count').textContent = resumo.total;
-  $('#al-progresso-txt').textContent = `${resumo.preenchidos} de ${resumo.total} preencheram` + (resumo.comissao?` · ${resumo.comissao} na comissão`:'');
+  const semPlanoQt = itens.filter(a=>a.status==='preenchido' && !a.plano).length;
+  $('#al-progresso-txt').textContent = `${resumo.preenchidos} de ${resumo.total} preencheram`
+    + (resumo.comissao?` · ${resumo.comissao} na comissão`:'')
+    + (semPlanoQt?` · ${semPlanoQt} sem plano`:'');
   const pct = resumo.total ? Math.round(resumo.preenchidos/resumo.total*100) : 0;
   $('#al-progresso-bar').style.width = pct+'%';
   if(!itens.length){ $('#al-tbody').innerHTML=`<tr><td colspan="8"><div class="empty"><i data-lucide="users"></i>Nenhum aluno ainda. Importe a lista acima.</div></td></tr>`; lucide.createIcons(); return; }
@@ -1209,13 +1214,19 @@ async function carregarAlunos(){
     const wa = a.celular ? `https://wa.me/55${a.celular.replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+a.nome+'! Faça seu cadastro da formatura aqui: '+link)}` : null;
     const cargoSel = `<select onchange="setCargo(${a.id},this.value)" style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:${a.cargo_comissao?'var(--primary-700)':'var(--gray-500)'};font-weight:${a.cargo_comissao?'600':'400'};"><option value="">— formando —</option>${CARGOS.map(c=>`<option ${a.cargo_comissao===c?'selected':''}>${c}</option>`).join('')}</select>`;
     const vendSel = `<select onchange="setVendedor(${a.id},this.value)" style="padding:6px 9px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:${a.vendedor_id?'var(--primary-700)':'var(--gray-500)'};font-weight:${a.vendedor_id?'600':'400'};"><option value="">— da turma —</option>${VENDEDORES.map(v=>`<option value="${v.id}" ${a.vendedor_id==v.id?'selected':''}>${v.nome}</option>`).join('')}</select>`;
-    return `<tr>
-      <td class="nome">${a.nome}</td>
+    const semPlano = a.status==='preenchido' && !a.plano;
+    const planoCell = a.plano
+      ? a.plano
+      : (semPlano
+          ? '<span class="badge" style="background:#FEF3C7;color:#92400E;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="alert-triangle" style="width:13px;height:13px;"></i> Sem plano</span>'
+          : '—');
+    return `<tr${semPlano?' style="background:#FFFBEB;box-shadow:inset 3px 0 0 #F59E0B;"':''}>
+      <td class="nome">${a.nome}${semPlano?' <i data-lucide="alert-triangle" title="Formando cadastrado sem plano — definir com a comissão" style="width:14px;height:14px;color:#F59E0B;vertical-align:-2px;"></i>':''}</td>
       <td>${a.celular||'—'}</td>
       <td>${a.status==='preenchido'?'<span class="badge b-realizado">Preenchido</span>':'<span class="badge b-previsto">Pendente</span>'}</td>
       <td>${cargoSel}</td>
       <td>${vendSel}</td>
-      <td>${a.plano||'—'}</td>
+      <td>${planoCell}</td>
       <td><div style="display:flex;gap:6px;">
         <button class="icon-btn" title="Copiar link de pré-cadastro" onclick="copiarLink('${link}')"><i data-lucide="link" style="width:15px;height:15px;"></i></button>
         <button class="icon-btn" title="Copiar link do encarte" onclick="copiarLink('${SITE}/encarte.html?t=${a.token}')" style="color:#7C3AED;"><i data-lucide="image" style="width:15px;height:15px;"></i></button>

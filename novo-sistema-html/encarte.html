@@ -27,7 +27,7 @@
   .top .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;
     background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 48%,transparent 62%);background-size:250% 250%;animation:sheen 9s ease-in-out infinite;}
   .top > *{position:relative;z-index:2;}
-  .top img{height:30px;display:block;margin:0 auto 16px;opacity:.9;}
+  .top img{height:64px;display:block;margin:0 auto 18px;opacity:1;}
   .top .marca{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#BFDBFE;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);padding:5px 13px;border-radius:999px;}
   .top h2{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(24px,6vw,32px);line-height:1.12;letter-spacing:-.01em;margin:16px 0 6px;}
   .top h2 em{font-style:italic;color:#93C5FD;}
@@ -76,7 +76,6 @@
 <div class="top">
   <span class="aurora"></span><span class="grain"></span>
   <img src="/assets/img/logo-branca.png" alt="Ventus Formaturas" onerror="this.style.display='none'">
-  <span class="marca">📸 Meu Encarte</span>
   <h2>Sua página no <em>encarte</em> da turma</h2>
   <p class="lead">Preencha os dados que vão junto da sua foto — dedicatória, nomes e a foto escolhida.</p>
 </div>
@@ -106,11 +105,8 @@ else passo1();
 async function passo1(){
   card.innerHTML = `
     <h1>Vamos começar</h1>
-    <p class="sub">Selecione sua turma e informe seu CPF para carregarmos seus dados.</p>
+    <p class="sub">Informe seu CPF — o sistema encontra a sua turma automaticamente.</p>
     <p class="erro" id="erro"></p>
-    <div class="fld"><label>Turma</label>
-      <select id="p1-turma"><option value="">Carregando turmas…</option></select>
-    </div>
     <div class="fld"><label>CPF</label>
       <input id="p1-cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" autocomplete="off">
     </div>
@@ -118,22 +114,10 @@ async function passo1(){
 
   const inCpf = document.getElementById('p1-cpf');
   inCpf.addEventListener('input', () => { inCpf.value = mascaraCpf(inCpf.value); });
+  inCpf.addEventListener('keydown', (e) => { if(e.key === 'Enter') continuar(); });
+  inCpf.focus();
 
   document.getElementById('p1-continuar').onclick = continuar;
-
-  // carrega turmas
-  try{
-    const r = await fetch(apiUrl('/api/turma-formatura'));
-    const d = await r.json();
-    const sel = document.getElementById('p1-turma');
-    const itens = (d.itens||[]);
-    if(!itens.length){ sel.innerHTML = '<option value="">Nenhuma turma disponível</option>'; return; }
-    sel.innerHTML = '<option value="">Selecione sua turma…</option>' +
-      itens.map(t => `<option value="${t.id}">${escHtml(t.nome)}</option>`).join('');
-  }catch(e){
-    document.getElementById('p1-turma').innerHTML = '<option value="">Erro ao carregar turmas</option>';
-    aviso('Não foi possível carregar as turmas. Tente recarregar a página.');
-  }
 }
 
 function mascaraCpf(v){
@@ -146,16 +130,14 @@ function mascaraCpf(v){
 
 async function continuar(){
   limparAviso();
-  const turmaId = document.getElementById('p1-turma').value;
   const cpf = soDigitos(document.getElementById('p1-cpf').value);
-  if(!turmaId){ aviso('Selecione sua turma.'); return; }
   if(cpf.length !== 11){ aviso('Digite um CPF válido (11 dígitos).'); return; }
 
   const btn = document.getElementById('p1-continuar');
   btn.textContent = 'Buscando…'; btn.disabled = true;
   try{
-    const r = await fetch(apiUrl('/api/encarte/por-cpf?turma_id='+encodeURIComponent(turmaId)+'&cpf='+encodeURIComponent(cpf)));
-    if(r.status === 404){ aviso('CPF não encontrado nesta turma. Confira os dados ou fale com a comissão.'); return; }
+    const r = await fetch(apiUrl('/api/encarte/por-cpf?cpf='+encodeURIComponent(cpf)));
+    if(r.status === 404){ aviso('CPF não encontrado. Confira o número digitado ou fale com a comissão.'); return; }
     if(!r.ok){ aviso('Não foi possível buscar seus dados. Tente novamente.'); return; }
     const d = await r.json();
     passo2(d);
