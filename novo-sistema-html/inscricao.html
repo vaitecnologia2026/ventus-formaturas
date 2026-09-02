@@ -965,6 +965,7 @@ function viewFinal(){
   const cupomVal = cupomDesconto(valFoto, subTotal);
   const taxa = taxaBoleto(p);
   const total = Math.max(0, subTotal - descTotal - cupomVal) + taxa;
+  F.total = total;   // guarda pro checkout gerar a cobrança real
   const meioLbl = p ? (meioLabel(p, F.meio_pagamento) || formaLabel(F.forma_pagamento) || '—') : '—';
 
   const linhas = [];
@@ -1107,6 +1108,9 @@ async function enviar(){
     }catch(e){ /* ignora */ }
   }
 
+  const dados = await r.json().catch(()=>({}));
+  const alunoId = dados.aluno_id;
+
   stepsEl.classList.add('hide');
   resumoEl.classList.add('hide');
   document.getElementById('wrap').style.gridTemplateColumns = '1fr';
@@ -1115,12 +1119,42 @@ async function enviar(){
     <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
     <h1>Cadastro confirmado!</h1>
     <p class="sub">Prontinho, ${esc((F.nome||'').split(' ')[0])}. ${p&&p.contrato&&F.aceite_contrato?'Contrato aceito. ':''}A comissão já vê seu cadastro.</p>
-    <div class="pay-hint" style="margin-top:8px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      <div class="ph-t">Em breve enviamos o <b>link de pagamento</b> no seu WhatsApp.</div>
-    </div>
+    <div id="pay-box" style="margin-top:14px;"></div>
   </div>`;
   window.scrollTo({top:0, behavior:'smooth'});
+  gerarPagamento(alunoId, p);
+}
+
+// Gera a cobrança real (Asaas) conforme a forma de pagamento escolhida
+async function gerarPagamento(alunoId, p){
+  const box = document.getElementById('pay-box'); if(!box) return;
+  const hintFallback = `<div class="pay-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="ph-t">Em breve enviamos o <b>link de pagamento</b> no seu WhatsApp.</div></div>`;
+  const total = +(F.total||0);
+  if(!alunoId || !p || total < 5){ box.innerHTML = hintFallback; return; }  // Asaas exige mín. R$5
+  const meio = (F.meio_pagamento||F.forma_pagamento||'').toLowerCase();
+  const metodo = /pix/.test(meio)?'pix':(/boleto/.test(meio)?'boleto':(/cart|cred/.test(meio)?'cartao':'link'));
+  box.innerHTML = `<div class="pay-hint"><div class="ph-t">Gerando seu pagamento…</div></div>`;
+  try{
+    const r = await fetch(apiUrl('/api/pagamento'), {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ aluno_id: alunoId, metodo, valor: total, parcelas: F.parcelas || null, descricao: `Formatura — ${p.nome||'Plano'}` })});
+    const c = await r.json();
+    if(!r.ok){ box.innerHTML = hintFallback; return; }
+    if(metodo==='pix' && (c.pix_copia_cola || c.pix_qr_base64)){
+      box.innerHTML = `<div style="text-align:center;">
+        <div style="font-weight:700;color:var(--ink);margin-bottom:8px;">Pague com Pix — ${brl(total)}</div>
+        ${c.pix_qr_base64?`<img src="data:image/png;base64,${c.pix_qr_base64}" alt="QR Pix" style="width:190px;height:190px;border-radius:12px;border:1px solid var(--linha);">`:''}
+        ${c.pix_copia_cola?`<div style="margin-top:10px;font-size:12px;word-break:break-all;background:#F1F5F9;border-radius:10px;padding:10px;color:var(--cinza2);">${esc(c.pix_copia_cola)}</div>
+        <button class="btn btn-primary" style="margin-top:10px;" onclick="navigator.clipboard.writeText('${esc(c.pix_copia_cola)}').then(()=>toast('Código Pix copiado!'))">Copiar código Pix</button>`:''}
+        ${c.url?`<div style="margin-top:8px;"><a href="${esc(c.url)}" target="_blank" style="color:var(--azul);font-weight:600;">Abrir fatura</a></div>`:''}
+      </div>`;
+    } else {
+      const rot = metodo==='boleto'?'Pagar boleto':(metodo==='cartao'?'Pagar no cartão':'Abrir pagamento');
+      box.innerHTML = `<div style="text-align:center;">
+        <div style="font-weight:700;color:var(--ink);margin-bottom:10px;">Pagamento — ${brl(total)}${F.parcelas>1?` em ${F.parcelas}x`:''}</div>
+        ${c.url?`<a href="${esc(c.url)}" target="_blank" class="btn btn-primary">${rot}</a>`:hintFallback}
+      </div>`;
+    }
+  }catch(e){ box.innerHTML = hintFallback; }
 }
 </script>
 </body>
