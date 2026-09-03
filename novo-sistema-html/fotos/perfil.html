@@ -40,6 +40,20 @@
   </div>
 
   <div id="conteudo"><p class="vt-empty"><span class="ft-spinner ft-spinner-lg"></span></p></div>
+
+  <!-- Excluir conta (exigência da App Store) -->
+  <div id="conta-danger" style="margin-top:28px;border:1px solid #FCA5A5;background:#FEF2F2;border-radius:16px;padding:18px 20px;">
+    <h2 style="margin:0 0 4px;font-size:16px;color:#991B1B;display:flex;align-items:center;gap:7px;"><i data-lucide="alert-triangle" style="width:17px;height:17px;"></i> Excluir minha conta</h2>
+    <p style="margin:0 0 12px;color:#7F1D1D;font-size:13.5px;line-height:1.5;">Remove permanentemente sua conta e seus dados pessoais deste aplicativo. Esta ação não pode ser desfeita.</p>
+    <button class="ft-btn" id="btn-excluir-conta" style="background:#DC2626;color:#fff;"><i data-lucide="trash-2"></i> Excluir minha conta</button>
+    <div id="excluir-confirm" hidden style="margin-top:14px;padding:14px;border-radius:12px;background:#fff;border:1px solid #FCA5A5;">
+      <p style="margin:0 0 12px;color:#111;font-size:14px;font-weight:600;">Tem certeza? Sua conta e seus dados serão apagados permanentemente.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="ft-btn" id="btn-excluir-sim" style="background:#DC2626;color:#fff;">Sim, excluir minha conta</button>
+        <button class="ft-btn ft-btn-secondary" id="btn-excluir-nao">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="app-cliente.js"></script>
@@ -76,6 +90,25 @@ fetch(apiUrl('/api/minhas-compras'), { headers: Ventus.Auth.headers() })
     lucide.createIcons();
   })
   .catch(() => { location.href = 'login.html?next=perfil.html'; });
+
+// Excluir minha conta — confirmação em 2 passos + DELETE autenticado (App Store 5.1.1(v))
+const _delBtn = document.getElementById('btn-excluir-conta');
+const _delBox = document.getElementById('excluir-confirm');
+_delBtn.addEventListener('click', () => { _delBox.hidden = false; _delBtn.hidden = true; });
+document.getElementById('btn-excluir-nao').addEventListener('click', () => { _delBox.hidden = true; _delBtn.hidden = false; });
+document.getElementById('btn-excluir-sim').addEventListener('click', async (e) => {
+  const b = e.currentTarget; b.disabled = true; b.textContent = 'Excluindo…';
+  try {
+    const r = await fetch(apiUrl('/api/eu'), { method: 'DELETE', headers: Ventus.Auth.headers() });
+    if (!r.ok) throw new Error();
+    Ventus.Auth.sair();
+    alert('Sua conta foi excluída.');
+    location.href = 'index.html';
+  } catch (_) {
+    b.disabled = false; b.textContent = 'Sim, excluir minha conta';
+    alert('Não foi possível excluir a conta agora. Tente novamente.');
+  }
+});
 
 // download autenticado (fetch com Bearer -> blob), já que <a href> não manda header
 document.getElementById('conteudo').addEventListener('click', async (e) => {
