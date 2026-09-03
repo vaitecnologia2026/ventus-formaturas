@@ -929,10 +929,10 @@ function viewContrato(){
     inner = `
       <p class="sec-title">Contrato — ${esc(contrato.nome)}</p>
       <p class="sec-hint">Leia com atenção e marque o aceite para continuar.</p>
-      <div class="contrato-box" id="contrato-box">${contrato.conteudo || esc('Contrato: '+contrato.nome)}</div>
-      <button type="button" id="c-abrir" style="margin-top:8px;background:none;border:none;color:var(--azul);font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:0;">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-        Abrir contrato em tela cheia
+      <div class="contrato-box" id="contrato-box" style="cursor:pointer;" title="Clique para abrir e assinar no ZapSign">${contrato.conteudo || esc('Contrato: '+contrato.nome)}</div>
+      <button type="button" id="c-abrir" style="margin-top:10px;background:var(--azul);border:none;color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;width:100%;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        <span id="c-abrir-txt">Abrir e assinar contrato (ZapSign)</span>
       </button>
       <label class="aceite">
         <input type="checkbox" id="i-aceite" ${F.aceite_contrato?'checked':''}>
@@ -955,18 +955,59 @@ function viewContrato(){
   const ac = document.getElementById('i-aceite');
   if(ac) ac.onchange = () => { F.aceite_contrato = ac.checked; };
 
-  const abrirC = document.getElementById('c-abrir');
-  if(abrirC) abrirC.onclick = () => {
+  // Abre o CONTRATO REAL no ZapSign: gera (ou reusa) o documento e abre a página de
+  // assinatura. Fallback: se não der (sem contrato configurado / offline), mostra o
+  // texto do contrato pra leitura.
+  function abrirLeituraContrato(w){
     const corpo = (contrato && contrato.conteudo) || esc('Contrato: '+((contrato&&contrato.nome)||''));
-    const w = window.open('', '_blank');
-    if(!w){ toast('Permita pop-ups para abrir o contrato.'); return; }
-    w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
+    const doc = '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
       + '<meta name="viewport" content="width=device-width,initial-scale=1">'
       + '<title>'+esc((contrato&&contrato.nome)||'Contrato')+'</title>'
       + '<style>body{font-family:Georgia,\'Times New Roman\',serif;max-width:760px;margin:32px auto;padding:0 24px 64px;color:#1e293b;line-height:1.7;font-size:15px;}h1,h2,h3{color:#0f172a;}img{max-width:100%;}</style>'
-      + '</head><body>'+corpo+'</body></html>');
-    w.document.close();
-  };
+      + '</head><body>'+corpo+'</body></html>';
+    if(w){ try{ w.document.open(); w.document.write(doc); w.document.close(); }catch(e){} }
+    else { const nw = window.open('', '_blank'); if(nw){ nw.document.write(doc); nw.document.close(); } }
+  }
+  let gerandoContrato = false;
+  async function abrirContratoZap(){
+    if(gerandoContrato) return;
+    gerandoContrato = true;
+    const txtEl = document.getElementById('c-abrir-txt');
+    const txtAntigo = txtEl ? txtEl.textContent : '';
+    if(txtEl) txtEl.textContent = 'Gerando contrato…';
+    // abre a aba JÁ (gesto do usuário) pra não ser bloqueada pelo pop-up blocker
+    const w = window.open('', '_blank');
+    if(w){ try{ w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:40px;color:#334155;">Gerando seu contrato para assinatura no ZapSign…</body>'); }catch(e){} }
+    try{
+      const body = {
+        nome: F.nome || (DADOS&&DADOS.aluno&&DADOS.aluno.nome) || '',
+        cpf: (F.cpf||'').replace(/\D/g,''),
+        email: F.email || '',
+        celular: (F.celular||'').replace(/\D/g,''),
+        plano_id: F.plano_id,
+      };
+      const r = await fetch(apiUrl('/api/inscricao/'+token+'/assinar-contrato'), {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+      });
+      const d = await r.json().catch(()=>({}));
+      if(r.ok && d.sign_url){
+        if(w) w.location.href = d.sign_url; else window.open(d.sign_url, '_blank');
+      } else {
+        toast(d.detail || 'Não foi possível gerar a assinatura agora — abrindo o contrato para leitura.');
+        abrirLeituraContrato(w);
+      }
+    }catch(e){
+      toast('Sem conexão para gerar a assinatura — abrindo o contrato para leitura.');
+      abrirLeituraContrato(w);
+    }finally{
+      gerandoContrato = false;
+      if(txtEl) txtEl.textContent = txtAntigo;
+    }
+  }
+  const abrirC = document.getElementById('c-abrir');
+  if(abrirC) abrirC.onclick = abrirContratoZap;
+  const boxC = document.getElementById('contrato-box');
+  if(boxC) boxC.onclick = abrirContratoZap;
 
   document.getElementById('btn-back').onclick = () => { STEP=2; render(); };
   document.getElementById('btn-next').onclick = () => {
