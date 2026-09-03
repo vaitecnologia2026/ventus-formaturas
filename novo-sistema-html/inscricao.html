@@ -929,7 +929,11 @@ function viewContrato(){
     inner = `
       <p class="sec-title">Contrato — ${esc(contrato.nome)}</p>
       <p class="sec-hint">Leia com atenção e marque o aceite para continuar.</p>
-      <div class="contrato-box">${esc(contrato.conteudo) || ('Contrato: '+esc(contrato.nome))}</div>
+      <div class="contrato-box" id="contrato-box">${contrato.conteudo || esc('Contrato: '+contrato.nome)}</div>
+      <button type="button" id="c-abrir" style="margin-top:8px;background:none;border:none;color:var(--azul);font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:0;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        Abrir contrato em tela cheia
+      </button>
       <label class="aceite">
         <input type="checkbox" id="i-aceite" ${F.aceite_contrato?'checked':''}>
         <span>Li e aceito o contrato <b>${esc(contrato.nome)}</b> e concordo com os termos da minha formatura.</span>
@@ -950,6 +954,19 @@ function viewContrato(){
 
   const ac = document.getElementById('i-aceite');
   if(ac) ac.onchange = () => { F.aceite_contrato = ac.checked; };
+
+  const abrirC = document.getElementById('c-abrir');
+  if(abrirC) abrirC.onclick = () => {
+    const corpo = (contrato && contrato.conteudo) || esc('Contrato: '+((contrato&&contrato.nome)||''));
+    const w = window.open('', '_blank');
+    if(!w){ toast('Permita pop-ups para abrir o contrato.'); return; }
+    w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
+      + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+      + '<title>'+esc((contrato&&contrato.nome)||'Contrato')+'</title>'
+      + '<style>body{font-family:Georgia,\'Times New Roman\',serif;max-width:760px;margin:32px auto;padding:0 24px 64px;color:#1e293b;line-height:1.7;font-size:15px;}h1,h2,h3{color:#0f172a;}img{max-width:100%;}</style>'
+      + '</head><body>'+corpo+'</body></html>');
+    w.document.close();
+  };
 
   document.getElementById('btn-back').onclick = () => { STEP=2; render(); };
   document.getElementById('btn-next').onclick = () => {
