@@ -126,42 +126,55 @@
       ${steps(1)}
       <h3 class="vt-h">Como você quer pagar?</h3>
       ${resumoHTML()}
+      <label class="ft-field" style="margin-bottom:12px;"><span>CPF (para o pagamento)</span><input id="m-cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"></label>
       <div class="vt-metodos">
         <label class="vt-metodo">
           <input type="radio" name="metodo" value="pix" checked>
           <span class="vt-metodo-ic"><i data-lucide="qr-code"></i></span>
-          <span class="vt-metodo-tx"><strong>Pix</strong><small>aprovação na hora</small></span>
+          <span class="vt-metodo-tx"><strong>Pix</strong><small>na hora</small></span>
           <i data-lucide="check" class="vt-metodo-chk"></i>
         </label>
         <label class="vt-metodo">
           <input type="radio" name="metodo" value="cartao">
           <span class="vt-metodo-ic"><i data-lucide="credit-card"></i></span>
-          <span class="vt-metodo-tx"><strong>Cartão de crédito</strong><small>à vista</small></span>
+          <span class="vt-metodo-tx"><strong>Cartão de crédito</strong><small>checkout seguro</small></span>
           <i data-lucide="check" class="vt-metodo-chk"></i>
         </label>
       </div>
+      <p class="ft-form-erro" id="m-erro" hidden></p>
       <button class="ft-btn ft-btn-primary vt-btn-full" id="m-ok">Continuar <i data-lucide="arrow-right"></i></button>
-      <p class="vt-secure"><i data-lucide="shield-check"></i> Ambiente de pagamento seguro</p>`);
+      <p class="vt-secure"><i data-lucide="shield-check"></i> Pagamento seguro via Asaas</p>`);
+    const cpfEl = document.getElementById("m-cpf");
+    cpfEl.addEventListener("input", () => {
+      let v = cpfEl.value.replace(/\D/g, "").slice(0, 11);
+      if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+      else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+      cpfEl.value = v;
+    });
     document.getElementById("m-ok").addEventListener("click", () => {
+      const cpf = cpfEl.value.replace(/\D/g, "");
+      const erro = document.getElementById("m-erro");
+      if (cpf.length !== 11) { erro.textContent = "Informe um CPF válido (11 dígitos)."; erro.hidden = false; return; }
       const metodo = modal.querySelector('input[name="metodo"]:checked').value;
-      metodo === "pix" ? passoPix() : passoCartao();
+      metodo === "pix" ? passoPix(cpf) : passoCartao(cpf);
     });
   }
 
-  async function criarPedido() {
+  async function criarPedido(cpf, metodo) {
     const u = Auth.user() || {};
     const ids = Cart.itens().map((i) => i.foto_id);
-    const r = await fetch(api("/api/pedido"), { method: "POST", headers: { "Content-Type": "application/json", ...Auth.headers() }, body: JSON.stringify({ fotos: ids, nome: u.nome, email: u.email }) });
-    const d = await r.json(); if (!r.ok) throw new Error(d.erro || "Falha ao gerar o pedido."); return d;
+    const r = await fetch(api("/api/pedido"), { method: "POST", headers: { "Content-Type": "application/json", ...Auth.headers() }, body: JSON.stringify({ fotos: ids, nome: u.nome, email: u.email, cpf, metodo }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.detail || d.erro || "Falha ao gerar o pedido."); return d;
   }
 
   function carregando(txt) {
     abrir(`<div class="ft-modal-icon" style="background:var(--gray-100);color:var(--gray-900);"><span class="ft-spinner ft-spinner-lg"></span></div><h3>${txt}</h3><p>Só um instante.</p>`);
   }
 
-  async function passoPix() {
+  async function passoPix(cpf) {
     carregando("Gerando Pix…");
-    let ped; try { ped = await criarPedido(); } catch (e) { return erroModal(e.message); }
+    let ped; try { ped = await criarPedido(cpf, "pix"); } catch (e) { return erroModal(e.message); }
     const qr = ped.pix_qrcode ? `<img src="data:image/png;base64,${ped.pix_qrcode}" alt="QR Pix">` : `<i data-lucide="qr-code" class="vt-qr-ph"></i>`;
     abrir(`
       ${steps(2)}
@@ -170,61 +183,59 @@
       <div class="vt-qrbox">${qr}</div>
       <p class="vt-hint">Abra o app do seu banco, escaneie o QR ou use o copia e cola:</p>
       <div class="vt-copy"><code id="pix-code">${ped.pix_copia_cola || "—"}</code><button id="p-copy" title="Copiar"><i data-lucide="copy"></i></button></div>
-      <button class="ft-btn ft-btn-primary vt-btn-full" id="p-ok"><i data-lucide="check"></i> Já paguei — confirmar</button>
-      <p class="vt-sim"><i data-lucide="info"></i> Pagamento simulado — a venda é aprovada na hora nesta versão.</p>`);
+      <button class="ft-btn ft-btn-primary vt-btn-full" id="p-ok"><i data-lucide="check"></i> Já paguei — liberar fotos</button>
+      <p class="vt-hint" id="p-status" style="text-align:center;margin-top:8px;"></p>`);
     document.getElementById("p-copy").addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(ped.pix_copia_cola || ""); } catch (e) {}
       const b = document.getElementById("p-copy"); b.innerHTML = '<i data-lucide="check"></i>'; if (window.lucide) lucide.createIcons();
     });
     document.getElementById("p-ok").addEventListener("click", () => finalizar(ped, "pix"));
+    iniciarPolling(ped, "pix");
   }
 
-  async function passoCartao() {
+  async function passoCartao(cpf) {
     carregando("Abrindo checkout…");
-    let ped; try { ped = await criarPedido(); } catch (e) { return erroModal(e.message); }
+    let ped; try { ped = await criarPedido(cpf, "cartao"); } catch (e) { return erroModal(e.message); }
+    if (ped.url) { try { window.open(ped.url, "_blank"); } catch (e) {} }
     abrir(`
       ${steps(2)}
-      <h3 class="vt-h">Cartão de crédito</h3>
-      <div class="vt-cc" id="cc">
-        <div class="vt-cc-top"><span class="vt-cc-chip"></span><span class="vt-cc-brand">VENTUS</span></div>
-        <div class="vt-cc-num" id="cc-num-view">•••• •••• •••• ••••</div>
-        <div class="vt-cc-row"><div><small>TITULAR</small><div id="cc-nome-view">NOME NO CARTÃO</div></div><div><small>VALIDADE</small><div id="cc-val-view">MM/AA</div></div></div>
-      </div>
-      <div class="ft-form" style="margin-top:16px;">
-        <label class="ft-field"><span>Número do cartão</span><input id="c-num" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="cc-number"></label>
-        <label class="ft-field"><span>Nome no cartão</span><input id="c-nome" placeholder="Como impresso" autocomplete="cc-name"></label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <label class="ft-field"><span>Validade</span><input id="c-val" placeholder="MM/AA" inputmode="numeric" autocomplete="cc-exp"></label>
-          <label class="ft-field"><span>CVV</span><input id="c-cvv" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc"></label>
-        </div>
-        <p class="ft-form-erro" id="c-erro" hidden></p>
-      </div>
-      <button class="ft-btn ft-btn-primary vt-btn-full" id="c-ok"><i data-lucide="lock"></i> Pagar ${brl(ped.total)}</button>
-      <p class="vt-sim"><i data-lucide="info"></i> Pagamento simulado — não use dados reais.</p>`);
-    const num = document.getElementById("c-num"), nome = document.getElementById("c-nome"), val = document.getElementById("c-val");
-    const upd = () => {
-      const raw = num.value.replace(/\D/g, "");
-      document.getElementById("cc-num-view").textContent = (raw + "•".repeat(Math.max(0, 16 - raw.length))).replace(/(.{4})/g, "$1 ").trim();
-      document.getElementById("cc-nome-view").textContent = (nome.value || "NOME NO CARTÃO").toUpperCase();
-      document.getElementById("cc-val-view").textContent = val.value || "MM/AA";
-    };
-    num.addEventListener("input", () => { num.value = num.value.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 "); upd(); });
-    val.addEventListener("input", () => { val.value = val.value.replace(/\D/g, "").slice(0, 4).replace(/(\d{2})(?=\d)/, "$1/"); upd(); });
-    nome.addEventListener("input", upd);
-    document.getElementById("c-ok").addEventListener("click", () => {
-      const erro = document.getElementById("c-erro");
-      if (num.value.replace(/\D/g, "").length < 13 || !nome.value.trim() || val.value.length < 5) { erro.textContent = "Preencha os dados do cartão (fictícios)."; erro.hidden = false; return; }
-      finalizar(ped, "cartao");
-    });
+      <h3 class="vt-h">Pagar no cartão</h3>
+      ${resumoHTML()}
+      <p class="vt-hint">Abrimos o checkout seguro do Asaas em outra aba para você pagar ${brl(ped.total)} no cartão. Se não abriu, use o botão:</p>
+      ${ped.url ? `<a class="ft-btn ft-btn-primary vt-btn-full" href="${ped.url}" target="_blank"><i data-lucide="external-link"></i> Abrir checkout do cartão</a>` : ""}
+      <button class="ft-btn ft-btn-secondary vt-btn-full" id="p-ok" style="margin-top:8px;"><i data-lucide="check"></i> Já paguei — liberar fotos</button>
+      <p class="vt-hint" id="p-status" style="text-align:center;margin-top:8px;"></p>`);
+    document.getElementById("p-ok").addEventListener("click", () => finalizar(ped, "cartao"));
+    iniciarPolling(ped, "cartao");
+  }
+
+  let _pollTimer = null;
+  function iniciarPolling(ped, metodo) {
+    let tentativas = 0;
+    clearInterval(_pollTimer);
+    _pollTimer = setInterval(async () => {
+      if (++tentativas > 36) { clearInterval(_pollTimer); return; }  // ~3 min
+      try {
+        const r = await fetch(api("/api/pagar"), { method: "POST", headers: { "Content-Type": "application/json", ...Auth.headers() }, body: JSON.stringify({ pedido_id: ped.pedido_id, metodo }) });
+        const d = await r.json();
+        if (d.pago && document.getElementById("p-ok")) { clearInterval(_pollTimer); telaSucesso(d); }
+      } catch (e) {}
+    }, 5000);
   }
 
   async function finalizar(ped, metodo) {
-    carregando("Aprovando pagamento…");
+    const st = document.getElementById("p-status");
+    if (st) st.textContent = "Verificando pagamento…";
     let d; try {
       const r = await fetch(api("/api/pagar"), { method: "POST", headers: { "Content-Type": "application/json", ...Auth.headers() }, body: JSON.stringify({ pedido_id: ped.pedido_id, metodo }) });
-      d = await r.json(); if (!r.ok) throw new Error(d.erro || "Falha no pagamento.");
-    } catch (e) { return erroModal(e.message); }
-    if (!d.pago) return erroModal("Pagamento não confirmado. Tente de novo.");
+      d = await r.json(); if (!r.ok) throw new Error(d.detail || d.erro || "Falha no pagamento.");
+    } catch (e) { if (st) st.textContent = ""; return erroModal(e.message); }
+    if (!d.pago) { if (st) st.textContent = "Pagamento ainda não identificado. Assim que cair, suas fotos liberam automaticamente."; return; }
+    clearInterval(_pollTimer);
+    telaSucesso(d);
+  }
+
+  function telaSucesso(d) {
     Cart.limpar();
     abrir(`
       <div class="vt-ok-badge"><i data-lucide="check"></i></div>
