@@ -9,32 +9,21 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Contratos — Ventus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 <style>
-.tabs { display:flex; gap:24px; border-bottom:1px solid var(--gray-200); margin-bottom:20px; }
-.tab { padding:12px 0; font-size:14px; color:var(--gray-500); font-weight:500; border-bottom:2px solid transparent; cursor:pointer; text-decoration:none; }
-.tab:hover { color:var(--gray-700); }
-.tab.active { color:var(--primary-700); border-color:var(--primary-600); font-weight:600; }
-.placeholder-pill { display:inline-block; padding:3px 8px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; }
+.placeholder-pill { display:inline-block; padding:3px 8px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-size:11px; font-family:'JetBrains Mono', monospace; cursor:pointer; margin:2px; border:0; }
 .placeholder-pill:hover { filter:brightness(.95); }
-.editor-fake { min-height:280px; padding:20px; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; font-size:14px; line-height:1.7; color:var(--gray-700); }
-
-/* Bloco de leitura do template na pré-visualização (respeita dark theme) */
+.editor-fake { min-height:120px; padding:18px; background:var(--surface); border:1px solid var(--gray-200); border-radius:10px; font-size:13.5px; line-height:1.7; color:var(--gray-700); }
 .contract-doc { background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; padding:26px 30px; font-family:Georgia,'Times New Roman',serif; font-size:14px; line-height:1.85; color:var(--gray-800); max-height:56vh; overflow:auto; }
 .contract-doc h4 { text-align:center; font-weight:800; font-size:15px; color:var(--gray-900); margin:0 0 18px; letter-spacing:.02em; }
 .contract-doc p { margin:0 0 14px; }
 .contract-doc .ph { display:inline-block; padding:1px 6px; background:var(--warning-bg); color:var(--warning-fg); border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:12px; }
 .contract-note { display:flex; gap:8px; align-items:center; margin-top:14px; padding:10px 14px; background:var(--primary-50); color:var(--primary-700); border-radius:10px; font-family:system-ui,sans-serif; font-size:12.5px; }
-/* Editor de template (textarea) */
-.tpl-editor { width:100%; height:340px; resize:vertical; padding:16px; border:1px solid var(--gray-200); border-radius:12px; background:var(--surface); color:var(--gray-800); font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; }
+.tpl-editor { width:100%; height:320px; resize:vertical; padding:16px; border:1px solid var(--gray-200); border-radius:12px; background:var(--surface); color:var(--gray-800); font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; }
 .tpl-editor:focus { outline:none; border-color:var(--primary-600); box-shadow:0 0 0 3px var(--primary-50); }
-/* Dropdown de exportação */
-.export-wrap { position:relative; }
-.export-menu { position:absolute; right:0; top:calc(100% + 6px); min-width:190px; background:var(--surface); border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 20px 50px -18px rgba(15,23,42,.4); padding:6px; z-index:50; display:none; }
-.export-menu.open { display:block; }
-.export-menu button { display:flex; align-items:center; gap:9px; width:100%; padding:9px 11px; border:0; background:transparent; color:var(--gray-700); font:inherit; font-size:13.5px; text-align:left; border-radius:8px; cursor:pointer; }
-.export-menu button:hover { background:var(--gray-100); color:var(--gray-900); }
+.ph-group-title { font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:14px 0 6px; }
 </style>
 </head>
 <body>
@@ -44,145 +33,33 @@
   <header class="topbar">
     <div style="flex:1"></div>
     <div class="flex gap-2">
-      <button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Disparar VAI WhatsApp</button>
-      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo template</button>
+      <button class="btn btn-primary btn-sm" id="btn-novo"><i data-lucide="plus" class="w-4 h-4"></i> Novo template</button>
     </div>
   </header>
 
   <main class="app-content">
     <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comercial / Contratos</div>
     <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Contratos & Assinaturas</h1>
-    <p class="text-sm mb-6" style="color:var(--gray-600);">Templates com 62 placeholders dinâmicos · 198 contratos ativos · 12 em assinatura via ZapSign</p>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Modelos de contrato usados no <strong>checkout</strong> e enviados para assinatura no <strong>ZapSign</strong>. Editou aqui, atualiza em todos os planos que usam o modelo.</p>
 
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="file-signature" class="w-5 h-5"></i></div><div class="kpi-label">Contratos ativos</div><div class="kpi-value">198</div><div class="kpi-trend up">+ 14 este mês</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Em assinatura</div><div class="kpi-value">12</div><div class="kpi-trend" style="color:var(--gray-500);">aguardando ZapSign</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Assinados (mês)</div><div class="kpi-value">22</div><div class="kpi-trend up">tempo médio: 18h</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="file-x" class="w-5 h-5"></i></div><div class="kpi-label">Cancelados</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">1.5% taxa</div></div>
-    </div>
-
-    <div class="tabs">
-      <a href="#" class="tab active" data-tab="templates">Templates (5)</a>
-      <a href="#" class="tab" data-tab="contratos">Lista de contratos (198)</a>
-      <a href="#" class="tab" data-tab="assinatura">Em assinatura (12)</a>
-    </div>
-
-    <!-- TAB: TEMPLATES -->
-    <div data-tab-panel="templates">
-      <div class="grid gap-4" style="grid-template-columns: 1fr 1fr;">
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <strong>Contrato Padrão Ouro 2026</strong>
-              <div style="font-size:12px;color:var(--gray-500);">Versão 3 · ativa · 132 contratos gerados</div>
-            </div>
-            <span class="badge badge-success">Ativo</span>
-          </div>
-          <div class="card-body" style="padding:14px;">
-            <div class="editor-fake">
-              <p style="margin-bottom:12px;"><strong>CONTRATO DE PRESTAÇÃO DE SERVIÇOS Nº <span class="placeholder-pill">{{NR_CONTRATO}}</span></strong></p>
-              <p style="margin-bottom:12px;">Pelo presente instrumento, de um lado <strong>VENTUS PRODUTORA LTDA</strong>, e de outro <span class="placeholder-pill">{{NM_ALUNO}}</span>, CPF <span class="placeholder-pill">{{CPF}}</span>, residente em <span class="placeholder-pill">{{DS_ENDERECO}}</span>, <span class="placeholder-pill">{{NR_ENDERECO}}</span>, <span class="placeholder-pill">{{DS_BAIRRO}}</span>, <span class="placeholder-pill">{{DS_CIDADE}}</span>/<span class="placeholder-pill">{{DS_UF}}</span>...</p>
-              <p style="margin-bottom:12px;">Cláusula 1ª — A CONTRATADA prestará serviços relativos à formatura da turma <span class="placeholder-pill">{{NM_TURMA}}</span> com previsão para <span class="placeholder-pill">{{DT_PREVISAO_FORMATURA}}</span>...</p>
-              <p style="margin-bottom:12px;">Cláusula 2ª — O valor total contratado é de <span class="placeholder-pill">{{VL_CONTRATO}}</span>, parcelado em <span class="placeholder-pill">{{NR_PARCELA}}</span> parcelas mensais de <span class="placeholder-pill">{{VL_PARCELA}}</span>, com primeira parcela em <span class="placeholder-pill">{{DT_PARCELA_PRIMEIRA}}</span>.</p>
-              <p style="margin-bottom:12px;">Eventos contratados: <span class="placeholder-pill">{{LISTA_EVENTOS}}</span>.</p>
-              <p style="margin-bottom:0;color:var(--gray-400);font-size:12px;">[Texto truncado · ver template completo]</p>
-            </div>
-            <div class="flex gap-2 mt-3">
-              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="editar" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
-              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="preview" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="eye" class="w-4 h-4"></i> Pré-visualizar</button>
-              <button class="btn btn-secondary btn-sm" data-no-toast data-tpl-action="duplicar" data-nome="Contrato Padrão Ouro 2026"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
-              <div class="export-wrap" style="margin-left:auto;">
-                <button class="btn btn-secondary btn-sm" data-no-toast data-export-toggle><i data-lucide="download" class="w-4 h-4"></i> Exportar <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
-                <div class="export-menu" data-export-menu>
-                  <button data-no-toast data-export="PDF"><i data-lucide="file-text" class="w-4 h-4"></i> Exportar PDF</button>
-                  <button data-no-toast data-export="DOCX"><i data-lucide="file" class="w-4 h-4"></i> Exportar DOCX</button>
-                  <button data-no-toast data-export="CSV"><i data-lucide="table" class="w-4 h-4"></i> Exportar CSV (dados)</button>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div class="grid gap-4" style="grid-template-columns: 1.4fr 1fr;">
+      <!-- LISTA DE TEMPLATES (real) -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="card-title" id="tpl-count">Templates</div>
         </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Placeholders disponíveis (62)</div>
-            <input class="input" placeholder="Buscar…" style="width:160px;font-size:13px;padding:6px 10px;">
-          </div>
-          <div class="card-body" style="max-height:560px;overflow-y:auto;">
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📌 Aluno (15)</div>
-            <span class="placeholder-pill">{{CD_ALUNO}}</span><span class="placeholder-pill">{{NM_ALUNO}}</span><span class="placeholder-pill">{{DT_NASCIMENTO}}</span><span class="placeholder-pill">{{CPF}}</span><span class="placeholder-pill">{{RG}}</span><span class="placeholder-pill">{{FONE01}}</span><span class="placeholder-pill">{{FONE02}}</span><span class="placeholder-pill">{{WHATSAPP}}</span><span class="placeholder-pill">{{EMAIL}}</span><span class="placeholder-pill">{{CEP}}</span><span class="placeholder-pill">{{DS_ENDERECO}}</span><span class="placeholder-pill">{{NR_ENDERECO}}</span><span class="placeholder-pill">{{DS_COMPLEMENTO}}</span><span class="placeholder-pill">{{DS_BAIRRO}}</span><span class="placeholder-pill">{{DS_CIDADE}}</span><span class="placeholder-pill">{{DS_UF}}</span>
-
-            <div class="divider" style="margin:16px 0;"></div>
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">💰 Financeiro (14)</div>
-            <span class="placeholder-pill">{{NR_PARCELA}}</span><span class="placeholder-pill">{{VL_PARCELA}}</span><span class="placeholder-pill">{{DT_PARCELA_PRIMEIRA}}</span><span class="placeholder-pill">{{DT_PARCELA_ULTIMA}}</span><span class="placeholder-pill">{{VL_CONTRATO}}</span><span class="placeholder-pill">{{VL_CONTRATO_DESC}}</span><span class="placeholder-pill">{{VL_CONTRATO_LIQ}}</span><span class="placeholder-pill">{{VL_TX_BOLETO}}</span><span class="placeholder-pill">{{TT_COBRANCA}}</span><span class="placeholder-pill">{{TT_DESCONTO}}</span><span class="placeholder-pill">{{TT_LIQUIDO}}</span><span class="placeholder-pill">{{TP_PAGAMENTO}}</span><span class="placeholder-pill">{{DT_VENCIMENTO}}</span><span class="placeholder-pill">{{NR_CONTRATO}}</span>
-
-            <div class="divider" style="margin:16px 0;"></div>
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">🎓 Turma & Curso (12)</div>
-            <span class="placeholder-pill">{{NM_TURMA}}</span><span class="placeholder-pill">{{CD_TURMA}}</span><span class="placeholder-pill">{{NM_CURSO}}</span><span class="placeholder-pill">{{CD_CURSO}}</span><span class="placeholder-pill">{{NM_INSTITUICAO}}</span><span class="placeholder-pill">{{DS_TP_TURNO}}</span><span class="placeholder-pill">{{MES_FORMATURA}}</span><span class="placeholder-pill">{{ANO_FORMATURA}}</span><span class="placeholder-pill">{{DT_PREVISAO_FORMATURA}}</span><span class="placeholder-pill">{{QT_FAMILIA}}</span><span class="placeholder-pill">{{QT_CONVIDADOS}}</span><span class="placeholder-pill">{{NM_PLANO}}</span>
-
-            <div class="divider" style="margin:16px 0;"></div>
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📦 Eventos & Brindes (8)</div>
-            <span class="placeholder-pill">{{LISTA_EVENTOS}}</span><span class="placeholder-pill">{{LISTA_CERIMONIAL}}</span><span class="placeholder-pill">{{LISTA_BRINDE}}</span><span class="placeholder-pill">{{LISTA_PRODUTO}}</span><span class="placeholder-pill">{{LISTA_SERVICO}}</span><span class="placeholder-pill">{{QT_CONTRATO_FOTOS}}</span><span class="placeholder-pill">{{NM_FORMA}}</span><span class="placeholder-pill">{{DS_TP_CONTRATO}}</span>
-
-            <div class="divider" style="margin:16px 0;"></div>
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">👔 Beca & Físico (5)</div>
-            <span class="placeholder-pill">{{PLUS_SIZE}}</span><span class="placeholder-pill">{{NR_CALCA}}</span><span class="placeholder-pill">{{ALTURA}}</span><span class="placeholder-pill">{{IMG_ASSINATURA}}</span><span class="placeholder-pill">{{NR_CONTRATO_CEDIMONIAL}}</span>
-
-            <div class="divider" style="margin:16px 0;"></div>
-            <div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:8px;">📅 Data & Sistema (8)</div>
-            <span class="placeholder-pill">{{DIA_ATUAL}}</span><span class="placeholder-pill">{{MES_ATUAL}}</span><span class="placeholder-pill">{{ANO_ATUAL}}</span><span class="placeholder-pill">{{VL_CERIMONIAL}}</span><span class="placeholder-pill">{{VL_CERIMONIAL_DESC}}</span><span class="placeholder-pill">{{VL_CERIMONIAL_LIQ}}</span><span class="placeholder-pill">{{VL_PROD_SERV}}</span><span class="placeholder-pill">{{VL_ASSESSORIA_CERIMONIAL}}</span>
-          </div>
-        </div>
-
+        <div id="tpl-list" class="grid gap-4"></div>
       </div>
-    </div>
 
-    <!-- TAB: LISTA DE CONTRATOS -->
-    <div data-tab-panel="contratos" hidden>
-      <div class="card">
+      <!-- PLACEHOLDERS reais -->
+      <div class="card" style="align-self:start;position:sticky;top:16px;">
         <div class="card-header">
-          <div class="card-title">Contratos ativos (198)</div>
-          <div class="flex gap-2">
-            <select class="select" style="width:160px;font-size:13px;padding:6px 10px;"><option>Todas turmas</option><option>MEDICINA T85</option><option>DIREITO T42</option><option>ENGENHARIA T31</option></select>
-            <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todos status</option><option>Em dia</option><option>Em atraso</option><option>Quitado</option></select>
-            <button class="btn btn-secondary btn-sm" data-no-toast data-export="CSV"><i data-lucide="download" class="w-4 h-4"></i> Exportar CSV</button>
-          </div>
+          <div class="card-title">Placeholders disponíveis</div>
         </div>
-        <table class="table">
-          <thead><tr><th>Nº</th><th>Aluno</th><th>Turma</th><th>Plano</th><th class="num">Valor</th><th class="num">Pago</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><strong>#4291</strong></td><td>Camila Almeida</td><td>MEDICINA T85</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 11.200</td><td><span class="badge badge-success">Em dia</span></td></tr>
-            <tr><td><strong>#4290</strong></td><td>Pedro Henrique</td><td>MEDICINA T85</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 18.400</td><td><span class="badge badge-success">Quitado</span></td></tr>
-            <tr><td><strong>#4289</strong></td><td>Júlia Ribeiro</td><td>MEDICINA T85</td><td>Prata 2026</td><td class="num">R$ 14.200</td><td class="num">R$ 7.100</td><td><span class="badge badge-success">Em dia</span></td></tr>
-            <tr><td><strong>#4288</strong></td><td>Marcos Silva</td><td>DIREITO T42</td><td>Ouro 2026</td><td class="num">R$ 18.400</td><td class="num">R$ 9.200</td><td><span class="badge badge-warning">Atraso D+3</span></td></tr>
-            <tr><td><strong>#4287</strong></td><td>Beatriz Lima</td><td>DIREITO T42</td><td>Diamante 2026</td><td class="num">R$ 24.800</td><td class="num">R$ 14.880</td><td><span class="badge badge-success">Em dia</span></td></tr>
-            <tr><td><strong>#4286</strong></td><td>Igor Martins Rocha</td><td>ENGENHARIA T31</td><td>Prata 2026</td><td class="num">R$ 14.200</td><td class="num">R$ 5.680</td><td><span class="badge badge-danger">Atraso D+15</span></td></tr>
-          </tbody>
-        </table>
-        <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 192 contratos · <a href="#" style="color:var(--primary-700);">ver todos</a></div>
-      </div>
-    </div>
-
-    <!-- TAB: EM ASSINATURA -->
-    <div data-tab-panel="assinatura" hidden>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Aguardando assinatura ZapSign (12)</div>
-          <button class="btn btn-secondary btn-sm"><i data-lucide="message-circle" class="w-4 h-4"></i> Lembrar todos</button>
+        <div class="card-body" style="max-height:70vh;overflow-y:auto;">
+          <p style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">Clique para copiar. Dentro do editor, clica para inserir no texto.</p>
+          <div id="ph-side"></div>
         </div>
-        <table class="table">
-          <thead><tr><th>Enviado</th><th>Aluno</th><th>Turma</th><th>Template</th><th>Tempo na fila</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>há 2h</td><td><strong>Beatriz Costa</strong></td><td>MEDICINA T85</td><td>Ouro 2026 v3</td><td>2h</td><td><span class="badge badge-info">Visualizado</span></td></tr>
-            <tr><td>há 4h</td><td><strong>Lucas Mendes</strong></td><td>DIREITO T42</td><td>Prata 2026 v3</td><td>4h</td><td><span class="badge badge-warning">Aguardando abertura</span></td></tr>
-            <tr><td>há 8h</td><td><strong>Sofia Pereira</strong></td><td>ENGENHARIA T31</td><td>Diamante 2026 v3</td><td>8h</td><td><span class="badge badge-info">Visualizado</span></td></tr>
-            <tr><td>há 12h</td><td><strong>Tiago Moreira Gomes</strong></td><td>MEDICINA T85</td><td>Ouro 2026 v3</td><td>12h</td><td><span class="badge badge-warning">Aguardando abertura</span></td></tr>
-            <tr><td>há 18h</td><td><strong>Helena Dias</strong></td><td>DIREITO T42</td><td>Prata 2026 v3</td><td>18h</td><td><span class="badge badge-danger">Lembrete enviado</span></td></tr>
-            <tr><td>há 1d</td><td><strong>Tiago Vieira</strong></td><td>ENGENHARIA T31</td><td>Ouro 2026 v3</td><td>1d</td><td><span class="badge badge-danger">Lembrete enviado</span></td></tr>
-          </tbody>
-        </table>
-        <div style="padding:12px;text-align:center;font-size:13px;color:var(--gray-500);border-top:1px solid var(--gray-100);">+ 6 envios · tempo médio até assinar: 18h</div>
       </div>
     </div>
   </main>
@@ -190,145 +67,198 @@
 <script src="../assets/js/app.js"></script>
 <script>
 (function () {
-  // Texto completo do template (mock) — placeholders preenchidos por aluno.
-  const TEMPLATES = {
-    'Contrato Padrão Ouro 2026': [
-      'CONTRATO DE PRESTAÇÃO DE SERVIÇOS Nº {{NR_CONTRATO}}',
-      '',
-      'Pelo presente instrumento particular, de um lado VENTUS PRODUTORA LTDA, inscrita no CNPJ sob nº 00.000.000/0001-00, doravante denominada CONTRATADA, e de outro lado {{NM_ALUNO}}, CPF {{CPF}}, RG {{RG}}, residente em {{DS_ENDERECO}}, {{NR_ENDERECO}}, {{DS_COMPLEMENTO}}, {{DS_BAIRRO}}, {{DS_CIDADE}}/{{DS_UF}}, CEP {{CEP}}, doravante denominado(a) CONTRATANTE, têm entre si justo e contratado o seguinte:',
-      '',
-      'CLÁUSULA 1ª — DO OBJETO. A CONTRATADA prestará serviços relativos à formatura da turma {{NM_TURMA}} do curso {{NM_CURSO}}, da instituição {{NM_INSTITUICAO}}, com previsão de realização para {{DT_PREVISAO_FORMATURA}}, contemplando o plano {{NM_PLANO}}.',
-      '',
-      'CLÁUSULA 2ª — DO VALOR E PAGAMENTO. O valor total contratado é de {{VL_CONTRATO}}, parcelado em {{NR_PARCELA}} parcelas mensais de {{VL_PARCELA}}, com primeira parcela em {{DT_PARCELA_PRIMEIRA}} e última em {{DT_PARCELA_ULTIMA}}, via {{TP_PAGAMENTO}}.',
-      '',
-      'CLÁUSULA 3ª — DOS EVENTOS E PRODUTOS. Ficam contratados os seguintes eventos: {{LISTA_EVENTOS}}. Cerimonial: {{LISTA_CERIMONIAL}}. Brindes: {{LISTA_BRINDE}}. Produtos e serviços: {{LISTA_PRODUTO}}, {{LISTA_SERVICO}}.',
-      '',
-      'CLÁUSULA 4ª — DA BECA. A CONTRATADA disponibilizará beca conforme medidas informadas: altura {{ALTURA}}, nº de calça {{NR_CALCA}}, plus size {{PLUS_SIZE}}.',
-      '',
-      'CLÁUSULA 5ª — DO FORO. Fica eleito o foro da comarca de {{DS_CIDADE}}/{{DS_UF}} para dirimir quaisquer questões oriundas deste contrato.',
-      '',
-      'E, por estarem assim justas e contratadas, as partes assinam o presente em {{DIA_ATUAL}} de {{MES_ATUAL}} de {{ANO_ATUAL}}.',
-      '',
-      '_________________________________',
-      '{{NM_ALUNO}} — CONTRATANTE',
-      '',
-      '_________________________________',
-      'VENTUS PRODUTORA LTDA — CONTRATADA'
-    ].join('\n')
-  };
+  const API = '/api/cadastro/modelo-documento';
+  // Placeholders REAIS que o backend (gerar_contrato) substitui por aluno.
+  const PH_GROUPS = [
+    ['📌 Aluno', ['nome','cpf','email','celular','curso','ano']],
+    ['🎓 Turma & Plano', ['turma','instituicao','plano']],
+    ['💰 Financeiro', ['valor','valor_fotografia','valor_cerimonial','forma_pagamento','parcelas','qt_fotos','tipo_contrato']],
+    ['📅 Data', ['data']],
+  ];
 
-  function esc(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-  // Envelopa {{...}} num <span class="ph"> e converte quebras de linha em parágrafos.
+  let ITEMS = [];
+  let curEditor = null; // textarea do modal de edição, quando aberto
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
   function renderDoc(text) {
-    const withPills = esc(text).replace(/\{\{[A-Z0-9_]+\}\}/g, m => `<span class="ph">${m}</span>`);
+    const withPills = esc(text).replace(/\{\{[a-zA-Z0-9_]+\}\}/g, m => `<span class="ph">${m}</span>`);
     const lines = withPills.split('\n');
-    const head = lines[0];
-    const body = lines.slice(1).join('\n')
-      .split(/\n{2,}/)
-      .map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '')
-      .join('');
+    const head = lines[0] || '(sem título)';
+    const body = lines.slice(1).join('\n').split(/\n{2,}/)
+      .map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
     return `<h4>${head}</h4>${body}`;
   }
 
   function toast(msg) {
-    // usa o stack de toast do app.js se existir; senão, cai no vtAlert
     const stack = document.getElementById('vt-toast-stack');
     if (stack) {
-      const t = document.createElement('div');
-      t.className = 'vt-toast';
-      t.textContent = msg;
-      stack.appendChild(t);
-      setTimeout(() => t.classList.add('fade'), 2200);
-      setTimeout(() => t.remove(), 2500);
-    } else {
-      window.vtAlert(msg);
+      const t = document.createElement('div'); t.className = 'vt-toast'; t.textContent = msg;
+      stack.appendChild(t); setTimeout(() => t.classList.add('fade'), 2200); setTimeout(() => t.remove(), 2500);
+    } else if (window.vtAlert) { window.vtAlert(msg); } else { console.log(msg); }
+  }
+
+  function phPillsHTML(insert) {
+    // insert=true → data-ins (inserir no editor); senão data-copy
+    return PH_GROUPS.map(([titulo, chaves]) =>
+      `<div class="ph-group-title">${titulo}</div>` +
+      chaves.map(k => {
+        const tag = '{{' + k + '}}';
+        const attr = insert ? `data-ins="${tag}"` : `data-copy="${tag}"`;
+        return `<button type="button" class="placeholder-pill" ${attr}>${tag}</button>`;
+      }).join('')
+    ).join('');
+  }
+
+  async function load() {
+    const list = document.getElementById('tpl-list');
+    list.innerHTML = `<div style="color:var(--gray-500);font-size:14px;padding:20px;">Carregando…</div>`;
+    try {
+      const r = await fetch(apiUrl(API));
+      const d = await r.json();
+      ITEMS = (d && d.itens) || [];
+    } catch (e) { ITEMS = []; }
+    document.getElementById('tpl-count').textContent = `Templates (${ITEMS.length})`;
+    if (!ITEMS.length) {
+      list.innerHTML = `<div class="card"><div class="card-body" style="text-align:center;color:var(--gray-500);padding:30px;">Nenhum modelo de contrato ainda.<br><button class="btn btn-primary btn-sm mt-3" onclick="document.getElementById('btn-novo').click()">Criar o primeiro</button></div></div>`;
+      return;
     }
+    list.innerHTML = ITEMS.map(t => `
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <strong>${esc(t.nome)}</strong>
+            <div style="font-size:12px;color:var(--gray-500);">${(t.conteudo || '').length} caracteres</div>
+          </div>
+          <span class="badge ${t.ativo === false ? 'badge-neutral' : 'badge-success'}">${t.ativo === false ? 'Inativo' : 'Ativo'}</span>
+        </div>
+        <div class="card-body" style="padding:14px;">
+          <div class="editor-fake" style="max-height:210px;overflow:auto;">${renderDoc(t.conteudo || '(vazio — clique em Editar para escrever)')}</div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-secondary btn-sm" data-no-toast data-act="editar" data-id="${t.id}"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
+            <button class="btn btn-secondary btn-sm" data-no-toast data-act="preview" data-id="${t.id}"><i data-lucide="eye" class="w-4 h-4"></i> Pré-visualizar</button>
+            <button class="btn btn-secondary btn-sm" data-no-toast data-act="duplicar" data-id="${t.id}"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
+            <button class="btn btn-secondary btn-sm" data-no-toast data-act="excluir" data-id="${t.id}" style="margin-left:auto;color:var(--danger-fg);"><i data-lucide="trash-2" class="w-4 h-4"></i> Excluir</button>
+          </div>
+        </div>
+      </div>`).join('');
+    if (window.lucide) lucide.createIcons();
   }
 
-  function getText(nome) {
-    return TEMPLATES[nome] || (TEMPLATES['Contrato Padrão Ouro 2026']);
-  }
+  function byId(id) { return ITEMS.find(x => String(x.id) === String(id)); }
 
-  function preview(nome) {
+  function preview(t) {
     window.vtModal({
-      title: `Pré-visualização — ${nome}`,
-      size: 'lg',
-      bodyHTML:
-        `<div class="contract-doc">${renderDoc(getText(nome))}</div>` +
-        `<div class="contract-note"><i data-lucide="info" class="w-4 h-4"></i> Os campos {{...}} são preenchidos automaticamente por aluno no momento da geração do contrato.</div>`
+      title: `Pré-visualização — ${t.nome}`, size: 'lg',
+      bodyHTML: `<div class="contract-doc">${renderDoc(t.conteudo || '(vazio)')}</div>` +
+        `<div class="contract-note"><i data-lucide="info" class="w-4 h-4"></i> Os campos {{...}} são preenchidos automaticamente por aluno na hora de gerar o contrato.</div>`
     });
     if (window.lucide) lucide.createIcons();
   }
 
-  function editar(nome) {
-    const text = getText(nome);
+  // Editor real: cria (POST) ou atualiza (PUT)
+  function editar(t) {
+    const isNew = !t;
     const wrap = document.createElement('div');
     wrap.innerHTML =
-      `<label style="display:block;font-size:12.5px;font-weight:700;color:var(--gray-600);margin-bottom:8px;">Texto do template · use {{PLACEHOLDERS}} para campos dinâmicos</label>` +
-      `<textarea class="tpl-editor" spellcheck="false"></textarea>` +
+      `<label style="display:block;font-size:12.5px;font-weight:700;color:var(--gray-600);margin-bottom:6px;">Nome do modelo</label>` +
+      `<input class="input" id="tpl-nome" style="width:100%;margin-bottom:14px;" placeholder="Ex: Contrato Padrão 2026">` +
+      `<label style="display:block;font-size:12.5px;font-weight:700;color:var(--gray-600);margin-bottom:6px;">Texto do contrato · use os {{placeholders}} abaixo</label>` +
+      `<textarea class="tpl-editor" id="tpl-texto" spellcheck="false" placeholder="CONTRATO DE PRESTAÇÃO DE SERVIÇOS...&#10;&#10;...de outro lado {{nome}}, CPF {{cpf}}..."></textarea>` +
+      `<div style="margin-top:10px;font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Inserir placeholder</div>` +
+      `<div id="ph-modal" style="margin-top:4px;max-height:118px;overflow:auto;"></div>` +
       `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">` +
       `<button class="btn btn-secondary btn-sm" data-no-toast data-act="cancel">Cancelar</button>` +
       `<button class="btn btn-primary btn-sm" data-no-toast data-act="save"><i data-lucide="check" class="w-4 h-4"></i> Salvar template</button>` +
       `</div>`;
-    wrap.querySelector('textarea').value = text;
+    wrap.querySelector('#tpl-nome').value = isNew ? '' : (t.nome || '');
+    wrap.querySelector('#tpl-texto').value = isNew ? '' : (t.conteudo || '');
+    wrap.querySelector('#ph-modal').innerHTML = phPillsHTML(true);
 
-    const m = window.vtModal({ title: `Editar template — ${nome}`, size: 'lg', bodyHTML: wrap });
+    const m = window.vtModal({ title: isNew ? 'Novo template de contrato' : `Editar template — ${t.nome}`, size: 'lg', bodyHTML: wrap });
     if (window.lucide) lucide.createIcons();
 
-    wrap.addEventListener('click', e => {
+    const ta = wrap.querySelector('#tpl-texto');
+    curEditor = ta;
+
+    wrap.addEventListener('click', async e => {
+      // inserir placeholder no cursor
+      const ins = e.target.closest('[data-ins]');
+      if (ins) { insertAtCursor(ta, ins.dataset.ins); return; }
+
       const b = e.target.closest('[data-act]');
       if (!b) return;
-      m.close();
-      if (b.dataset.act === 'save') toast('Template salvo (protótipo).');
+      if (b.dataset.act === 'cancel') { curEditor = null; m.close(); return; }
+      if (b.dataset.act === 'save') {
+        const nome = wrap.querySelector('#tpl-nome').value.trim();
+        const conteudo = ta.value;
+        if (!nome) { toast('Dê um nome ao modelo.'); return; }
+        b.disabled = true; b.textContent = 'Salvando…';
+        try {
+          const url = isNew ? apiUrl(API) : apiUrl(API + '/' + t.id);
+          const r = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, conteudo, ativo: true }) });
+          if (!r.ok) { const er = await r.json().catch(() => ({})); toast(er.detail || 'Erro ao salvar.'); b.disabled = false; b.innerHTML = 'Salvar template'; return; }
+          curEditor = null; m.close();
+          toast(isNew ? 'Template criado!' : 'Template salvo!');
+          load();
+        } catch (err) { toast('Sem conexão ao salvar.'); b.disabled = false; b.innerHTML = 'Salvar template'; }
+      }
     });
   }
 
-  async function duplicar(nome) {
-    const ok = await window.vtConfirm(`Duplicar o template "${nome}"?`, { okText: 'Duplicar' });
-    if (ok) await window.vtAlert('Template duplicado.', { title: 'Pronto' });
+  function insertAtCursor(ta, text) {
+    const s = ta.selectionStart || 0, e = ta.selectionEnd || 0;
+    ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+    const pos = s + text.length;
+    ta.focus(); ta.setSelectionRange(pos, pos);
   }
 
-  function exportar(formato) {
-    toast(`Exportando ${formato}… (protótipo)`);
+  async function duplicar(t) {
+    const ok = await window.vtConfirm(`Duplicar o template "${t.nome}"?`, { okText: 'Duplicar' });
+    if (!ok) return;
+    try {
+      const r = await fetch(apiUrl(API), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: (t.nome || 'Contrato') + ' (cópia)', conteudo: t.conteudo || '', ativo: true }) });
+      if (!r.ok) { toast('Erro ao duplicar.'); return; }
+      toast('Template duplicado.'); load();
+    } catch (e) { toast('Sem conexão.'); }
   }
 
-  // Delegação de eventos — cobre todos os cards de template.
-  document.addEventListener('click', e => {
-    const act = e.target.closest('[data-tpl-action]');
-    if (act) {
-      e.preventDefault();
-      const nome = act.dataset.nome || 'Template';
-      if (act.dataset.tplAction === 'preview') preview(nome);
-      else if (act.dataset.tplAction === 'editar') editar(nome);
-      else if (act.dataset.tplAction === 'duplicar') duplicar(nome);
-      return;
-    }
+  async function excluir(t) {
+    const ok = await window.vtConfirm(`Excluir o template "${t.nome}"? Planos que usam este modelo ficarão sem contrato.`, { okText: 'Excluir', danger: true });
+    if (!ok) return;
+    try {
+      const r = await fetch(apiUrl(API + '/' + t.id), { method: 'DELETE' });
+      if (!r.ok) { toast('Erro ao excluir.'); return; }
+      toast('Template excluído.'); load();
+    } catch (e) { toast('Sem conexão.'); }
+  }
 
-    // Toggle do dropdown de exportação
-    const toggle = e.target.closest('[data-export-toggle]');
-    if (toggle) {
-      e.preventDefault();
-      const menu = toggle.parentElement.querySelector('[data-export-menu]');
-      const wasOpen = menu.classList.contains('open');
-      document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
-      if (!wasOpen) menu.classList.add('open');
-      return;
-    }
+  // eventos
+  document.getElementById('btn-novo').addEventListener('click', () => editar(null));
 
-    // Item de exportação (dentro do menu ou botão CSV direto)
-    const exp = e.target.closest('[data-export]');
-    if (exp) {
-      e.preventDefault();
-      document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
-      exportar(exp.dataset.export);
-      return;
-    }
-
-    // Clique fora fecha qualquer dropdown aberto
-    document.querySelectorAll('[data-export-menu].open').forEach(m => m.classList.remove('open'));
+  document.getElementById('tpl-list').addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    e.preventDefault();
+    const t = byId(b.dataset.id); if (!t) return;
+    const a = b.dataset.act;
+    if (a === 'editar') editar(t);
+    else if (a === 'preview') preview(t);
+    else if (a === 'duplicar') duplicar(t);
+    else if (a === 'excluir') excluir(t);
   });
+
+  // placeholders laterais: copiar
+  const side = document.getElementById('ph-side');
+  side.innerHTML = phPillsHTML(false);
+  side.addEventListener('click', e => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const tag = b.dataset.copy;
+    if (curEditor) { insertAtCursor(curEditor, tag); toast('Inserido no texto.'); }
+    else if (navigator.clipboard) { navigator.clipboard.writeText(tag).then(() => toast(tag + ' copiado.')); }
+    else toast(tag);
+  });
+
+  load();
 })();
 </script>
 
