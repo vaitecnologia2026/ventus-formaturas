@@ -306,14 +306,16 @@ function itensComissao(p){
   const raw = p.itens_comissao || p.brindes_comissao || (DADOS && DADOS.itens_comissao) || [];
   return (Array.isArray(raw)?raw:[]).map(b => (b && typeof b==='object') ? (b.nome||b.descricao||b.label||'') : String(b)).filter(Boolean);
 }
-// Taxa de boleto quando aplicável (defensivo)
+// Taxa de boleto quando aplicável — VALOR vem de valor_taxa (por parcela) na config do plano.
+// taxa_boleto é só o boolean (tem taxa?); antes ele era usado como valor (true=R$1,00).
 function taxaBoleto(p){
   const meio = (F.meio_pagamento||F.forma_pagamento||'').toLowerCase();
-  const ehBoleto = meio.includes('boleto');
-  if(!ehBoleto) return 0;
-  const cands = [p && p.taxa_boleto, DADOS && DADOS.taxa_boleto, DADOS && DADOS.config && DADOS.config.taxa_boleto];
-  const t = cands.find(v => v != null);
-  return Number(t)||0;
+  if(!meio.includes('boleto')) return 0;
+  const temTaxa = !!((p && p.taxa_boleto) || (DADOS && DADOS.taxa_boleto));
+  if(!temTaxa) return 0;
+  const valorPorParcela = Number(p && p.valor_taxa) || Number(DADOS && DADOS.valor_taxa) || 0;
+  const parcelas = Math.max(1, +(F.parcelas || 1));
+  return valorPorParcela * parcelas;
 }
 // Lista de cursos da turma (se a API trouxer); aceita array de strings ou de {id,nome}
 function cursosDaTurma(){
