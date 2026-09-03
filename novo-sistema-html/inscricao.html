@@ -252,7 +252,7 @@ const F = {
   nome:'', celular:'', email:'', email_confirma:'', cpf:'', curso:'', ano_formatura:'',
   altura:'', peso:'', calcado:'',
   plus_size:null, num_calca:'',      // medidas (só quando a turma solicitar)
-  plano_id:null, meio_pagamento:null, forma_pagamento:null, parcelas:null,
+  plano_id:null, meio_pagamento:null, forma_pagamento:null, parcelas:null, vencimento:null,
   aceite_contrato:false, observacoes:'',
   participacoes:[],   // {evento_fotografico_id, qtd_familiares, qtd_convidados}
   adicionais:[],      // {descricao, valor, quantidade}
@@ -679,13 +679,25 @@ function renderPagamento(){
     const formas = DADOS.formas_pagamento || [];
     meiosHtml = `<div class="fld"><select id="i-forma"><option value="">Selecione…</option>${formas.map(f=>`<option value="${esc(f[0])}" ${F.forma_pagamento===f[0]?'selected':''}>${esc(f[1])}</option>`).join('')}</select></div>`;
   }
+  // Datas de 1ª parcela configuradas no plano (Asaas exige vencimento — buscar daqui, não default)
+  const datas = p.datas_1a_parcela || [];
+  if(datas.length && !F.vencimento) F.vencimento = datas[0];
+  const dataBR = s => (s||'').split('-').reverse().join('/');
+  const datasHtml = datas.length ? `
+    <div class="fld" style="margin-top:14px;"><label>Data da 1ª parcela</label>
+      <select id="i-venc">${datas.map(d=>`<option value="${d}" ${F.vencimento===d?'selected':''}>${dataBR(d)}</option>`).join('')}</select></div>` : '';
+
   sec.innerHTML = `
     <p class="sec-title">Forma de pagamento</p>
     <p class="sec-hint">Como você prefere pagar seu plano.</p>
     ${meiosHtml}
+    ${datasHtml}
     <div id="desc-note" style="margin-top:10px;font-size:13px;"></div>
     <div id="parc-box" style="margin-top:12px;"></div>
     <div id="cupom-box" style="margin-top:16px;"></div>`;
+
+  const vencSel = document.getElementById('i-venc');
+  if(vencSel){ vencSel.onchange = () => { F.vencimento = vencSel.value; }; }
 
   renderCupom();
 
@@ -1136,7 +1148,7 @@ async function gerarPagamento(alunoId, p){
   box.innerHTML = `<div class="pay-hint"><div class="ph-t">Gerando seu pagamento…</div></div>`;
   try{
     const r = await fetch(apiUrl('/api/pagamento'), {method:'POST',headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ aluno_id: alunoId, metodo, valor: total, parcelas: F.parcelas || null, descricao: `Formatura — ${p.nome||'Plano'}` })});
+      body: JSON.stringify({ aluno_id: alunoId, metodo, valor: total, parcelas: F.parcelas || null, vencimento: F.vencimento || null, descricao: `Formatura — ${p.nome||'Plano'}` })});
     const c = await r.json();
     if(!r.ok){ box.innerHTML = hintFallback; return; }
     if(metodo==='pix' && (c.pix_copia_cola || c.pix_qr_base64)){
