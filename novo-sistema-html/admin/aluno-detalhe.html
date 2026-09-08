@@ -304,6 +304,10 @@ function montarDadosForm(a){
     +fld('curso','Curso',a.curso)+fld('ano_formatura','Ano formatura',a.ano_formatura,'number')
     +fld('nome_fotografia','Foto do encarte',a.nome_fotografia)+fld('nome_mae','Nome da mãe',a.nome_mae)+fld('nome_pai','Nome do pai',a.nome_pai)
     +ro('Data do encarte',a.data_encarte?a.data_encarte.split('-').reverse().join('/'):'—')
+    +ro('Assinatura do contrato', a.data_assinatura_contrato
+        ? (a.data_assinatura_contrato.split('T')[0].split('-').reverse().join('/')
+           + (a.assinatura_status==='signed'?' · ZapSign':a.assinatura_status==='aceite_digital'?' · aceite digital':''))
+        : '—')
     +fld('cep','CEP',a.cep)+fld('rua','Rua',a.rua)+fld('numero','Número',a.numero)+fld('complemento','Complemento',a.complemento)
     +fld('bairro','Bairro',a.bairro)+fld('cidade','Cidade',a.cidade)+fld('uf','UF',a.uf)
     +`<div class="med-fld" style="grid-column:1/-1;"><label>Mensagem</label><textarea id="d-mensagem" style="min-height:60px;">${(a.mensagem||'').replace(/</g,'&lt;')}</textarea></div>`
