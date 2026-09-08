@@ -250,20 +250,21 @@
       <span class="input-prefix">🇧🇷 +55</span>
       <input id="wa" class="input" placeholder="(38) 99863-1234" value="(38) 99863-1234">
     </div>
-    <p class="help">Você receberá o link em poucos segundos.</p>
+    <p class="help">Informe o número cadastrado na sua formatura.</p>
 
-    <button onclick="document.getElementById('sent').classList.add('show'); this.style.display='none';" class="btn">
+    <button id="btn-entrar" class="btn">
       <i data-lucide="message-circle" class="ico"></i>
-      Enviar link no WhatsApp
+      <span id="btn-label">Entrar</span>
     </button>
 
+    <div id="erro" class="sent" style="border-left-color:#B91C1C;">
+      <strong style="color:#B91C1C;">Número não encontrado</strong>
+      <p style="margin-bottom:0;">Confira com a comissão o número cadastrado na sua formatura.</p>
+    </div>
+
     <div id="sent" class="sent">
-      <strong>Enviado.</strong>
-      <p>Verifique seu WhatsApp e toque no link recebido para entrar no app da formatura.</p>
-      <a href="inicio.html">
-        Já cliquei no link
-        <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
-      </a>
+      <strong>Tudo certo!</strong>
+      <p>Entrando na área da sua formatura…</p>
     </div>
 
     <div class="divider"></div>
@@ -277,8 +278,56 @@
 <script>
   if (window.lucide) lucide.createIcons();
 </script>
-<script src="../assets/js/auth.js?v=2"></script>
-<script src="../assets/js/app.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="espaco.js"></script>
+<script>
+(function(){
+  const wa = document.getElementById('wa');
+  const btn = document.getElementById('btn-entrar');
+  const btnLabel = document.getElementById('btn-label');
+  const erro = document.getElementById('erro');
+  const sent = document.getElementById('sent');
+  const TOKEN_KEY = window.VENTUS_ALUNO_TOKEN_KEY || 'ventus_aluno_token';
+
+  async function entrar(){
+    const numero = (wa.value || '').replace(/\D/g, '');
+    erro.classList.remove('show');
+    sent.classList.remove('show');
+    if(numero.length < 8){
+      erro.querySelector('strong').textContent = 'Número inválido';
+      erro.querySelector('p').textContent = 'Digite o número completo com DDD.';
+      erro.classList.add('show');
+      return;
+    }
+    btn.disabled = true;
+    btnLabel.textContent = 'Verificando…';
+    try{
+      const r = await fetch(apiUrl('/api/meu-espaco?celular=' + encodeURIComponent(numero)));
+      const data = r.ok ? await r.json() : null;
+      if(data && data.encontrado && data.token){
+        try{ localStorage.setItem(TOKEN_KEY, data.token); }catch(e){}
+        sent.classList.add('show');
+        location.href = 'inicio.html?t=' + encodeURIComponent(data.token);
+        return;
+      }
+      // não encontrado
+      erro.querySelector('strong').textContent = 'Número não encontrado';
+      erro.querySelector('p').textContent = 'Confira com a comissão o número cadastrado na sua formatura.';
+      erro.classList.add('show');
+    }catch(e){
+      erro.querySelector('strong').textContent = 'Erro de conexão';
+      erro.querySelector('p').textContent = 'Verifique sua internet e tente novamente.';
+      erro.classList.add('show');
+    }finally{
+      btn.disabled = false;
+      btnLabel.textContent = 'Entrar';
+    }
+  }
+
+  btn.addEventListener('click', entrar);
+  wa.addEventListener('keydown', function(e){ if(e.key === 'Enter') entrar(); });
+})();
+</script>
 
 </body>
 </html>

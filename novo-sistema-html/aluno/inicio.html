@@ -11,6 +11,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="../assets/js/config.js"></script>
+<script src="espaco.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 
@@ -262,12 +263,121 @@ function mostrarEstado(titulo, texto){
   lucide.createIcons();
 }
 
-const ALUNO_ID = resolverId();
+// ---- Boot: prioriza acesso por TOKEN (link único), senão mantém o modo ?id= ----
+const TOKEN_ALUNO = (typeof getTokenAluno === 'function') ? getTokenAluno() : '';
 
-if(!ALUNO_ID){
-  mostrarEstado('Acesse pelo seu link', 'Abra a área do formando pelo link que você recebeu ou pela página de login.');
+if(TOKEN_ALUNO){
+  carregarPorToken();
 } else {
-  carregar(ALUNO_ID);
+  const ALUNO_ID = resolverId();
+  if(!ALUNO_ID){
+    mostrarEstado('Acesse pelo seu link', 'Abra a área do formando pelo link que você recebeu ou pela página de login.');
+  } else {
+    carregar(ALUNO_ID);
+  }
+}
+
+// Modo TOKEN: /api/meu-espaco/{token} -> mapeia para os mesmos ids da página.
+async function carregarPorToken(){
+  let d;
+  try{
+    d = await carregarEspaco();
+  }catch(e){ d = null; }
+
+  if(!d){
+    location.href = 'login.html';
+    return;
+  }
+
+  const aluno   = d.aluno   || {};
+  const turma   = d.turma   || {};
+  const plano   = d.plano   || {};
+  const encarte = d.encarte || {};
+  const bol     = d.boletos || {};
+  const parcelas = Array.isArray(bol.parcelas) ? bol.parcelas : [];
+
+  // ---- Header + hero ----
+  const primeiro = (aluno.nome||'').trim().split(/\s+/)[0] || 'Formando(a)';
+  $('#hdr-nome').textContent = aluno.nome || 'Formando(a)';
+  $('#hdr-avatar').textContent = iniciais(aluno.nome);
+  $('#hero-turma').textContent = turma.nome || 'Sua formatura';
+  $('#hero-sub').textContent = 'Olá, ' + primeiro + ' 👋';
+
+  // ---- Financeiro (base para quick stats e card) ----
+  const total = Number(bol.total||0);
+  const pago  = Number(bol.pago||0);
+  const restante = (bol.pendente!=null) ? Number(bol.pendente) : Math.max(0, total - pago);
+  const pct = total>0 ? Math.min(100, Math.round(pago/total*100)) : 0;
+
+  // ---- Quick stats ----
+  $('#qs-pago').textContent = brl(pago);
+  $('#qs-restante').textContent = brl(restante);
+  const qtFotos = (plano.qt_fotos!=null && plano.qt_fotos!=='') ? plano.qt_fotos : null;
+  $('#qs-fotos').textContent = qtFotos!=null ? qtFotos : '—';
+
+  const pagas = parcelas.filter(p => p.pago === true || p.pago === 1).length;
+  $('#qs-parcelas').textContent = `${pagas}/${parcelas.length} parcelas`;
+
+  // ---- Card PLANO ----
+  $('#pl-nome').textContent = plano.nome || 'Plano não definido';
+  $('#pl-valor').textContent = plano.valor ? brl(plano.valor) : '—';
+  $('#pl-tipo').textContent = plano.tipo_contrato || 'Contrato do formando';
+  $('#pl-entrega').textContent = '—';
+  $('#pl-fotos').textContent = qtFotos!=null ? (qtFotos + ' fotos') : '';
+  $('#card-plano').style.display = 'block';
+
+  // ---- Card FINANCEIRO ----
+  $('#fin-pago').textContent = brl(pago);
+  $('#fin-restante').textContent = brl(restante);
+  $('#fin-total').textContent = 'Total: ' + brl(total);
+  $('#fin-progresso').textContent = pct + '% quitado';
+  $('#fin-bar').style.width = pct + '%';
+  $('#card-financeiro').style.display = 'block';
+
+  // Propaga token para os links internos que dependem dele
+  ['#fin-link'].forEach(sel => { const el=$(sel); if(el) el.href = 'pagamento.html?t=' + encodeURIComponent(TOKEN_ALUNO); });
+
+  // Próximas parcelas em aberto
+  const abertas = parcelas
+    .filter(p => !(p.pago === true || p.pago === 1))
+    .map(p => ({ ...p, _venc: p.vencimento || null }))
+    .sort((x,y) => String(x._venc||'').localeCompare(String(y._venc||'')))
+    .slice(0,3);
+
+  if(abertas.length){
+    $('#atalho-pagamento').textContent = 'Próx. venc.: ' + (dtBR(abertas[0]._venc) || '—');
+    $('#fin-parcelas').innerHTML =
+      '<div style="border-top:1px solid var(--gray-200);margin-top:2px;padding-top:10px;">'
+      + '<div style="font-size:11px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">Próximas parcelas</div>'
+      + abertas.map(p => `<div class="flex justify-between" style="font-size:13px;padding:4px 0;">
+          <span style="color:var(--gray-600);">${dtBR(p._venc) || 'Sem data'}</span>
+          <strong style="color:var(--gray-900);">${brl(p.valor)}</strong>
+        </div>`).join('')
+      + '</div>';
+  } else {
+    $('#atalho-pagamento').textContent = parcelas.length ? 'Tudo quitado' : 'Ver parcelas';
+  }
+
+  // ---- Card ENCARTE ----
+  const dataEnc = dtBR(encarte.data_encarte);
+  if(dataEnc){
+    $('#encarte-titulo').textContent = 'Encarte preenchido';
+    $('#encarte-sub').textContent = 'Enviado em ' + dataEnc;
+    $('#encarte-icon').style.background = '#DCFCE7';
+    $('#encarte-icon').style.color = '#166534';
+    $('#encarte-icon').innerHTML = '<i data-lucide="check-circle-2"></i>';
+  } else {
+    $('#encarte-titulo').textContent = 'Preencher meu encarte';
+    $('#encarte-sub').textContent = 'Dados que vão no seu álbum';
+  }
+  $('#card-encarte').style.display = 'block';
+
+  // ---- Atalhos ----
+  $('#atalho-contrato').textContent = plano.nome ? (plano.nome + (plano.tipo_contrato ? ' · ' + plano.tipo_contrato : '')) : 'Meu plano e assinatura';
+  if(qtFotos!=null) $('#atalho-fotos').textContent = qtFotos + ' fotos do plano';
+  $('#card-atalhos').style.display = 'block';
+
+  lucide.createIcons();
 }
 
 async function carregar(id){
