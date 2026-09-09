@@ -281,8 +281,11 @@ function pedeMedidas(){
 }
 // Este CPF é da comissão? (defensivo: usa flag da API se vier)
 function cpfEhComissao(){
-  const cands = [DESC && DESC.comissao, DESC && DESC.is_comissao, DADOS && DADOS.aluno && DADOS.aluno.comissao, DADOS && DADOS.aluno && DADOS.aluno.is_comissao];
-  return cands.some(v => v === true);
+  const a = (DADOS && DADOS.aluno) || {};
+  const cands = [DESC && DESC.comissao, DESC && DESC.is_comissao, a.comissao, a.is_comissao];
+  if(cands.some(v => v === true)) return true;
+  // cargo na comissão preenchido (ex.: "Membro", "Presidente") = é da comissão
+  return !!(a.cargo_comissao && String(a.cargo_comissao).trim());
 }
 // Itens/brindes inclusos no plano (defensivo com os nomes de campo que vierem)
 function brindesDoPlano(p){
