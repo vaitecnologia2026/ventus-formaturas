@@ -70,10 +70,12 @@
   const API = '/api/cadastro/modelo-documento';
   // Placeholders REAIS que o backend (gerar_contrato) substitui por aluno.
   const PH_GROUPS = [
-    ['📌 Aluno', ['nome','cpf','email','celular','curso','ano']],
-    ['🎓 Turma & Plano', ['turma','instituicao','plano']],
-    ['💰 Financeiro', ['valor','valor_fotografia','valor_cerimonial','forma_pagamento','parcelas','qt_fotos','tipo_contrato']],
-    ['📅 Data', ['data']],
+    ['📌 Aluno', ['NM_ALUNO','CD_ALUNO','CPF','RG','DT_NASCIMENTO','FONE01','FONE02','DS_ENDERECO','NR_ENDERECO','DS_COMPLEMENTO','DS_BAIRRO','DS_CIDADE','DS_UF']],
+    ['🎓 Turma & Curso', ['NM_TURMA','NM_INSTITUICAO','NM_CURSO','DS_TP_TURNO','DT_PREVISAO_FORMATURA','NM_PLANO']],
+    ['💰 Financeiro', ['NR_CONTRATO','TP_PAGAMENTO','VL_TX_BOLETO','TT_COBRANCA','TT_DESCONTO','TT_LIQUIDO','VL_CONTRATO','VL_CONTRATO_DESC','VL_CONTRATO_LIQ','VL_PROD_SERV','VL_PROD_SERV_DESC','VL_PROD_SERV_LIQ','NR_PARCELA','VL_PARCELA','DT_PARCELA_PRIMEIRA','DT_PARCELA_ULTIMA','DT_VENCIMENTO','NM_FORMA']],
+    ['🎭 Cerimonial', ['NR_CONTRATO_CEDIMONIAL','VL_CERIMONIAL','VL_CERIMONIAL_DESC','VL_CERIMONIAL_LIQ','VL_ASSESSORIA_CERIMONIAL','LISTA_CERIMONIAL','QT_CONVIDADOS']],
+    ['📦 Eventos, brindes e itens', ['LISTA_EVENTOS','LISTA_BRINDE','LISTA_PRODUTO','LISTA_SERVICO']],
+    ['📅 Data', ['DIA_ATUAL','MES_ATUAL','ANO_ATUAL']],
   ];
 
   let ITEMS = [];
