@@ -524,6 +524,22 @@ function trocarAba(aba) {
   if (aba==='alunos') carregarAlunos();
   if (aba==='cursos') carregarCursos();
   if (aba==='historico') carregarHistorico();
+  if (aba==='planos') atualizarEventosPlano();
+}
+
+// Mantém a lista de eventos fotográficos do form de plano SEMPRE fresca — o Bruno
+// cadastra eventos na aba Eventos e volta pro plano; sem isso a lista ficava velha
+// ("Nenhum evento cadastrado") porque PLOPC só carregava uma vez.
+async function atualizarEventosPlano(){
+  try{
+    const r = await fetch(apiUrl(`/api/turma-formatura/${id}/planos-opcoes`));
+    const d = await r.json();
+    PLOPC.eventos = d.eventos || [];
+    const tc = document.getElementById('pl-tipocontrato');
+    if(tc && tc.value === 'fotos_por_evento' && typeof montarFotosEventos === 'function'){
+      montarFotosEventos(typeof fotosEventosSelecionados==='function' ? fotosEventosSelecionados() : undefined);
+    }
+  }catch(e){}
 }
 
 /* ---------------- CURSOS vinculados ---------------- */
@@ -697,7 +713,7 @@ async function salvarEvento() {
   const r = await fetch(url,{method:evEdit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const d = await r.json(); if(!r.ok){await vtAlert(d.detail||'Erro',{title:'Ops'});return;}
   AGENDA=null; // invalida cache da agenda (mudou uma data)
-  limparEv(); carregarEventos();
+  limparEv(); carregarEventos(); atualizarEventosPlano();
 }
 async function carregarEventos() {
   const r = await fetch(apiUrl(`/api/turma-formatura/${id}/eventos`)); const {itens}=await r.json();
@@ -728,7 +744,7 @@ window.editarEvento = function(e){
   setPrestSel(e.prestador_ids||[]);
   $('#ev-btn').textContent='Atualizar'; $('#ev-form-title').textContent='Editar evento'; window.scrollTo({top:0,behavior:'smooth'});
 };
-window.excluirEvento = async function(eid){ if(!await vtConfirm('Excluir este evento?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok)carregarEventos(); };
+window.excluirEvento = async function(eid){ if(!await vtConfirm('Excluir este evento?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/eventos/'+eid),{method:'DELETE'}); if(r.ok){carregarEventos(); atualizarEventosPlano();} };
 
 /* ---------------- BRINDES ---------------- */
 function montarBrForm() {
