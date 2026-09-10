@@ -9,6 +9,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Modo TV — Ventus</title>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
 <style>
   :root{
     --tv-blue:   var(--primary-500);
@@ -268,6 +269,33 @@
     .tv{ min-height:auto; }
     .kpi-num{ font-size:clamp(34px, 4.6vw, 60px); }
   }
+
+  /* ---------- ESTADO: seleção de evento ---------- */
+  .picker{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:clamp(14px, 2vh, 28px);
+    padding:clamp(30px, 5vh, 80px) 20px;
+  }
+  .picker h2{
+    font-size:clamp(24px, 3vw, 48px); font-weight:900; letter-spacing:-.03em; margin:0;
+  }
+  .picker p{ font-size:clamp(13px,1vw,18px); color:rgba(255,255,255,.55); margin:0; font-weight:500; }
+  .picker select{
+    font-family:inherit;
+    font-size:clamp(15px, 1.3vw, 20px); font-weight:700;
+    color:#F8FAFC;
+    background:var(--glass-2);
+    border:1px solid var(--stroke-2);
+    border-radius:var(--radius-lg);
+    padding:clamp(12px,1.3vw,18px) clamp(18px,1.8vw,28px);
+    min-width:min(90vw, 460px);
+    backdrop-filter:blur(14px);
+    cursor:pointer;
+  }
+  .picker select:focus{ outline:none; border-color:var(--tv-blue); }
+  .picker select option{ background:#0E1729; color:#F8FAFC; }
+  .empty-ci{ color:rgba(255,255,255,.45); font-size:clamp(13px,1vw,17px); font-weight:500; padding:clamp(18px,2vh,30px) 0; }
 </style>
 </head>
 <body>
@@ -293,27 +321,39 @@
     </div>
   </header>
 
+  <!-- ESTADO: nenhum evento selecionado -->
+  <section class="picker" id="picker" hidden>
+    <h2>Selecione um evento</h2>
+    <p>Escolha o evento para exibir o check-in ao vivo.</p>
+    <select id="picker-select">
+      <option value="">Carregando eventos…</option>
+    </select>
+  </section>
+
+  <!-- CONTEÚDO: evento selecionado -->
+  <div id="content" hidden style="display:contents">
+
   <!-- KPI STRIP -->
   <section class="kpis">
     <div class="card kpi">
-      <div class="kpi-label">Eventos hoje</div>
-      <div class="kpi-num c-blue">3</div>
-      <div class="kpi-foot">2 fotografias · 1 baile</div>
+      <div class="kpi-label">Presentes</div>
+      <div class="kpi-num c-ok" id="kpi-presentes">—</div>
+      <div class="kpi-foot" id="kpi-presentes-foot">—</div>
     </div>
     <div class="card kpi">
-      <div class="kpi-label">Check-ins ativos</div>
-      <div class="kpi-num c-ok">317</div>
-      <div class="kpi-foot">Baile T84 · 76% da capacidade</div>
+      <div class="kpi-label">Ausentes</div>
+      <div class="kpi-num c-warn" id="kpi-ausentes">—</div>
+      <div class="kpi-foot">Ainda não fizeram check-in</div>
     </div>
     <div class="card kpi">
-      <div class="kpi-label">Convidados esperados</div>
-      <div class="kpi-num">418</div>
-      <div class="kpi-foot">98 pendentes de entrada</div>
+      <div class="kpi-label">Total esperado</div>
+      <div class="kpi-num" id="kpi-total">—</div>
+      <div class="kpi-foot" id="kpi-total-foot">—</div>
     </div>
     <div class="card kpi">
-      <div class="kpi-label">Faturamento do mês</div>
-      <div class="kpi-num c-purple"><small>R$</small> 1,38<small>M</small></div>
-      <div class="kpi-foot up c-ok">+12% vs. março</div>
+      <div class="kpi-label">Comparecimento</div>
+      <div class="kpi-num c-purple" id="kpi-pct">—<small>%</small></div>
+      <div class="kpi-foot" id="kpi-pct-foot">presentes / total</div>
     </div>
   </section>
 
@@ -325,28 +365,28 @@
       <div class="hero-top">
         <div>
           <span class="eyebrow"><span class="live-dot"></span> Em andamento agora</span>
-          <div class="hero-title">Baile + After</div>
-          <div class="hero-meta">Medicina T84 · Unimontes · Espaço Ventus</div>
+          <div class="hero-title" id="hero-title">—</div>
+          <div class="hero-meta" id="hero-meta">—</div>
         </div>
         <div class="hero-time">
-          <div class="lbl">Iniciado às</div>
-          <div class="val">21:30</div>
+          <div class="lbl">Data</div>
+          <div class="val" id="hero-data">—</div>
         </div>
       </div>
 
       <div class="prog-wrap">
         <div class="prog-head">
-          <div class="big">317 <small>/ 418 entraram</small></div>
-          <div class="pct">76%</div>
+          <div class="big"><span id="prog-presentes">0</span> <small>/ <span id="prog-total">0</span> presentes</small></div>
+          <div class="pct" id="prog-pct">0%</div>
         </div>
-        <div class="prog-bar"><div class="prog-fill"></div></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
       </div>
 
       <div class="hero-stats">
-        <div class="hstat"><div class="n c-ok">317</div><div class="k">Entraram</div></div>
-        <div class="hstat"><div class="n c-warn">98</div><div class="k">Pendentes</div></div>
-        <div class="hstat"><div class="n c-danger">3</div><div class="k">Negados</div></div>
-        <div class="hstat"><div class="n">418</div><div class="k">Convidados</div></div>
+        <div class="hstat"><div class="n c-ok" id="hs-presentes">0</div><div class="k">Presentes</div></div>
+        <div class="hstat"><div class="n c-warn" id="hs-ausentes">0</div><div class="k">Ausentes</div></div>
+        <div class="hstat"><div class="n" id="hs-total">0</div><div class="k">Total</div></div>
+        <div class="hstat"><div class="n c-purple" id="hs-pct">0%</div><div class="k">Comparecimento</div></div>
       </div>
     </div>
 
@@ -356,77 +396,19 @@
         <div class="side-title">Últimos check-ins</div>
         <span class="mini-live"><span class="live-dot"></span> Tempo real</span>
       </div>
-      <div class="checkins">
-        <div class="ci">
-          <span class="ci-dot"></span>
-          <div class="ci-name"><b>Marcos Silva</b><span>convidado</span></div>
-          <div class="ci-time">há 2s</div>
-        </div>
-        <div class="ci">
-          <span class="ci-dot"></span>
-          <div class="ci-name"><b>Ana Paula Mendes</b><span>familiar</span></div>
-          <div class="ci-time">há 14s</div>
-        </div>
-        <div class="ci">
-          <span class="ci-dot"></span>
-          <div class="ci-name"><b>Luis Augusto</b><span>imprensa</span></div>
-          <div class="ci-time">há 32s</div>
-        </div>
-        <div class="ci">
-          <span class="ci-dot"></span>
-          <div class="ci-name"><b>Júlia Ribeiro</b><span>comissão</span></div>
-          <div class="ci-time">há 1m</div>
-        </div>
-        <div class="ci">
-          <span class="ci-dot"></span>
-          <div class="ci-name"><b>Roberto Almeida</b><span>familiar</span></div>
-          <div class="ci-time">há 2m</div>
-        </div>
-        <div class="ci faded">
-          <span class="ci-dot warn"></span>
-          <div class="ci-name"><b style="color:var(--tv-danger)">QR já utilizado</b><span>acesso negado</span></div>
-          <div class="ci-time">há 3m</div>
-        </div>
+      <div class="checkins" id="checkins">
+        <div class="empty-ci">Nenhum check-in ainda</div>
       </div>
     </div>
 
   </section>
 
-  <!-- FOOTER: indicadores discretos -->
-  <section class="foot">
-    <div class="fitem">
-      <div>
-        <div class="flabel">Recebido no mês</div>
-        <div class="fval c-ok">R$ 1,38M</div>
-      </div>
-      <div class="ftrend up">+12%</div>
-    </div>
-    <div class="fitem">
-      <div>
-        <div class="flabel">Vendas adicionais</div>
-        <div class="fval c-purple">R$ 28K</div>
-      </div>
-      <div class="ftrend up">+43%</div>
-    </div>
-    <div class="fitem">
-      <div>
-        <div class="flabel">Fotos vendidas</div>
-        <div class="fval c-blue">412</div>
-      </div>
-      <div class="ftrend">12,4 / aluno</div>
-    </div>
-    <div class="fitem">
-      <div>
-        <div class="flabel">Adesão em dia</div>
-        <div class="fval">87%</div>
-      </div>
-      <div class="ftrend up">+4pp</div>
-    </div>
-  </section>
+  </div>
 
 </div>
 
 <script>
+// ---------- RELÓGIO ----------
 function tick() {
   const d = new Date();
   const hh = String(d.getHours()).padStart(2, '0');
@@ -439,6 +421,147 @@ function tick() {
 }
 tick();
 setInterval(tick, 1000);
+
+// ---------- CHECK-IN AO VIVO ----------
+const params = new URLSearchParams(location.search);
+const eventoId = params.get('e');
+const $ = (id) => document.getElementById(id);
+
+// mapa turma_id -> nome (preenchido por /opcoes)
+let turmasMap = {};
+
+function fmtData(iso) {
+  if (!iso) return '—';
+  const partes = String(iso).slice(0, 10).split('-');
+  if (partes.length !== 3) return String(iso);
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function fmtHora(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function carregarOpcoes() {
+  try {
+    const r = await fetch(apiUrl('/api/checkin/opcoes'));
+    if (!r.ok) throw new Error('opcoes ' + r.status);
+    const data = await r.json();
+    (data.turmas || []).forEach(t => { turmasMap[t.id] = t.nome; });
+    return data;
+  } catch (e) {
+    console.error(e);
+    return { turmas: [], eventos: [] };
+  }
+}
+
+async function montarSeletor() {
+  const sel = $('picker-select');
+  const data = await carregarOpcoes();
+  const eventos = data.eventos || [];
+  if (!eventos.length) {
+    sel.innerHTML = '<option value="">Nenhum evento disponível</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">Selecione…</option>' + eventos.map(ev => {
+    const turma = turmasMap[ev.turma_id] ? ' · ' + turmasMap[ev.turma_id] : '';
+    return `<option value="${ev.id}">${esc(ev.nome + turma)}</option>`;
+  }).join('');
+  sel.onchange = () => {
+    if (sel.value) location.search = '?e=' + encodeURIComponent(sel.value);
+  };
+}
+
+async function carregarEvento() {
+  try {
+    const r = await fetch(apiUrl('/api/checkin/' + encodeURIComponent(eventoId)));
+    if (!r.ok) throw new Error('checkin ' + r.status);
+    const d = await r.json();
+    render(d);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function render(d) {
+  const ev = d.evento || {};
+  const total = Number(d.total) || 0;
+  const presentes = Number(d.presentes) || 0;
+  const ausentes = Number(d.ausentes) || 0;
+  const pct = total > 0 ? Math.round((presentes / total) * 100) : 0;
+  const turmaNome = turmasMap[ev.turma_id] || '';
+
+  // KPIs
+  $('kpi-presentes').textContent = presentes;
+  $('kpi-presentes-foot').textContent = total > 0 ? (pct + '% do total') : '—';
+  $('kpi-ausentes').textContent = ausentes;
+  $('kpi-total').textContent = total;
+  $('kpi-total-foot').textContent = turmaNome || (ev.nome || '—');
+  $('kpi-pct').innerHTML = pct + '<small>%</small>';
+  $('kpi-pct-foot').textContent = presentes + ' / ' + total;
+
+  // HERO
+  $('hero-title').textContent = ev.nome || '—';
+  const meta = [turmaNome, ev.local].filter(Boolean).join(' · ');
+  $('hero-meta').textContent = meta || '—';
+  $('hero-data').textContent = fmtData(ev.data);
+
+  $('prog-presentes').textContent = presentes;
+  $('prog-total').textContent = total;
+  $('prog-pct').textContent = pct + '%';
+  $('prog-fill').style.width = pct + '%';
+
+  $('hs-presentes').textContent = presentes;
+  $('hs-ausentes').textContent = ausentes;
+  $('hs-total').textContent = total;
+  $('hs-pct').textContent = pct + '%';
+
+  // Últimos check-ins: presente=true, ordenado por checkin_em desc
+  const presentesLista = (d.itens || [])
+    .filter(i => i.presente)
+    .sort((a, b) => {
+      const ta = a.checkin_em ? new Date(a.checkin_em).getTime() : 0;
+      const tb = b.checkin_em ? new Date(b.checkin_em).getTime() : 0;
+      return tb - ta;
+    })
+    .slice(0, 12);
+
+  const box = $('checkins');
+  if (!presentesLista.length) {
+    box.innerHTML = '<div class="empty-ci">Nenhum check-in ainda</div>';
+    return;
+  }
+  box.innerHTML = presentesLista.map(i => {
+    const hora = fmtHora(i.checkin_em);
+    const sub = i.curso ? esc(i.curso) : 'formando';
+    return `<div class="ci">
+      <span class="ci-dot"></span>
+      <div class="ci-name"><b>${esc(i.nome)}</b><span>${sub}</span></div>
+      <div class="ci-time">${hora || '—'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---------- BOOT ----------
+if (!eventoId) {
+  $('picker').hidden = false;
+  $('content').hidden = true;
+  $('content').style.display = 'none';
+  montarSeletor();
+} else {
+  $('picker').hidden = true;
+  $('content').hidden = false;
+  $('content').style.display = 'contents';
+  carregarOpcoes().then(carregarEvento);
+  setInterval(carregarEvento, 10000);
+}
 </script>
 
 </body>
