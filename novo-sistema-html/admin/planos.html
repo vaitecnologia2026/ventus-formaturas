@@ -9,6 +9,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Planos — Ventus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 </head>
@@ -19,136 +20,113 @@
   <header class="topbar">
     <div style="flex:1"></div>
     <div class="flex gap-2">
-      <select class="select" style="width:200px;font-size:13px;padding:6px 10px;"><option>Todas as turmas</option><option>MEDICINA T85</option><option>DIREITO UNIMONTES</option><option>ENG. FLORESTAL UFMG</option></select>
-      <button class="btn btn-secondary btn-sm"><i data-lucide="copy" class="w-4 h-4"></i> Duplicar</button>
-      <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo plano</button>
+      <select id="f-turma" class="select" style="width:220px;font-size:13px;padding:6px 10px;"><option value="">Todas as turmas</option></select>
+      <a href="turmas.html" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Novo plano (na turma)</a>
     </div>
   </header>
 
   <main class="app-content">
     <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comercial / Planos</div>
-    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Planos por turma</h1>
+    <h1 class="text-2xl font-bold mt-1 mb-2" style="color:var(--gray-900);">Planos por turma</h1>
+    <p class="text-sm mb-6" style="color:var(--gray-600);">Todos os planos cadastrados, de todas as turmas. Os planos são criados e editados dentro de cada turma — clique em <strong>Gerenciar</strong> para abrir a turma.</p>
 
     <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="package-2" class="w-5 h-5"></i></div><div class="kpi-label">Planos ativos</div><div class="kpi-value">14</div><div class="kpi-trend" style="color:var(--gray-500);">38 turmas</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="trophy" class="w-5 h-5"></i></div><div class="kpi-label">Mais vendido</div><div class="kpi-value" style="font-size:22px;line-height:1.3;">OURO<br><span style="font-size:13px;color:var(--gray-500);font-weight:500;">67% adesão</span></div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="banknote" class="w-5 h-5"></i></div><div class="kpi-label">Ticket médio</div><div class="kpi-value">R$ 2,8K</div><div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +6%</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--purple-bg);color:var(--purple-fg);"><i data-lucide="repeat" class="w-5 h-5"></i></div><div class="kpi-label">Trocas (30d)</div><div class="kpi-value">7</div><div class="kpi-trend" style="color:var(--gray-500);">5 upgrade · 2 downgrade</div></div>
-    </div>
-
-    <div class="grid gap-4 mb-6" style="grid-template-columns:repeat(3,1fr);">
-
-      <div class="card">
-        <div style="background:linear-gradient(135deg,var(--warning-fg),#B45309);color:white;padding:20px 22px;border-radius:12px 12px 0 0;">
-          <div class="flex justify-between items-start">
-            <span class="badge" style="background:rgba(255,255,255,.18);color:white;font-weight:700;">BRONZE</span>
-            <button class="btn btn-ghost btn-icon" style="color:white;"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-          </div>
-          <div style="font-size:24px;font-weight:800;margin-top:8px;">R$ 1.869</div>
-          <div style="font-size:13px;opacity:.85;">21x de R$ 89,00 sem juros</div>
-        </div>
-        <div class="card-body">
-          <ul style="list-style:none;padding:0;font-size:13px;color:var(--gray-700);">
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> 4 eventos básicos</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> 15 fotos editadas</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Link em nuvem</li>
-            <li style="padding:5px 0;color:var(--gray-400);"><i data-lucide="x" class="inline w-4 h-4"></i> Sem álbum físico</li>
-            <li style="padding:5px 0;color:var(--gray-400);"><i data-lucide="x" class="inline w-4 h-4"></i> Cota 4 convidados</li>
-          </ul>
-          <div class="divider"></div>
-          <div class="flex justify-between" style="font-size:13px;color:var(--gray-600);">
-            <span>Adesões:</span><strong style="color:var(--gray-900);">23 · 12%</strong>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="edit" class="w-3 h-3"></i> Editar</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="copy" class="w-3 h-3"></i> Duplicar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="border:2px solid var(--primary-600);position:relative;">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--primary-600);color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px;letter-spacing:.04em;">⭐ MAIS VENDIDO</div>
-        <div style="background:linear-gradient(135deg,#B45309,#D4AF37);color:white;padding:20px 22px;border-radius:12px 12px 0 0;">
-          <div class="flex justify-between items-start">
-            <span class="badge" style="background:rgba(255,255,255,.2);color:white;font-weight:700;">OURO</span>
-            <button class="btn btn-ghost btn-icon" style="color:white;"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-          </div>
-          <div style="font-size:24px;font-weight:800;margin-top:8px;">R$ 3.062,65</div>
-          <div style="font-size:13px;opacity:.85;">21x de R$ 145,82 sem juros</div>
-        </div>
-        <div class="card-body">
-          <ul style="list-style:none;padding:0;font-size:13px;color:var(--gray-700);">
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> 13 eventos completos</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> 30 fotos editadas</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Álbum "Memórias" 21x30cm</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Cota: 8 convidados</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Family Day (você + 4)</li>
-          </ul>
-          <div class="divider"></div>
-          <div class="flex justify-between" style="font-size:13px;color:var(--gray-600);">
-            <span>Adesões:</span><strong style="color:var(--success);">132 · 67%</strong>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="edit" class="w-3 h-3"></i> Editar</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="copy" class="w-3 h-3"></i> Duplicar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="background:linear-gradient(135deg,var(--purple-fg),#7C3AED);color:white;padding:20px 22px;border-radius:12px 12px 0 0;">
-          <div class="flex justify-between items-start">
-            <span class="badge" style="background:rgba(255,255,255,.18);color:white;font-weight:700;">DIAMANTE</span>
-            <button class="btn btn-ghost btn-icon" style="color:white;"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-          </div>
-          <div style="font-size:24px;font-weight:800;margin-top:8px;">R$ 4.515</div>
-          <div style="font-size:13px;opacity:.85;">21x de R$ 215,00 sem juros</div>
-        </div>
-        <div class="card-body">
-          <ul style="list-style:none;padding:0;font-size:13px;color:var(--gray-700);">
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Todos os eventos</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> 60 fotos editadas</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Álbum "Inesquecível" 30x40cm</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Cota: 12 convidados</li>
-            <li style="padding:5px 0;"><i data-lucide="check" class="inline w-4 h-4" style="color:var(--success);"></i> Acesso VIP no baile</li>
-          </ul>
-          <div class="divider"></div>
-          <div class="flex justify-between" style="font-size:13px;color:var(--gray-600);">
-            <span>Adesões:</span><strong style="color:var(--gray-900);">39 · 20%</strong>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="edit" class="w-3 h-3"></i> Editar</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;"><i data-lucide="copy" class="w-3 h-3"></i> Duplicar</button>
-          </div>
-        </div>
-      </div>
-
+      <div class="kpi"><div class="kpi-icon" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="package-2" class="w-5 h-5"></i></div><div class="kpi-label">Planos</div><div class="kpi-value" id="k-planos">—</div><div class="kpi-trend" style="color:var(--gray-500);" id="k-turmas">— turmas</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Ativos</div><div class="kpi-value" id="k-ativos">—</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="banknote" class="w-5 h-5"></i></div><div class="kpi-label">Ticket médio</div><div class="kpi-value" id="k-ticket">—</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--purple-bg);color:var(--purple-fg);"><i data-lucide="layers" class="w-5 h-5"></i></div><div class="kpi-label">Maior plano</div><div class="kpi-value" id="k-maior" style="font-size:18px;line-height:1.3;">—</div></div>
     </div>
 
     <div class="card">
       <div class="card-header">
-        <div class="card-title">Planos por turma (14)</div>
-        <div class="flex gap-2">
-          <select class="select" style="width:140px;font-size:13px;padding:6px 10px;"><option>Todos status</option><option>Ativos</option><option>Inativos</option></select>
-        </div>
+        <div class="card-title" id="tbl-title">Planos</div>
+        <input id="busca" class="input" placeholder="Buscar plano ou turma…" style="width:220px;font-size:13px;padding:6px 10px;">
       </div>
       <table class="table">
-        <thead><tr><th>Turma</th><th>Plano</th><th class="num">Valor</th><th>Parcelas</th><th class="num">Adesões</th><th>Vencimento</th><th>Status</th><th></th></tr></thead>
-        <tbody>
-          <tr><td><strong>MEDICINA T85 - UNIMONTES</strong></td><td><span class="badge" style="background:var(--warning-bg);color:var(--warning-fg);">OURO</span></td><td class="num">R$ 3.062,65</td><td>21x · sem juros</td><td class="num">17/20</td><td>dia 02</td><td><span class="badge badge-success">Ativo</span></td><td class="text-right"><button class="btn btn-ghost btn-icon"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button></td></tr>
-          <tr><td><strong>MEDICINA T84 - UNIMONTES</strong></td><td><span class="badge" style="background:var(--warning-bg);color:var(--warning-fg);">OURO</span></td><td class="num">R$ 3.396,09</td><td>21x · sem juros</td><td class="num">23/23</td><td>dia 05</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td><strong>UNIFICADA - IPATINGA</strong></td><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-fg);">DIAMANTE</span></td><td class="num">R$ 886,77</td><td>21x · sem juros</td><td class="num">100/100</td><td>dia 10</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td><strong>ENG. FLORESTAL - UFMG</strong></td><td><span class="badge" style="background:var(--warning-bg);color:var(--warning-fg);">OURO</span></td><td class="num">R$ 1.102,78</td><td>21x · sem juros</td><td class="num">72/72</td><td>dia 15</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td><strong>DIREITO - UNIMONTES</strong></td><td><span class="badge" style="background:var(--warning-bg);color:var(--warning-fg);">OURO</span></td><td class="num">R$ 1.366,81</td><td>18x · sem juros</td><td class="num">31/31</td><td>dia 12</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td><strong>ODONTOLOGIA - FUNORTE</strong></td><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-fg);">DIAMANTE</span></td><td class="num">R$ 1.718,36</td><td>21x · sem juros</td><td class="num">39/39</td><td>dia 08</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td><strong>ENFERMAGEM - FUNORTE</strong></td><td><span class="badge">BRONZE</span></td><td class="num">R$ 2.015,00</td><td>15x · sem juros</td><td class="num">16/16</td><td>dia 20</td><td><span class="badge badge-success">Ativo</span></td><td></td></tr>
-          <tr><td colspan="8" style="text-align:center;color:var(--gray-500);font-size:13px;padding:18px;">+ 7 planos ativos</td></tr>
-        </tbody>
+        <thead><tr><th>Turma</th><th>Plano</th><th class="num">Valor</th><th>Parcelas</th><th>Limite de fotos</th><th>Status</th><th></th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="7" style="text-align:center;color:var(--gray-500);padding:24px;">Carregando…</td></tr></tbody>
       </table>
     </div>
   </main>
 </div>
 <script src="../assets/js/app.js"></script>
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const TIPO = { fotos_ilimitadas:'Ilimitado', fotos_por_evento:'Por evento', fotos_por_contrato:'Por contrato' };
+  let LINHAS = [];
+
+  async function carregar(){
+    let turmas = [];
+    try {
+      const r = await fetch(apiUrl('/api/turma-formatura'));
+      const d = await r.json();
+      turmas = d.itens || [];
+    } catch(e){ $('#tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger-fg);padding:24px;">Erro ao carregar turmas.</td></tr>`; return; }
+
+    // filtro de turmas
+    const fturma = $('#f-turma');
+    fturma.innerHTML = '<option value="">Todas as turmas</option>' + turmas.map(t=>`<option value="${t.id}">${esc(t.nome)}</option>`).join('');
+
+    // busca os planos de cada turma em paralelo
+    const results = await Promise.all(turmas.map(async t => {
+      try {
+        const r = await fetch(apiUrl(`/api/turma-formatura/${t.id}/planos`));
+        const d = await r.json();
+        return (d.itens||[]).map(p => ({ ...p, turma_id: t.id, turma_nome: t.nome }));
+      } catch(e){ return []; }
+    }));
+    LINHAS = results.flat();
+    render();
+  }
+
+  function render(){
+    const fturma = $('#f-turma').value;
+    const q = ($('#busca').value||'').toLowerCase().trim();
+    let linhas = LINHAS;
+    if(fturma) linhas = linhas.filter(p => String(p.turma_id)===String(fturma));
+    if(q) linhas = linhas.filter(p => (p.nome||'').toLowerCase().includes(q) || (p.turma_nome||'').toLowerCase().includes(q));
+
+    // KPIs (sobre o conjunto filtrado)
+    const ativos = linhas.filter(p => p.ativo !== false);
+    const valores = linhas.map(p => Number(p.valor)||0).filter(v=>v>0);
+    const ticket = valores.length ? valores.reduce((a,b)=>a+b,0)/valores.length : 0;
+    const maior = linhas.reduce((m,p)=> (Number(p.valor)||0)>(Number(m&&m.valor)||0)?p:m, null);
+    const turmasUnicas = new Set(linhas.map(p=>p.turma_id)).size;
+    $('#k-planos').textContent = linhas.length;
+    $('#k-turmas').textContent = turmasUnicas + ' turma' + (turmasUnicas===1?'':'s');
+    $('#k-ativos').textContent = ativos.length;
+    $('#k-ticket').textContent = ticket ? brl(ticket) : '—';
+    $('#k-maior').textContent = maior ? esc(maior.nome) : '—';
+    $('#tbl-title').textContent = `Planos (${linhas.length})`;
+
+    if(!linhas.length){
+      $('#tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--gray-500);padding:24px;">Nenhum plano ${fturma||q?'com esse filtro':'cadastrado'}. Crie um dentro da turma (aba Planos).</td></tr>`;
+      return;
+    }
+    $('#tbody').innerHTML = linhas.map(p=>{
+      const limite = p.tipo_contrato==='fotos_ilimitadas' ? 'Ilimitado'
+        : (p.qt_fotos ? `${p.qt_fotos} fotos${p.tipo_contrato?` · ${TIPO[p.tipo_contrato]||''}`:''}` : (TIPO[p.tipo_contrato]||'—'));
+      return `<tr>
+        <td><a href="turma-detalhe.html?id=${p.turma_id}" style="color:var(--primary-700);font-weight:600;text-decoration:none;">${esc(p.turma_nome)}</a></td>
+        <td><strong>${esc(p.nome)}</strong></td>
+        <td class="num">${brl(p.valor)}</td>
+        <td>${p.max_parcelas||1}x</td>
+        <td>${esc(limite)}</td>
+        <td><span class="badge ${p.ativo===false?'badge-neutral':'badge-success'}">${p.ativo===false?'Inativo':'Ativo'}</span></td>
+        <td class="text-right"><a href="turma-detalhe.html?id=${p.turma_id}" class="btn btn-secondary btn-sm"><i data-lucide="settings-2" class="w-4 h-4"></i> Gerenciar</a></td>
+      </tr>`;
+    }).join('');
+    if(window.lucide) lucide.createIcons();
+  }
+
+  $('#f-turma').addEventListener('change', render);
+  $('#busca').addEventListener('input', render);
+  carregar();
+})();
+</script>
 
 </body>
 </html>
