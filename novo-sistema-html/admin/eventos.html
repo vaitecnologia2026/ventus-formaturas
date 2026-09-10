@@ -11,45 +11,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
-<style>
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
-.cal-day-head { background:var(--gray-50); padding:10px; text-align:center; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-500); }
-.cal-cell { background:var(--surface); min-height:108px; padding:8px; position:relative; transition:background .15s; cursor:pointer; }
-.cal-cell:hover { background:var(--gray-50); }
-.cal-cell.other { background:var(--gray-50); color:var(--gray-400); }
-.cal-cell.other .cal-num { color:var(--gray-400); }
-.cal-cell.today { background:var(--primary-50); }
-.cal-num { font-size:13px; font-weight:600; color:var(--gray-900); }
-.cal-today-mark { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--primary-600); color:#fff; font-size:12px; font-weight:700; }
-.cal-evt { display:block; font-size:11px; padding:3px 6px; border-radius:4px; margin-top:4px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
-.cal-evt.cer { background:var(--primary-50); color:var(--primary-800); }
-.cal-evt.fes { background:var(--purple-bg); color:var(--purple-fg); }
-.cal-evt.fot { background:var(--warning-bg); color:var(--warning-fg); }
-.cal-evt.ens { background:var(--success-bg); color:var(--success-fg); }
-.cal-legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; }
-/* Views */
-.cal-view { display:none; }
-.cal-view.active { display:block; }
-/* Lista / Semana */
-.cal-list { display:flex; flex-direction:column; gap:2px; }
-.cal-list-day { padding:12px 4px 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-500); border-bottom:1px solid var(--gray-200); }
-.cal-list-item { display:flex; align-items:center; gap:12px; padding:11px 8px; border-radius:8px; cursor:pointer; transition:background .15s; }
-.cal-list-item:hover { background:var(--gray-50); }
-.cal-list-chip { width:12px; height:12px; border-radius:4px; flex:none; }
-.cal-list-chip.cer { background:var(--primary-800); }
-.cal-list-chip.fes { background:var(--purple-fg); }
-.cal-list-chip.fot { background:var(--warning-fg); }
-.cal-list-chip.ens { background:var(--success-fg); }
-.cal-list-txt { flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--gray-900); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.cal-list-empty { padding:40px 8px; text-align:center; color:var(--gray-400); font-size:14px; }
-.cal-week { display:flex; flex-direction:column; gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
-.cal-week-row { display:flex; gap:12px; background:var(--surface); padding:12px 14px; align-items:flex-start; min-height:56px; }
-.cal-week-row.today { background:var(--primary-50); }
-.cal-week-date { width:112px; flex:none; font-size:13px; font-weight:700; color:var(--gray-900); text-transform:capitalize; }
-.cal-week-date small { display:block; font-size:11px; font-weight:500; color:var(--gray-500); text-transform:none; }
-.cal-week-evts { flex:1; display:flex; flex-direction:column; gap:5px; min-width:0; }
-.cal-week-empty { color:var(--gray-400); font-size:12px; padding-top:2px; }
-</style>
+<script src="../assets/js/config.js"></script>
 </head>
 <body>
 <aside id="admin-sidebar" class="sidebar"></aside>
@@ -57,72 +19,21 @@
 <div class="app-shell">
   <header class="topbar">
     <div style="flex:1"></div>
-    <div class="flex gap-2 items-center">
-      <button class="btn btn-secondary btn-sm" id="cal-btn-sync"><i data-lucide="calendar-sync" class="w-4 h-4"></i> Sincronizar Google Agenda</button>
-      <button class="btn btn-secondary btn-sm" id="cal-btn-ics"><i data-lucide="download" class="w-4 h-4"></i> Exportar ICS</button>
-      <button class="btn btn-primary btn-sm" id="cal-btn-new"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
-    </div>
+    <button class="btn btn-primary btn-sm" id="btnNovoEvento"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
   </header>
 
   <main class="app-content">
     <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Eventos</div>
     <div class="flex justify-between items-center mt-1 mb-6">
-      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Calendário de eventos</h1>
-      <div class="flex gap-2" id="cal-view-toggle">
-        <button class="btn btn-secondary btn-sm" data-view="month">Mês</button>
-        <button class="btn btn-secondary btn-sm" data-view="week">Semana</button>
-        <button class="btn btn-secondary btn-sm" data-view="list">Lista</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:var(--primary-50);color:var(--primary-700);"><i data-lucide="calendar" class="w-5 h-5"></i></div><div class="kpi-label">Eventos no mês</div><div class="kpi-value">17</div><div class="kpi-trend" style="color:var(--gray-500);">+ 5 vs abr</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="check-circle" class="w-5 h-5"></i></div><div class="kpi-label">Confirmados</div><div class="kpi-value">12</div><div class="kpi-trend up">71%</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="clock" class="w-5 h-5"></i></div><div class="kpi-label">Hoje</div><div class="kpi-value">3</div><div class="kpi-trend" style="color:var(--gray-500);">2 fotografias · 1 baile</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div><div class="kpi-label">Conflitos detectados</div><div class="kpi-value">1</div><div class="kpi-trend down">15/07 · 2 turmas</div></div>
-    </div>
-
-    <div class="card mb-6">
-      <div class="card-header">
-        <div class="flex items-center gap-3">
-          <button class="btn btn-ghost btn-icon" id="cal-prev" aria-label="Mês anterior"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-          <h2 id="cal-label" style="font-size:18px;font-weight:700;min-width:150px;text-align:center;">—</h2>
-          <button class="btn btn-ghost btn-icon" id="cal-next" aria-label="Próximo mês"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
-          <button class="btn btn-secondary btn-sm" id="cal-today" style="margin-left:8px;">Hoje</button>
-        </div>
-        <div class="flex gap-2 items-center" style="font-size:12px;color:var(--gray-600);">
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--primary-800);"></span> Cerimônia</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--purple-fg);"></span> Festa</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--warning-fg);"></span> Fotografia</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cal-legend-dot" style="background:var(--success-fg);"></span> Ensaio</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div id="cal-month" class="cal-view active">
-          <div class="cal-grid" id="cal-grid"></div>
-        </div>
-        <div id="cal-week" class="cal-view">
-          <div class="cal-week" id="cal-week-body"></div>
-        </div>
-        <div id="cal-list" class="cal-view">
-          <div class="cal-list" id="cal-list-body"></div>
-        </div>
-      </div>
+      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Tipos de evento</h1>
+      <button class="btn btn-secondary btn-sm" id="btnRecarregar"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Recarregar</button>
     </div>
 
     <div class="card">
-      <div class="card-header"><div class="card-title">Próximos eventos detalhados</div><a href="#" class="text-sm" style="color:var(--primary-600);text-decoration:none;font-weight:600;">Ver todos →</a></div>
+      <div class="card-header"><div class="card-title" id="listTitle">Eventos cadastrados</div></div>
       <table class="table">
-        <thead><tr><th>Data</th><th>Evento</th><th>Turma</th><th>Local</th><th>Convidados</th><th>Status</th><th></th></tr></thead>
-        <tbody>
-          <tr><td><strong>03/05</strong> 21h</td><td>BAILE + AFTER (40 fotos)</td><td>MEDICINA T84 - UNIMONTES</td><td>Espaço Ventus</td><td>89/160</td><td><span class="badge badge-success">Confirmado</span></td><td class="text-right"><button class="btn btn-ghost btn-icon"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button></td></tr>
-          <tr><td><strong>05/05</strong> 14h</td><td>FOTO CONVITE INTERNO</td><td>ODONTOLOGIA - FUNORTE</td><td>Estúdio Ventus</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
-          <tr><td><strong>09/05</strong> 19h</td><td>CULTO ECUMÊNICO (20 fotos)</td><td>ENFERMAGEM - FUNORTE</td><td>Igreja Matriz</td><td>—</td><td><span class="badge badge-warning">Aguardando</span></td><td></td></tr>
-          <tr><td><strong>10/05</strong> 14h</td><td>FAMILY DAY (você + 4)</td><td>DIREITO - UNIMONTES</td><td>Salão Ipiranga</td><td>62/124</td><td><span class="badge badge-success">Confirmado</span></td><td></td></tr>
-          <tr><td><strong>15/05</strong> 19h</td><td>COLAÇÃO OFICIAL</td><td>MEDICINA VETERINÁRIA - IFNMG</td><td>Auditório UNIMONTES</td><td>180/240</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
-          <tr><td><strong>15/05</strong> 22h</td><td>COLAÇÃO SIMBÓLICA</td><td>MEDICINA VETERINÁRIA - IFNMG</td><td>Auditório UNIMONTES</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
-          <tr><td><strong>22/05</strong> 19h</td><td>CULTO</td><td>ENFERMAGEM UNIMONTES</td><td>Igreja Bom Pastor</td><td>—</td><td><span class="badge badge-info">Planejado</span></td><td></td></tr>
-        </tbody>
+        <thead id="evThead"></thead>
+        <tbody id="evTbody"></tbody>
       </table>
     </div>
   </main>
@@ -133,224 +44,264 @@
 (function () {
   'use strict';
 
-  const EVENTOS = {
-    '2026-04-27':[{tipo:'fot',txt:'FOTO CONVITE · Med T85'}],
-    '2026-04-30':[{tipo:'fot',txt:'14h Foto Convite Externo'},{tipo:'cer',txt:'19h Ensaio Beca'},{tipo:'fes',txt:'21h Festa 365 dias · DIR'}],
-    '2026-05-03':[{tipo:'fes',txt:'21h BAILE+AFTER · Med T84'}],
-    '2026-05-05':[{tipo:'fot',txt:'FOTO CONVITE · ODONTO FUN'}],
-    '2026-05-09':[{tipo:'cer',txt:'CULTO ECUMÊNICO · Enf FUN'}],
-    '2026-05-10':[{tipo:'fes',txt:'FAMILY DAY · DIREITO UNI'}],
-    '2026-05-12':[{tipo:'ens',txt:'ENSAIO IND · Letras'}],
-    '2026-05-15':[{tipo:'cer',txt:'COLAÇÃO OFICIAL · Med Vet IFNMG'}],
-    '2026-05-16':[{tipo:'cer',txt:'COLAÇÃO SIMBÓLICA · Med Vet IFNMG'}],
-    '2026-05-19':[{tipo:'fes',txt:'100 DIAS · Direito FUN'}],
-    '2026-05-22':[{tipo:'cer',txt:'CULTO · Enf UNIMONTES'}],
-    '2026-05-26':[{tipo:'fot',txt:'POSICIONAMENTO · Eng UFMG'}],
-    '2026-05-29':[{tipo:'fes',txt:'FESTA EXTRA · Odontologia'}],
-  };
+  var SLUG = 'evento';
+  var CAMPOS = [], LABEL = 'Evento', PLURAL = 'Eventos';
 
-  const TIPO_LABEL = { cer:'Cerimônia', fes:'Festa', fot:'Fotografia', ens:'Ensaio' };
-  const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const DIAS_SEM = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-
-  const today = new Date();
-  const todayISO = iso(today.getFullYear(), today.getMonth(), today.getDate());
-
-  // Mês de referência: começa em Maio 2026 (onde há eventos)
-  let refYear = 2026, refMonth = 4; // 4 = Maio (0-based)
-  let view = 'month';
-
-  const $ = (id) => document.getElementById(id);
-
-  function pad(n) { return String(n).padStart(2, '0'); }
-  function iso(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
-  function eventsFor(isoDate) { return EVENTOS[isoDate] || []; }
-
+  function notify(msg) {
+    if (typeof showToast === 'function') showToast(msg);
+    else if (window.vtAlert) window.vtAlert(msg);
+  }
+  function alerta(msg, titulo) {
+    if (window.vtAlert) return window.vtAlert(msg, { title: titulo });
+    window.alert(msg);
+  }
   function esc(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-  }
-
-  function refreshIcons() {
-    if (window.lucide) { try { lucide.createIcons(); } catch (e) {} }
-  }
-
-  function openEvent(ev, isoDate) {
-    const [y, m, d] = isoDate.split('-');
-    const dataFmt = d + '/' + m + '/' + y;
-    const alertFn = window.vtAlert || ((msg) => window.alert(msg));
-    alertFn('Evento: ' + ev.txt + ' — ' + dataFmt, { title: TIPO_LABEL[ev.tipo] || 'Evento' });
-  }
-
-  /* ---------- Visão Mês ---------- */
-  function renderMonth() {
-    const grid = $('cal-grid');
-    let html = '';
-    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
-      html += '<div class="cal-day-head">' + d + '</div>';
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
+  }
+  function refreshIcons() { if (window.lucide) { try { lucide.createIcons(); } catch (e) {} } }
 
-    const first = new Date(refYear, refMonth, 1);
-    const startOffset = first.getDay(); // 0 = Domingo
-    const start = new Date(refYear, refMonth, 1 - startOffset);
-    const showTodayMark = (refYear === today.getFullYear() && refMonth === today.getMonth());
+  // Colunas visíveis na tabela (esconde textarea/imagem, que ficam feios em coluna)
+  function colunas() { return CAMPOS.filter(function (c) { return c.tipo !== 'textarea' && c.tipo !== 'imagem'; }); }
 
-    for (let i = 0; i < 42; i++) {
-      const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      const cy = cur.getFullYear(), cm = cur.getMonth(), cd = cur.getDate();
-      const cIso = iso(cy, cm, cd);
-      const other = (cm !== refMonth);
-      const isToday = (cIso === todayISO);
-      const evts = eventsFor(cIso);
-
-      let cls = 'cal-cell';
-      if (other) cls += ' other';
-      if (isToday) cls += ' today';
-
-      let numHtml;
-      if (isToday && showTodayMark && !other) {
-        numHtml = '<div class="cal-today-mark">' + cd + '</div>';
-      } else {
-        numHtml = '<div class="cal-num">' + cd + '</div>';
-      }
-
-      let evHtml = '';
-      evts.forEach((ev, idx) => {
-        evHtml += '<span class="cal-evt ' + ev.tipo + '" data-iso="' + cIso + '" data-idx="' + idx + '" title="' + esc(ev.txt) + '">' + esc(ev.txt) + '</span>';
-      });
-
-      html += '<div class="' + cls + '" data-iso="' + cIso + '">' + numHtml + evHtml + '</div>';
+  function celula(campo, valor) {
+    if (campo.tipo === 'bool') {
+      return valor
+        ? '<span class="badge badge-success">Sim</span>'
+        : '<span class="badge">Não</span>';
     }
-    grid.innerHTML = html;
+    if (campo.tipo === 'select') {
+      var op = (campo.opcoes || []).filter(function (o) { return String(o[0]) === String(valor); })[0];
+      return esc(op ? op[1] : (valor == null ? '' : valor));
+    }
+    return esc(valor == null ? '' : valor);
   }
 
-  /* ---------- Visão Lista (mês visível) ---------- */
-  function renderList() {
-    const body = $('cal-list-body');
-    const days = Object.keys(EVENTOS)
-      .filter(k => { const [y, m] = k.split('-').map(Number); return y === refYear && (m - 1) === refMonth; })
-      .sort();
+  // ---- Descobre o schema real ----
+  async function carregarSchema() {
+    var r = await fetch(apiUrl('/api/cadastro/' + SLUG + '/schema'));
+    if (!r.ok) throw new Error('Schema não encontrado.');
+    var schema = await r.json();
+    CAMPOS = schema.campos || [];
+    LABEL = schema.label || 'Evento';
+    PLURAL = schema.plural || 'Eventos';
+    document.getElementById('listTitle').textContent = PLURAL + ' cadastrados';
+  }
 
-    if (!days.length) {
-      body.innerHTML = '<div class="cal-list-empty">Nenhum evento em ' + MESES[refMonth] + ' de ' + refYear + '.</div>';
+  // ---- Carrega e lista os eventos reais ----
+  async function carregar() {
+    var thead = document.getElementById('evThead');
+    var tbody = document.getElementById('evTbody');
+    var cols = colunas();
+    thead.innerHTML = '<tr>' + cols.map(function (c) { return '<th>' + esc(c.label) + '</th>'; }).join('') + '<th style="text-align:right;">Ações</th></tr>';
+    tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:var(--gray-500);padding:18px;">Carregando…</td></tr>';
+
+    var itens;
+    try {
+      var r = await fetch(apiUrl('/api/cadastro/' + SLUG));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var d = await r.json();
+      itens = d.itens || [];
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:#DC2626;padding:18px;">Não foi possível carregar os eventos.</td></tr>';
       return;
     }
 
-    let html = '';
-    days.forEach(isoDate => {
-      const [y, m, d] = isoDate.split('-');
-      const dt = new Date(Number(y), Number(m) - 1, Number(d));
-      html += '<div class="cal-list-day">' + d + '/' + m + ' · ' + DIAS_SEM[dt.getDay()] + '</div>';
-      eventsFor(isoDate).forEach((ev, idx) => {
-        html += '<div class="cal-list-item" data-iso="' + isoDate + '" data-idx="' + idx + '">' +
-          '<span class="cal-list-chip ' + ev.tipo + '"></span>' +
-          '<span class="cal-list-txt">' + esc(ev.txt) + '</span>' +
-          '<span class="badge badge-info">' + (TIPO_LABEL[ev.tipo] || '') + '</span>' +
-        '</div>';
-      });
-    });
-    body.innerHTML = html;
-  }
-
-  /* ---------- Visão Semana (1ª semana do mês visível, ou semana atual se hoje ∈ mês) ---------- */
-  function renderWeek() {
-    const body = $('cal-week-body');
-    // Se o mês visível é o mês real de hoje, mostra a semana de hoje; senão, a 1ª semana do mês.
-    let anchor;
-    if (refYear === today.getFullYear() && refMonth === today.getMonth()) {
-      anchor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    } else {
-      anchor = new Date(refYear, refMonth, 1);
+    if (!itens.length) {
+      tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:var(--gray-400);padding:36px 18px;">Nenhum evento cadastrado.</td></tr>';
+      return;
     }
-    const start = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - anchor.getDay());
 
-    let html = '';
-    for (let i = 0; i < 7; i++) {
-      const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      const cIso = iso(cur.getFullYear(), cur.getMonth(), cur.getDate());
-      const isToday = (cIso === todayISO);
-      const evts = eventsFor(cIso);
-
-      let evtsHtml = '';
-      if (evts.length) {
-        evts.forEach((ev, idx) => {
-          evtsHtml += '<span class="cal-evt ' + ev.tipo + '" style="white-space:normal;" data-iso="' + cIso + '" data-idx="' + idx + '">' + esc(ev.txt) + '</span>';
-        });
-      } else {
-        evtsHtml = '<span class="cal-week-empty">Sem eventos</span>';
-      }
-
-      html += '<div class="cal-week-row' + (isToday ? ' today' : '') + '">' +
-        '<div class="cal-week-date">' + DIAS_SEM[cur.getDay()] +
-          '<small>' + pad(cur.getDate()) + '/' + pad(cur.getMonth() + 1) + '</small></div>' +
-        '<div class="cal-week-evts">' + evtsHtml + '</div>' +
-      '</div>';
-    }
-    body.innerHTML = html;
-  }
-
-  /* ---------- Orquestração ---------- */
-  function render() {
-    $('cal-label').textContent = MESES[refMonth] + ' · ' + refYear;
-
-    if (view === 'month') renderMonth();
-    else if (view === 'list') renderList();
-    else if (view === 'week') renderWeek();
-
-    document.querySelectorAll('.cal-view').forEach(v => v.classList.remove('active'));
-    $('cal-' + view).classList.add('active');
-
-    // Botões de view ativos
-    document.querySelectorAll('#cal-view-toggle [data-view]').forEach(b => {
-      const on = (b.dataset.view === view);
-      b.style.background = on ? 'var(--primary-50)' : '';
-      b.style.color = on ? 'var(--primary-700)' : '';
-      b.style.borderColor = on ? 'var(--primary-200)' : '';
-    });
-
+    tbody.innerHTML = itens.map(function (it) {
+      var tds = cols.map(function (c, idx) {
+        return '<td' + (idx === 0 ? ' style="font-weight:600;color:var(--gray-900);"' : '') + '>' + celula(c, it[c.nome]) + '</td>';
+      }).join('');
+      return '<tr>' + tds +
+        '<td class="text-right"><div class="row-actions" style="display:flex;gap:6px;justify-content:flex-end;">' +
+          '<button class="icon-btn" title="Editar" data-edit="' + it.id + '"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>' +
+          '<button class="icon-btn danger" title="Excluir" data-del="' + it.id + '"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>' +
+        '</div></td></tr>';
+    }).join('');
     refreshIcons();
+
+    tbody.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var item = itens.filter(function (x) { return String(x.id) === b.dataset.edit; })[0];
+        if (item) abrirForm(item);
+      });
+    });
+    tbody.querySelectorAll('[data-del]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var item = itens.filter(function (x) { return String(x.id) === b.dataset.del; })[0];
+        if (item) excluir(item);
+      });
+    });
   }
 
-  function shiftMonth(delta) {
-    refMonth += delta;
-    while (refMonth < 0) { refMonth += 12; refYear--; }
-    while (refMonth > 11) { refMonth -= 12; refYear++; }
-    render();
-  }
-
-  /* ---------- Eventos de UI ---------- */
-  $('cal-prev').addEventListener('click', () => shiftMonth(-1));
-  $('cal-next').addEventListener('click', () => shiftMonth(1));
-  $('cal-today').addEventListener('click', () => {
-    refYear = today.getFullYear();
-    refMonth = today.getMonth();
-    render();
-  });
-
-  document.querySelectorAll('#cal-view-toggle [data-view]').forEach(b => {
-    b.addEventListener('click', () => { view = b.dataset.view; render(); });
-  });
-
-  // Delegação de clique: chip de evento / linha de lista / semana
-  document.querySelector('.card-body').addEventListener('click', (e) => {
-    const item = e.target.closest('[data-iso][data-idx]');
-    if (item) {
-      const isoDate = item.dataset.iso;
-      const idx = Number(item.dataset.idx);
-      const ev = eventsFor(isoDate)[idx];
-      if (ev) openEvent(ev, isoDate);
-      return;
+  // ---- Renderiza um controle a partir do tipo do campo ----
+  function controleHtml(c) {
+    var id = 'f-' + c.nome;
+    if (c.tipo === 'text') return '<input class="input" type="text" id="' + id + '">';
+    if (c.tipo === 'number') return '<input class="input" type="number" step="0.01" id="' + id + '">';
+    if (c.tipo === 'int') return '<input class="input" type="number" step="1" id="' + id + '">';
+    if (c.tipo === 'textarea') return '<textarea class="textarea" rows="3" id="' + id + '"></textarea>';
+    if (c.tipo === 'select') {
+      return '<select class="select" id="' + id + '">' +
+        (c.opcoes || []).map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') +
+        '</select>';
     }
-    // Célula vazia do mês → nada de erro (silencioso)
-  });
+    if (c.tipo === 'bool') {
+      return '<label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">' +
+          '<input type="checkbox" id="' + id + '" style="width:0;height:0;position:absolute;opacity:0;">' +
+          '<span data-track="' + id + '" style="width:42px;height:24px;border-radius:999px;background:var(--gray-300);position:relative;transition:background .15s;flex:none;">' +
+            '<span data-knob="' + id + '" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);"></span>' +
+          '</span>' +
+        '</label>';
+    }
+    if (c.tipo === 'imagem') return '<input class="input" type="url" id="' + id + '" placeholder="URL da imagem">';
+    // fallback
+    return '<input class="input" type="text" id="' + id + '">';
+  }
 
-  // Botões mortos → feedback
-  const alertFn = (m, t) => (window.vtAlert ? window.vtAlert(m, { title: t }) : window.alert(m));
-  const bSync = $('cal-btn-sync'), bIcs = $('cal-btn-ics'), bNew = $('cal-btn-new');
-  if (bNew)  bNew.addEventListener('click',  () => alertFn('Cadastro de evento em construção.', 'Novo evento (protótipo)'));
-  if (bSync) bSync.addEventListener('click', () => alertFn('Sincronização com o Google Agenda em construção.', 'Sincronizar (protótipo)'));
-  if (bIcs)  bIcs.addEventListener('click',  () => alertFn('Exportação de agenda (.ics) em construção.', 'Exportar ICS (protótipo)'));
+  function bindToggle(body, id) {
+    var chk = body.querySelector('#' + id);
+    var track = body.querySelector('[data-track="' + id + '"]');
+    var knob = body.querySelector('[data-knob="' + id + '"]');
+    if (!chk || !track || !knob) return;
+    function paint() {
+      track.style.background = chk.checked ? 'var(--primary-500)' : 'var(--gray-300)';
+      knob.style.left = chk.checked ? '20px' : '2px';
+    }
+    chk.addEventListener('change', paint);
+    paint();
+  }
 
-  render();
+  // ---- Form dinâmico (novo/editar) ----
+  function abrirForm(item) {
+    var editando = !!(item && item.id != null);
+    var body = document.createElement('form');
+    body.setAttribute('novalidate', '');
+
+    var camposHtml = CAMPOS.map(function (c) {
+      var req = c.obrigatorio ? ' <span style="color:#DC2626;">*</span>' : '';
+      // bool: label ao lado do switch
+      if (c.tipo === 'bool') {
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+            '<span style="font-size:14px;font-weight:600;color:var(--gray-700);">' + esc(c.label) + '</span>' +
+            controleHtml(c) +
+          '</div>';
+      }
+      return '<div>' +
+          '<label class="label" for="f-' + c.nome + '">' + esc(c.label) + req + '</label>' +
+          controleHtml(c) +
+        '</div>';
+    }).join('');
+
+    body.innerHTML = '<div style="display:flex;flex-direction:column;gap:14px;">' +
+        camposHtml +
+        '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">' +
+          '<button type="button" class="btn btn-secondary" data-cancel>Cancelar</button>' +
+          '<button type="submit" class="btn btn-primary" data-handled="1"><span data-savetxt>Salvar</span></button>' +
+        '</div>' +
+      '</div>';
+
+    var modal = window.vtModal({ title: editando ? 'Editar ' + LABEL.toLowerCase() : 'Novo ' + LABEL.toLowerCase(), bodyHTML: body });
+
+    // Preenche defaults / valores e liga toggles
+    CAMPOS.forEach(function (c) {
+      var el = body.querySelector('#f-' + c.nome);
+      if (!el) return;
+      var val = editando ? item[c.nome] : c.default;
+      if (c.tipo === 'bool') {
+        el.checked = editando ? !!item[c.nome] : (c.default !== undefined ? !!c.default : false);
+        bindToggle(body, 'f-' + c.nome);
+      } else {
+        el.value = (val === undefined || val === null) ? '' : val;
+      }
+    });
+
+    body.querySelector('[data-cancel]').addEventListener('click', modal.close);
+
+    body.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var payload = {};
+      var faltando = null;
+      CAMPOS.forEach(function (c) {
+        var el = body.querySelector('#f-' + c.nome);
+        if (!el) return;
+        var v;
+        if (c.tipo === 'bool') v = el.checked;
+        else v = (el.value || '').trim();
+        if (c.obrigatorio && (v === '' || v === null || v === undefined) && !faltando) faltando = c;
+        payload[c.nome] = v;
+      });
+      if (faltando) {
+        alerta('Preencha o campo "' + faltando.label + '".', 'Campo obrigatório');
+        var f = body.querySelector('#f-' + faltando.nome);
+        if (f) f.focus();
+        return;
+      }
+
+      var btn = body.querySelector('[data-savetxt]');
+      var orig = btn.textContent;
+      btn.textContent = 'Salvando…';
+      var url = editando ? apiUrl('/api/cadastro/' + SLUG + '/' + item.id) : apiUrl('/api/cadastro/' + SLUG);
+      try {
+        var r = await fetch(url, {
+          method: editando ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        var d = await r.json().catch(function () { return {}; });
+        if (!r.ok) throw new Error(d.detail || 'Erro ao salvar.');
+        modal.close();
+        notify(editando ? LABEL + ' atualizado.' : LABEL + ' criado.');
+        carregar();
+      } catch (err) {
+        btn.textContent = orig;
+        alerta(err.message || 'Erro ao salvar.', 'Erro');
+      }
+    });
+
+    setTimeout(function () {
+      var first = body.querySelector('input, select, textarea');
+      if (first) first.focus();
+    }, 80);
+  }
+
+  async function excluir(item) {
+    var nome = item.nome || ('#' + item.id);
+    var ok = window.vtConfirm
+      ? await window.vtConfirm('Excluir "' + nome + '"? Esta ação não pode ser desfeita.', { title: 'Excluir ' + LABEL.toLowerCase(), okText: 'Excluir', danger: true })
+      : window.confirm('Excluir "' + nome + '"?');
+    if (!ok) return;
+    try {
+      var r = await fetch(apiUrl('/api/cadastro/' + SLUG + '/' + item.id), { method: 'DELETE' });
+      if (!r.ok) {
+        var d = await r.json().catch(function () { return {}; });
+        throw new Error(d.detail || 'Erro ao excluir.');
+      }
+      notify(LABEL + ' excluído.');
+      carregar();
+    } catch (err) {
+      alerta(err.message || 'Erro ao excluir.', 'Erro');
+    }
+  }
+
+  // ---- Init ----
+  (async function init() {
+    var btnNovo = document.getElementById('btnNovoEvento');
+    var btnReload = document.getElementById('btnRecarregar');
+    try {
+      await carregarSchema();
+    } catch (e) {
+      document.getElementById('evTbody').innerHTML = '<tr><td style="text-align:center;color:#DC2626;padding:18px;">Não foi possível carregar o formulário de eventos.</td></tr>';
+    }
+    if (btnNovo) btnNovo.addEventListener('click', function () { abrirForm(null); });
+    if (btnReload) btnReload.addEventListener('click', carregar);
+    await carregar();
+  })();
 })();
 </script>
 

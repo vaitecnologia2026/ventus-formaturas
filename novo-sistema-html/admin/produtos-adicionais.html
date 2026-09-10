@@ -6,11 +6,12 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0A2540">
 
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Produtos Adicionais — Ventus</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Produtos e Serviços — Ventus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/config.js"></script>
 </head>
 <body>
 <aside id="admin-sidebar" class="sidebar"></aside>
@@ -22,120 +23,17 @@
   </header>
 
   <main class="app-content">
-    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comercial / Produtos Adicionais</div>
-    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Produtos adicionais</h1>
-
-    <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="kpi"><div class="kpi-icon" style="background:#FCE7F3;color:#9D174D;"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div><div class="kpi-label">Vendas no mês</div><div class="kpi-value">R$ 28K</div><div class="kpi-trend up"><i data-lucide="trending-up" class="w-3 h-3"></i> +43%</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--warning-bg);color:var(--warning-fg);"><i data-lucide="package" class="w-5 h-5"></i></div><div class="kpi-label">Pedidos</div><div class="kpi-value">142</div><div class="kpi-trend" style="color:var(--gray-500);">3,2 itens/pedido</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--success-bg);color:var(--success-fg);"><i data-lucide="users" class="w-5 h-5"></i></div><div class="kpi-label">Alunos compradores</div><div class="kpi-value">87</div><div class="kpi-trend up">35% conversão</div></div>
-      <div class="kpi"><div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-fg);"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div><div class="kpi-label">Carrinhos abertos</div><div class="kpi-value">23</div><div class="kpi-trend" style="color:var(--gray-500);">R$ 9,4K em valor</div></div>
-    </div>
-
-    <div class="grid gap-6 mb-6" style="grid-template-columns:2fr 1fr;">
-
-      <div class="card">
-        <div class="card-header"><div class="card-title">Catálogo (12 itens)</div><button class="btn btn-secondary btn-sm"><i data-lucide="filter" class="w-4 h-4"></i> Filtrar</button></div>
-        <div class="card-body">
-          <div class="grid gap-4" style="grid-template-columns:repeat(2,1fr);">
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#1E3A8A,#7C3AED);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="book" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Álbum "Memórias" 30x30</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">40 páginas · couché 720gr</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 280</strong>
-                  <span class="badge badge-info">142 vend.</span>
-                </div>
-              </div>
-            </div>
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#EC4899,#7C3AED);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="image-plus" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Foto extra editada</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">unidade · alta resolução</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 25</strong>
-                  <span class="badge badge-info">412 vend.</span>
-                </div>
-              </div>
-            </div>
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#DC2626);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="shirt" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Camisa da turma</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">PP-GG · estampa exclusiva</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 75</strong>
-                  <span class="badge badge-info">68 vend.</span>
-                </div>
-              </div>
-            </div>
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#16A34A,#1E3A8A);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Convite extra</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">+ 1 cota além do pacote</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 180</strong>
-                  <span class="badge badge-info">94 vend.</span>
-                </div>
-              </div>
-            </div>
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#0EA5E9,#1E3A8A);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="usb" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Pendrive personalizado</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">32GB · estojo de madeira</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 90</strong>
-                  <span class="badge">12 vend.</span>
-                </div>
-              </div>
-            </div>
-            <div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">
-              <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#EC4899);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="frame" class="w-6 h-6"></i></div>
-              <div style="flex:1;min-width:0;">
-                <strong style="font-size:14px;display:block;">Quadro 30x40 com moldura</strong>
-                <div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">impressão fine art</div>
-                <div class="flex justify-between items-end">
-                  <strong style="color:var(--success);font-size:16px;">R$ 220</strong>
-                  <span class="badge">29 vend.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><div class="card-title">Top vendas (mês)</div></div>
-        <div class="card-body">
-          <div style="font-size:13px;color:var(--gray-700);">
-            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><span>📷 Foto extra editada</span><strong>412</strong></div>
-            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><span>📚 Álbum Memórias</span><strong>142</strong></div>
-            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><span>🎟 Convite extra</span><strong>94</strong></div>
-            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><span>👕 Camisa turma</span><strong>68</strong></div>
-            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--gray-100);"><span>🖼 Quadro 30x40</span><strong>29</strong></div>
-            <div class="flex justify-between" style="padding:10px 0;"><span>💾 Pendrive</span><strong>12</strong></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Comercial / Produtos e Serviços</div>
+    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Produtos e serviços</h1>
 
     <div class="card">
-      <div class="card-header"><div class="card-title">Carrinhos abandonados (23)</div><button class="btn btn-primary btn-sm" id="btnDispararWhats" data-handled="1"><i data-lucide="message-circle" class="w-4 h-4"></i> Disparar VAI WhatsApp</button></div>
-      <table class="table">
-        <thead><tr><th>Aluno</th><th>Turma</th><th>Itens</th><th class="num">Valor</th><th>Aberto há</th><th></th></tr></thead>
-        <tbody>
-          <tr><td><strong>Camila Almeida</strong></td><td>MEDICINA T85</td><td>1× Álbum + 5× foto extra</td><td class="num">R$ 405</td><td>2 dias</td><td class="text-right"><button class="btn btn-secondary btn-sm">Lembrar</button></td></tr>
-          <tr><td><strong>Pedro Henrique</strong></td><td>MEDICINA T85</td><td>1× Convite extra + 1× Camisa</td><td class="num">R$ 255</td><td>3 dias</td><td class="text-right"><button class="btn btn-secondary btn-sm">Lembrar</button></td></tr>
-          <tr><td><strong>Igor Martins Rocha</strong></td><td>DIREITO UNIMONTES</td><td>3× foto extra</td><td class="num">R$ 75</td><td>4 dias</td><td class="text-right"><button class="btn btn-secondary btn-sm">Lembrar</button></td></tr>
-          <tr><td><strong>Fernanda Alves Lopes</strong></td><td>LETRAS UNIMONTES</td><td>1× Quadro + 1× Álbum</td><td class="num">R$ 500</td><td>5 dias</td><td class="text-right"><button class="btn btn-secondary btn-sm">Lembrar</button></td></tr>
-          <tr><td colspan="6" style="text-align:center;color:var(--gray-500);font-size:13px;padding:18px;">+ 19 carrinhos abandonados</td></tr>
-        </tbody>
-      </table>
+      <div class="card-header">
+        <div class="card-title" id="catTitle">Catálogo</div>
+        <button class="btn btn-secondary btn-sm" id="btnRecarregar"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Recarregar</button>
+      </div>
+      <div class="card-body">
+        <div id="listaProdutos" class="grid gap-4" style="grid-template-columns:repeat(2,1fr);"></div>
+      </div>
     </div>
   </main>
 </div>
@@ -143,59 +41,128 @@
 
 <script>
 (function () {
+  'use strict';
+
+  var SLUG = 'produto';
+  var TIPO_LABEL = { produto: 'Produto', servico: 'Serviço', cerimonial: 'Cerimonial' };
+
   function notify(msg) {
     if (typeof showToast === 'function') showToast(msg);
     else if (window.vtAlert) window.vtAlert(msg);
   }
+  function alerta(msg, titulo) {
+    if (window.vtAlert) return window.vtAlert(msg, { title: titulo });
+    window.alert(msg);
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function refreshIcons() { if (window.lucide) { try { lucide.createIcons(); } catch (e) {} } }
 
-  // ---- Novo produto (modal com formulário) ----
-  function abrirNovoProduto() {
+  // ---- Carregar e renderizar catálogo real ----
+  async function carregar() {
+    var lista = document.getElementById('listaProdutos');
+    lista.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--gray-500);font-size:14px;">Carregando…</div>';
+    var itens;
+    try {
+      var r = await fetch(apiUrl('/api/cadastro/' + SLUG));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var d = await r.json();
+      itens = d.itens || [];
+    } catch (e) {
+      lista.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:#DC2626;font-size:14px;">Não foi possível carregar os produtos. Tente novamente.</div>';
+      return;
+    }
+
+    document.getElementById('catTitle').textContent = 'Catálogo (' + itens.length + (itens.length === 1 ? ' item' : ' itens') + ')';
+
+    if (!itens.length) {
+      lista.innerHTML = '<div style="grid-column:1/-1;padding:40px 16px;text-align:center;color:var(--gray-400);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:10px;">' +
+        '<i data-lucide="package-open" style="width:34px;height:34px;"></i>' +
+        'Nenhum produto cadastrado.</div>';
+      refreshIcons();
+      return;
+    }
+
+    lista.innerHTML = itens.map(function (it) {
+      var img = it.imagem_url
+        ? '<img src="' + esc(it.imagem_url) + '" alt="" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--gray-200);">'
+        : '<div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#1E3A8A,#7C3AED);flex-shrink:0;display:grid;place-items:center;color:white;"><i data-lucide="package" class="w-6 h-6"></i></div>';
+      var statusBadge = it.ativo
+        ? '<span class="badge badge-success">Ativo</span>'
+        : '<span class="badge">Inativo</span>';
+      return '<div style="padding:16px;border:1px solid var(--gray-200);border-radius:12px;display:flex;gap:14px;">' +
+          img +
+          '<div style="flex:1;min-width:0;">' +
+            '<strong style="font-size:14px;display:block;">' + esc(it.nome) + '</strong>' +
+            '<div style="font-size:12px;color:var(--gray-500);margin:2px 0 6px;">' + esc(TIPO_LABEL[it.tipo] || it.tipo || '') + (it.descricao ? ' · ' + esc(it.descricao) : '') + '</div>' +
+            '<div class="flex justify-between items-end">' +
+              statusBadge +
+              '<div class="row-actions" style="display:flex;gap:6px;">' +
+                '<button class="btn btn-secondary btn-sm" data-edit="' + it.id + '"><i data-lucide="pencil" class="w-4 h-4"></i></button>' +
+                '<button class="btn btn-secondary btn-sm" data-del="' + it.id + '"><i data-lucide="trash-2" class="w-4 h-4"></i></button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+    refreshIcons();
+
+    lista.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var item = itens.filter(function (x) { return String(x.id) === b.dataset.edit; })[0];
+        if (item) abrirForm(item);
+      });
+    });
+    lista.querySelectorAll('[data-del]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var item = itens.filter(function (x) { return String(x.id) === b.dataset.del; })[0];
+        if (item) excluir(item);
+      });
+    });
+  }
+
+  // ---- Form (novo/editar) ----
+  function abrirForm(item) {
+    var editando = !!(item && item.id != null);
     var body = document.createElement('form');
     body.setAttribute('novalidate', '');
     body.innerHTML = [
       '<div style="display:flex;flex-direction:column;gap:14px;">',
         '<div>',
-          '<label class="label" for="np-nome">Nome do produto *</label>',
-          '<input class="input" id="np-nome" type="text" placeholder="Ex.: Álbum 30x30, Foto extra…" autocomplete="off">',
+          '<label class="label" for="np-nome">Nome *</label>',
+          '<input class="input" id="np-nome" type="text" placeholder="Ex.: Foto adicional, Convite de festa…" autocomplete="off">',
         '</div>',
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">',
-          '<div>',
-            '<label class="label" for="np-preco">Preço (R$)</label>',
-            '<input class="input" id="np-preco" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00">',
-          '</div>',
-          '<div>',
-            '<label class="label" for="np-categoria">Categoria</label>',
-            '<select class="select" id="np-categoria">',
-              '<option>Álbuns e impressos</option>',
-              '<option>Fotos</option>',
-              '<option>Vestuário</option>',
-              '<option>Convites</option>',
-              '<option>Digitais</option>',
-              '<option>Outros</option>',
-            '</select>',
-          '</div>',
+        '<div>',
+          '<label class="label" for="np-tipo">Tipo</label>',
+          '<select class="select" id="np-tipo">',
+            '<option value="produto">Produto</option>',
+            '<option value="servico">Serviço</option>',
+            '<option value="cerimonial">Cerimonial</option>',
+          '</select>',
         '</div>',
         '<div>',
           '<label class="label" for="np-desc">Descrição</label>',
           '<textarea class="textarea" id="np-desc" rows="3" placeholder="Detalhes do produto (opcional)"></textarea>',
         '</div>',
         '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">',
-          '<input type="checkbox" id="np-ativo" checked style="width:0;height:0;position:absolute;opacity:0;">',
-          '<span data-track style="width:42px;height:24px;border-radius:999px;background:var(--primary-500);position:relative;transition:background .15s;flex:none;">',
-            '<span data-knob style="position:absolute;top:2px;left:20px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);"></span>',
+          '<input type="checkbox" id="np-ativo" style="width:0;height:0;position:absolute;opacity:0;">',
+          '<span data-track style="width:42px;height:24px;border-radius:999px;background:var(--gray-300);position:relative;transition:background .15s;flex:none;">',
+            '<span data-knob style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);"></span>',
           '</span>',
-          '<span style="font-size:14px;font-weight:600;color:var(--gray-700);">Produto ativo</span>',
+          '<span style="font-size:14px;font-weight:600;color:var(--gray-700);">Ativo</span>',
         '</label>',
         '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">',
           '<button type="button" class="btn btn-secondary" data-cancel>Cancelar</button>',
-          '<button type="submit" class="btn btn-primary" data-handled="1">Salvar produto</button>',
+          '<button type="submit" class="btn btn-primary" data-handled="1"><span data-savetxt>Salvar</span></button>',
         '</div>',
       '</div>'
     ].join('');
 
-    var modal = window.vtModal({ title: 'Novo produto', bodyHTML: body });
+    var modal = window.vtModal({ title: editando ? 'Editar produto' : 'Novo produto', bodyHTML: body });
 
-    // Toggle "Ativo"
     var chk = body.querySelector('#np-ativo');
     var track = body.querySelector('[data-track]');
     var knob = body.querySelector('[data-knob]');
@@ -204,37 +171,85 @@
       knob.style.left = chk.checked ? '20px' : '2px';
     }
     chk.addEventListener('change', paintToggle);
+
+    // Preenche valores (edição) ou defaults (novo)
+    if (editando) {
+      body.querySelector('#np-nome').value = item.nome || '';
+      body.querySelector('#np-tipo').value = item.tipo || 'produto';
+      body.querySelector('#np-desc').value = item.descricao || '';
+      chk.checked = !!item.ativo;
+    } else {
+      chk.checked = true; // default ativo
+    }
     paintToggle();
 
     body.querySelector('[data-cancel]').addEventListener('click', modal.close);
 
-    body.addEventListener('submit', function (e) {
+    body.addEventListener('submit', async function (e) {
       e.preventDefault();
       var nome = (body.querySelector('#np-nome').value || '').trim();
       if (!nome) {
-        window.vtAlert('Informe o nome do produto.', { title: 'Campo obrigatório' });
+        alerta('Informe o nome do produto.', 'Campo obrigatório');
         body.querySelector('#np-nome').focus();
         return;
       }
-      modal.close();
-      notify('Produto criado (protótipo).');
+      var payload = {
+        nome: nome,
+        tipo: body.querySelector('#np-tipo').value,
+        descricao: (body.querySelector('#np-desc').value || '').trim(),
+        ativo: chk.checked
+      };
+      // Preserva imagem existente na edição (form não altera imagem)
+      if (editando && item.imagem_url) payload.imagem_url = item.imagem_url;
+
+      var btn = body.querySelector('[data-savetxt]');
+      var orig = btn.textContent;
+      btn.textContent = 'Salvando…';
+      var url = editando ? apiUrl('/api/cadastro/' + SLUG + '/' + item.id) : apiUrl('/api/cadastro/' + SLUG);
+      try {
+        var r = await fetch(url, {
+          method: editando ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        var d = await r.json().catch(function () { return {}; });
+        if (!r.ok) throw new Error(d.detail || 'Erro ao salvar.');
+        modal.close();
+        notify(editando ? 'Produto atualizado.' : 'Produto criado.');
+        carregar();
+      } catch (err) {
+        btn.textContent = orig;
+        alerta(err.message || 'Erro ao salvar.', 'Erro');
+      }
     });
 
     setTimeout(function () { body.querySelector('#np-nome').focus(); }, 80);
   }
 
-  var btnNovo = document.getElementById('btnNovoProduto');
-  if (btnNovo) btnNovo.addEventListener('click', abrirNovoProduto);
+  async function excluir(item) {
+    var ok = window.vtConfirm
+      ? await window.vtConfirm('Excluir "' + item.nome + '"? Esta ação não pode ser desfeita.', { title: 'Excluir produto', okText: 'Excluir', danger: true })
+      : window.confirm('Excluir "' + item.nome + '"?');
+    if (!ok) return;
+    try {
+      var r = await fetch(apiUrl('/api/cadastro/' + SLUG + '/' + item.id), { method: 'DELETE' });
+      if (!r.ok) {
+        var d = await r.json().catch(function () { return {}; });
+        throw new Error(d.detail || 'Erro ao excluir.');
+      }
+      notify('Produto excluído.');
+      carregar();
+    } catch (err) {
+      alerta(err.message || 'Erro ao excluir.', 'Erro');
+    }
+  }
 
-  // ---- Disparar VAI WhatsApp (confirmação) ----
-  var btnWhats = document.getElementById('btnDispararWhats');
-  if (btnWhats) btnWhats.addEventListener('click', async function () {
-    var ok = await window.vtConfirm(
-      'Enviar lembrete via WhatsApp para os 23 carrinhos abandonados?',
-      { title: 'Disparar VAI WhatsApp', okText: 'Disparar' }
-    );
-    if (ok) notify('Disparo enviado (protótipo).');
-  });
+  var btnNovo = document.getElementById('btnNovoProduto');
+  if (btnNovo) btnNovo.addEventListener('click', function () { abrirForm(null); });
+  var btnReload = document.getElementById('btnRecarregar');
+  if (btnReload) btnReload.addEventListener('click', carregar);
+
+  carregar();
 })();
 </script>
 

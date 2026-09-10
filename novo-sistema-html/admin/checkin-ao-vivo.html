@@ -9,6 +9,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Check-in ao vivo — Ventus</title>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('ventus-theme')||'light')}catch(e){}</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../assets/js/config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/tokens.css">
@@ -100,151 +101,263 @@
       <div class="chip"><i data-lucide="scan-line"></i></div>
       <div class="ph-txt">
         <h1>Check-in ao vivo <span class="badge-live"><span class="live-dot"></span> AO VIVO</span></h1>
-        <p>Baile + After · Medicina T84 — Unimontes · Espaço Ventus · 22/04/2026 · 21:30</p>
+        <p id="evt-sub">Selecione um evento para iniciar o check-in.</p>
       </div>
       <div class="actions">
-        <button class="btn btn-secondary"><i data-lucide="printer" class="w-4 h-4"></i> Status impressora</button>
-        <button class="btn btn-secondary"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+        <select id="evt-select" class="input" style="min-width:280px;max-width:100%;">
+          <option value="">Carregando eventos…</option>
+        </select>
       </div>
     </div>
 
-    <!-- KPIs ao vivo -->
+    <!-- KPIs ao vivo (preenchidos via API) -->
     <div class="kpis">
       <div class="kpi">
         <div class="top"><div class="ic"><i data-lucide="users-round"></i></div></div>
-        <div class="l">Convidados / Capacidade</div>
-        <div class="v">418</div>
-        <div class="s">capacidade do espaço: 450</div>
+        <div class="l">Total de alunos</div>
+        <div class="v" id="kpi-total">—</div>
+        <div class="s">no evento selecionado</div>
       </div>
       <div class="kpi verde">
         <div class="top"><div class="ic"><i data-lucide="user-check"></i></div></div>
         <div class="l">Check-ins realizados</div>
-        <div class="v">317</div>
-        <div class="s">76% dos convidados</div>
-      </div>
-      <div class="kpi">
-        <div class="top"><div class="ic"><i data-lucide="badge-check"></i></div></div>
-        <div class="l">Confirmados na porta</div>
-        <div class="v">314</div>
-        <div class="s">QR válido lido</div>
+        <div class="v" id="kpi-presentes">—</div>
+        <div class="s" id="kpi-presentes-pct">—</div>
       </div>
       <div class="kpi laranja">
         <div class="top"><div class="ic"><i data-lucide="clock"></i></div></div>
         <div class="l">Pendentes</div>
-        <div class="v">68</div>
-        <div class="s">confirmados que ainda não entraram</div>
+        <div class="v" id="kpi-ausentes">—</div>
+        <div class="s">ainda não fizeram check-in</div>
+      </div>
+      <div class="kpi">
+        <div class="top"><div class="ic"><i data-lucide="calendar-days"></i></div></div>
+        <div class="l">Data do evento</div>
+        <div class="v" id="kpi-data" style="font-size:20px;">—</div>
+        <div class="s" id="kpi-local">—</div>
       </div>
     </div>
 
-    <!-- Corpo em 2 colunas -->
-    <div class="cols">
-      <!-- Esquerda: últimos check-ins -->
-      <div class="col">
-        <div class="panel">
-          <div class="panel-head">
-            <span class="ph-l"><i data-lucide="list" style="width:17px;height:17px;color:var(--primary-600);"></i> Últimos check-ins</span>
-            <span class="badge badge-success"><span class="live-dot"></span> Tempo real</span>
-          </div>
-          <table class="tbl">
-            <tbody>
-              <tr>
-                <td class="nome">Marcos Silva<small>Convidado · Camila Almeida</small></td>
-                <td class="cat"><span class="badge badge-info">Comum</span></td>
-                <td class="hora ok">há 2s</td>
-              </tr>
-              <tr>
-                <td class="nome">Ana Paula Mendes<small>Familiar · Pedro Henrique</small></td>
-                <td class="cat"><span class="badge badge-warning">VIP</span></td>
-                <td class="hora ok">há 14s</td>
-              </tr>
-              <tr>
-                <td class="nome">Luis Augusto<small>Imprensa</small></td>
-                <td class="cat"><span class="badge">Imprensa</span></td>
-                <td class="hora ok">há 32s</td>
-              </tr>
-              <tr>
-                <td class="nome">Júlia Ribeiro<small>Comissão · representante</small></td>
-                <td class="cat"><span class="badge badge-danger">Comissão</span></td>
-                <td class="hora ok">há 1min</td>
-              </tr>
-              <tr>
-                <td class="nome">Fernanda Costa<small>Familiar · Júlia Ribeiro</small></td>
-                <td class="cat"><span class="badge badge-info">Comum</span></td>
-                <td class="hora ok">há 1min</td>
-              </tr>
-              <tr>
-                <td class="nome">Roberto Almeida<small>Familiar · Camila Almeida</small></td>
-                <td class="cat"><span class="badge badge-info">Comum</span></td>
-                <td class="hora ok">há 2min</td>
-              </tr>
-              <tr>
-                <td class="nome">Tentativa não autorizada<small>QR já usado · 10:23</small></td>
-                <td class="cat"><span class="badge badge-danger">Negado</span></td>
-                <td class="hora err">há 3min</td>
-              </tr>
-              <tr>
-                <td class="nome">Carlos Eduardo Lima<small>Funcionário · Ventus</small></td>
-                <td class="cat"><span class="badge badge-success">Funcionário</span></td>
-                <td class="hora ok">há 4min</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    <!-- Lista de alunos do evento -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="ph-l"><i data-lucide="list" style="width:17px;height:17px;color:var(--primary-600);"></i> Alunos do evento</span>
+        <span class="badge badge-info" id="lista-info">—</span>
       </div>
-
-      <!-- Direita: distribuição + pontos de acesso -->
-      <div class="col">
-        <div class="panel">
-          <div class="panel-head"><span class="ph-l"><i data-lucide="pie-chart" style="width:17px;height:17px;color:var(--primary-600);"></i> Distribuição por categoria</span></div>
-          <div class="panel-body">
-            <div class="dist">
-              <div class="dist-row">
-                <div class="dist-top"><span>VIP</span><b>42</b></div>
-                <div class="dist-bar"><span style="width:50%;background:var(--band-vip);"></span></div>
-              </div>
-              <div class="dist-row">
-                <div class="dist-top"><span>Comum</span><b>248</b></div>
-                <div class="dist-bar"><span style="width:78%;background:var(--band-comum);"></span></div>
-              </div>
-              <div class="dist-row">
-                <div class="dist-top"><span>Comissão</span><b>14</b></div>
-                <div class="dist-bar"><span style="width:28%;background:var(--band-comissao);"></span></div>
-              </div>
-              <div class="dist-row">
-                <div class="dist-top"><span>Imprensa</span><b>8</b></div>
-                <div class="dist-bar"><span style="width:16%;background:var(--gray-400);"></span></div>
-              </div>
-              <div class="dist-row">
-                <div class="dist-top"><span>Funcionário</span><b>5</b></div>
-                <div class="dist-bar"><span style="width:10%;background:var(--success);"></span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head"><span class="ph-l"><i data-lucide="door-open" style="width:17px;height:17px;color:var(--primary-600);"></i> Pontos de acesso</span></div>
-          <div class="panel-body">
-            <div class="pop">
-              <span class="n"><i data-lucide="qr-code"></i> Portaria principal</span>
-              <span class="b">218 entradas</span>
-            </div>
-            <div class="pop">
-              <span class="n"><i data-lucide="qr-code"></i> Portaria lateral</span>
-              <span class="b">88 entradas</span>
-            </div>
-            <div class="pop">
-              <span class="n"><i data-lucide="qr-code"></i> Acesso VIP</span>
-              <span class="b">11 entradas</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <table class="tbl" id="alunos-tbl">
+        <tbody id="alunos-body"></tbody>
+      </table>
+      <div id="alunos-empty" style="padding:40px;text-align:center;color:var(--gray-500);font-size:14px;">Nenhum evento disponível para check-in.</div>
     </div>
   </main>
 </div>
 
 <script src="../assets/js/app.js"></script>
-<script>lucide.createIcons();</script>
+<script>
+/* ================================================================
+   Check-in ao vivo — 100% real.
+   GET  /api/checkin/opcoes                         -> turmas + eventos
+   GET  /api/checkin/{evento_id}                    -> situação (alunos)
+   POST /api/checkin/{evento_id}/aluno/{aluno_id}   -> marca presença
+   ZERO dado hardcoded. Sem evento/dados => estado vazio real.
+================================================================ */
+(function () {
+  const selEl    = document.getElementById('evt-select');
+  const subEl    = document.getElementById('evt-sub');
+  const bodyEl   = document.getElementById('alunos-body');
+  const emptyEl  = document.getElementById('alunos-empty');
+  const infoEl   = document.getElementById('lista-info');
+  const tblEl    = document.getElementById('alunos-tbl');
+
+  const kpiTotal   = document.getElementById('kpi-total');
+  const kpiPres    = document.getElementById('kpi-presentes');
+  const kpiPresPct = document.getElementById('kpi-presentes-pct');
+  const kpiAus     = document.getElementById('kpi-ausentes');
+  const kpiData    = document.getElementById('kpi-data');
+  const kpiLocal   = document.getElementById('kpi-local');
+
+  const notify = (m) => { if (typeof showToast === 'function') showToast(m); };
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function fmtData(d) {
+    if (!d) return '—';
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d);
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+  }
+  function fmtHora(iso) {
+    if (!iso) return '';
+    const dt = new Date(iso);
+    if (isNaN(dt)) return '';
+    return dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function resetKpis() {
+    kpiTotal.textContent = '—'; kpiPres.textContent = '—'; kpiPresPct.textContent = '—';
+    kpiAus.textContent = '—'; kpiData.textContent = '—'; kpiLocal.textContent = '—';
+  }
+
+  // Carrega opções (turmas + eventos) e monta o seletor agrupado por turma.
+  async function carregarOpcoes() {
+    let data;
+    try {
+      const r = await fetch(apiUrl('/api/checkin/opcoes'));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      data = await r.json();
+    } catch (e) {
+      selEl.innerHTML = '<option value="">Erro ao carregar eventos</option>';
+      subEl.textContent = 'Não foi possível carregar os eventos. Verifique a conexão.';
+      return;
+    }
+
+    const turmas  = Array.isArray(data.turmas)  ? data.turmas  : [];
+    const eventos = Array.isArray(data.eventos) ? data.eventos : [];
+    const turmaNome = new Map(turmas.map(t => [t.id, t.nome]));
+
+    if (!eventos.length) {
+      selEl.innerHTML = '<option value="">Nenhum evento disponível</option>';
+      selEl.disabled = true;
+      subEl.textContent = 'Nenhum evento disponível para check-in.';
+      tblEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      infoEl.textContent = '0 alunos';
+      return;
+    }
+
+    // Agrupa eventos por turma em <optgroup>.
+    const porTurma = new Map();
+    eventos.forEach(ev => {
+      const key = ev.turma_id;
+      if (!porTurma.has(key)) porTurma.set(key, []);
+      porTurma.get(key).push(ev);
+    });
+
+    let html = '<option value="">Selecione um evento…</option>';
+    porTurma.forEach((evs, tid) => {
+      const label = esc(turmaNome.get(tid) || ('Turma ' + tid));
+      html += `<optgroup label="${label}">`;
+      evs.forEach(ev => {
+        const dt = ev.data ? ' · ' + fmtData(ev.data) : '';
+        html += `<option value="${ev.id}">${esc(ev.nome)}${esc(dt)}</option>`;
+      });
+      html += '</optgroup>';
+    });
+    selEl.innerHTML = html;
+    selEl.disabled = false;
+    subEl.textContent = 'Selecione um evento para iniciar o check-in.';
+  }
+
+  // Carrega a situação de check-in de um evento e lista os alunos.
+  async function carregarEvento(eventoId) {
+    if (!eventoId) {
+      resetKpis();
+      bodyEl.innerHTML = '';
+      tblEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      emptyEl.textContent = 'Selecione um evento para ver os alunos.';
+      infoEl.textContent = '—';
+      subEl.textContent = 'Selecione um evento para iniciar o check-in.';
+      return;
+    }
+
+    infoEl.textContent = 'Carregando…';
+    let data;
+    try {
+      const r = await fetch(apiUrl('/api/checkin/' + encodeURIComponent(eventoId)));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      data = await r.json();
+    } catch (e) {
+      resetKpis();
+      bodyEl.innerHTML = '';
+      tblEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      emptyEl.textContent = 'Não foi possível carregar este evento.';
+      infoEl.textContent = 'erro';
+      return;
+    }
+
+    const ev    = data.evento || {};
+    const itens = Array.isArray(data.itens) ? data.itens : [];
+    const total = data.total != null ? data.total : itens.length;
+    const pres  = data.presentes != null ? data.presentes : itens.filter(i => i.presente).length;
+    const aus   = data.ausentes  != null ? data.ausentes  : (total - pres);
+
+    // KPIs reais
+    kpiTotal.textContent = total;
+    kpiPres.textContent  = pres;
+    kpiPresPct.textContent = total ? `${Math.round((pres / total) * 100)}% dos alunos` : '—';
+    kpiAus.textContent   = aus;
+    kpiData.textContent  = fmtData(ev.data);
+    kpiLocal.textContent = ev.local || '—';
+
+    // Subtítulo
+    subEl.textContent = [ev.nome, ev.local, fmtData(ev.data)].filter(x => x && x !== '—').join(' · ')
+                        || 'Evento selecionado';
+
+    infoEl.textContent = `${total} aluno${total === 1 ? '' : 's'}`;
+
+    if (!itens.length) {
+      bodyEl.innerHTML = '';
+      tblEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      emptyEl.textContent = 'Nenhum aluno neste evento.';
+      return;
+    }
+
+    tblEl.style.display = '';
+    emptyEl.style.display = 'none';
+    renderAlunos(eventoId, itens);
+  }
+
+  function renderAlunos(eventoId, itens) {
+    bodyEl.innerHTML = itens.map(a => {
+      const sub = a.curso ? esc(a.curso) : 'Aluno';
+      const hora = fmtHora(a.checkin_em);
+      const acao = a.presente
+        ? `<span class="badge badge-success"><i data-lucide="check" style="width:12px;height:12px;"></i> Presente${hora ? ' · ' + esc(hora) : ''}</span>`
+        : `<button class="btn btn-primary btn-sm" data-checkin="${a.aluno_id}">
+             <i data-lucide="user-check" class="w-4 h-4"></i> Marcar presença
+           </button>`;
+      return `<tr data-row="${a.aluno_id}">
+        <td class="nome">${esc(a.nome || 'Sem nome')}<small>${sub}</small></td>
+        <td class="cat" style="text-align:right;">${acao}</td>
+      </tr>`;
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+
+    bodyEl.querySelectorAll('[data-checkin]').forEach(btn => {
+      btn.addEventListener('click', () => marcarPresenca(eventoId, btn.dataset.checkin, btn));
+    });
+  }
+
+  async function marcarPresenca(eventoId, alunoId, btn) {
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Registrando…';
+    try {
+      const r = await fetch(apiUrl(`/api/checkin/${encodeURIComponent(eventoId)}/aluno/${encodeURIComponent(alunoId)}`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      notify('Presença registrada.');
+      // Recarrega a situação real do evento (KPIs + lista).
+      await carregarEvento(eventoId);
+    } catch (e) {
+      btn.disabled = false;
+      btn.innerHTML = original;
+      if (window.lucide) lucide.createIcons();
+      notify('Não foi possível registrar a presença.');
+    }
+  }
+
+  selEl.addEventListener('change', () => carregarEvento(selEl.value));
+
+  // Init
+  resetKpis();
+  tblEl.style.display = 'none';
+  carregarOpcoes();
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
 </body>
 </html>
