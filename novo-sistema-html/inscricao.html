@@ -373,7 +373,8 @@ async function carregar(){
   // participações já escolhidas (por evento)
   stepsEl.classList.remove('hide');
   resumoEl.classList.remove('hide');
-  STEP = 0;
+  // voltou do ZapSign (redirect após assinar) → cai direto na etapa do Contrato
+  STEP = /[?&]assinado=1/.test(location.search) ? 3 : 0;
   render();
 }
 
@@ -991,6 +992,8 @@ function viewContrato(){
         email: F.email || '',
         celular: (F.celular||'').replace(/\D/g,''),
         plano_id: F.plano_id,
+        // pra o ZapSign trazer o formando de volta ao checkout depois de assinar
+        redirect_url: location.origin + location.pathname + '?t=' + encodeURIComponent(token) + '&assinado=1',
       };
       const r = await fetch(apiUrl('/api/inscricao/'+token+'/assinar-contrato'), {
         method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
@@ -1014,6 +1017,42 @@ function viewContrato(){
   if(abrirC) abrirC.onclick = abrirContratoZap;
   const boxC = document.getElementById('contrato-box');
   if(boxC) boxC.onclick = abrirContratoZap;
+
+  // Mostra o contrato JÁ PREENCHIDO com os dados do formando (não os {{placeholders}}).
+  if(contrato){
+    (async () => {
+      try{
+        const r = await fetch(apiUrl('/api/inscricao/'+token+'/contrato-preview'), {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            nome: F.nome||'', cpf:(F.cpf||'').replace(/\D/g,''), email:F.email||'',
+            celular:(F.celular||'').replace(/\D/g,''), curso:F.curso||'',
+            ano_formatura: F.ano_formatura||null, plano_id: F.plano_id,
+          })
+        });
+        const d = await r.json();
+        const box = document.getElementById('contrato-box');
+        if(box && d && d.html){ box.textContent = d.html; }
+      }catch(e){}
+    })();
+  }
+
+  // Se o formando já assinou (voltou do ZapSign), marca o aceite e libera continuar.
+  function marcarAssinado(){
+    F.aceite_contrato = true;
+    const cb = document.getElementById('i-aceite'); if(cb) cb.checked = true;
+    const t = document.getElementById('c-abrir-txt'); if(t) t.textContent = '✓ Contrato assinado';
+    const b = document.getElementById('c-abrir'); if(b) b.style.background = 'var(--verde, #16A34A)';
+  }
+  if(contrato){
+    (async () => {
+      try{
+        const r = await fetch(apiUrl('/api/inscricao/'+token+'/assinatura'));
+        const d = await r.json();
+        if(d && d.assinado) marcarAssinado();
+      }catch(e){}
+    })();
+  }
 
   document.getElementById('btn-back').onclick = () => { STEP=2; render(); };
   document.getElementById('btn-next').onclick = () => {
