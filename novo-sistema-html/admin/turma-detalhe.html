@@ -194,7 +194,10 @@
 <div class="app-shell">
   <header class="topbar">
     <div style="flex:1"></div>
-    <div class="flex items-center gap-3"><a href="turmas.html" class="btn btn-secondary btn-sm"><i data-lucide="arrow-left" class="w-4 h-4"></i> Turmas</a></div>
+    <div class="flex items-center gap-3">
+      <a id="btn-galeria" href="#" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:none;"><i data-lucide="images" class="w-4 h-4"></i> Galeria da turma</a>
+      <a href="turmas.html" class="btn btn-secondary btn-sm"><i data-lucide="arrow-left" class="w-4 h-4"></i> Turmas</a>
+    </div>
   </header>
   <main class="app-content">
     <div class="crumb"><a href="turmas.html">Turmas</a> › <span id="crumb-nome">…</span></div>
@@ -210,6 +213,7 @@
       <button class="tab" data-tab="cerimonial"><i data-lucide="utensils" style="width:15px;height:15px;"></i> Cerimonial</button>
       <button class="tab" data-tab="planos"><i data-lucide="package-2" style="width:15px;height:15px;"></i> Planos</button>
       <button class="tab" data-tab="cursos"><i data-lucide="graduation-cap" style="width:15px;height:15px;"></i> Cursos</button>
+      <button class="tab" data-tab="comissao"><i data-lucide="badge-check" style="width:15px;height:15px;"></i> Comissão</button>
       <button class="tab" data-tab="alunos"><i data-lucide="user-plus" style="width:15px;height:15px;"></i> Pré-cadastro</button>
       <button class="tab" data-tab="historico"><i data-lucide="history" style="width:15px;height:15px;"></i> Histórico</button>
     </div>
@@ -369,6 +373,29 @@
       </div>
     </section>
 
+    <section id="pane-comissao" hidden>
+      <div class="panel">
+        <div class="panel-head"><h2><i data-lucide="badge-check" style="width:16px;height:16px;color:var(--primary-600);"></i> Comissão da turma</h2><span class="count" id="com-count">0</span></div>
+        <div class="panel-body">
+          <p style="margin:0 0 14px;font-size:13px;color:var(--gray-500);">Cadastre o <strong>CPF</strong> (e o nome) de quem é da comissão. Quando o formando usar esse CPF, o sistema já reconhece que ele é da comissão e libera o que é exclusivo (brindes de comissão, etc.). <strong>Nada disso aparece para o aluno.</strong></p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-size:12px;color:var(--gray-500);margin-bottom:5px;">CPF</label>
+              <input type="text" id="com-cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14" style="padding:11px 12px;border:1px solid var(--gray-300);border-radius:11px;font-size:14px;outline:none;width:180px;">
+            </div>
+            <div style="flex:1;min-width:180px;">
+              <label style="display:block;font-size:12px;color:var(--gray-500);margin-bottom:5px;">Nome (opcional)</label>
+              <input type="text" id="com-nome" autocomplete="off" placeholder="Nome de quem é da comissão" style="width:100%;padding:11px 12px;border:1px solid var(--gray-300);border-radius:11px;font-size:14px;outline:none;box-sizing:border-box;">
+            </div>
+            <button class="btn btn-primary" id="com-add"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>CPF</th><th>Nome</th><th style="text-align:right;">Ações</th></tr></thead>
+            <tbody id="com-tbody"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
     <section id="pane-historico" hidden>
       <div class="panel" style="margin-bottom:18px;">
         <div class="panel-head"><h2><i data-lucide="history" style="width:16px;height:16px;color:var(--primary-600);"></i> Novo lançamento no histórico</h2></div>
@@ -510,6 +537,9 @@ async function init() {
   const t = await rt.json(); OPC = await ro.json(); PLOPC = await rp.json();
   $('#crumb-nome').textContent = t.nome; $('#turma-nome').textContent = t.nome;
   $('#turma-sub').textContent = [t.instituicao, t.periodo, t.ano].filter(Boolean).join(' · ');
+  // galeria criada junto com a turma (amarrada): botão direto pro acervo dela
+  const bg2 = $('#btn-galeria');
+  if (bg2 && t.album_id) { bg2.href = `../fotos/turma.html?id=${encodeURIComponent(t.album_id)}`; bg2.style.display = ''; }
   pintarDados(t);
   document.querySelectorAll('.tab').forEach(x => x.onclick = () => trocarAba(x.dataset.tab));
   montarEvForm(); montarBrForm(); montarCeForm(); montarPlForm();
@@ -530,12 +560,44 @@ async function gerarLinkPublico(){
 
 function trocarAba(aba) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab===aba));
-  ['dados','eventos','brindes','cerimonial','planos','cursos','alunos','historico'].forEach(p => $('#pane-'+p).hidden = p!==aba);
+  ['dados','eventos','brindes','cerimonial','planos','cursos','comissao','alunos','historico'].forEach(p => $('#pane-'+p).hidden = p!==aba);
   if (aba==='alunos') carregarAlunos();
   if (aba==='cursos') carregarCursos();
+  if (aba==='comissao') carregarComissao();
   if (aba==='historico') carregarHistorico();
   if (aba==='planos') atualizarEventosPlano();
 }
+
+/* ---------------- COMISSÃO por CPF ---------------- */
+function fmtCpf(v){ const d=(v||'').replace(/\D/g,'').slice(0,11); return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); }
+async function carregarComissao(){
+  const cpf=$('#com-cpf'); if(cpf && !cpf._mask){ cpf._mask=1; cpf.addEventListener('input',()=>{ cpf.value=fmtCpf(cpf.value); }); }
+  const add=$('#com-add'); if(add && !add._b){ add._b=1; add.onclick=addComissao; }
+  const r=await fetch(apiUrl(`/api/turma-formatura/${id}/comissao`));
+  const d=await r.json().catch(()=>({itens:[]}));
+  const itens=d.itens||[];
+  $('#com-count').textContent=itens.length;
+  const tb=$('#com-tbody');
+  tb.innerHTML = itens.length ? itens.map(c=>`<tr>
+    <td>${fmtCpf(c.cpf)}</td>
+    <td>${c.nome||'—'}</td>
+    <td style="text-align:right;"><button class="btn btn-ghost" onclick="excluirComissao(${c.id})" title="Remover"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button></td>
+  </tr>`).join('') : '<tr><td colspan="3" style="color:var(--gray-400);text-align:center;padding:18px;">Ninguém na comissão ainda.</td></tr>';
+  if(window.lucide) lucide.createIcons();
+}
+async function addComissao(){
+  const cpf=($('#com-cpf').value||'').replace(/\D/g,'');
+  if(cpf.length!==11){ await vtAlert('Informe um CPF válido (11 dígitos).',{title:'CPF inválido'}); return; }
+  const nome=($('#com-nome').value||'').trim();
+  const r=await fetch(apiUrl(`/api/turma-formatura/${id}/comissao`),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cpf,nome})});
+  if(r.ok){ $('#com-cpf').value=''; $('#com-nome').value=''; toast('Adicionado à comissão.'); carregarComissao(); }
+  else { const e=await r.json().catch(()=>({})); await vtAlert(e.detail||'Erro ao adicionar.',{title:'Ops'}); }
+}
+window.excluirComissao = async function(cid){
+  if(!await vtConfirm('Remover este CPF da comissão?',{title:'Confirmar',danger:true,okText:'Remover'})) return;
+  const r=await fetch(apiUrl('/api/turma-formatura/comissao/'+cid),{method:'DELETE'});
+  if(r.ok){ toast('Removido.'); carregarComissao(); }
+};
 
 // Mantém a lista de eventos fotográficos do form de plano SEMPRE fresca — o Bruno
 // cadastra eventos na aba Eventos e volta pro plano; sem isso a lista ficava velha

@@ -28,6 +28,7 @@
 <div class="app-shell">
   <header class="topbar">
     <div style="flex:1"></div>
+    <button class="btn btn-secondary btn-sm no-print" id="btn-link-geral"><i data-lucide="link" class="w-4 h-4"></i> Copiar link geral</button>
     <button class="btn btn-secondary btn-sm no-print" id="btn-imprimir"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF</button>
   </header>
 
@@ -158,6 +159,15 @@
   selTurma.addEventListener("change", function () { carregarRelatorio(selTurma.value); });
   soPreench.addEventListener("change", pintar);
   document.getElementById("btn-imprimir").addEventListener("click", function () { window.print(); });
+
+  // Link geral do encarte (para o formando abrir a tela de encarte e preencher)
+  var LINK_ENCARTE_GERAL = "https://ventus-fotos.vercel.app/encarte.html";
+  document.getElementById("btn-link-geral").addEventListener("click", function () {
+    function ok(){ if(window.showToast) showToast("Link geral copiado!"); else if(window.vtAlert) vtAlert(LINK_ENCARTE_GERAL, {title:"Link geral do encarte"}); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(LINK_ENCARTE_GERAL).then(ok).catch(function(){ if(window.vtAlert) vtAlert(LINK_ENCARTE_GERAL, {title:"Copie o link do encarte"}); });
+    } else if (window.vtAlert) { vtAlert(LINK_ENCARTE_GERAL, {title:"Copie o link do encarte"}); }
+  });
 
   if (window.lucide) lucide.createIcons();
   carregarTurmas();

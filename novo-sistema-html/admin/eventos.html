@@ -12,6 +12,26 @@
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="../assets/css/app.css">
 <script src="../assets/js/config.js"></script>
+<style>
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--gray-200); border-radius:12px; overflow:hidden; }
+.cal-day-head { background:var(--gray-50); padding:10px; text-align:center; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-500); }
+.cal-cell { background:var(--surface,#fff); min-height:110px; padding:8px; position:relative; }
+.cal-cell.other { background:var(--gray-50); }
+.cal-cell.other .cal-num { color:var(--gray-400); }
+.cal-cell.today { background:var(--primary-50); }
+.cal-num { font-size:13px; font-weight:600; color:var(--gray-900); }
+.cal-today-mark { display:inline-grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--primary-600); color:#fff; font-size:12px; font-weight:700; }
+.cal-evt { display:block; font-size:11px; padding:3px 6px; border-radius:4px; margin-top:4px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; background:var(--warning-bg,#FEF3C7); color:var(--warning-fg,#92400E); text-decoration:none; }
+.cal-evt:hover { filter:brightness(.97); }
+.cal-list { display:flex; flex-direction:column; gap:2px; }
+.cal-list-day { padding:12px 4px 6px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gray-500); border-bottom:1px solid var(--gray-200); }
+.cal-list-item { display:flex; align-items:center; gap:12px; padding:11px 8px; border-radius:8px; text-decoration:none; color:inherit; }
+.cal-list-item:hover { background:var(--gray-50); }
+.cal-list-chip { width:12px; height:12px; border-radius:4px; flex:none; background:var(--primary-600); }
+.cal-list-txt { flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--gray-900); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cal-list-sub { font-size:12px; color:var(--gray-500); }
+.cal-view { display:none; } .cal-view.active { display:block; }
+</style>
 </head>
 <body>
 <aside id="admin-sidebar" class="sidebar"></aside>
@@ -19,22 +39,37 @@
 <div class="app-shell">
   <header class="topbar">
     <div style="flex:1"></div>
-    <button class="btn btn-primary btn-sm" id="btnNovoEvento"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento</button>
+    <div class="flex gap-2 items-center">
+      <button class="btn btn-secondary btn-sm" id="cal-btn-reload"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Recarregar</button>
+      <a class="btn btn-primary btn-sm" href="turmas.html"><i data-lucide="plus" class="w-4 h-4"></i> Novo evento (via turma)</a>
+    </div>
   </header>
 
   <main class="app-content">
     <div class="text-sm" style="color:var(--gray-500);"><a href="dashboard.html" style="color:inherit;text-decoration:none;">Painel</a> / Eventos</div>
-    <div class="flex justify-between items-center mt-1 mb-6">
-      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Tipos de evento</h1>
-      <button class="btn btn-secondary btn-sm" id="btnRecarregar"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Recarregar</button>
+    <div class="flex justify-between items-center mt-1 mb-2">
+      <h1 class="text-2xl font-bold" style="color:var(--gray-900);">Calendário de eventos</h1>
+      <div class="flex gap-2" id="cal-view-toggle">
+        <button class="btn btn-secondary btn-sm active" data-view="month">Mês</button>
+        <button class="btn btn-secondary btn-sm" data-view="list">Lista</button>
+      </div>
     </div>
+    <p class="mb-6" style="color:var(--gray-500);font-size:14px;">Todos os eventos fotográficos agendados nas turmas. Os eventos são cadastrados na turma (aba <b>Eventos fotográficos</b>).</p>
 
-    <div class="card">
-      <div class="card-header"><div class="card-title" id="listTitle">Eventos cadastrados</div></div>
-      <table class="table">
-        <thead id="evThead"></thead>
-        <tbody id="evTbody"></tbody>
-      </table>
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="flex items-center gap-3">
+          <button class="btn btn-ghost btn-icon" id="cal-prev" aria-label="Mês anterior"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+          <h2 id="cal-label" style="font-size:18px;font-weight:700;min-width:170px;text-align:center;text-transform:capitalize;">—</h2>
+          <button class="btn btn-ghost btn-icon" id="cal-next" aria-label="Próximo mês"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+          <button class="btn btn-secondary btn-sm" id="cal-today" style="margin-left:8px;">Hoje</button>
+        </div>
+        <div id="cal-count" class="text-sm" style="color:var(--gray-500);">—</div>
+      </div>
+      <div class="card-body">
+        <div id="cal-month" class="cal-view active"><div class="cal-grid" id="cal-grid"></div></div>
+        <div id="cal-list" class="cal-view"><div class="cal-list" id="cal-list-body"></div></div>
+      </div>
     </div>
   </main>
 </div>
@@ -43,265 +78,109 @@
 <script>
 (function () {
   'use strict';
+  var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  var DIAS_SEM = ['dom','seg','ter','qua','qui','sex','sáb'];
+  var DIAS_LONGO = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
-  var SLUG = 'evento';
-  var CAMPOS = [], LABEL = 'Evento', PLURAL = 'Eventos';
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function $(id){ return document.getElementById(id); }
+  function icons(){ if(window.lucide){ try{ lucide.createIcons(); }catch(e){} } }
 
-  function notify(msg) {
-    if (typeof showToast === 'function') showToast(msg);
-    else if (window.vtAlert) window.vtAlert(msg);
-  }
-  function alerta(msg, titulo) {
-    if (window.vtAlert) return window.vtAlert(msg, { title: titulo });
-    window.alert(msg);
-  }
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
-    });
-  }
-  function refreshIcons() { if (window.lucide) { try { lucide.createIcons(); } catch (e) {} } }
+  var EVENTOS = [];               // {data, turma_id, turma, evento, hora_inicio, hora_fim}
+  var PORDIA = {};                // 'YYYY-MM-DD' -> [ev...]
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var refYear = hoje.getFullYear(), refMonth = hoje.getMonth();
+  var view = 'month';
 
-  // Colunas visíveis na tabela (esconde textarea/imagem, que ficam feios em coluna)
-  function colunas() { return CAMPOS.filter(function (c) { return c.tipo !== 'textarea' && c.tipo !== 'imagem'; }); }
+  function iso(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+  function horaTxt(e){ return e.hora_inicio ? (e.hora_inicio + (e.hora_fim ? '–'+e.hora_fim : '')) : ''; }
+  function tituloEv(e){ var h = horaTxt(e); return (h ? h+' · ' : '') + (e.evento || 'Evento') + (e.turma ? ' — '+e.turma : ''); }
+  function linkTurma(e){ return e.turma_id ? ('turma-detalhe.html?id='+encodeURIComponent(e.turma_id)) : '#'; }
 
-  function celula(campo, valor) {
-    if (campo.tipo === 'bool') {
-      return valor
-        ? '<span class="badge badge-success">Sim</span>'
-        : '<span class="badge">Não</span>';
-    }
-    if (campo.tipo === 'select') {
-      var op = (campo.opcoes || []).filter(function (o) { return String(o[0]) === String(valor); })[0];
-      return esc(op ? op[1] : (valor == null ? '' : valor));
-    }
-    return esc(valor == null ? '' : valor);
+  function indexar(){
+    PORDIA = {};
+    EVENTOS.forEach(function(e){ (PORDIA[e.data] || (PORDIA[e.data]=[])).push(e); });
   }
 
-  // ---- Descobre o schema real ----
-  async function carregarSchema() {
-    var r = await fetch(apiUrl('/api/cadastro/' + SLUG + '/schema'));
-    if (!r.ok) throw new Error('Schema não encontrado.');
-    var schema = await r.json();
-    CAMPOS = schema.campos || [];
-    LABEL = schema.label || 'Evento';
-    PLURAL = schema.plural || 'Eventos';
-    document.getElementById('listTitle').textContent = PLURAL + ' cadastrados';
-  }
-
-  // ---- Carrega e lista os eventos reais ----
-  async function carregar() {
-    var thead = document.getElementById('evThead');
-    var tbody = document.getElementById('evTbody');
-    var cols = colunas();
-    thead.innerHTML = '<tr>' + cols.map(function (c) { return '<th>' + esc(c.label) + '</th>'; }).join('') + '<th style="text-align:right;">Ações</th></tr>';
-    tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:var(--gray-500);padding:18px;">Carregando…</td></tr>';
-
-    var itens;
-    try {
-      var r = await fetch(apiUrl('/api/cadastro/' + SLUG));
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      var d = await r.json();
-      itens = d.itens || [];
-    } catch (e) {
-      tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:#DC2626;padding:18px;">Não foi possível carregar os eventos.</td></tr>';
-      return;
-    }
-
-    if (!itens.length) {
-      tbody.innerHTML = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;color:var(--gray-400);padding:36px 18px;">Nenhum evento cadastrado.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = itens.map(function (it) {
-      var tds = cols.map(function (c, idx) {
-        return '<td' + (idx === 0 ? ' style="font-weight:600;color:var(--gray-900);"' : '') + '>' + celula(c, it[c.nome]) + '</td>';
+  function renderMonth(){
+    var grid = $('cal-grid');
+    var html = DIAS_SEM.map(function(d){ return '<div class="cal-day-head">'+d+'</div>'; }).join('');
+    var first = new Date(refYear, refMonth, 1);
+    var startOffset = first.getDay();
+    var start = new Date(refYear, refMonth, 1 - startOffset);
+    var noMes = 0;
+    for (var i=0;i<42;i++){
+      var cur = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+      var cy=cur.getFullYear(), cm=cur.getMonth(), cd=cur.getDate();
+      var key = iso(cy,cm,cd);
+      var other = (cm !== refMonth);
+      var isToday = (cur.getTime() === hoje.getTime());
+      var evs = PORDIA[key] || [];
+      if(!other) noMes += evs.length;
+      var evHtml = evs.slice(0,4).map(function(e){
+        return '<a class="cal-evt" href="'+linkTurma(e)+'" title="'+esc(tituloEv(e))+'">'+(e.hora_inicio?esc(e.hora_inicio)+' ':'')+esc(e.evento||'Evento')+'</a>';
       }).join('');
-      return '<tr>' + tds +
-        '<td class="text-right"><div class="row-actions" style="display:flex;gap:6px;justify-content:flex-end;">' +
-          '<button class="icon-btn" title="Editar" data-edit="' + it.id + '"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>' +
-          '<button class="icon-btn danger" title="Excluir" data-del="' + it.id + '"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>' +
-        '</div></td></tr>';
-    }).join('');
-    refreshIcons();
+      if(evs.length>4) evHtml += '<div style="font-size:10px;color:var(--gray-500);margin-top:3px;">+'+(evs.length-4)+' mais</div>';
+      html += '<div class="cal-cell'+(other?' other':'')+(isToday?' today':'')+'">'+
+        '<div class="'+(isToday?'cal-today-mark':'cal-num')+'">'+cd+'</div>'+evHtml+'</div>';
+    }
+    grid.innerHTML = html;
+    $('cal-count').textContent = noMes + (noMes===1?' evento no mês':' eventos no mês');
+    icons();
+  }
 
-    tbody.querySelectorAll('[data-edit]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var item = itens.filter(function (x) { return String(x.id) === b.dataset.edit; })[0];
-        if (item) abrirForm(item);
-      });
+  function renderList(){
+    var body = $('cal-list-body');
+    var futuros = EVENTOS.filter(function(e){ return e.data >= iso(hoje.getFullYear(),hoje.getMonth(),hoje.getDate()); })
+                         .sort(function(a,b){ return a.data<b.data?-1:(a.data>b.data?1:(String(a.hora_inicio||'').localeCompare(String(b.hora_inicio||'')))); });
+    if(!futuros.length){ body.innerHTML = '<div class="cal-list-empty" style="padding:40px;text-align:center;color:var(--gray-400);">Nenhum evento futuro agendado.</div>'; return; }
+    var html = '', ultimo = '';
+    futuros.forEach(function(e){
+      if(e.data !== ultimo){
+        ultimo = e.data;
+        var p = e.data.split('-').map(Number); var dt = new Date(p[0],p[1]-1,p[2]);
+        html += '<div class="cal-list-day">'+p[2]+'/'+p[1]+' · '+DIAS_LONGO[dt.getDay()]+'</div>';
+      }
+      html += '<a class="cal-list-item" href="'+linkTurma(e)+'">'+
+        '<span class="cal-list-chip"></span>'+
+        '<div class="cal-list-txt">'+esc(e.evento||'Evento')+
+          (e.turma?'<div class="cal-list-sub">'+esc(e.turma)+(horaTxt(e)?' · '+esc(horaTxt(e)):'')+'</div>':'')+
+        '</div>'+
+        '<i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--gray-400);"></i></a>';
     });
-    tbody.querySelectorAll('[data-del]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var item = itens.filter(function (x) { return String(x.id) === b.dataset.del; })[0];
-        if (item) excluir(item);
-      });
+    body.innerHTML = html; icons();
+  }
+
+  function render(){
+    $('cal-label').textContent = MESES[refMonth] + ' de ' + refYear;
+    $('cal-month').classList.toggle('active', view==='month');
+    $('cal-list').classList.toggle('active', view==='list');
+    if(view==='month') renderMonth(); else renderList();
+  }
+
+  function carregar(){
+    var grid = $('cal-grid');
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--gray-500);">Carregando…</div>';
+    return fetch(apiUrl('/api/agenda'))
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){ EVENTOS = (d && d.itens) || []; indexar(); render(); })
+      .catch(function(){ grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:#DC2626;">Não foi possível carregar o calendário.</div>'; });
+  }
+
+  $('cal-prev').addEventListener('click', function(){ refMonth--; if(refMonth<0){refMonth=11;refYear--;} render(); });
+  $('cal-next').addEventListener('click', function(){ refMonth++; if(refMonth>11){refMonth=0;refYear++;} render(); });
+  $('cal-today').addEventListener('click', function(){ refYear=hoje.getFullYear(); refMonth=hoje.getMonth(); render(); });
+  $('cal-btn-reload').addEventListener('click', carregar);
+  document.querySelectorAll('#cal-view-toggle [data-view]').forEach(function(b){
+    b.addEventListener('click', function(){
+      view = b.dataset.view;
+      document.querySelectorAll('#cal-view-toggle [data-view]').forEach(function(x){ x.classList.toggle('active', x===b); });
+      render();
     });
-  }
+  });
 
-  // ---- Renderiza um controle a partir do tipo do campo ----
-  function controleHtml(c) {
-    var id = 'f-' + c.nome;
-    if (c.tipo === 'text') return '<input class="input" type="text" id="' + id + '">';
-    if (c.tipo === 'number') return '<input class="input" type="number" step="0.01" id="' + id + '">';
-    if (c.tipo === 'int') return '<input class="input" type="number" step="1" id="' + id + '">';
-    if (c.tipo === 'textarea') return '<textarea class="textarea" rows="3" id="' + id + '"></textarea>';
-    if (c.tipo === 'select') {
-      return '<select class="select" id="' + id + '">' +
-        (c.opcoes || []).map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') +
-        '</select>';
-    }
-    if (c.tipo === 'bool') {
-      return '<label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">' +
-          '<input type="checkbox" id="' + id + '" style="width:0;height:0;position:absolute;opacity:0;">' +
-          '<span data-track="' + id + '" style="width:42px;height:24px;border-radius:999px;background:var(--gray-300);position:relative;transition:background .15s;flex:none;">' +
-            '<span data-knob="' + id + '" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);"></span>' +
-          '</span>' +
-        '</label>';
-    }
-    if (c.tipo === 'imagem') return '<input class="input" type="url" id="' + id + '" placeholder="URL da imagem">';
-    // fallback
-    return '<input class="input" type="text" id="' + id + '">';
-  }
-
-  function bindToggle(body, id) {
-    var chk = body.querySelector('#' + id);
-    var track = body.querySelector('[data-track="' + id + '"]');
-    var knob = body.querySelector('[data-knob="' + id + '"]');
-    if (!chk || !track || !knob) return;
-    function paint() {
-      track.style.background = chk.checked ? 'var(--primary-500)' : 'var(--gray-300)';
-      knob.style.left = chk.checked ? '20px' : '2px';
-    }
-    chk.addEventListener('change', paint);
-    paint();
-  }
-
-  // ---- Form dinâmico (novo/editar) ----
-  function abrirForm(item) {
-    var editando = !!(item && item.id != null);
-    var body = document.createElement('form');
-    body.setAttribute('novalidate', '');
-
-    var camposHtml = CAMPOS.map(function (c) {
-      var req = c.obrigatorio ? ' <span style="color:#DC2626;">*</span>' : '';
-      // bool: label ao lado do switch
-      if (c.tipo === 'bool') {
-        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
-            '<span style="font-size:14px;font-weight:600;color:var(--gray-700);">' + esc(c.label) + '</span>' +
-            controleHtml(c) +
-          '</div>';
-      }
-      return '<div>' +
-          '<label class="label" for="f-' + c.nome + '">' + esc(c.label) + req + '</label>' +
-          controleHtml(c) +
-        '</div>';
-    }).join('');
-
-    body.innerHTML = '<div style="display:flex;flex-direction:column;gap:14px;">' +
-        camposHtml +
-        '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">' +
-          '<button type="button" class="btn btn-secondary" data-cancel>Cancelar</button>' +
-          '<button type="submit" class="btn btn-primary" data-handled="1"><span data-savetxt>Salvar</span></button>' +
-        '</div>' +
-      '</div>';
-
-    var modal = window.vtModal({ title: editando ? 'Editar ' + LABEL.toLowerCase() : 'Novo ' + LABEL.toLowerCase(), bodyHTML: body });
-
-    // Preenche defaults / valores e liga toggles
-    CAMPOS.forEach(function (c) {
-      var el = body.querySelector('#f-' + c.nome);
-      if (!el) return;
-      var val = editando ? item[c.nome] : c.default;
-      if (c.tipo === 'bool') {
-        el.checked = editando ? !!item[c.nome] : (c.default !== undefined ? !!c.default : false);
-        bindToggle(body, 'f-' + c.nome);
-      } else {
-        el.value = (val === undefined || val === null) ? '' : val;
-      }
-    });
-
-    body.querySelector('[data-cancel]').addEventListener('click', modal.close);
-
-    body.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      var payload = {};
-      var faltando = null;
-      CAMPOS.forEach(function (c) {
-        var el = body.querySelector('#f-' + c.nome);
-        if (!el) return;
-        var v;
-        if (c.tipo === 'bool') v = el.checked;
-        else v = (el.value || '').trim();
-        if (c.obrigatorio && (v === '' || v === null || v === undefined) && !faltando) faltando = c;
-        payload[c.nome] = v;
-      });
-      if (faltando) {
-        alerta('Preencha o campo "' + faltando.label + '".', 'Campo obrigatório');
-        var f = body.querySelector('#f-' + faltando.nome);
-        if (f) f.focus();
-        return;
-      }
-
-      var btn = body.querySelector('[data-savetxt]');
-      var orig = btn.textContent;
-      btn.textContent = 'Salvando…';
-      var url = editando ? apiUrl('/api/cadastro/' + SLUG + '/' + item.id) : apiUrl('/api/cadastro/' + SLUG);
-      try {
-        var r = await fetch(url, {
-          method: editando ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        var d = await r.json().catch(function () { return {}; });
-        if (!r.ok) throw new Error(d.detail || 'Erro ao salvar.');
-        modal.close();
-        notify(editando ? LABEL + ' atualizado.' : LABEL + ' criado.');
-        carregar();
-      } catch (err) {
-        btn.textContent = orig;
-        alerta(err.message || 'Erro ao salvar.', 'Erro');
-      }
-    });
-
-    setTimeout(function () {
-      var first = body.querySelector('input, select, textarea');
-      if (first) first.focus();
-    }, 80);
-  }
-
-  async function excluir(item) {
-    var nome = item.nome || ('#' + item.id);
-    var ok = window.vtConfirm
-      ? await window.vtConfirm('Excluir "' + nome + '"? Esta ação não pode ser desfeita.', { title: 'Excluir ' + LABEL.toLowerCase(), okText: 'Excluir', danger: true })
-      : window.confirm('Excluir "' + nome + '"?');
-    if (!ok) return;
-    try {
-      var r = await fetch(apiUrl('/api/cadastro/' + SLUG + '/' + item.id), { method: 'DELETE' });
-      if (!r.ok) {
-        var d = await r.json().catch(function () { return {}; });
-        throw new Error(d.detail || 'Erro ao excluir.');
-      }
-      notify(LABEL + ' excluído.');
-      carregar();
-    } catch (err) {
-      alerta(err.message || 'Erro ao excluir.', 'Erro');
-    }
-  }
-
-  // ---- Init ----
-  (async function init() {
-    var btnNovo = document.getElementById('btnNovoEvento');
-    var btnReload = document.getElementById('btnRecarregar');
-    try {
-      await carregarSchema();
-    } catch (e) {
-      document.getElementById('evTbody').innerHTML = '<tr><td style="text-align:center;color:#DC2626;padding:18px;">Não foi possível carregar o formulário de eventos.</td></tr>';
-    }
-    if (btnNovo) btnNovo.addEventListener('click', function () { abrirForm(null); });
-    if (btnReload) btnReload.addEventListener('click', carregar);
-    await carregar();
-  })();
+  icons();
+  carregar();
 })();
 </script>
 

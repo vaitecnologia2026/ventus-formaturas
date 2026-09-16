@@ -355,7 +355,8 @@ async function carregar(){
   F.email_confirma = a.email || '';   // se já veio preenchido, considera confirmado
   F.cpf = a.cpf ? maskCpf(a.cpf) : '';
   F.curso = a.curso || '';
-  F.ano_formatura = a.ano_formatura || '';
+  // ano já vem do cadastro da turma; se o aluno ainda não tiver, puxa o ano da turma
+  F.ano_formatura = a.ano_formatura || (DADOS.turma && DADOS.turma.ano) || '';
   F.altura = a.altura || '';
   F.peso = a.peso || '';
   F.calcado = a.calcado || '';
@@ -542,14 +543,36 @@ function viewDados(){
   const ncEl = document.getElementById('i-numcalca');
   if(ncEl){ ncEl.oninput = () => { ncEl.value = ncEl.value.replace(/\D/g,'').slice(0,3); }; }
 
-  document.getElementById('btn-next').onclick = () => {
+  document.getElementById('btn-next').onclick = async () => {
     saveDados();
     if(!validarDados()) return;
+    // bloqueia CPF já usado por outro formando da mesma turma (antes de seguir pra compra)
+    const btn = document.getElementById('btn-next');
+    btn.disabled = true;
+    try {
+      if(!(await cpfDisponivel())){ btn.disabled = false; return; }
+    } catch(e) { /* rede: não trava o fluxo, o backend valida de novo ao enviar */ }
+    btn.disabled = false;
     clearErro();
     // aplica desconto por CPF ao avançar (mantém comportamento existente)
     checarDesconto();
     STEP = 1; render();
   };
+}
+
+// consulta o backend se o CPF já está em uso na turma; avisa e bloqueia se estiver
+async function cpfDisponivel(){
+  const cpfNum = (F.cpf||'').replace(/\D/g,'');
+  if(cpfNum.length !== 11) return true; // validarDados já cobriu o formato
+  const r = await fetch(apiUrl(`/api/inscricao/${token}/cpf-disponivel?cpf=${cpfNum}`));
+  if(!r.ok) return true; // não trava por erro de rede
+  const d = await r.json();
+  if(!d.disponivel && d.motivo === 'duplicado'){
+    showErro('Este CPF já está cadastrado nesta turma. Fale com a comissão se precisar de ajuda.');
+    toast('CPF já cadastrado nesta turma.');
+    return false;
+  }
+  return true;
 }
 
 // valida todos os campos obrigatórios da etapa Dados; avisa via toast
@@ -838,7 +861,9 @@ function removerCupom(){
 
 /* =================== ETAPA 3: ADICIONAIS =================== */
 function viewAdicionais(){
-  const cat = DADOS.adicionais_catalogo || [];
+  // adicionais SÓ do plano escolhido (produtos/serviços cadastrados nele).
+  // sem plano escolhido, ou plano sem adicionais, não mostra nenhum.
+  const cat = (planoSel() && planoSel().adicionais) || [];
   const eventos = DADOS.eventos || [];
   const jaEsc = {}; F.adicionais.forEach(x=>{ jaEsc[x.descricao.toLowerCase()] = x.quantidade; });
 

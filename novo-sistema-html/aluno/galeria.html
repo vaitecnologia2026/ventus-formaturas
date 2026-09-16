@@ -48,7 +48,7 @@
 
   <!-- Counter de seleção -->
   <div style="background:#FEF3C7;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;">
-    <div style="font-size:13px;color:#92400E;">Seleção: <strong><span id="selecao-counter">3</span> de 10</strong> fotos</div>
+    <div style="font-size:13px;color:#92400E;">Seleção: <strong><span id="selecao-counter">3</span> de <span id="selecao-limite">—</span></strong> fotos <span id="selecao-excedente" style="display:none;margin-left:6px;font-weight:600;color:#B45309;"></span></div>
     <a href="galeria-final.html" style="font-size:13px;color:var(--primary-600);font-weight:600;text-decoration:none;">Finalizar →</a>
   </div>
 
@@ -95,7 +95,42 @@
   </div>
 </div>
 
+<script src="../assets/js/config.js"></script>
+<script src="espaco.js"></script>
 <script src="../assets/js/app.js"></script>
+<script>
+// Contador ao vivo do saldo GLOBAL do contrato ("X de 100"): busca o limite real
+// do plano e recalcula quantas o formando pode selecionar sem gerar excedente.
+(function(){
+  let LIMITE = null, MODO = null;
+  function selecionadas(){ return document.querySelectorAll('.photo-tile.selected').length; }
+  function pintar(){
+    const usadas = selecionadas();
+    const c = document.getElementById('selecao-counter'); if(c) c.textContent = usadas;
+    const cb = document.getElementById('counter-bottom'); if(cb) cb.textContent = usadas;
+    const lim = document.getElementById('selecao-limite'); if(lim) lim.textContent = (LIMITE!=null? LIMITE : '—');
+    const ex = document.getElementById('selecao-excedente');
+    if(ex){
+      if(LIMITE!=null && usadas>LIMITE){ ex.style.display='inline'; ex.textContent = '· +'+(usadas-LIMITE)+' excedente'; }
+      else { ex.style.display='none'; }
+    }
+  }
+  // reaproveita o togglePhoto do app.js e injeta nosso repaint por cima
+  const orig = window.togglePhoto;
+  window.togglePhoto = function(el){ if(typeof orig==='function') orig(el); pintar(); };
+  async function boot(){
+    try{
+      const t = (typeof getTokenAluno==='function') ? getTokenAluno() : '';
+      if(!t){ pintar(); return; }
+      const r = await fetch(apiUrl('/api/meu-espaco/'+encodeURIComponent(t)+'/excedente'),
+        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fotos:[]})});
+      if(r.ok){ const d = await r.json(); if(d && d.saldo){ LIMITE = d.saldo.limite; MODO = d.saldo.modo; } }
+    }catch(e){}
+    pintar();
+  }
+  boot();
+})();
+</script>
 
 </body>
 </html>

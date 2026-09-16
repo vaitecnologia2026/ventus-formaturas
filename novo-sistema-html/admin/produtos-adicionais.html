@@ -101,6 +101,7 @@
             '<div class="flex justify-between items-end">' +
               statusBadge +
               '<div class="row-actions" style="display:flex;gap:6px;">' +
+                '<button class="btn btn-primary btn-sm" data-vender="' + it.id + '"><i data-lucide="shopping-cart" class="w-4 h-4"></i> Vender</button>' +
                 '<button class="btn btn-secondary btn-sm" data-edit="' + it.id + '"><i data-lucide="pencil" class="w-4 h-4"></i></button>' +
                 '<button class="btn btn-secondary btn-sm" data-del="' + it.id + '"><i data-lucide="trash-2" class="w-4 h-4"></i></button>' +
               '</div>' +
@@ -122,6 +123,83 @@
         if (item) excluir(item);
       });
     });
+    lista.querySelectorAll('[data-vender]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var item = itens.filter(function (x) { return String(x.id) === b.dataset.vender; })[0];
+        if (item) venderAvulso(item);
+      });
+    });
+  }
+
+  // ---- Venda avulsa: gera cobrança (Pix/Boleto/Link) para um cliente sem turma ----
+  function venderAvulso(item) {
+    var body = document.createElement('form');
+    body.setAttribute('novalidate', '');
+    body.innerHTML = [
+      '<div style="display:flex;flex-direction:column;gap:12px;">',
+        '<div style="background:var(--gray-50);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--gray-700);"><strong>'+esc(item.nome)+'</strong>'+(item.descricao?' · '+esc(item.descricao):'')+'</div>',
+        '<div style="display:flex;gap:10px;">',
+          '<div style="flex:1;"><label class="label">Valor (R$) *</label><input class="input" id="va-valor" type="number" step="0.01" min="5" placeholder="0,00"></div>',
+          '<div style="flex:1;"><label class="label">Forma</label><select class="select" id="va-metodo"><option value="pix">Pix</option><option value="boleto">Boleto</option><option value="link">Link de pagamento</option></select></div>',
+        '</div>',
+        '<div><label class="label">Nome do cliente *</label><input class="input" id="va-nome" type="text" placeholder="Nome de quem vai pagar" autocomplete="off"></div>',
+        '<div style="display:flex;gap:10px;">',
+          '<div style="flex:1;"><label class="label">CPF</label><input class="input" id="va-cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"></div>',
+          '<div style="flex:1;"><label class="label">WhatsApp</label><input class="input" id="va-tel" type="text" inputmode="numeric" placeholder="(00) 00000-0000"></div>',
+        '</div>',
+        '<div><label class="label">E-mail</label><input class="input" id="va-email" type="email" placeholder="email@exemplo.com (opcional)"></div>',
+        '<div id="va-result" style="display:none;"></div>',
+        '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">',
+          '<button type="button" class="btn btn-secondary" data-cancel>Fechar</button>',
+          '<button type="submit" class="btn btn-primary" data-handled="1"><span data-savetxt>Gerar cobrança</span></button>',
+        '</div>',
+      '</div>'
+    ].join('');
+
+    var modal = window.vtModal({ title: 'Vender "' + item.nome + '"', bodyHTML: body });
+    var cpf = body.querySelector('#va-cpf');
+    cpf.addEventListener('input', function(){ var d=cpf.value.replace(/\D/g,'').slice(0,11); cpf.value=d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); });
+    body.querySelector('[data-cancel]').addEventListener('click', modal.close);
+
+    body.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var valor = parseFloat(String(body.querySelector('#va-valor').value||'').replace(',','.'));
+      var nome = (body.querySelector('#va-nome').value||'').trim();
+      if (!(valor > 0)) { alerta('Informe um valor válido (mínimo R$ 5,00).', 'Valor'); return; }
+      if (valor < 5) { alerta('O valor mínimo da cobrança é R$ 5,00.', 'Valor'); return; }
+      if (!nome) { alerta('Informe o nome do cliente.', 'Cliente'); return; }
+      var payload = {
+        metodo: body.querySelector('#va-metodo').value,
+        valor: valor,
+        descricao: item.nome,
+        cliente: {
+          nome: nome,
+          cpf: (body.querySelector('#va-cpf').value||'').replace(/\D/g,'') || null,
+          telefone: (body.querySelector('#va-tel').value||'').replace(/\D/g,'') || null,
+          email: (body.querySelector('#va-email').value||'').trim() || null
+        }
+      };
+      var btn = body.querySelector('[data-savetxt]'); var orig = btn.textContent; btn.textContent = 'Gerando…';
+      try {
+        var r = await fetch(apiUrl('/api/pagamento'), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        var d = await r.json().catch(function(){ return {}; });
+        if (!r.ok) throw new Error(d.detail || 'Erro ao gerar cobrança.');
+        var res = body.querySelector('#va-result');
+        var linhas = '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:12px;font-size:13px;color:#065F46;">'+
+          '<strong>Cobrança gerada!</strong> Valor R$ '+valor.toFixed(2).replace('.',',')+'.';
+        if (d.url) linhas += '<div style="margin-top:8px;"><a href="'+esc(d.url)+'" target="_blank" rel="noopener" class="btn btn-primary btn-sm"><i data-lucide="external-link" class="w-4 h-4"></i> Abrir '+(payload.metodo==='boleto'?'boleto':'pagamento')+'</a></div>';
+        if (d.pix_copia_cola) linhas += '<div style="margin-top:8px;"><div style="font-size:11px;color:#047857;margin-bottom:3px;">Pix copia e cola:</div><textarea readonly style="width:100%;font-size:11px;padding:8px;border:1px solid #A7F3D0;border-radius:8px;resize:none;" rows="3" onclick="this.select()">'+esc(d.pix_copia_cola)+'</textarea></div>';
+        linhas += '</div>';
+        res.innerHTML = linhas; res.style.display = '';
+        btn.textContent = orig; refreshIcons();
+        notify('Cobrança gerada.');
+      } catch (err) {
+        btn.textContent = orig;
+        alerta(err.message || 'Erro ao gerar cobrança.', 'Erro');
+      }
+    });
+
+    setTimeout(function(){ body.querySelector('#va-valor').focus(); }, 80);
   }
 
   // ---- Form (novo/editar) ----

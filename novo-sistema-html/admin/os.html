@@ -195,6 +195,31 @@ async function carregar(){
 function render(){ if(VIEW==='kanban') renderKanban(); else renderLista(); }
 
 const PRIO_COR={alta:'#DC2626',media:'#D97706',baixa:'#16A34A'};
+// Fotos enviadas pelo fotógrafo ficam como URLs no texto da observação —
+// aqui viram MINIATURAS clicáveis (antes só aparecia o link).
+function fotosDoTexto(txt){
+  if(!txt) return [];
+  var urls = String(txt).match(/https?:\/\/[^\s"'<>]+/gi) || [];
+  return urls.filter(function(u){ return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(u); });
+}
+function textoSemUrls(txt){
+  return String(txt||'').replace(/\d+\.\s*/g,'').replace(/https?:\/\/[^\s"'<>]+/gi,'').replace(/\n{2,}/g,'\n').trim();
+}
+function galeriaMiniaturas(urls){
+  if(!urls.length) return '';
+  return '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">'+
+    urls.slice(0,8).map(function(u){
+      return '<a href="'+esc(u)+'" target="_blank" rel="noopener" title="Abrir foto" style="display:block;width:54px;height:54px;border-radius:8px;overflow:hidden;border:1px solid var(--gray-200);"><img src="'+esc(u)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></a>';
+    }).join('')+
+    (urls.length>8?'<span style="align-self:center;font-size:11px;color:var(--gray-500);">+'+(urls.length-8)+' fotos</span>':'')+
+  '</div>';
+}
+function blocoObservacao(obs){
+  var fs = fotosDoTexto(obs);
+  var txt = fs.length ? textoSemUrls(obs) : String(obs||'').trim();
+  var linhaTxt = txt ? '<div style="font-size:12px;color:var(--gray-500);margin-top:6px;display:flex;gap:6px;align-items:flex-start;"><i data-lucide="sticky-note" style="width:13px;height:13px;flex:none;margin-top:2px;"></i><span style="white-space:pre-wrap;">'+esc(txt)+'</span></div>' : '';
+  return linhaTxt + galeriaMiniaturas(fs);
+}
 function cardOS(o){
   const prio=o.prioridade?`<span style="font-size:11px;font-weight:700;color:${PRIO_COR[o.prioridade]||'#64748B'};">● ${o.prioridade}</span>`:'';
   const linha=(ic,txt)=>txt?`<div style="font-size:12px;color:var(--gray-600);display:flex;gap:6px;align-items:center;"><i data-lucide="${ic}" style="width:13px;height:13px;"></i>${esc(txt)}</div>`:'';
@@ -206,7 +231,7 @@ function cardOS(o){
     <div style="margin:8px 0 6px;"><span class="badge b-tipo">${tipo}</span>${o.situacao_os?` <span class="badge b-todos">${esc(o.situacao_os)}</span>`:''}</div>
     ${linha('users-round',o.turma)}${linha('user',o.aluno)}${linha('calendar-days',o.evento)}${linha('user-check',o.responsavel)}
     ${o.chamado?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;">${esc(o.chamado)}</div>`:''}
-    ${o.observacoes?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;display:flex;gap:6px;align-items:center;"><i data-lucide="sticky-note" style="width:13px;height:13px;flex:none;"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(o.observacoes)}</span></div>`:''}
+    ${o.observacoes?blocoObservacao(o.observacoes):''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:8px;border-top:1px solid var(--gray-100);">
       <span style="font-size:11px;color:var(--gray-400);">${o.dias_na_etapa!=null?`há ${o.dias_na_etapa}d nesta etapa`:''}</span>
       <span style="display:flex;gap:4px;">
