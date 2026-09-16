@@ -1233,12 +1233,23 @@ async function enviar(){
     adicionais: F.adicionais,
   };
 
+  // Abre a aba do pagamento JÁ no clique (gesto do usuário) pra o boleto/link
+  // abrir automático — sem o clique extra em "Pagar boleto". Pix mostra QR inline.
+  const _meio = (F.meio_pagamento||F.forma_pagamento||'').toLowerCase();
+  const _metodo = /pix/.test(_meio)?'pix':(/boleto/.test(_meio)?'boleto':(/cart|cred/.test(_meio)?'cartao':'link'));
+  let payWin = null;
+  if(_metodo!=='pix' && +(F.total||0) >= 5){
+    payWin = window.open('', '_blank');
+    if(payWin){ try{ payWin.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:40px;color:#334155;">Gerando seu boleto…</body>'); }catch(e){} }
+  }
+
   btn.textContent = 'Enviando…'; btn.disabled = true;
   let r;
   try{
     r = await fetch(apiUrl('/api/inscricao/'+token), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   }catch(e){ r = {ok:false}; }
   if(!r.ok){
+    if(payWin){ try{ payWin.close(); }catch(e){} }
     showErro('Erro ao enviar. Tente de novo.');
     btn.textContent = 'Confirmar cadastro'; btn.disabled = false; return;
   }
@@ -1264,15 +1275,16 @@ async function enviar(){
     <div id="pay-box" style="margin-top:14px;"></div>
   </div>`;
   window.scrollTo({top:0, behavior:'smooth'});
-  gerarPagamento(alunoId, p);
+  gerarPagamento(alunoId, p, payWin);
 }
 
 // Gera a cobrança real (Asaas) conforme a forma de pagamento escolhida
-async function gerarPagamento(alunoId, p){
+async function gerarPagamento(alunoId, p, payWin){
   const box = document.getElementById('pay-box'); if(!box) return;
+  const fecharAba = () => { if(payWin){ try{ payWin.close(); }catch(e){} } };
   const hintFallback = `<div class="pay-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="ph-t">Em breve enviamos o <b>link de pagamento</b> no seu WhatsApp.</div></div>`;
   const total = +(F.total||0);
-  if(!alunoId || !p || total < 5){ box.innerHTML = hintFallback; return; }  // Asaas exige mín. R$5
+  if(!alunoId || !p || total < 5){ fecharAba(); box.innerHTML = hintFallback; return; }  // Asaas exige mín. R$5
   const meio = (F.meio_pagamento||F.forma_pagamento||'').toLowerCase();
   const metodo = /pix/.test(meio)?'pix':(/boleto/.test(meio)?'boleto':(/cart|cred/.test(meio)?'cartao':'link'));
   box.innerHTML = `<div class="pay-hint"><div class="ph-t">Gerando seu pagamento…</div></div>`;
@@ -1280,7 +1292,10 @@ async function gerarPagamento(alunoId, p){
     const r = await fetch(apiUrl('/api/pagamento'), {method:'POST',headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ aluno_id: alunoId, metodo, valor: total, parcelas: F.parcelas || null, vencimento: F.vencimento || null, descricao: `Formatura — ${p.nome||'Plano'}` })});
     const c = await r.json();
-    if(!r.ok){ box.innerHTML = hintFallback; return; }
+    if(!r.ok){ fecharAba(); box.innerHTML = hintFallback; return; }
+    // boleto/link/cartão: leva o formando direto pro boleto já gerado (aba aberta no clique)
+    if(metodo!=='pix' && c.url && payWin){ try{ payWin.location.href = c.url; }catch(e){} }
+    else fecharAba();
     if(metodo==='pix' && (c.pix_copia_cola || c.pix_qr_base64)){
       box.innerHTML = `<div style="text-align:center;">
         <div style="font-weight:700;color:var(--ink);margin-bottom:8px;">Pague com Pix — ${brl(total)}</div>
