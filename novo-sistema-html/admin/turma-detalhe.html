@@ -352,9 +352,19 @@
       <div class="panel">
         <div class="panel-head"><h2><i data-lucide="graduation-cap" style="width:16px;height:16px;color:var(--primary-600);"></i> Cursos vinculados</h2></div>
         <div class="panel-body">
-          <p style="margin:0 0 12px;font-size:13px;color:var(--gray-500);">Turmas de cursos unificados podem ter vários cursos (até de instituições diferentes). Marque os cursos desta turma.</p>
-          <div id="cur-lista" style="display:flex;flex-wrap:wrap;gap:8px 16px;"></div>
-          <div style="margin-top:16px;"><button class="btn btn-primary" id="cur-salvar"><i data-lucide="check" class="w-4 h-4"></i> Salvar cursos</button></div>
+          <p style="margin:0 0 14px;font-size:13px;color:var(--gray-500);">Turmas de cursos unificados podem ter vários cursos (até de instituições diferentes). Busque e vincule os cursos desta turma.</p>
+
+          <!-- Chips dos cursos JÁ vinculados -->
+          <div id="cur-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+
+          <!-- Dropdown pesquisável (lupa) -->
+          <div id="cur-picker" style="position:relative;max-width:440px;">
+            <div style="position:relative;">
+              <i data-lucide="search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--gray-400);pointer-events:none;"></i>
+              <input type="text" id="cur-busca" autocomplete="off" placeholder="Buscar curso para vincular..." style="width:100%;padding:11px 12px 11px 38px;border:1px solid var(--gray-300);border-radius:11px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box;">
+            </div>
+            <div id="cur-dropdown" hidden style="position:absolute;z-index:60;left:0;right:0;margin-top:6px;background:var(--gray-0,#fff);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-height:260px;overflow-y:auto;padding:4px;"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -542,8 +552,12 @@ async function atualizarEventosPlano(){
   }catch(e){}
 }
 
-/* ---------------- CURSOS vinculados ---------------- */
-let CURSOS_OPC = [];
+/* ---------------- CURSOS vinculados (dropdown pesquisável + chips) ---------------- */
+let CURSOS_OPC = [];        // todos os cursos disponíveis (da API /opcoes)
+let CURSOS_SEL = [];        // ids vinculados na turma (estado local)
+let CURSOS_PICKER_BOUND = false;
+function escHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
 async function carregarCursos() {
   if (!CURSOS_OPC.length) {
     const r = await fetch(apiUrl('/api/turma-formatura/opcoes'));
@@ -551,18 +565,98 @@ async function carregarCursos() {
   }
   const rt = await fetch(apiUrl('/api/turma-formatura/'+id));
   const t = await rt.json();
-  const sel = new Set((t.curso_ids)||[]);
-  $('#cur-lista').innerHTML = CURSOS_OPC.length
-    ? CURSOS_OPC.map(c=>`<label style="display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--gray-700);cursor:pointer;"><input type="checkbox" value="${c.id}" ${sel.has(c.id)?'checked':''}> ${c.nome}</label>`).join('')
-    : '<span style="font-size:13px;color:var(--gray-400);">Nenhum curso cadastrado. Cadastre em Cadastros › Cursos.</span>';
-  $('#cur-salvar').onclick = salvarCursos;
+  CURSOS_SEL = [...new Set((t.curso_ids)||[])];
+  bindCursosPicker();
+  renderCursosChips();
+  renderCursosDropdown($('#cur-busca') ? $('#cur-busca').value : '');
 }
-async function salvarCursos() {
-  const ids = [...$('#cur-lista').querySelectorAll('input:checked')].map(x=>Number(x.value));
-  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/cursos`), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso_ids:ids})});
-  if (r.ok) { toast('Cursos atualizados.'); const t=await(await fetch(apiUrl('/api/turma-formatura/'+id))).json(); pintarDados(t); }
-  else await vtAlert('Erro ao salvar cursos.',{title:'Ops'});
+
+function nomeCurso(cid){ const c = CURSOS_OPC.find(x=>x.id===cid); return c ? c.nome : ('#'+cid); }
+
+function renderCursosChips() {
+  const box = $('#cur-chips'); if (!box) return;
+  if (!CURSOS_SEL.length) {
+    box.innerHTML = '<span style="font-size:13px;color:var(--gray-400);">Nenhum curso vinculado ainda. Use a busca abaixo.</span>';
+    return;
+  }
+  box.innerHTML = CURSOS_SEL.map(cid=>`
+    <span class="cur-chip" style="display:inline-flex;align-items:center;gap:7px;background:var(--primary-50,#eef2ff);color:var(--primary-700,#3730a3);border:1px solid var(--primary-200,#c7d2fe);padding:6px 8px 6px 12px;border-radius:999px;font-size:13px;font-weight:600;">
+      ${escHtml(nomeCurso(cid))}
+      <button type="button" onclick="desvincularCurso(${cid})" title="Desvincular curso" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:none;background:rgba(0,0,0,.06);color:inherit;border-radius:50%;cursor:pointer;padding:0;line-height:0;">
+        <i data-lucide="x" style="width:12px;height:12px;"></i>
+      </button>
+    </span>`).join('');
+  lucide.createIcons();
 }
+
+function renderCursosDropdown(termo) {
+  const dd = $('#cur-dropdown'); if (!dd) return;
+  const q = (termo||'').trim().toLowerCase();
+  const disponiveis = CURSOS_OPC.filter(c=>!CURSOS_SEL.includes(c.id));
+  const filtrados = q ? disponiveis.filter(c=>(c.nome||'').toLowerCase().includes(q)) : disponiveis;
+  if (!CURSOS_OPC.length) {
+    dd.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--gray-400);">Nenhum curso cadastrado. Cadastre em Cadastros › Cursos.</div>';
+  } else if (!filtrados.length) {
+    dd.innerHTML = `<div style="padding:12px;font-size:13px;color:var(--gray-400);">${disponiveis.length ? 'Nenhum curso encontrado para a busca.' : 'Todos os cursos já foram vinculados.'}</div>`;
+  } else {
+    dd.innerHTML = filtrados.map(c=>`
+      <button type="button" class="cur-opt" onclick="vincularCurso(${c.id})" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 12px;border:none;background:none;border-radius:9px;cursor:pointer;font-size:14px;color:var(--gray-700);">
+        <i data-lucide="plus" style="width:15px;height:15px;color:var(--primary-500,#6366f1);flex:0 0 auto;"></i>
+        <span>${escHtml(c.nome)}</span>
+      </button>`).join('');
+    lucide.createIcons();
+    dd.querySelectorAll('.cur-opt').forEach(b=>{
+      b.onmouseenter=()=>b.style.background='var(--gray-100,#f3f4f6)';
+      b.onmouseleave=()=>b.style.background='none';
+    });
+  }
+}
+
+function bindCursosPicker() {
+  if (CURSOS_PICKER_BOUND) return;
+  const inp = $('#cur-busca'), dd = $('#cur-dropdown'), wrap = $('#cur-picker');
+  if (!inp || !dd || !wrap) return;
+  const abrir = ()=>{ renderCursosDropdown(inp.value); dd.hidden=false; };
+  inp.addEventListener('focus', abrir);
+  inp.addEventListener('input', ()=>{ renderCursosDropdown(inp.value); dd.hidden=false; });
+  document.addEventListener('click', (e)=>{ if(!wrap.contains(e.target)) dd.hidden=true; });
+  inp.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ dd.hidden=true; inp.blur(); } });
+  CURSOS_PICKER_BOUND = true;
+}
+
+async function salvarCursosVinculo(msgOk) {
+  const r = await fetch(apiUrl(`/api/turma-formatura/${id}/cursos`), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso_ids:CURSOS_SEL})});
+  if (r.ok) {
+    if (msgOk) toast(msgOk);
+    try { const t=await(await fetch(apiUrl('/api/turma-formatura/'+id))).json(); pintarDados(t); } catch(e){}
+    return true;
+  }
+  await vtAlert('Erro ao salvar cursos.',{title:'Ops'});
+  return false;
+}
+
+window.vincularCurso = async function(cid){
+  cid = Number(cid);
+  if (CURSOS_SEL.includes(cid)) return;
+  const anterior = [...CURSOS_SEL];
+  CURSOS_SEL.push(cid);
+  renderCursosChips();
+  const inp = $('#cur-busca'); if (inp) inp.value='';
+  renderCursosDropdown('');
+  const ok = await salvarCursosVinculo('Curso vinculado.');
+  if (!ok) { CURSOS_SEL = anterior; renderCursosChips(); renderCursosDropdown(''); }
+};
+
+window.desvincularCurso = async function(cid){
+  cid = Number(cid);
+  if (!await vtConfirm(`Desvincular o curso "${nomeCurso(cid)}" desta turma?`,{title:'Confirmar',danger:true,okText:'Desvincular'})) return;
+  const anterior = [...CURSOS_SEL];
+  CURSOS_SEL = CURSOS_SEL.filter(x=>x!==cid);
+  renderCursosChips();
+  renderCursosDropdown($('#cur-busca') ? $('#cur-busca').value : '');
+  const ok = await salvarCursosVinculo('Curso desvinculado.');
+  if (!ok) { CURSOS_SEL = anterior; renderCursosChips(); renderCursosDropdown(''); }
+};
 
 /* ---------------- HISTÓRICO da turma ---------------- */
 async function carregarHistorico() {
