@@ -421,6 +421,7 @@
 lucide.createIcons();
 const $ = s => document.querySelector(s);
 const id = new URLSearchParams(location.search).get('id');
+function hojeISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
 /* =============================================================
    Single-select com busca (reaproveita o visual .ms-list/.ms-opt
@@ -933,14 +934,18 @@ async function carregarBrindes() {
       <td><span class="badge b-${b.escopo}">${esc}</span></td>
       <td>${b.observacao||'—'}</td>
       <td><div class="row-actions">
+        <input type="date" id="dt-br-${b.id}" value="${hojeISO()}" max="${hojeISO()}" title="Data da entrega" style="padding:6px 8px;border:1px solid var(--gray-300);border-radius:8px;font-size:13px;font-family:inherit;">
         <button class="btn btn-secondary btn-sm" title="Marcar como entregue para todos os alunos da turma" onclick="entregarTodos(${b.id})"><i data-lucide="check-check" style="width:14px;height:14px;"></i> Entregar a todos</button>
         <button class="icon-btn" title="Editar" onclick='editarBrinde(${JSON.stringify(b)})'><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
         <button class="icon-btn danger" title="Excluir" onclick="excluirBrinde(${b.id})"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>
       </div></td></tr>`;}).join('');
   lucide.createIcons();
 }
-window.entregarTodos = async function(tbid){ if(!await vtConfirm('Marcar este brinde como ENTREGUE para todos os alunos da turma que o recebem?',{title:'Confirmar'}))return;
-  const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+tbid+'/entregar-todos'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue:true})});
+window.entregarTodos = async function(tbid){
+  const dtEl = document.getElementById('dt-br-'+tbid);
+  const dataEnt = (dtEl && dtEl.value) || hojeISO();
+  if(!await vtConfirm(`Marcar este brinde como ENTREGUE (em ${dataEnt.split('-').reverse().join('/')}) para todos os alunos da turma que o recebem?`,{title:'Confirmar'}))return;
+  const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+tbid+'/entregar-todos'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue:true, data_entrega:dataEnt})});
   const d=await r.json(); if(r.ok) toast(`Entregue para ${d.afetados} aluno(s).`); else await vtAlert('Erro',{title:'Ops'}); };
 window.editarBrinde = function(b){ brEdit=b.id; $('#br-brinde_id').value=b.brinde_id||''; $('#br-escopo').value=b.escopo; $('#br-obs').value=b.observacao||''; refreshSelects(['br-brinde_id']); $('#br-btn').textContent='Atualizar'; $('#br-form-title').textContent='Editar brinde'; window.scrollTo({top:0,behavior:'smooth'}); };
 window.excluirBrinde = async function(bid){ if(!await vtConfirm('Excluir este brinde?',{title:'Confirmar exclusão',danger:true,okText:'Excluir'}))return; const r=await fetch(apiUrl('/api/turma-formatura/brindes/'+bid),{method:'DELETE'}); if(r.ok)carregarBrindes(); };

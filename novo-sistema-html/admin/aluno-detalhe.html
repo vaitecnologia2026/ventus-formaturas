@@ -258,6 +258,7 @@ const $ = s => document.querySelector(s);
 const id = new URLSearchParams(location.search).get('id');
 const brl = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const dtBR = s => s ? s.split('-').reverse().join('/') : '—';
+function hojeISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 let FORMAS = [], TAMS = [], planoValor = 0;
 
 if (!id) location.href = 'turmas.html'; else init();
@@ -407,12 +408,18 @@ async function carregarBrindes(){
     <td class="nome">${b.nome}</td>
     <td>${b.escopo==='comissao'?'<span class="badge b-ok">Comissão</span>':'<span class="badge b-pago">Todos</span>'}</td>
     <td>${b.observacao||'—'}</td>
-    <td><label class="switch"><input type="checkbox" ${b.entregue?'checked':''} onchange="toggleEntrega(${b.id},this.checked)"><span class="track"></span></label>
-        ${b.entregue&&b.entregue_em?`<span style="font-size:11px;color:var(--gray-500);margin-left:8px;">entregue ${dtBR(b.entregue_em)}</span>`:''}</td></tr>`).join('');
+    <td><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <label class="switch"><input type="checkbox" ${b.entregue?'checked':''} onchange="toggleEntrega(${b.id},this.checked)"><span class="track"></span></label>
+        <input type="date" id="dt-ent-${b.id}" value="${b.entregue_em||hojeISO()}" max="${hojeISO()}" title="Data da entrega" style="padding:5px 8px;border:1px solid var(--gray-300);border-radius:8px;font-size:12px;font-family:inherit;">
+        ${b.entregue&&b.entregue_em?`<span style="font-size:11px;color:var(--gray-500);">entregue ${dtBR(b.entregue_em)}</span>`:''}
+      </div></td></tr>`).join('');
   lucide.createIcons();
 }
 window.toggleEntrega=async function(turmaBrindeId,entregue){
-  const r=await fetch(apiUrl(`/api/aluno/${id}/brindes/${turmaBrindeId}/entrega`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({entregue})});
+  const dtEl=document.getElementById('dt-ent-'+turmaBrindeId);
+  const dataEnt=(dtEl && dtEl.value) || hojeISO();
+  const body=entregue?{entregue:true, data_entrega:dataEnt}:{entregue:false};
+  const r=await fetch(apiUrl(`/api/aluno/${id}/brindes/${turmaBrindeId}/entrega`),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(r.ok)carregarBrindes(); else await vtAlert('Erro',{title:'Ops'});
 };
 let AD_CAT=[];
