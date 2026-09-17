@@ -1,56 +1,75 @@
 /* ============================================================
    Responsivo do ESPAÇO DO ALUNO (todas as telas do /aluno).
-   Mobile-first fica intacto (definido em app.css). Aqui só
-   ajustamos tablet (>=700px) e desktop (>=1000px) pra a área
-   NÃO aparecer como "telinha de celular" no notebook.
+   - Celular: experiência de app (bottom-nav), intacta.
+   - Tablet (>=700px): a moldura respira.
+   - Desktop (>=1000px): vira um APP FULL-WIDTH com MENU LATERAL.
    ============================================================ */
 
-/* ---- Tablet: a moldura já respira um pouco ---- */
-@media (min-width: 700px) {
+/* O menu lateral só existe no desktop */
+.aluno-sidebar { display: none; }
+
+/* ---- Tablet: moldura maior, ainda em formato de cartão ---- */
+@media (min-width: 700px) and (max-width: 999.98px) {
   body { background: var(--gray-100); }
   .phone-frame {
-    max-width: 720px;
-    margin: 20px auto 28px;
-    border-radius: 20px;
-    box-shadow: 0 10px 34px rgba(15, 37, 64, .10);
-    overflow: hidden;
-    min-height: auto;
+    max-width: 720px; margin: 20px auto 28px; min-height: auto;
+    border-radius: 20px; box-shadow: 0 10px 34px rgba(15,37,64,.10); overflow: hidden;
   }
   .mobile-header { padding: 18px 26px; }
-  .bottom-nav {
-    position: sticky; bottom: 0;
-    max-width: 720px; margin: 0 auto;
-    border-radius: 0 0 20px 20px;
-    box-shadow: 0 -2px 12px rgba(15, 37, 64, .06);
-  }
+  .bottom-nav { position: sticky; bottom: 0; max-width: 720px; margin: 0 auto;
+    border-radius: 0 0 20px 20px; box-shadow: 0 -2px 12px rgba(15,37,64,.06); }
 }
 
-/* ---- Desktop: layout largo, cards em 2 colunas onde faz sentido ---- */
+/* ========================= DESKTOP ========================= */
 @media (min-width: 1000px) {
+  body { background: var(--gray-100); padding-left: 240px; padding-bottom: 32px !important; }
+
+  /* ---- Menu lateral (fixo) ---- */
+  .aluno-sidebar {
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0; width: 240px; z-index: 50;
+    background: #0A2540; color: #fff; padding: 18px 14px;
+  }
+  .aluno-sb-brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 18px; }
+  .aluno-sb-brand img { width: 34px; height: 34px; object-fit: contain; }
+  .aluno-sb-brand strong { display: block; font-size: 15px; line-height: 1.1; }
+  .aluno-sb-brand span { font-size: 11px; opacity: .6; }
+  .aluno-sb-nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .aluno-sb-link {
+    display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 10px;
+    color: rgba(255,255,255,.78); text-decoration: none; font-size: 14px; font-weight: 500;
+    transition: background .15s, color .15s;
+  }
+  .aluno-sb-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .aluno-sb-link.active { background: var(--primary-600, #2563EB); color: #fff; font-weight: 600; }
+  .aluno-sb-link i { width: 19px; height: 19px; }
+  .aluno-sb-footer { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 4px; border-top: 1px solid rgba(255,255,255,.1); }
+  .aluno-sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--primary-600,#2563EB); display: grid; place-items: center; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+  .aluno-sb-user { min-width: 0; }
+  .aluno-sb-user strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aluno-sb-user span { font-size: 11px; opacity: .6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+  /* ---- Conteúdo ocupa o resto da tela ---- */
   .phone-frame {
-    max-width: 1040px;
-    margin: 28px auto 36px;
+    max-width: 1080px; min-height: auto;
+    margin: 26px auto 36px; border-radius: 20px;
+    box-shadow: 0 10px 34px rgba(15,37,64,.08); overflow: hidden;
   }
   .mobile-header { padding: 22px 34px; }
-  .bottom-nav { max-width: 1040px; }
 
-  /* Páginas que agrupam os cards em .aluno-conteudo (ex.: início)
-     ganham 2 colunas automaticamente. */
+  /* bottom-nav some no desktop (o menu lateral substitui) */
+  .bottom-nav { display: none !important; }
+
+  /* Cards agrupados em .aluno-conteudo → 2 colunas */
   .aluno-conteudo {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;
     padding: 24px 34px 8px;
   }
   .aluno-conteudo > * { margin: 0 !important; }
 
-  /* Grades de fotos (galeria do aluno) ganham mais colunas no desktop */
-  .photo-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-    padding: 12px 34px !important;
-  }
+  /* Grade de fotos ganha mais colunas */
+  .photo-grid { grid-template-columns: repeat(5, 1fr) !important; padding: 12px 34px !important; }
 
-  /* Conteúdo "solto" (seções empilhadas) ganha um respiro lateral */
-  .aluno-secao, .card-sec { padding-left: 34px; padding-right: 34px; }
+  /* Barras fixas embaixo (galeria) acompanham a largura do conteúdo */
+  .aluno-barra-fixa { left: 240px !important; }
 }

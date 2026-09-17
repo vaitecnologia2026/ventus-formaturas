@@ -367,7 +367,7 @@
               <i data-lucide="search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--gray-400);pointer-events:none;"></i>
               <input type="text" id="cur-busca" autocomplete="off" placeholder="Buscar curso para vincular..." style="width:100%;padding:11px 12px 11px 38px;border:1px solid var(--gray-300);border-radius:11px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box;">
             </div>
-            <div id="cur-dropdown" hidden style="position:absolute;z-index:60;left:0;right:0;margin-top:6px;background:var(--gray-0,#fff);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-height:260px;overflow-y:auto;padding:4px;"></div>
+            <div id="cur-dropdown" hidden style="position:fixed;z-index:400;background:var(--gray-0,#fff);border:1px solid var(--gray-200);border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-height:260px;overflow-y:auto;padding:4px;"></div>
           </div>
         </div>
       </div>
@@ -679,10 +679,14 @@ function bindCursosPicker() {
   if (CURSOS_PICKER_BOUND) return;
   const inp = $('#cur-busca'), dd = $('#cur-dropdown'), wrap = $('#cur-picker');
   if (!inp || !dd || !wrap) return;
-  const abrir = ()=>{ renderCursosDropdown(inp.value); dd.hidden=false; };
+  // dropdown é position:fixed → posiciona colado no input (nunca é cortado por overflow do painel)
+  const posicionar = ()=>{ const r = inp.getBoundingClientRect(); dd.style.left = r.left+'px'; dd.style.top = (r.bottom+6)+'px'; dd.style.width = r.width+'px'; };
+  const abrir = ()=>{ renderCursosDropdown(inp.value); posicionar(); dd.hidden=false; };
   inp.addEventListener('focus', abrir);
-  inp.addEventListener('input', ()=>{ renderCursosDropdown(inp.value); dd.hidden=false; });
-  document.addEventListener('click', (e)=>{ if(!wrap.contains(e.target)) dd.hidden=true; });
+  inp.addEventListener('input', ()=>{ renderCursosDropdown(inp.value); posicionar(); dd.hidden=false; });
+  window.addEventListener('scroll', ()=>{ if(!dd.hidden) posicionar(); }, true);
+  window.addEventListener('resize', ()=>{ if(!dd.hidden) posicionar(); });
+  document.addEventListener('click', (e)=>{ if(!wrap.contains(e.target) && !dd.contains(e.target)) dd.hidden=true; });
   inp.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ dd.hidden=true; inp.blur(); } });
   CURSOS_PICKER_BOUND = true;
 }
