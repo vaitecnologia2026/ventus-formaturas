@@ -1,0 +1,56 @@
+/* ============================================================
+   Responsivo do ESPAÇO DO ALUNO (todas as telas do /aluno).
+   Mobile-first fica intacto (definido em app.css). Aqui só
+   ajustamos tablet (>=700px) e desktop (>=1000px) pra a área
+   NÃO aparecer como "telinha de celular" no notebook.
+   ============================================================ */
+
+/* ---- Tablet: a moldura já respira um pouco ---- */
+@media (min-width: 700px) {
+  body { background: var(--gray-100); }
+  .phone-frame {
+    max-width: 720px;
+    margin: 20px auto 28px;
+    border-radius: 20px;
+    box-shadow: 0 10px 34px rgba(15, 37, 64, .10);
+    overflow: hidden;
+    min-height: auto;
+  }
+  .mobile-header { padding: 18px 26px; }
+  .bottom-nav {
+    position: sticky; bottom: 0;
+    max-width: 720px; margin: 0 auto;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 -2px 12px rgba(15, 37, 64, .06);
+  }
+}
+
+/* ---- Desktop: layout largo, cards em 2 colunas onde faz sentido ---- */
+@media (min-width: 1000px) {
+  .phone-frame {
+    max-width: 1040px;
+    margin: 28px auto 36px;
+  }
+  .mobile-header { padding: 22px 34px; }
+  .bottom-nav { max-width: 1040px; }
+
+  /* Páginas que agrupam os cards em .aluno-conteudo (ex.: início)
+     ganham 2 colunas automaticamente. */
+  .aluno-conteudo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 24px 34px 8px;
+  }
+  .aluno-conteudo > * { margin: 0 !important; }
+
+  /* Grades de fotos (galeria do aluno) ganham mais colunas no desktop */
+  .photo-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    padding: 12px 34px !important;
+  }
+
+  /* Conteúdo "solto" (seções empilhadas) ganha um respiro lateral */
+  .aluno-secao, .card-sec { padding-left: 34px; padding-right: 34px; }
+}

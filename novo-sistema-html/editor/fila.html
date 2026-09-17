@@ -23,9 +23,9 @@
 <body>
 <aside class="sidebar">
   <div class="sidebar-brand"><div class="sidebar-brand-mark" style="background:transparent;"><img src="/assets/img/icon-branco.png" alt="Ventus" style="width:100%;height:100%;object-fit:contain;display:block;"></div><div><div>Ventus</div><div style="font-size:11px;font-weight:400;opacity:.6;">Editor</div></div></div>
-  <a href="fila.html" class="sidebar-link active"><i data-lucide="palette"></i>Fila de edição</a>
-  <a href="#" class="sidebar-link"><i data-lucide="check-circle"></i>Finalizadas</a>
-  <a href="#" class="sidebar-link"><i data-lucide="bar-chart-2"></i>Minha produtividade</a>
+  <a href="#" id="nav-fila" class="sidebar-link active" onclick="event.preventDefault();setEditorView('fila')"><i data-lucide="palette"></i>Fila de edição</a>
+  <a href="#" id="nav-finalizadas" class="sidebar-link" onclick="event.preventDefault();setEditorView('finalizadas')"><i data-lucide="check-circle"></i>Finalizadas</a>
+  <a href="#" id="nav-produtividade" class="sidebar-link" onclick="event.preventDefault();setEditorView('produtividade')"><i data-lucide="bar-chart-2"></i>Minha produtividade</a>
   <div class="sidebar-footer"><div class="avatar" id="prestadorAvatar">ED</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;" id="prestadorNome">Editor</div><div style="font-size:11px;opacity:.6;" id="prestadorFuncao">Editor freelancer</div></div><a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-4 h-4"></i></a></div>
 </aside>
 
@@ -39,11 +39,14 @@
   </header>
 
   <main class="app-content">
-    <div class="text-sm" style="color:var(--gray-500);">Editor / Fila de edição</div>
-    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);">Fila de edição</h1>
+    <div class="text-sm" style="color:var(--gray-500);">Editor / <span id="crumb-view">Fila de edição</span></div>
+    <h1 class="text-2xl font-bold mt-1 mb-6" style="color:var(--gray-900);" id="view-title">Fila de edição</h1>
 
     <!-- Contadores por etapa (a partir de resumo) -->
     <div id="kpis" class="grid grid-cols-4 gap-4 mb-6"></div>
+
+    <!-- Visão "Minha produtividade" -->
+    <div id="produtividade" style="display:none;"></div>
 
     <!-- Erro amigável de carregamento -->
     <div id="filaErro" class="card mt-2" style="display:none;border-color:var(--danger);">
@@ -242,30 +245,62 @@ function cardOS(os){
   '</div>';
 }
 
+// Guarda os dados carregados e roteia entre as 3 visões da sidebar
+var EDITOR_VIEW = 'fila', ITENS_ALL = [], RESUMO_ALL = {};
+var STATUS_FINAL = ['concluida', 'entregue'];
+
 function render(itens, resumo){
-  renderKpis(resumo);
+  ITENS_ALL = itens || [];
+  RESUMO_ALL = resumo || {};
+  renderView();
+}
+
+function setEditorView(v){
+  EDITOR_VIEW = v;
+  ['fila','finalizadas','produtividade'].forEach(function(x){
+    var el = document.getElementById('nav-'+x); if(el) el.classList.toggle('active', x===v);
+  });
+  renderView();
+}
+
+function renderView(){
+  var titulos = { fila:'Fila de edição', finalizadas:'Finalizadas', produtividade:'Minha produtividade' };
+  var t = titulos[EDITOR_VIEW] || 'Fila de edição';
+  document.getElementById('view-title').textContent = t;
+  document.getElementById('crumb-view').textContent = t;
   var kanban = document.getElementById('kanban');
+  var prod = document.getElementById('produtividade');
+  var kpis = document.getElementById('kpis');
 
-  if (!itens.length){
-    kanban.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--gray-500);">' +
-      '<i data-lucide="inbox" style="width:48px;height:48px;opacity:.4;"></i>' +
-      '<div style="margin-top:12px;font-weight:600;color:var(--gray-700);">Nenhuma ordem de serviço na fila</div>' +
-      '<div class="text-sm">Quando novas ordens chegarem, elas aparecem aqui.</div>' +
-    '</div>';
-    lucide.createIcons();
-    return;
+  if (EDITOR_VIEW === 'produtividade'){
+    kanban.style.display = 'none'; kpis.style.display = 'none'; prod.style.display = '';
+    renderProdutividade(); return;
   }
+  prod.style.display = 'none'; kanban.style.display = '';
+  if (EDITOR_VIEW === 'finalizadas'){ kpis.style.display = 'none'; renderFinalizadas(); return; }
+  kpis.style.display = ''; renderKpis(RESUMO_ALL); renderFila();
+}
 
+// Vazio padrão (mensagem configurável)
+function vazioMsg(icon, titulo, sub){
+  return '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--gray-500);">' +
+    '<i data-lucide="'+icon+'" style="width:48px;height:48px;opacity:.4;"></i>' +
+    '<div style="margin-top:12px;font-weight:600;color:var(--gray-700);">'+esc(titulo)+'</div>' +
+    (sub?'<div class="text-sm">'+esc(sub)+'</div>':'') +
+  '</div>';
+}
+
+// Visão FILA — kanban por status (todas as ordens)
+function renderFila(){
+  var kanban = document.getElementById('kanban');
+  kanban.style.gridTemplateColumns = 'repeat(4,1fr)';
+  if (!ITENS_ALL.length){ kanban.innerHTML = vazioMsg('inbox','Nenhuma ordem de serviço na fila','Quando novas ordens chegarem, elas aparecem aqui.'); lucide.createIcons(); return; }
   var porStatus = {};
   STATUS_ORDER.forEach(function(st){ porStatus[st] = []; });
-  itens.forEach(function(os){ (porStatus[os.status] || (porStatus[os.status]=[])).push(os); });
-
+  ITENS_ALL.forEach(function(os){ (porStatus[os.status] || (porStatus[os.status]=[])).push(os); });
   kanban.innerHTML = STATUS_ORDER.map(function(st){
     var lista = porStatus[st] || [];
-    var m = STATUS_META[st] || {};
-    var cards = lista.length
-      ? lista.map(cardOS).join('')
-      : '<div class="text-sm" style="color:var(--gray-400);padding:8px 2px;">Vazio</div>';
+    var cards = lista.length ? lista.map(cardOS).join('') : '<div class="text-sm" style="color:var(--gray-400);padding:8px 2px;">Vazio</div>';
     return '<div>' +
       '<div class="flex justify-between items-center mb-3" style="padding:0 2px;">' +
         '<strong style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-700);">'+esc(labelStatus(st))+'</strong>' +
@@ -273,6 +308,56 @@ function render(itens, resumo){
       '</div>' + cards +
     '</div>';
   }).join('');
+  lucide.createIcons();
+}
+
+// Visão FINALIZADAS — ordens concluídas/entregues em grade
+function renderFinalizadas(){
+  var kanban = document.getElementById('kanban');
+  kanban.style.gridTemplateColumns = 'repeat(3,minmax(0,1fr))';
+  var finais = ITENS_ALL.filter(function(os){ return STATUS_FINAL.indexOf(os.status) >= 0; });
+  if (!finais.length){ kanban.innerHTML = vazioMsg('check-circle','Nenhuma ordem finalizada ainda','Quando você concluir ou entregar ordens, elas aparecem aqui.'); lucide.createIcons(); return; }
+  kanban.innerHTML = finais.map(cardOS).join('');
+  lucide.createIcons();
+}
+
+// Visão MINHA PRODUTIVIDADE — números do editor
+function renderProdutividade(){
+  var prod = document.getElementById('produtividade');
+  var total = ITENS_ALL.length;
+  var cont = {}; STATUS_ORDER.forEach(function(st){ cont[st] = 0; });
+  ITENS_ALL.forEach(function(os){ if(cont[os.status]!=null) cont[os.status]++; });
+  var finalizadas = (cont.concluida||0) + (cont.entregue||0);
+  var andamento = (cont.aberta||0) + (cont.em_andamento||0);
+  var taxa = total ? Math.round(finalizadas*100/total) : 0;
+
+  var kpiCards = [
+    { label:'Total de ordens', valor: total, icon:'layers', bg:'#EEF2FF', fg:'#3730A3' },
+    { label:'Finalizadas', valor: finalizadas, icon:'check-circle', bg:'#DCFCE7', fg:'#166534' },
+    { label:'Em andamento', valor: andamento, icon:'palette', bg:'#FEF3C7', fg:'#92400E' },
+    { label:'Taxa de conclusão', valor: taxa+'%', icon:'trending-up', bg:'#DBEAFE', fg:'#1E40AF' }
+  ].map(function(k){
+    return '<div class="kpi">' +
+      '<div class="kpi-icon" style="background:'+k.bg+';color:'+k.fg+';"><i data-lucide="'+k.icon+'" class="w-5 h-5"></i></div>' +
+      '<div class="kpi-label">'+k.label+'</div>' +
+      '<div class="kpi-value">'+k.valor+'</div>' +
+    '</div>';
+  }).join('');
+
+  var barra = STATUS_ORDER.map(function(st){
+    var n = cont[st]||0; var pct = total ? Math.round(n*100/total) : 0;
+    var m = STATUS_META[st] || {};
+    return '<div style="margin-bottom:12px;">' +
+      '<div class="flex justify-between" style="font-size:13px;color:var(--gray-700);margin-bottom:4px;"><span>'+esc(labelStatus(st))+'</span><span>'+n+' ('+pct+'%)</span></div>' +
+      '<div style="height:10px;background:var(--gray-100);border-radius:999px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+(m.fg||'#6366F1')+';"></div></div>' +
+    '</div>';
+  }).join('');
+
+  prod.innerHTML =
+    '<div class="grid grid-cols-4 gap-4 mb-6">'+kpiCards+'</div>' +
+    '<div class="card"><div class="card-body" style="padding:20px;">' +
+      '<strong style="display:block;margin-bottom:16px;color:var(--gray-900);">Ordens por etapa</strong>' + barra +
+    '</div></div>';
   lucide.createIcons();
 }
 
