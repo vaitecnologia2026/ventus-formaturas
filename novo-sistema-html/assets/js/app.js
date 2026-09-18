@@ -459,3 +459,11 @@ function fmtMoney(v) {
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('pt-BR');
 }
+
+/* Injeta o botão flutuante "Reportar erro" em toda página que carrega o app.js */
+(function () {
+  if (document.querySelector('script[src*="reportar-erro.js"]')) return;
+  var s = document.createElement('script');
+  s.src = '/assets/js/reportar-erro.js';
+  document.head.appendChild(s);
+})();
