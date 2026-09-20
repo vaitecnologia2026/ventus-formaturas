@@ -21,6 +21,22 @@
     return (location.pathname.split('/').pop() || 'inicio.html').toLowerCase();
   }
 
+  // Garante que TODO link interno do aluno (bottom-nav, atalhos, etc.) leve o token
+  // junto — senão a página de destino (ex.: pagamento) não acha o token e cai no login.
+  function propagarTokenNosLinks() {
+    var t = '';
+    try { t = (typeof getTokenAluno === 'function') ? getTokenAluno() : ''; } catch (e) { t = ''; }
+    if (!t) return;
+    document.querySelectorAll('a[href]').forEach(function (a) {
+      var href = a.getAttribute('href') || '';
+      if (!href || href.charAt(0) === '#') return;
+      if (/^https?:|^\/\/|^mailto:|^tel:/i.test(href)) return;   // externos
+      if (/[?&]t=/.test(href)) return;                            // já tem token
+      if (!/\.html(\?|#|$)/i.test(href)) return;                  // só páginas .html
+      a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 't=' + encodeURIComponent(t));
+    });
+  }
+
   function montar() {
     if (document.querySelector('.aluno-sidebar')) return;
     var atual = paginaAtual();
@@ -45,6 +61,8 @@
       '</div>';
     document.body.insertBefore(aside, document.body.firstChild);
     if (window.lucide) { try { lucide.createIcons(); } catch (e) {} }
+
+    propagarTokenNosLinks();
 
     // preenche nome/turma do aluno (se o espaco.js tiver o helper)
     if (typeof carregarEspaco === 'function') {
