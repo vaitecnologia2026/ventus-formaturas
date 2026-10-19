@@ -996,8 +996,7 @@ function viewContrato(){
       + '<meta name="viewport" content="width=device-width,initial-scale=1">'
       + '<title>'+esc((contrato&&contrato.nome)||'Contrato')+'</title>'
       + '<style>body{font-family:Georgia,\'Times New Roman\',serif;max-width:760px;margin:32px auto;padding:0 24px 64px;color:#1e293b;line-height:1.7;font-size:15px;}h1,h2,h3{color:#0f172a;}img{max-width:100%;}</style>'
-      + '</head><body>'+corpo+'<script src="/assets/js/reportar-erro.js"></script>
-</body></html>';
+      + '</head><body>'+corpo+'<script src="/assets/js/reportar-erro.js"><\/script></body></html>';
     if(w){ try{ w.document.open(); w.document.write(doc); w.document.close(); }catch(e){} }
     else { const nw = window.open('', '_blank'); if(nw){ nw.document.write(doc); nw.document.close(); } }
   }
