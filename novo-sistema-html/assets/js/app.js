@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   installMobileNav();
   installThemeToggle();
   installTableScroll();
+  installSelectEnhancer();  // troca <select> nativo pelo dropdown estilizado c/ busca
 });
 
 /* ================== Tema claro / escuro ================== */
@@ -467,3 +468,164 @@ function fmtDate(d) {
   s.src = '/assets/js/reportar-erro.js';
   document.head.appendChild(s);
 })();
+
+/* =========================================================
+   Seletor estilizado global — substitui <select> nativo por
+   um dropdown bonito com busca, mantendo o <select> real
+   escondido e sincronizado (não quebra nenhuma lógica/filtro).
+   Opt-out: <select data-vs-skip> mantém o nativo.
+   Reprocessar manualmente: window.vtEnhanceSelects()
+   ========================================================= */
+function vsEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function vsNorm(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+
+function installSelectEnhancer(){
+  vsEnhanceAll(document);
+  var mo = new MutationObserver(function(muts){
+    for(var i=0;i<muts.length;i++){
+      var added = muts[i].addedNodes;
+      for(var j=0;j<added.length;j++){
+        var n = added[j];
+        if(n.nodeType !== 1) continue;
+        if(n.tagName === 'SELECT') vsEnhance(n);
+        else if(n.querySelectorAll) { var ss=n.querySelectorAll('select'); for(var k=0;k<ss.length;k++) vsEnhance(ss[k]); }
+      }
+    }
+  });
+  if(document.body) mo.observe(document.body, { childList:true, subtree:true });
+}
+window.vtEnhanceSelects = function(){ vsEnhanceAll(document); };
+
+function vsEnhanceAll(root){ var ss = root.querySelectorAll('select'); for(var i=0;i<ss.length;i++) vsEnhance(ss[i]); }
+
+function vsEnhance(sel){
+  if(!sel || sel.multiple) return;
+  if(sel.dataset.vsDone || typeof sel.dataset.vsSkip !== 'undefined') return;
+  if(sel.closest && sel.closest('.vs-wrap')) return;
+  sel.dataset.vsDone = '1';
+
+  var wrap = document.createElement('div');
+  wrap.className = 'vs-wrap';
+  // leva junto classes de largura comuns (mantém grid do form)
+  sel.parentNode.insertBefore(wrap, sel);
+  wrap.appendChild(sel);
+  sel.classList.add('vs-native');
+  sel.setAttribute('tabindex', '-1');
+  sel.setAttribute('aria-hidden', 'true');
+
+  var trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'vs-trigger';
+  trigger.innerHTML = '<span class="vs-val"></span><svg class="vs-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+  wrap.appendChild(trigger);
+  var valEl = trigger.querySelector('.vs-val');
+
+  var panel=null, searchInput=null, listEl=null, open=false, activeIdx=-1;
+
+  function syncTrigger(){
+    var o = sel.options[sel.selectedIndex];
+    var txt = o ? o.textContent.trim() : '';
+    valEl.textContent = txt || (sel.getAttribute('data-placeholder') || 'Selecione');
+    valEl.classList.toggle('ph', !txt);
+    trigger.disabled = sel.disabled;
+  }
+
+  function buildPanel(){
+    panel = document.createElement('div');
+    panel.className = 'vs-panel';
+    if(sel.options.length > 6){
+      var sw = document.createElement('div'); sw.className = 'vs-search-wrap';
+      sw.innerHTML = '<svg class="vs-search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input class="vs-search" type="text" placeholder="Buscar..." autocomplete="off">';
+      panel.appendChild(sw);
+      searchInput = sw.querySelector('.vs-search');
+      searchInput.addEventListener('input', renderOpts);
+      searchInput.addEventListener('keydown', onSearchKey);
+    }
+    listEl = document.createElement('div'); listEl.className = 'vs-list';
+    panel.appendChild(listEl);
+    document.body.appendChild(panel);
+    renderOpts();
+  }
+
+  function renderOpts(){
+    var q = vsNorm(searchInput ? searchInput.value : '');
+    listEl.innerHTML = '';
+    var shown = 0;
+    for(var i=0;i<sel.options.length;i++){
+      var o = sel.options[i], label = o.textContent.trim();
+      if(q && vsNorm(label).indexOf(q) === -1) continue;
+      shown++;
+      var el = document.createElement('div');
+      el.className = 'vs-opt' + (i === sel.selectedIndex ? ' sel' : '');
+      el.setAttribute('data-i', i);
+      el.innerHTML = '<svg class="vs-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>' + vsEsc(label) + '</span>';
+      (function(idx){ el.addEventListener('mousedown', function(e){ e.preventDefault(); pick(idx); }); })(i);
+      listEl.appendChild(el);
+    }
+    if(!shown){ var e = document.createElement('div'); e.className = 'vs-empty'; e.textContent = 'Nada encontrado'; listEl.appendChild(e); }
+  }
+
+  function onSearchKey(e){
+    if(e.key === 'Escape'){ e.preventDefault(); closePanel(); trigger.focus(); }
+    else if(e.key === 'Enter'){ e.preventDefault(); var first = listEl.querySelector('.vs-opt'); if(first) pick(parseInt(first.getAttribute('data-i'),10)); }
+  }
+
+  function pick(i){
+    if(i !== sel.selectedIndex){
+      sel.selectedIndex = i;
+      sel.dispatchEvent(new Event('input', { bubbles:true }));
+      sel.dispatchEvent(new Event('change', { bubbles:true }));
+    }
+    syncTrigger();
+    closePanel();
+    trigger.focus();
+  }
+
+  function position(){
+    if(!panel) return;
+    var r = trigger.getBoundingClientRect();
+    panel.style.width = Math.max(r.width, 190) + 'px';
+    panel.style.left = Math.min(r.left, window.innerWidth - panel.offsetWidth - 8) + 'px';
+    var ph = panel.offsetHeight, below = window.innerHeight - r.bottom;
+    if(below < ph + 10 && r.top > below){ panel.style.top = Math.max(8, r.top - ph - 6) + 'px'; }
+    else { panel.style.top = (r.bottom + 6) + 'px'; }
+  }
+
+  function openPanel(){
+    if(open || sel.disabled || !sel.options.length) return;
+    buildPanel(); open = true; wrap.classList.add('open');
+    position();
+    if(searchInput){ searchInput.value = ''; renderOpts(); setTimeout(function(){ searchInput.focus(); }, 10); }
+    position();
+    document.addEventListener('mousedown', onDoc, true);
+    window.addEventListener('scroll', position, true);
+    window.addEventListener('resize', position);
+  }
+  function closePanel(){
+    if(!open) return;
+    open = false; wrap.classList.remove('open');
+    if(panel){ panel.remove(); panel = null; searchInput = null; listEl = null; }
+    document.removeEventListener('mousedown', onDoc, true);
+    window.removeEventListener('scroll', position, true);
+    window.removeEventListener('resize', position);
+  }
+  function onDoc(e){ if(!wrap.contains(e.target) && (!panel || !panel.contains(e.target))) closePanel(); }
+
+  trigger.addEventListener('click', function(){ open ? closePanel() : openPanel(); });
+  trigger.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '||e.key==='ArrowDown'){ e.preventDefault(); openPanel(); } });
+
+  // Sincroniza quando as opções mudam (preenchidas via fetch) ou disabled muda
+  var selMo = new MutationObserver(function(){ syncTrigger(); if(open) renderOpts(); });
+  selMo.observe(sel, { childList:true, attributes:true, attributeFilter:['disabled'] });
+  // Captura .value / .selectedIndex setados por código (não disparam evento)
+  try{
+    var proto = HTMLSelectElement.prototype;
+    var dv = Object.getOwnPropertyDescriptor(proto, 'value');
+    var di = Object.getOwnPropertyDescriptor(proto, 'selectedIndex');
+    if(dv && dv.configurable){ Object.defineProperty(sel, 'value', { configurable:true, enumerable:true, get:function(){ return dv.get.call(this); }, set:function(v){ dv.set.call(this, v); syncTrigger(); if(open) renderOpts(); } }); }
+    if(di && di.configurable){ Object.defineProperty(sel, 'selectedIndex', { configurable:true, enumerable:true, get:function(){ return di.get.call(this); }, set:function(v){ di.set.call(this, v); syncTrigger(); if(open) renderOpts(); } }); }
+  }catch(e){}
+  sel.addEventListener('change', syncTrigger);
+
+  syncTrigger();
+}

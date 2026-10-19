@@ -617,3 +617,31 @@ input[type="date"]:not(:focus):invalid::-webkit-datetime-edit{ color:var(--gray-
 [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
 [data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
 [data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator{ filter:invert(1) brightness(1.2); }
+
+/* =========================================================
+   Filtro/seletor estilizado — substitui o <select> nativo
+   (visual único em todo o sistema, com busca quando há muitas opções)
+   ========================================================= */
+select.vs-native{ position:absolute !important; width:1px !important; height:1px !important; padding:0 !important; margin:-1px !important; border:0 !important; opacity:0 !important; overflow:hidden !important; clip:rect(0 0 0 0) !important; pointer-events:none !important; }
+.vs-wrap{ position:relative; display:block; width:100%; }
+.vs-trigger{ display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-height:42px; padding:9px 13px; border:1px solid var(--gray-300); border-radius:11px; background:var(--surface); color:var(--gray-900); font-size:14px; font-family:inherit; line-height:1.2; cursor:pointer; text-align:left; transition:border-color .15s, box-shadow .15s, background .15s; }
+.vs-trigger:hover{ border-color:var(--gray-400); }
+.vs-trigger:disabled{ opacity:.55; cursor:not-allowed; }
+.vs-wrap.open .vs-trigger{ border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+.vs-trigger .vs-val{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.vs-trigger .vs-val.ph{ color:var(--gray-400); }
+.vs-trigger .vs-caret{ flex:none; color:var(--gray-400); transition:transform .18s; }
+.vs-wrap.open .vs-trigger .vs-caret{ transform:rotate(180deg); color:var(--primary-500); }
+.vs-panel{ position:fixed; z-index:10050; background:var(--surface); border:1px solid var(--gray-200); border-radius:13px; box-shadow:0 14px 38px rgba(2,8,23,.22); padding:7px; box-sizing:border-box; animation:vsPop .12s ease; }
+@keyframes vsPop{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+.vs-search-wrap{ position:relative; margin:2px 2px 7px; }
+.vs-search-ico{ position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--gray-400); pointer-events:none; }
+.vs-search{ width:100%; box-sizing:border-box; padding:9px 11px 9px 33px; border:1px solid var(--gray-300); border-radius:9px; background:var(--surface); color:var(--gray-900); font-size:13.5px; font-family:inherit; outline:none; transition:border-color .15s, box-shadow .15s; }
+.vs-search:focus{ border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-100); }
+.vs-list{ max-height:264px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+.vs-opt{ display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:8px; font-size:14px; color:var(--gray-700); cursor:pointer; white-space:nowrap; }
+.vs-opt:hover{ background:var(--gray-100); color:var(--gray-900); }
+.vs-opt.sel{ background:var(--primary-50); color:var(--primary-700); font-weight:600; }
+.vs-opt .vs-check{ flex:none; color:var(--primary-600); opacity:0; }
+.vs-opt.sel .vs-check{ opacity:1; }
+.vs-empty{ padding:11px; font-size:13px; color:var(--gray-400); text-align:center; }
