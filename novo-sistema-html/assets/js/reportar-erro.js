@@ -91,16 +91,23 @@
     function abrir() { overlay.style.display = 'flex'; }
     function fechar() { overlay.style.display = 'none'; obsEl.value = ''; msgEl.textContent = ''; }
 
+    var lblEl = btn.querySelector('span');
     btn.addEventListener('click', function () {
       msgEl.textContent = ''; obsEl.value = '';
       shotEl.removeAttribute('src'); dataUrl = '';
-      abrir();
-      btn.style.visibility = 'hidden';
+      // feedback no próprio botão durante a captura (modal ainda fechado)
+      var txtOrig = lblEl ? lblEl.textContent : '';
+      if (lblEl) lblEl.textContent = 'Capturando…';
+      btn.disabled = true;
+      // 1) CAPTURA a tela ANTES de abrir o modal — senão o print sai com a
+      //    própria tela de reportar na frente. ignoreElements garante que o
+      //    botão/overlay nunca entrem no print.
       carregarHtml2Canvas().then(function (h2c) {
         return h2c(document.body, {
           x: window.scrollX, y: window.scrollY,
           width: window.innerWidth, height: window.innerHeight,
-          scale: Math.min(1, 900 / window.innerWidth), useCORS: true, logging: false, backgroundColor: '#ffffff'
+          scale: Math.min(1, 900 / window.innerWidth), useCORS: true, logging: false, backgroundColor: '#ffffff',
+          ignoreElements: function (el) { return el.id === 'rep-erro-ov' || el.id === 'rep-erro-btn'; }
         });
       }).then(function (canvas) {
         dataUrl = canvas.toDataURL('image/jpeg', 0.72);
@@ -109,7 +116,10 @@
         msgEl.style.color = '#B45309';
         msgEl.textContent = 'Não consegui capturar o print automaticamente, mas você pode enviar a descrição mesmo assim.';
       }).finally(function () {
-        btn.style.visibility = '';
+        if (lblEl) lblEl.textContent = txtOrig || 'Reportar erro';
+        btn.disabled = false;
+        // 2) só AGORA abre o modal, já com o print da tela limpa pronto
+        abrir();
       });
     });
 
