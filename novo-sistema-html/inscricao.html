@@ -252,7 +252,7 @@ let CUPOM = null;            // cupom aplicado {codigo, tipo:'valor'|'percentual
 
 // ---- estado do formulário (persiste entre etapas) ----
 const F = {
-  nome:'', celular:'', email:'', email_confirma:'', cpf:'', curso:'', ano_formatura:'',
+  nome:'', celular:'', email:'', email_confirma:'', cpf:'', rg:'', curso:'', ano_formatura:'',
   altura:'', peso:'', calcado:'',
   plus_size:null, num_calca:'',      // medidas (só quando a turma solicitar)
   cep:'', rua:'', numero:'', complemento:'', bairro:'', cidade:'', uf:'',  // endereço (contrato + boleto)
@@ -355,6 +355,7 @@ async function carregar(){
   F.email = a.email || '';
   F.email_confirma = a.email || '';   // se já veio preenchido, considera confirmado
   F.cpf = a.cpf ? maskCpf(a.cpf) : '';
+  F.rg = a.rg || '';
   F.curso = a.curso || '';
   // ano já vem do cadastro da turma; se o aluno ainda não tiver, puxa o ano da turma
   F.ano_formatura = a.ano_formatura || (DADOS.turma && DADOS.turma.ano) || '';
@@ -512,7 +513,11 @@ function viewDados(){
 
     <div class="grid2">
       <div class="fld"><label>CPF *</label><input id="i-cpf" value="${esc(F.cpf)}" inputmode="numeric" placeholder="000.000.000-00"></div>
+      <div class="fld"><label>RG</label><input id="i-rg" value="${esc(F.rg)}" placeholder="Opcional"></div>
+    </div>
+    <div class="grid2">
       <div class="fld"><label>WhatsApp *</label><input id="i-cel" value="${esc(F.celular)}" placeholder="(38) 99999-0000"></div>
+      <div class="fld"></div>
     </div>
     <div class="grid2">
       <div class="fld"><label>E-mail *</label><input id="i-email" type="email" value="${esc(F.email)}" placeholder="voce@email.com" autocomplete="email"></div>
@@ -654,6 +659,7 @@ function saveDados(){
   F.email = document.getElementById('i-email').value;
   F.email_confirma = document.getElementById('i-email2').value;
   F.cpf = document.getElementById('i-cpf').value;
+  const rgEl = document.getElementById('i-rg'); if(rgEl) F.rg = rgEl.value.trim();
   F.curso = document.getElementById('i-curso').value;
   F.ano_formatura = document.getElementById('i-ano').value || '';
   const nc = document.getElementById('i-numcalca');
@@ -1097,6 +1103,7 @@ function viewContrato(){
         cpf: (F.cpf||'').replace(/\D/g,''),
         email: F.email || '',
         celular: (F.celular||'').replace(/\D/g,''),
+        rg: F.rg || '',
         plano_id: F.plano_id,
         meio_pagamento: F.meio_pagamento||null, forma_pagamento: F.forma_pagamento||F.meio_pagamento||null,
         parcelas: F.parcelas||null,
@@ -1136,7 +1143,7 @@ function viewContrato(){
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({
             nome: F.nome||'', cpf:(F.cpf||'').replace(/\D/g,''), email:F.email||'',
-            celular:(F.celular||'').replace(/\D/g,''), curso:F.curso||'',
+            celular:(F.celular||'').replace(/\D/g,''), curso:F.curso||'', rg:F.rg||'',
             ano_formatura: F.ano_formatura||null, plano_id: F.plano_id,
             meio_pagamento: F.meio_pagamento||null, forma_pagamento: F.forma_pagamento||F.meio_pagamento||null,
             parcelas: F.parcelas||null,
@@ -1306,6 +1313,7 @@ async function enviar(){
     celular: F.celular,
     email: (F.email||'').trim(),
     cpf: F.cpf,
+    rg: F.rg || '',
     curso: F.curso,
     ano_formatura: F.ano_formatura || null,
     // medidas do doc: altura + plus size + medida da calça (sem elastano). Peso/calçado não são mais pedidos.
