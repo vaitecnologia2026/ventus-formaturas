@@ -223,6 +223,22 @@
     color: var(--azul-700);
     font-weight: 600;
   }
+  /* ===== Desktop: split hero + formulário (deixa de ser coluna de celular) ===== */
+  @media (min-width: 980px) {
+    body { display: grid; place-items: center; padding: 40px 24px; }
+    .page {
+      max-width: 940px; width: 100%; min-height: auto;
+      display: grid; grid-template-columns: 1.05fr 1fr; align-items: stretch;
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 30px 80px -24px rgba(0,0,0,.65);
+    }
+    .hero { height: auto; min-height: 540px; }
+    .hero-content { padding: 42px 40px; }
+    .form-card {
+      border-radius: 0; margin-top: 0; padding: 52px 48px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+  }
 </style>
 </head>
 <body>

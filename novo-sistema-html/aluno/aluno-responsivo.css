@@ -49,13 +49,13 @@
   .aluno-sb-user strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .aluno-sb-user span { font-size: 11px; opacity: .6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
-  /* ---- Conteúdo ocupa o resto da tela ---- */
+  /* ---- Conteúdo ocupa o resto da tela (app desktop, não card de celular) ---- */
   .phone-frame {
-    max-width: 1080px; min-height: auto;
+    max-width: 1400px; min-height: auto;
     margin: 26px auto 36px; border-radius: 20px;
     box-shadow: 0 10px 34px rgba(15,37,64,.08); overflow: hidden;
   }
-  .mobile-header { padding: 22px 34px; }
+  .mobile-header { padding: 26px 40px; }
 
   /* bottom-nav some no desktop (o menu lateral substitui) */
   .bottom-nav { display: none !important; }
