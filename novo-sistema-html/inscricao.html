@@ -255,6 +255,7 @@ const F = {
   nome:'', celular:'', email:'', email_confirma:'', cpf:'', curso:'', ano_formatura:'',
   altura:'', peso:'', calcado:'',
   plus_size:null, num_calca:'',      // medidas (só quando a turma solicitar)
+  cep:'', rua:'', numero:'', complemento:'', bairro:'', cidade:'', uf:'',  // endereço (contrato + boleto)
   plano_id:null, meio_pagamento:null, forma_pagamento:null, parcelas:null, vencimento:null,
   aceite_contrato:false, observacoes:'',
   participacoes:[],   // {evento_fotografico_id, qtd_familiares, qtd_convidados}
@@ -363,6 +364,14 @@ async function carregar(){
   // medidas (backend: plus_size:bool / num_calca:texto)
   F.plus_size = (a.plus_size != null) ? !!a.plus_size : null;
   F.num_calca = a.num_calca || '';
+  // endereço (se já cadastrado, pré-preenche)
+  F.cep = a.cep || '';
+  F.rua = a.rua || '';
+  F.numero = a.numero || '';
+  F.complemento = a.complemento || '';
+  F.bairro = a.bairro || '';
+  F.cidade = a.cidade || '';
+  F.uf = a.uf || '';
   F.plano_id = a.plano_id != null ? a.plano_id : null;
   F.meio_pagamento = a.meio_pagamento || null;
   F.forma_pagamento = a.forma_pagamento || null;
@@ -514,6 +523,25 @@ function viewDados(){
       <div class="fld"><label>Ano de formatura *</label><input id="i-ano" type="number" value="${esc(F.ano_formatura)}" placeholder="2026"></div>
     </div>
 
+    <p class="sec-title" style="margin-top:8px;">Endereço</p>
+    <p class="sec-hint">Usado no contrato e no boleto. Informe o CEP para preenchimento automático.</p>
+    <div class="grid2">
+      <div class="fld"><label>CEP *</label><input id="i-cep" value="${esc(F.cep)}" inputmode="numeric" placeholder="00000-000" maxlength="9"></div>
+      <div class="fld"><label>Logradouro (rua) *</label><input id="i-rua" value="${esc(F.rua)}" placeholder="Rua / Avenida"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>Número *</label><input id="i-numero" value="${esc(F.numero)}" placeholder="Nº" maxlength="10"></div>
+      <div class="fld"><label>Complemento</label><input id="i-compl" value="${esc(F.complemento)}" placeholder="Apto, bloco… (opcional)"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>Bairro *</label><input id="i-bairro" value="${esc(F.bairro)}" placeholder="Bairro"></div>
+      <div class="fld"><label>Cidade *</label><input id="i-cidade" value="${esc(F.cidade)}" placeholder="Cidade"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label>UF *</label><input id="i-uf" value="${esc(F.uf)}" placeholder="UF" maxlength="2" style="text-transform:uppercase"></div>
+      <div class="fld"></div>
+    </div>
+
     ${medidasHtml}
 
     <div class="nav">
@@ -542,6 +570,19 @@ function viewDados(){
   // Medida da calça: apenas números (até 3 dígitos)
   const ncEl = document.getElementById('i-numcalca');
   if(ncEl){ ncEl.oninput = () => { ncEl.value = ncEl.value.replace(/\D/g,'').slice(0,3); }; }
+
+  // CEP: máscara 00000-000 + busca automática no ViaCEP ao completar 8 dígitos
+  const cepEl = document.getElementById('i-cep');
+  if(cepEl){
+    cepEl.oninput = () => {
+      const d = cepEl.value.replace(/\D/g,'').slice(0,8);
+      cepEl.value = d.length > 5 ? d.slice(0,5)+'-'+d.slice(5) : d;
+      if(d.length === 8) buscarCep(d);
+    };
+  }
+  // UF sempre maiúscula
+  const ufEl = document.getElementById('i-uf');
+  if(ufEl){ ufEl.oninput = () => { ufEl.value = ufEl.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2); }; }
 
   document.getElementById('btn-next').onclick = async () => {
     saveDados();
@@ -589,6 +630,12 @@ function validarDados(){
   if(email !== email2){ toast('Os e-mails não coincidem. Verifique e tente de novo.'); return false; }
   if(!(F.curso||'').trim()){ toast('Selecione ou informe seu curso.'); return false; }
   if(!(String(F.ano_formatura||'').trim())){ toast('Informe o ano de formatura.'); return false; }
+  if((F.cep||'').replace(/\D/g,'').length !== 8){ toast('Informe um CEP válido (8 dígitos).'); return false; }
+  if(!(F.rua||'').trim()){ toast('Informe o logradouro (rua).'); return false; }
+  if(!(F.numero||'').trim()){ toast('Informe o número do endereço.'); return false; }
+  if(!(F.bairro||'').trim()){ toast('Informe o bairro.'); return false; }
+  if(!(F.cidade||'').trim()){ toast('Informe a cidade.'); return false; }
+  if((F.uf||'').trim().length !== 2){ toast('Informe a UF (2 letras).'); return false; }
   if(pedeMedidas()){
     if(F.plus_size === null){ toast('Informe se você usa plus size.'); return false; }
     const alt = parseFloat(String(F.altura||'').replace(',','.'));
@@ -613,6 +660,34 @@ function saveDados(){
   if(nc) F.num_calca = nc.value;
   const al = document.getElementById('i-altura');
   if(al) F.altura = al.value;
+  const g = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  F.cep = g('i-cep');
+  F.rua = g('i-rua');
+  F.numero = g('i-numero');
+  F.complemento = g('i-compl');
+  F.bairro = g('i-bairro');
+  F.cidade = g('i-cidade');
+  F.uf = (g('i-uf')||'').toUpperCase().slice(0,2);
+}
+
+// busca o endereço pelo CEP (ViaCEP) e preenche rua/bairro/cidade/uf; foca no número
+async function buscarCep(cep){
+  try{
+    const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d.erro) { toast('CEP não encontrado.'); return; }
+    const set = (id, val) => { const e = document.getElementById(id); if(e && val){ e.value = val; } };
+    set('i-rua', d.logradouro);
+    set('i-bairro', d.bairro);
+    set('i-cidade', d.localidade);
+    set('i-uf', d.uf);
+    F.rua = d.logradouro || F.rua;
+    F.bairro = d.bairro || F.bairro;
+    F.cidade = d.localidade || F.cidade;
+    F.uf = d.uf || F.uf;
+    const n = document.getElementById('i-numero'); if(n) n.focus();
+  }catch(e){ /* sem rede: usuário preenche manual */ }
 }
 
 /* =================== ETAPA 2: PLANO + PAGAMENTO =================== */
@@ -698,7 +773,13 @@ function renderPagamento(){
   if(!p){ sec.innerHTML = ''; return; }
   let meiosHtml;
   if(p.meios_pagamento && p.meios_pagamento.length){
-    meiosHtml = `<div class="meios">${p.meios_pagamento.map(m=>{
+    // dedup: o mesmo meio/parcela pode vir repetido do backend — mostra 1x só
+    const _vistos = new Set();
+    const meios = p.meios_pagamento.filter(m=>{
+      const k = (m.meio||'')+'|'+(m.label||'')+'|'+(m.qt_parcela||1)+'|'+(m.descricao||'');
+      if(_vistos.has(k)) return false; _vistos.add(k); return true;
+    });
+    meiosHtml = `<div class="meios">${meios.map(m=>{
       const on = F.meio_pagamento===m.meio;
       return `
         <label class="meio ${on?'on':''}" data-meio="${esc(m.meio)}" data-qt="${m.qt_parcela||1}">
@@ -1017,6 +1098,10 @@ function viewContrato(){
         email: F.email || '',
         celular: (F.celular||'').replace(/\D/g,''),
         plano_id: F.plano_id,
+        meio_pagamento: F.meio_pagamento||null, forma_pagamento: F.forma_pagamento||F.meio_pagamento||null,
+        parcelas: F.parcelas||null,
+        cep:F.cep||'', rua:F.rua||'', numero:F.numero||'', complemento:F.complemento||'',
+        bairro:F.bairro||'', cidade:F.cidade||'', uf:F.uf||'',
         // pra o ZapSign trazer o formando de volta ao checkout depois de assinar
         redirect_url: location.origin + location.pathname + '?t=' + encodeURIComponent(token) + '&assinado=1',
       };
@@ -1053,6 +1138,10 @@ function viewContrato(){
             nome: F.nome||'', cpf:(F.cpf||'').replace(/\D/g,''), email:F.email||'',
             celular:(F.celular||'').replace(/\D/g,''), curso:F.curso||'',
             ano_formatura: F.ano_formatura||null, plano_id: F.plano_id,
+            meio_pagamento: F.meio_pagamento||null, forma_pagamento: F.forma_pagamento||F.meio_pagamento||null,
+            parcelas: F.parcelas||null,
+            cep:F.cep||'', rua:F.rua||'', numero:F.numero||'', complemento:F.complemento||'',
+            bairro:F.bairro||'', cidade:F.cidade||'', uf:F.uf||'',
           })
         });
         const d = await r.json();
@@ -1223,6 +1312,14 @@ async function enviar(){
     altura: F.altura || '',
     plus_size: F.plus_size,
     num_calca: F.num_calca || '',
+    // endereço (CEP buscado no ViaCEP) — vai pro contrato e pro boleto
+    cep: F.cep || '',
+    rua: F.rua || '',
+    numero: F.numero || '',
+    complemento: F.complemento || '',
+    bairro: F.bairro || '',
+    cidade: F.cidade || '',
+    uf: F.uf || '',
     plano_id: p ? p.id : null,
     meio_pagamento: F.meio_pagamento || null,
     forma_pagamento: F.forma_pagamento || F.meio_pagamento || null,
