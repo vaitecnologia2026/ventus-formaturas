@@ -645,3 +645,22 @@ select.vs-native{ position:absolute !important; width:1px !important; height:1px
 .vs-opt .vs-check{ flex:none; color:var(--primary-600); opacity:0; }
 .vs-opt.sel .vs-check{ opacity:1; }
 .vs-empty{ padding:11px; font-size:13px; color:var(--gray-400); text-align:center; }
+
+/* =========================================================
+   Modo escuro — campos de formulário sem fundo próprio ficavam
+   BRANCOS (default do navegador). Baseline dark p/ todo input.
+   ========================================================= */
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]),
+[data-theme="dark"] select,
+[data-theme="dark"] textarea{
+  background-color: var(--surface);
+  color: var(--gray-900);
+  border-color: var(--gray-300);
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder{ color: var(--gray-500); opacity:1; }
+/* seleção marcada no dropdown estilizado: tom escuro (nao o azul claro do light) */
+[data-theme="dark"] .vs-opt.sel{ background: rgba(37,99,235,.20); color: var(--primary-300); }
+/* o modal "Reportar erro" é um card branco próprio — mantém os campos claros */
+[data-theme="dark"] #rep-erro-ov input,
+[data-theme="dark"] #rep-erro-ov textarea{ background-color:#fff; color:#334155; border-color:#CBD5E1; }
