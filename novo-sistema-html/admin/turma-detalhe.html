@@ -1401,7 +1401,7 @@ async function carregarAlunos(){
           ? '<span class="badge" style="background:#FEF3C7;color:#92400E;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="alert-triangle" style="width:13px;height:13px;"></i> Sem plano</span>'
           : '—');
     return `<tr${semPlano?' style="background:#FFFBEB;box-shadow:inset 3px 0 0 #F59E0B;"':''}>
-      <td class="nome">${a.nome}${semPlano?' <i data-lucide="alert-triangle" title="Formando cadastrado sem plano — definir com a comissão" style="width:14px;height:14px;color:#F59E0B;vertical-align:-2px;"></i>':''}</td>
+      <td class="nome">${a.nome}${!a.cpf?' <span class="badge" title="Formando sem CPF cadastrado" style="background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 7px;border-radius:30px;font-weight:700;letter-spacing:.3px;vertical-align:1px;">SEM CPF</span>':''}${semPlano?' <i data-lucide="alert-triangle" title="Formando cadastrado sem plano — definir com a comissão" style="width:14px;height:14px;color:#F59E0B;vertical-align:-2px;"></i>':''}</td>
       <td>${a.celular||'—'}</td>
       <td>${a.status==='preenchido'?'<span class="badge b-realizado">Preenchido</span>':'<span class="badge b-previsto">Pendente</span>'}</td>
       <td>${cargoSel}</td>
