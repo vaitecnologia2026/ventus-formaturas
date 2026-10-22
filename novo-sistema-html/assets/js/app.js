@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ================== Tema claro / escuro ================== */
 function aplicarTema() {
+  // Telas voltadas ao CLIENTE (espaço do formando, inscrição, encarte) são SEMPRE
+  // claras — não herdam o tema escuro que o admin tenha escolhido no CRM.
+  const p = location.pathname.toLowerCase();
+  if (/\/aluno\/|inscricao\.html|encarte\.html|cadastro-turma\.html/.test(p)) {
+    document.documentElement.setAttribute('data-theme', 'light');
+    return;
+  }
   const t = localStorage.getItem('ventus-theme') || 'light';
   document.documentElement.setAttribute('data-theme', t);
 }
