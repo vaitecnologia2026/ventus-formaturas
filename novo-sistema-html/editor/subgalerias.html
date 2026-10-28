@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteira de Edição — Ventus</title>
+<script src="/assets/js/config.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body{font-family:-apple-system,Segoe UI,Roboto,Inter,sans-serif;background:#F1F5F9;color:#0F172A;margin:0;}
+  .badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;display:inline-block;}
+  .st-nao_iniciada{background:#E2E8F0;color:#475569;}
+  .st-em_selecao{background:#DBEAFE;color:#1D4ED8;}
+  .st-aguardando_pagamento{background:#FEF3C7;color:#B45309;}
+  .st-selecao_concluida{background:#D1FAE5;color:#047857;}
+  .st-em_tratamento{background:#EDE9FE;color:#6D28D9;}
+  .st-entregue{background:#DCFCE7;color:#15803D;}
+  .card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:16px;}
+  .btn{font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;cursor:pointer;border:1px solid #E2E8F0;background:#fff;display:inline-flex;align-items:center;gap:6px;}
+  .btn-azul{background:#2563EB;color:#fff;border-color:#2563EB;}
+  .btn-verde{background:#16A34A;color:#fff;border-color:#16A34A;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .chip{font-size:12px;color:#475569;background:#F1F5F9;border-radius:8px;padding:3px 9px;}
+  .ov{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
+  .ov.on{display:flex;}
+  .modal{background:#fff;border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:20px;}
+  input,select{font-size:13px;padding:7px 10px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;}
+</style>
+</head>
+<body>
+<header style="background:#0F172A;color:#fff;padding:16px 22px;display:flex;align-items:center;gap:12px;">
+  <i data-lucide="scissors" class="w-5 h-5"></i>
+  <div style="flex:1;"><div style="font-weight:800;font-size:17px;">Esteira de Edição</div>
+  <div style="font-size:12px;opacity:.65;">Subgalerias por acadêmico · do ZIP ao entregue</div></div>
+  <a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-5 h-5"></i></a>
+</header>
+
+<div style="max-width:1100px;margin:0 auto;padding:20px 16px 60px;">
+  <!-- filtros -->
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px;">
+    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Turma (id)</label>
+      <input id="f-turma" type="number" placeholder="ex.: 251" style="width:110px;"></div>
+    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Evento (id)</label>
+      <input id="f-evento" type="number" placeholder="opcional" style="width:110px;"></div>
+    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Status</label>
+      <select id="f-status"><option value="">Todos</option></select></div>
+    <button class="btn btn-azul" onclick="carregar()"><i data-lucide="search" class="w-4 h-4"></i>Filtrar</button>
+    <div style="flex:1;"></div>
+    <div id="resumo" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+
+  <div id="lista"></div>
+  <p id="vazio" style="display:none;text-align:center;color:#94A3B8;padding:40px;">Nenhuma subgaleria encontrada. Ajuste os filtros.</p>
+</div>
+
+<!-- modal detalhe -->
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<input type="file" id="file-trat" accept="image/*" multiple style="display:none;">
+
+<script>
+let LABELS={}, ATUAL=null;
+
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function stLabel(s){return LABELS[s]||s;}
+
+async function initOpcoes(){
+  try{
+    const d=await (await fetch(apiUrl('/api/subgalerias/opcoes'))).json();
+    (d.status||[]).forEach(([k,l])=>{ LABELS[k]=l; const o=document.createElement('option');o.value=k;o.textContent=l;document.getElementById('f-status').appendChild(o); });
+  }catch(e){}
+}
+
+async function carregar(){
+  const turma=document.getElementById('f-turma').value.trim();
+  const ev=document.getElementById('f-evento').value.trim();
+  const st=document.getElementById('f-status').value;
+  const qs=new URLSearchParams();
+  if(turma) qs.set('turma_id',turma);
+  if(ev) qs.set('evento_id',ev);
+  if(st) qs.set('status_f',st);
+  const d=await (await fetch(apiUrl('/api/subgalerias?'+qs.toString()))).json();
+  // resumo
+  const rz=document.getElementById('resumo'); rz.innerHTML='';
+  Object.entries(d.resumo||{}).forEach(([k,v])=>{ if(v>0){const s=document.createElement('span');s.className='badge st-'+k;s.textContent=stLabel(k)+': '+v;rz.appendChild(s);} });
+  // lista
+  const L=document.getElementById('lista'); L.innerHTML='';
+  const itens=d.itens||[];
+  document.getElementById('vazio').style.display=itens.length?'none':'block';
+  itens.forEach(sg=>L.appendChild(card(sg)));
+  if(window.lucide) lucide.createIcons();
+}
+
+function card(sg){
+  const c=document.createElement('div'); c.className='card'; c.style.marginBottom='12px';
+  const cg=sg.contagens||{};
+  const temSelec=(cg.selecionada||0)>0, temTrat=(cg.tratada||0)>0;
+  c.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-weight:700;font-size:15px;">${esc(sg.aluno||('Aluno '+sg.aluno_id))}</div>
+        <div style="font-size:12px;color:#64748B;">${esc(sg.evento||('Evento '+sg.evento_id))} · turma ${esc(sg.turma_id||'')}</div>
+      </div>
+      <span class="badge st-${sg.status}">${esc(stLabel(sg.status))}</span>
+      ${sg.bloqueado_inadimplencia?'<span class="badge" style="background:#FEE2E2;color:#B91C1C;">bloqueado</span>':''}
+    </div>
+    <div style="display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;">
+      <span class="chip">🔍 identificadas: <b>${cg.identificada||0}</b></span>
+      <span class="chip">✅ selecionadas: <b>${cg.selecionada||0}</b></span>
+      <span class="chip">🎨 tratadas: <b>${cg.tratada||0}</b></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn" ${temSelec?'':'disabled'} onclick="baixarZip(${sg.id})"><i data-lucide="download" class="w-4 h-4"></i>Baixar seleção (ZIP)</button>
+      <button class="btn" onclick="subirTratadas(${sg.id})"><i data-lucide="upload" class="w-4 h-4"></i>Subir tratadas</button>
+      <button class="btn btn-verde" ${temTrat && sg.status!=='entregue'?'':'disabled'} onclick="entregar(${sg.id})"><i data-lucide="send" class="w-4 h-4"></i>Entregar</button>
+      <button class="btn" onclick="abrirDetalhe(${sg.id})"><i data-lucide="eye" class="w-4 h-4"></i>Detalhe</button>
+    </div>`;
+  return c;
+}
+
+function baixarZip(id){ window.location = apiUrl('/api/subgalerias/'+id+'/baixar-selecionadas'); setTimeout(carregar,1500); }
+
+function subirTratadas(id){
+  ATUAL=id;
+  const inp=document.getElementById('file-trat'); inp.value='';
+  inp.click();
+}
+document.getElementById('file-trat').onchange=async function(){
+  const files=[...this.files]; if(!files.length) return;
+  const fotos=[];
+  for(const f of files){ fotos.push({nome:f.name, dados: await toDataURL(f)}); }
+  const r=await fetch(apiUrl('/api/subgalerias/'+ATUAL+'/tratadas'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fotos, por:'editor'})});
+  const d=await r.json().catch(()=>({}));
+  alert(r.ok?('Subidas '+(d.subidas||[]).length+' foto(s) tratada(s).'):(d.detail||'Falha ao subir.'));
+  carregar();
+};
+function toDataURL(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});}
+
+async function entregar(id){
+  if(!confirm('Publicar as fotos tratadas para o acadêmico (status Entregue)?')) return;
+  const r=await fetch(apiUrl('/api/subgalerias/'+id+'/entregar'),{method:'POST'});
+  const d=await r.json().catch(()=>({}));
+  alert(r.ok?'Entregue! O acadêmico já pode baixar as fotos tratadas.':(d.detail||'Falha.'));
+  carregar();
+}
+
+async function abrirDetalhe(id){
+  const d=await (await fetch(apiUrl('/api/subgalerias/'+id))).json();
+  const f=d.fotos||{};
+  const sec=(titulo,cat,arr,opts={})=>`
+    <div style="margin-top:14px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">${titulo} (${arr.length})</div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      ${arr.map(x=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;border:1px solid #F1F5F9;border-radius:7px;padding:5px 8px;">
+        <span style="flex:1;word-break:break-all;">${x.url?`<a href="${x.url}" target="_blank" style="color:#2563EB;">${esc(x.nome||x.arquivo)}</a>`:esc(x.arquivo)}</span>
+        ${x.adicionada_por?`<span style="color:#94A3B8;">${esc(x.adicionada_por)}</span>`:''}
+        ${opts.remover?`<button class="btn" style="padding:3px 7px;" onclick="removerTratada(${id},'${esc(x.arquivo)}')">×</button>`:''}
+        ${opts.excluir?`<button class="btn" style="padding:3px 7px;" onclick="editorFoto(${id},'excluir','${cat}','${esc(x.arquivo)}')">excluir</button>`:''}
+      </div>`).join('')||'<span style="color:#94A3B8;font-size:12px;">—</span>'}
+    </div></div>`;
+  document.getElementById('modal').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;"><div style="font-weight:800;font-size:16px;">${esc(d.aluno)}</div>
+      <div style="font-size:12px;color:#64748B;">${esc(d.evento)} · <span class="badge st-${d.status}">${esc(stLabel(d.status))}</span></div></div>
+      <button class="btn" onclick="document.getElementById('ov').classList.remove('on')">Fechar</button>
+    </div>
+    ${sec('🔍 Identificadas','identificada',f.identificada||[],{excluir:true})}
+    <div style="margin-top:6px;display:flex;gap:6px;">
+      <input id="add-arq" placeholder="album/arquivo.jpg (incluir identificada)" style="flex:1;">
+      <button class="btn" onclick="editorFoto(${id},'incluir','identificada',document.getElementById('add-arq').value)">+ incluir</button>
+    </div>
+    ${sec('✅ Selecionadas','selecionada',f.selecionada||[])}
+    ${sec('🎨 Tratadas','tratada',f.tratada||[],{remover:true})}`;
+  document.getElementById('ov').classList.add('on');
+}
+async function removerTratada(id,arq){ await fetch(apiUrl('/api/subgalerias/'+id+'/tratadas/remover'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({arquivo:arq})}); abrirDetalhe(id); carregar(); }
+async function editorFoto(id,acao,categoria,arquivo){ if(!arquivo){alert('Informe o arquivo.');return;} await fetch(apiUrl('/api/subgalerias/'+id+'/fotos'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao,categoria,arquivo,por:'editor'})}); abrirDetalhe(id); carregar(); }
+
+document.getElementById('ov').onclick=e=>{ if(e.target.id==='ov') e.currentTarget.classList.remove('on'); };
+initOpcoes().then(()=>{ if(window.lucide) lucide.createIcons(); });
+</script>
+</body>
+</html>
