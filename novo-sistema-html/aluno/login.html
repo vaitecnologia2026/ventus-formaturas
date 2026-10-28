@@ -261,7 +261,7 @@
     <h2>Acesse pelo WhatsApp</h2>
     <p class="lede">Envie seu número e receba um link único de acesso. Sem senha.</p>
 
-    <label class="label" for="wa">WhatsApp</label>
+    <label class="label" for="wa">WhatsApp ou CPF</label>
     <div class="input-wrap">
       <span class="input-prefix">🇧🇷 +55</span>
       <input id="wa" class="input" placeholder="(38) 99863-1234" value="(38) 99863-1234">
@@ -310,15 +310,17 @@
     erro.classList.remove('show');
     sent.classList.remove('show');
     if(numero.length < 8){
-      erro.querySelector('strong').textContent = 'Número inválido';
-      erro.querySelector('p').textContent = 'Digite o número completo com DDD.';
+      erro.querySelector('strong').textContent = 'Dado inválido';
+      erro.querySelector('p').textContent = 'Digite seu WhatsApp (com DDD) ou seu CPF.';
       erro.classList.add('show');
       return;
     }
     btn.disabled = true;
     btnLabel.textContent = 'Verificando…';
     try{
-      const r = await fetch(apiUrl('/api/meu-espaco?celular=' + encodeURIComponent(numero)));
+      // 11 dígitos = CPF; senão WhatsApp (os dois funcionam)
+      const q = (numero.length === 11) ? ('cpf=' + encodeURIComponent(numero)) : ('celular=' + encodeURIComponent(numero));
+      const r = await fetch(apiUrl('/api/meu-espaco?' + q));
       const data = r.ok ? await r.json() : null;
       if(data && data.encontrado && data.token){
         try{ localStorage.setItem(TOKEN_KEY, data.token); }catch(e){}
@@ -327,8 +329,8 @@
         return;
       }
       // não encontrado
-      erro.querySelector('strong').textContent = 'Número não encontrado';
-      erro.querySelector('p').textContent = 'Confira com a comissão o número cadastrado na sua formatura.';
+      erro.querySelector('strong').textContent = 'Não encontrado';
+      erro.querySelector('p').textContent = 'Confira com a comissão o WhatsApp ou CPF cadastrado na sua formatura.';
       erro.classList.add('show');
     }catch(e){
       erro.querySelector('strong').textContent = 'Erro de conexão';

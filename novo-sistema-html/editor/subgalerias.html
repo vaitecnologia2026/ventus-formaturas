@@ -36,6 +36,13 @@
 </header>
 
 <div style="max-width:1100px;margin:0 auto;padding:20px 16px 60px;">
+  <!-- navegação -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+    <button class="btn btn-azul" id="nav-sg" onclick="verView('sg')">Subgalerias</button>
+    <button class="btn" id="nav-sol" onclick="verView('sol')">Solicitações <span id="sol-badge" class="badge" style="background:#FEE2E2;color:#B91C1C;display:none;"></span></button>
+    <a class="btn" href="triagem.html">Triagem de fotos</a>
+  </div>
+
   <!-- filtros -->
   <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px;">
     <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Turma (id)</label>
@@ -51,6 +58,7 @@
 
   <div id="lista"></div>
   <p id="vazio" style="display:none;text-align:center;color:#94A3B8;padding:40px;">Nenhuma subgaleria encontrada. Ajuste os filtros.</p>
+  <div id="solicitacoes" style="display:none;"></div>
 </div>
 
 <!-- modal detalhe -->
@@ -175,7 +183,51 @@ async function removerTratada(id,arq){ await fetch(apiUrl('/api/subgalerias/'+id
 async function editorFoto(id,acao,categoria,arquivo){ if(!arquivo){alert('Informe o arquivo.');return;} await fetch(apiUrl('/api/subgalerias/'+id+'/fotos'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao,categoria,arquivo,por:'editor'})}); abrirDetalhe(id); carregar(); }
 
 document.getElementById('ov').onclick=e=>{ if(e.target.id==='ov') e.currentTarget.classList.remove('on'); };
-initOpcoes().then(()=>{ if(window.lucide) lucide.createIcons(); });
+
+/* ===== views: subgalerias x solicitações ===== */
+function verView(v){
+  const sg=v==='sg';
+  document.getElementById('lista').style.display=sg?'':'none';
+  document.getElementById('vazio').style.display='none';
+  document.getElementById('solicitacoes').style.display=sg?'none':'';
+  document.getElementById('nav-sg').className='btn'+(sg?' btn-azul':'');
+  document.getElementById('nav-sol').className='btn'+(sg?'':' btn-azul');
+  if(sg) carregar(); else carregarSolicitacoes();
+}
+async function carregarSolicitacoes(){
+  const turma=document.getElementById('f-turma').value.trim();
+  const qs=new URLSearchParams(); if(turma) qs.set('turma_id',turma);
+  const d=await (await fetch(apiUrl('/api/solicitacoes?'+qs.toString()))).json();
+  const box=document.getElementById('solicitacoes');
+  const itens=d.itens||[];
+  box.innerHTML = itens.length ? itens.map(s=>`
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-weight:700;">${esc(s.aluno||('Aluno '+s.aluno_id))}</div>
+          <div style="font-size:12px;color:#64748B;">${esc(s.evento||'—')} · turma ${esc(s.turma_id||'')}</div>
+        </div>
+        <span class="badge" style="background:#EDE9FE;color:#6D28D9;">${esc(s.tipo_label)}</span>
+        <span class="badge" style="background:${s.status==='aberta'?'#FEF3C7':'#DCFCE7'};color:${s.status==='aberta'?'#B45309':'#15803D'};">${s.status}</span>
+      </div>
+      ${s.descricao?`<div style="font-size:13px;color:#334155;margin:8px 0;">${esc(s.descricao)}</div>`:''}
+      <div style="display:flex;gap:8px;">
+        ${s.subgaleria_id?`<button class="btn" onclick="abrirDetalhe(${s.subgaleria_id})">Abrir subgaleria</button>`:''}
+        ${s.status==='aberta'?`<button class="btn btn-verde" onclick="atender(${s.id})">Marcar como atendida</button>`:`<span class="chip">atendida por ${esc(s.atendida_por||'editor')}</span>`}
+      </div>
+    </div>`).join('') : '<p style="text-align:center;color:#94A3B8;padding:40px;">Nenhuma solicitação.</p>';
+  // badge de abertas
+  const b=document.getElementById('sol-badge');
+  if(d.abertas>0){ b.textContent=d.abertas; b.style.display='inline-block'; } else b.style.display='none';
+}
+async function atender(id){
+  await fetch(apiUrl('/api/solicitacoes/'+id+'/atender'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({por:'editor'})});
+  carregarSolicitacoes();
+}
+// carrega contagem de solicitações abertas no load (badge)
+async function pingSolicitacoes(){ try{ const d=await (await fetch(apiUrl('/api/solicitacoes?status_f=aberta'))).json(); const b=document.getElementById('sol-badge'); if((d.abertas||0)>0){ b.textContent=d.abertas; b.style.display='inline-block'; } }catch(e){} }
+
+initOpcoes().then(()=>{ if(window.lucide) lucide.createIcons(); pingSolicitacoes(); });
 </script>
 </body>
 </html>
