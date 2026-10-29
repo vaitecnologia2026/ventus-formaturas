@@ -209,7 +209,9 @@ async function carregarSolicitacoes(){
         </div>
         <span class="badge" style="background:#EDE9FE;color:#6D28D9;">${esc(s.tipo_label)}</span>
         <span class="badge" style="background:${s.status==='aberta'?'#FEF3C7':'#DCFCE7'};color:${s.status==='aberta'?'#B45309':'#15803D'};">${s.status}</span>
+        ${s.atrasada?'<span class="badge" style="background:#FEE2E2;color:#B91C1C;">⏰ atrasada</span>':''}
       </div>
+      <div style="font-size:11px;color:#94A3B8;margin-top:4px;">${s.dias_aberta!=null?('aberta há '+s.dias_aberta+'d'):''}${s.prazo_dias?(' · prazo '+s.prazo_dias+'d'):''}</div>
       ${s.descricao?`<div style="font-size:13px;color:#334155;margin:8px 0;">${esc(s.descricao)}</div>`:''}
       <div style="display:flex;gap:8px;">
         ${s.subgaleria_id?`<button class="btn" onclick="abrirDetalhe(${s.subgaleria_id})">Abrir subgaleria</button>`:''}

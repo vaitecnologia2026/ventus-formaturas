@@ -184,9 +184,55 @@
         </div>
       </div>
     </div>
+
+    <div class="card mt-6">
+      <div class="card-header"><div class="card-title">Prazos do fluxo de fotos</div></div>
+      <div class="card-body">
+        <div style="max-width:620px;display:flex;flex-direction:column;gap:18px;">
+          <div>
+            <label class="label" for="prazo-selecao">Prazo de seleção do acadêmico (dias)</label>
+            <div class="flex items-center gap-3">
+              <input class="input" id="prazo-selecao" type="number" min="0" step="1" inputmode="numeric" placeholder="0 = sem prazo" style="width:180px;">
+              <button class="btn btn-primary" id="btn-prazo-selecao">Salvar</button>
+            </div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:8px;">Quantos dias o formando tem para escolher as fotos depois que a galeria fica disponível. <b>0</b> = sem prazo.</div>
+          </div>
+          <div>
+            <label class="label" for="prazo-solicitacao">Prazo do editor para atender uma solicitação (dias)</label>
+            <div class="flex items-center gap-3">
+              <input class="input" id="prazo-solicitacao" type="number" min="0" step="1" inputmode="numeric" placeholder="ex.: 3" style="width:180px;">
+              <button class="btn btn-primary" id="btn-prazo-solicitacao">Salvar</button>
+            </div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:8px;">Quando o formando pede "não encontrei uma foto", o editor tem este prazo para atender. Passou disso, a solicitação aparece <b>atrasada</b> no painel do editor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 <script>lucide.createIcons();</script>
+
+<script>
+/* ================== Prazos do fluxo de fotos ================== */
+(function(){
+  function feedback(msg){ if(typeof showToast==='function') showToast(msg); else if(typeof vtAlert==='function') vtAlert(msg); }
+  function wire(chave, inputId, btnId){
+    var input=document.getElementById(inputId), btn=document.getElementById(btnId);
+    if(!input||!btn) return;
+    fetch(apiUrl('/api/config/'+chave)).then(function(r){return r.ok?r.json():null;})
+      .then(function(d){ if(d&&d.valor!=null) input.value=d.valor; }).catch(function(){});
+    btn.addEventListener('click', function(){
+      btn.disabled=true;
+      fetch(apiUrl('/api/config/'+chave),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({valor:(input.value||'').trim()})})
+        .then(function(r){ if(!r.ok) throw new Error('falha'); feedback('Salvo'); })
+        .catch(function(){ feedback('Erro ao salvar. Tente novamente.'); })
+        .finally(function(){ btn.disabled=false; });
+    });
+  }
+  wire('prazo_selecao_dias','prazo-selecao','btn-prazo-selecao');
+  wire('prazo_solicitacao_dias','prazo-solicitacao','btn-prazo-solicitacao');
+})();
+</script>
 
 <script>
 /* ================== Numeração de contratos ================== */
