@@ -97,7 +97,7 @@ async function turmaMudou(){
   if(tid){
     try{ const d=await (await fetch(apiUrl('/api/turma-formatura/'+tid+'/eventos'))).json();
       const evs=d.itens||d.eventos||d||[];
-      (Array.isArray(evs)?evs:[]).forEach(e=>{ const nome=e.nome||e.local||('Evento '+e.id); ALBUM_POR_EVENTO[e.id]=e.album_id; const o=document.createElement('option');o.value=e.id;o.textContent=nome;sel.appendChild(o); });
+      (Array.isArray(evs)?evs:[]).forEach(e=>{ const nome=e.evento||e.nome||e.local||('Evento '+e.id); ALBUM_POR_EVENTO[e.id]=e.album_id; const o=document.createElement('option');o.value=e.id;o.textContent=nome;sel.appendChild(o); });
     }catch(e){}
   }
   recarregar();
