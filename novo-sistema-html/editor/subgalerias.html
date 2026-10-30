@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Esteira de Edição — Ventus</title>
 <script src="/assets/js/config.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="/assets/js/vtui.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
   body{font-family:-apple-system,Segoe UI,Roboto,Inter,sans-serif;background:#F1F5F9;color:#0F172A;margin:0;}
@@ -15,89 +15,124 @@
   .st-selecao_concluida{background:#D1FAE5;color:#047857;}
   .st-em_tratamento{background:#EDE9FE;color:#6D28D9;}
   .st-entregue{background:#DCFCE7;color:#15803D;}
+  .b-red{background:#FEE2E2;color:#B91C1C;}
   .card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:16px;}
-  .btn{font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;cursor:pointer;border:1px solid #E2E8F0;background:#fff;display:inline-flex;align-items:center;gap:6px;}
+  .btn{font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;cursor:pointer;border:1px solid #E2E8F0;background:#fff;color:#0F172A;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
   .btn-azul{background:#2563EB;color:#fff;border-color:#2563EB;}
   .btn-verde{background:#16A34A;color:#fff;border-color:#16A34A;}
   .btn:disabled{opacity:.45;cursor:not-allowed;}
-  .chip{font-size:12px;color:#475569;background:#F1F5F9;border-radius:8px;padding:3px 9px;}
+  .chip{font-size:12px;color:#475569;background:#F1F5F9;border-radius:8px;padding:4px 10px;display:inline-flex;align-items:center;gap:5px;}
+  .chip i{width:14px;height:14px;}
   .ov{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .ov.on{display:flex;}
   .modal{background:#fff;border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:20px;}
-  input,select{font-size:13px;padding:7px 10px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;}
+  label.lbl{font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:4px;}
+  input,select{font-size:13px;padding:8px 11px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;color:#0F172A;min-width:150px;}
+  select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 6 8 10 12 6'/></svg>");background-repeat:no-repeat;background-position:right 9px center;padding-right:30px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .tile{background:#fff;border:1px solid #E2E8F0;border-radius:11px;overflow:hidden;position:relative;}
+  .tile img{width:100%;height:150px;object-fit:cover;display:block;background:#E2E8F0;}
+  .tile .x{position:absolute;top:6px;right:6px;background:rgba(220,38,38,.92);color:#fff;border:none;border-radius:8px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .tile .meta{font-size:11px;color:#64748B;padding:6px 8px;display:flex;justify-content:space-between;align-items:center;gap:6px;}
 </style>
 </head>
 <body>
 <header style="background:#0F172A;color:#fff;padding:16px 22px;display:flex;align-items:center;gap:12px;">
   <i data-lucide="scissors" class="w-5 h-5"></i>
   <div style="flex:1;"><div style="font-weight:800;font-size:17px;">Esteira de Edição</div>
-  <div style="font-size:12px;opacity:.65;">Subgalerias por acadêmico · do ZIP ao entregue</div></div>
+  <div style="font-size:12px;opacity:.65;">Subgalerias por acadêmico, do download ao entregue</div></div>
   <a href="../index.html" style="color:rgba(255,255,255,.6);"><i data-lucide="home" class="w-5 h-5"></i></a>
 </header>
 
 <div style="max-width:1100px;margin:0 auto;padding:20px 16px 60px;">
-  <!-- navegação -->
+  <!-- navegação (sempre visível) -->
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-    <button class="btn btn-azul" id="nav-sg" onclick="verView('sg')">Subgalerias</button>
-    <button class="btn" id="nav-sol" onclick="verView('sol')">Solicitações <span id="sol-badge" class="badge" style="background:#FEE2E2;color:#B91C1C;display:none;"></span></button>
-    <a class="btn" href="triagem.html">Triagem de fotos</a>
+    <button class="btn btn-azul" id="nav-sg" onclick="verView('sg')"><i data-lucide="images" class="w-4 h-4"></i>Subgalerias</button>
+    <button class="btn" id="nav-sol" onclick="verView('sol')"><i data-lucide="inbox" class="w-4 h-4"></i>Solicitações <span id="sol-badge" class="badge b-red" style="display:none;"></span></button>
+    <button class="btn" id="nav-tri" onclick="verView('tri')"><i data-lucide="scan-search" class="w-4 h-4"></i>Triagem de fotos</button>
   </div>
 
-  <!-- filtros -->
-  <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px;">
-    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Turma (id)</label>
-      <input id="f-turma" type="number" placeholder="ex.: 251" style="width:110px;"></div>
-    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Evento (id)</label>
-      <input id="f-evento" type="number" placeholder="opcional" style="width:110px;"></div>
-    <div><label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px;">Status</label>
-      <select id="f-status"><option value="">Todos</option></select></div>
-    <button class="btn btn-azul" onclick="carregar()"><i data-lucide="search" class="w-4 h-4"></i>Filtrar</button>
+  <!-- filtros por NOME -->
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:16px;">
+    <div><label class="lbl">Turma</label>
+      <select id="f-turma" onchange="turmaMudou()"><option value="">Selecione a turma…</option></select></div>
+    <div><label class="lbl">Evento</label>
+      <select id="f-evento" onchange="recarregar()"><option value="">Todos os eventos</option></select></div>
+    <div id="wrap-status"><label class="lbl">Status</label>
+      <select id="f-status" onchange="carregar()"><option value="">Todos</option></select></div>
     <div style="flex:1;"></div>
     <div id="resumo" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
   </div>
 
   <div id="lista"></div>
-  <p id="vazio" style="display:none;text-align:center;color:#94A3B8;padding:40px;">Nenhuma subgaleria encontrada. Ajuste os filtros.</p>
+  <p id="vazio" style="display:none;text-align:center;color:#94A3B8;padding:40px;">Nenhuma subgaleria. Escolha a turma (e, se quiser, o evento).</p>
   <div id="solicitacoes" style="display:none;"></div>
+  <div id="triagem" style="display:none;"></div>
 </div>
 
-<!-- modal detalhe -->
 <div class="ov" id="ov"><div class="modal" id="modal"></div></div>
 <input type="file" id="file-trat" accept="image/*" multiple style="display:none;">
 
 <script>
-let LABELS={}, ATUAL=null;
-
+let LABELS={}, ATUAL=null, VIEW='sg', ALBUM_POR_EVENTO={};
 function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function stLabel(s){return LABELS[s]||s;}
+function icons(){ if(window.lucide) lucide.createIcons(); }
 
-async function initOpcoes(){
-  try{
-    const d=await (await fetch(apiUrl('/api/subgalerias/opcoes'))).json();
+async function init(){
+  // status
+  try{ const d=await (await fetch(apiUrl('/api/subgalerias/opcoes'))).json();
     (d.status||[]).forEach(([k,l])=>{ LABELS[k]=l; const o=document.createElement('option');o.value=k;o.textContent=l;document.getElementById('f-status').appendChild(o); });
   }catch(e){}
+  // turmas por nome
+  try{ const d=await (await fetch(apiUrl('/api/turma-formatura'))).json();
+    (d.itens||[]).forEach(t=>{ const o=document.createElement('option');o.value=t.id;o.textContent=t.nome;document.getElementById('f-turma').appendChild(o); });
+  }catch(e){}
+  pingSolicitacoes(); icons();
 }
 
+async function turmaMudou(){
+  const tid=document.getElementById('f-turma').value;
+  const sel=document.getElementById('f-evento'); sel.innerHTML='<option value="">Todos os eventos</option>'; ALBUM_POR_EVENTO={};
+  if(tid){
+    try{ const d=await (await fetch(apiUrl('/api/turma-formatura/'+tid+'/eventos'))).json();
+      const evs=d.itens||d.eventos||d||[];
+      (Array.isArray(evs)?evs:[]).forEach(e=>{ const nome=e.nome||e.local||('Evento '+e.id); ALBUM_POR_EVENTO[e.id]=e.album_id; const o=document.createElement('option');o.value=e.id;o.textContent=nome;sel.appendChild(o); });
+    }catch(e){}
+  }
+  recarregar();
+}
+function recarregar(){ if(VIEW==='sg') carregar(); else if(VIEW==='sol') carregarSolicitacoes(); else carregarTriagem(); }
+
+function verView(v){
+  VIEW=v;
+  document.getElementById('lista').style.display = v==='sg'?'':'none';
+  document.getElementById('vazio').style.display = 'none';
+  document.getElementById('solicitacoes').style.display = v==='sol'?'':'none';
+  document.getElementById('triagem').style.display = v==='tri'?'':'none';
+  document.getElementById('wrap-status').style.display = v==='sg'?'':'none';
+  document.getElementById('resumo').style.display = v==='sg'?'':'none';
+  for(const [id,val] of [['nav-sg','sg'],['nav-sol','sol'],['nav-tri','tri']]){
+    document.getElementById(id).className='btn'+(v===val?' btn-azul':'');
+  }
+  icons();
+  recarregar();
+}
+
+/* ---------------- SUBGALERIAS ---------------- */
 async function carregar(){
-  const turma=document.getElementById('f-turma').value.trim();
-  const ev=document.getElementById('f-evento').value.trim();
-  const st=document.getElementById('f-status').value;
+  const turma=document.getElementById('f-turma').value, ev=document.getElementById('f-evento').value, st=document.getElementById('f-status').value;
   const qs=new URLSearchParams();
-  if(turma) qs.set('turma_id',turma);
-  if(ev) qs.set('evento_id',ev);
-  if(st) qs.set('status_f',st);
+  if(turma) qs.set('turma_id',turma); if(ev) qs.set('evento_id',ev); if(st) qs.set('status_f',st);
   const d=await (await fetch(apiUrl('/api/subgalerias?'+qs.toString()))).json();
-  // resumo
   const rz=document.getElementById('resumo'); rz.innerHTML='';
   Object.entries(d.resumo||{}).forEach(([k,v])=>{ if(v>0){const s=document.createElement('span');s.className='badge st-'+k;s.textContent=stLabel(k)+': '+v;rz.appendChild(s);} });
-  // lista
   const L=document.getElementById('lista'); L.innerHTML='';
   const itens=d.itens||[];
   document.getElementById('vazio').style.display=itens.length?'none':'block';
   itens.forEach(sg=>L.appendChild(card(sg)));
-  if(window.lucide) lucide.createIcons();
+  icons();
 }
-
 function card(sg){
   const c=document.createElement('div'); c.className='card'; c.style.marginBottom='12px';
   const cg=sg.contagens||{};
@@ -106,15 +141,15 @@ function card(sg){
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div style="flex:1;min-width:200px;">
         <div style="font-weight:700;font-size:15px;">${esc(sg.aluno||('Aluno '+sg.aluno_id))}</div>
-        <div style="font-size:12px;color:#64748B;">${esc(sg.evento||('Evento '+sg.evento_id))} · turma ${esc(sg.turma_id||'')}</div>
+        <div style="font-size:12px;color:#64748B;">${esc(sg.evento||('Evento '+sg.evento_id))}</div>
       </div>
       <span class="badge st-${sg.status}">${esc(stLabel(sg.status))}</span>
-      ${sg.bloqueado_inadimplencia?'<span class="badge" style="background:#FEE2E2;color:#B91C1C;">bloqueado</span>':''}
+      ${sg.bloqueado_inadimplencia?'<span class="badge b-red">Bloqueado</span>':''}
     </div>
-    <div style="display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;">
-      <span class="chip">🔍 identificadas: <b>${cg.identificada||0}</b></span>
-      <span class="chip">✅ selecionadas: <b>${cg.selecionada||0}</b></span>
-      <span class="chip">🎨 tratadas: <b>${cg.tratada||0}</b></span>
+    <div style="display:flex;gap:7px;margin:12px 0;flex-wrap:wrap;">
+      <span class="chip"><i data-lucide="scan-face"></i>Identificadas: <b>${cg.identificada||0}</b></span>
+      <span class="chip"><i data-lucide="check-circle-2"></i>Selecionadas: <b>${cg.selecionada||0}</b></span>
+      <span class="chip"><i data-lucide="palette"></i>Tratadas: <b>${cg.tratada||0}</b></span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn" ${temSelec?'':'disabled'} onclick="baixarZip(${sg.id})"><i data-lucide="download" class="w-4 h-4"></i>Baixar seleção (ZIP)</button>
@@ -124,33 +159,24 @@ function card(sg){
     </div>`;
   return c;
 }
-
 function baixarZip(id){ window.location = apiUrl('/api/subgalerias/'+id+'/baixar-selecionadas'); setTimeout(carregar,1500); }
-
-function subirTratadas(id){
-  ATUAL=id;
-  const inp=document.getElementById('file-trat'); inp.value='';
-  inp.click();
-}
+function subirTratadas(id){ ATUAL=id; const inp=document.getElementById('file-trat'); inp.value=''; inp.dataset.alvo='sg'; inp.click(); }
 document.getElementById('file-trat').onchange=async function(){
   const files=[...this.files]; if(!files.length) return;
-  const fotos=[];
-  for(const f of files){ fotos.push({nome:f.name, dados: await toDataURL(f)}); }
+  const fotos=[]; for(const f of files){ fotos.push({nome:f.name, dados: await toDataURL(f)}); }
   const r=await fetch(apiUrl('/api/subgalerias/'+ATUAL+'/tratadas'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fotos, por:'editor'})});
   const d=await r.json().catch(()=>({}));
-  alert(r.ok?('Subidas '+(d.subidas||[]).length+' foto(s) tratada(s).'):(d.detail||'Falha ao subir.'));
+  vtToast(r.ok?('Subidas '+(d.subidas||[]).length+' foto(s) tratada(s).'):(d.detail||'Falha ao subir.'));
   carregar();
 };
 function toDataURL(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});}
-
 async function entregar(id){
-  if(!confirm('Publicar as fotos tratadas para o acadêmico (status Entregue)?')) return;
+  if(!(await vtConfirm('Publicar as fotos tratadas para o acadêmico? O status passa para Entregue.',{ok:'Entregar',title:'Entregar fotos'}))) return;
   const r=await fetch(apiUrl('/api/subgalerias/'+id+'/entregar'),{method:'POST'});
   const d=await r.json().catch(()=>({}));
-  alert(r.ok?'Entregue! O acadêmico já pode baixar as fotos tratadas.':(d.detail||'Falha.'));
+  vtToast(r.ok?'Entregue. O acadêmico já pode baixar as fotos tratadas.':(d.detail||'Falha.'));
   carregar();
 }
-
 async function abrirDetalhe(id){
   const d=await (await fetch(apiUrl('/api/subgalerias/'+id))).json();
   const f=d.fotos||{};
@@ -160,8 +186,8 @@ async function abrirDetalhe(id){
       ${arr.map(x=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;border:1px solid #F1F5F9;border-radius:7px;padding:5px 8px;">
         <span style="flex:1;word-break:break-all;">${x.url?`<a href="${x.url}" target="_blank" style="color:#2563EB;">${esc(x.nome||x.arquivo)}</a>`:esc(x.arquivo)}</span>
         ${x.adicionada_por?`<span style="color:#94A3B8;">${esc(x.adicionada_por)}</span>`:''}
-        ${opts.remover?`<button class="btn" style="padding:3px 7px;" onclick="removerTratada(${id},'${esc(x.arquivo)}')">×</button>`:''}
-        ${opts.excluir?`<button class="btn" style="padding:3px 7px;" onclick="editorFoto(${id},'excluir','${cat}','${esc(x.arquivo)}')">excluir</button>`:''}
+        ${opts.remover?`<button class="btn" style="padding:3px 7px;" onclick="removerTratada(${id},'${esc(x.arquivo)}')">Remover</button>`:''}
+        ${opts.excluir?`<button class="btn" style="padding:3px 7px;" onclick="editorFoto(${id},'excluir','${cat}','${esc(x.arquivo)}')">Excluir</button>`:''}
       </div>`).join('')||'<span style="color:#94A3B8;font-size:12px;">—</span>'}
     </div></div>`;
   document.getElementById('modal').innerHTML=`
@@ -170,46 +196,31 @@ async function abrirDetalhe(id){
       <div style="font-size:12px;color:#64748B;">${esc(d.evento)} · <span class="badge st-${d.status}">${esc(stLabel(d.status))}</span></div></div>
       <button class="btn" onclick="document.getElementById('ov').classList.remove('on')">Fechar</button>
     </div>
-    ${sec('🔍 Identificadas','identificada',f.identificada||[],{excluir:true})}
-    <div style="margin-top:6px;display:flex;gap:6px;">
-      <input id="add-arq" placeholder="album/arquivo.jpg (incluir identificada)" style="flex:1;">
-      <button class="btn" onclick="editorFoto(${id},'incluir','identificada',document.getElementById('add-arq').value)">+ incluir</button>
-    </div>
-    ${sec('✅ Selecionadas','selecionada',f.selecionada||[])}
-    ${sec('🎨 Tratadas','tratada',f.tratada||[],{remover:true})}`;
+    ${sec('Identificadas','identificada',f.identificada||[],{excluir:true})}
+    ${sec('Selecionadas','selecionada',f.selecionada||[])}
+    ${sec('Tratadas','tratada',f.tratada||[],{remover:true})}`;
   document.getElementById('ov').classList.add('on');
 }
 async function removerTratada(id,arq){ await fetch(apiUrl('/api/subgalerias/'+id+'/tratadas/remover'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({arquivo:arq})}); abrirDetalhe(id); carregar(); }
-async function editorFoto(id,acao,categoria,arquivo){ if(!arquivo){alert('Informe o arquivo.');return;} await fetch(apiUrl('/api/subgalerias/'+id+'/fotos'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao,categoria,arquivo,por:'editor'})}); abrirDetalhe(id); carregar(); }
-
+async function editorFoto(id,acao,categoria,arquivo){ await fetch(apiUrl('/api/subgalerias/'+id+'/fotos'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao,categoria,arquivo,por:'editor'})}); abrirDetalhe(id); carregar(); }
 document.getElementById('ov').onclick=e=>{ if(e.target.id==='ov') e.currentTarget.classList.remove('on'); };
 
-/* ===== views: subgalerias x solicitações ===== */
-function verView(v){
-  const sg=v==='sg';
-  document.getElementById('lista').style.display=sg?'':'none';
-  document.getElementById('vazio').style.display='none';
-  document.getElementById('solicitacoes').style.display=sg?'none':'';
-  document.getElementById('nav-sg').className='btn'+(sg?' btn-azul':'');
-  document.getElementById('nav-sol').className='btn'+(sg?'':' btn-azul');
-  if(sg) carregar(); else carregarSolicitacoes();
-}
+/* ---------------- SOLICITAÇÕES ---------------- */
 async function carregarSolicitacoes(){
-  const turma=document.getElementById('f-turma').value.trim();
+  const turma=document.getElementById('f-turma').value;
   const qs=new URLSearchParams(); if(turma) qs.set('turma_id',turma);
   const d=await (await fetch(apiUrl('/api/solicitacoes?'+qs.toString()))).json();
-  const box=document.getElementById('solicitacoes');
-  const itens=d.itens||[];
+  const box=document.getElementById('solicitacoes'); const itens=d.itens||[];
   box.innerHTML = itens.length ? itens.map(s=>`
     <div class="card" style="margin-bottom:12px;">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
           <div style="font-weight:700;">${esc(s.aluno||('Aluno '+s.aluno_id))}</div>
-          <div style="font-size:12px;color:#64748B;">${esc(s.evento||'—')} · turma ${esc(s.turma_id||'')}</div>
+          <div style="font-size:12px;color:#64748B;">${esc(s.evento||'—')}</div>
         </div>
         <span class="badge" style="background:#EDE9FE;color:#6D28D9;">${esc(s.tipo_label)}</span>
         <span class="badge" style="background:${s.status==='aberta'?'#FEF3C7':'#DCFCE7'};color:${s.status==='aberta'?'#B45309':'#15803D'};">${s.status}</span>
-        ${s.atrasada?'<span class="badge" style="background:#FEE2E2;color:#B91C1C;">⏰ atrasada</span>':''}
+        ${s.atrasada?'<span class="badge b-red">Atrasada</span>':''}
       </div>
       <div style="font-size:11px;color:#94A3B8;margin-top:4px;">${s.dias_aberta!=null?('aberta há '+s.dias_aberta+'d'):''}${s.prazo_dias?(' · prazo '+s.prazo_dias+'d'):''}</div>
       ${s.descricao?`<div style="font-size:13px;color:#334155;margin:8px 0;">${esc(s.descricao)}</div>`:''}
@@ -218,18 +229,43 @@ async function carregarSolicitacoes(){
         ${s.status==='aberta'?`<button class="btn btn-verde" onclick="atender(${s.id})">Marcar como atendida</button>`:`<span class="chip">atendida por ${esc(s.atendida_por||'editor')}</span>`}
       </div>
     </div>`).join('') : '<p style="text-align:center;color:#94A3B8;padding:40px;">Nenhuma solicitação.</p>';
-  // badge de abertas
   const b=document.getElementById('sol-badge');
   if(d.abertas>0){ b.textContent=d.abertas; b.style.display='inline-block'; } else b.style.display='none';
 }
-async function atender(id){
-  await fetch(apiUrl('/api/solicitacoes/'+id+'/atender'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({por:'editor'})});
-  carregarSolicitacoes();
-}
-// carrega contagem de solicitações abertas no load (badge)
+async function atender(id){ await fetch(apiUrl('/api/solicitacoes/'+id+'/atender'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({por:'editor'})}); carregarSolicitacoes(); }
 async function pingSolicitacoes(){ try{ const d=await (await fetch(apiUrl('/api/solicitacoes?status_f=aberta'))).json(); const b=document.getElementById('sol-badge'); if((d.abertas||0)>0){ b.textContent=d.abertas; b.style.display='inline-block'; } }catch(e){} }
 
-initOpcoes().then(()=>{ if(window.lucide) lucide.createIcons(); pingSolicitacoes(); });
+/* ---------------- TRIAGEM (embutida) ---------------- */
+function albumAtual(){
+  const ev=document.getElementById('f-evento').value;
+  if(ev && ALBUM_POR_EVENTO[ev]) return ALBUM_POR_EVENTO[ev];
+  // sem evento escolhido: usa o 1º álbum disponível da turma
+  const vals=Object.values(ALBUM_POR_EVENTO).filter(Boolean);
+  return vals[0]||null;
+}
+async function carregarTriagem(){
+  const box=document.getElementById('triagem');
+  const alb=albumAtual();
+  if(!alb){ box.innerHTML='<p style="text-align:center;color:#94A3B8;padding:40px;">Escolha a turma (e o evento) para ver e triar as fotos.</p>'; return; }
+  box.innerHTML='<p style="color:#64748B;padding:10px;">Carregando fotos…</p>';
+  let d; try{ d=await (await fetch(apiUrl('/api/albuns/'+encodeURIComponent(alb)))).json(); }catch(e){ box.innerHTML='<p style="color:#94A3B8;padding:20px;">Não foi possível carregar.</p>'; return; }
+  const fotos=d.fotos||[];
+  box.innerHTML=`<div class="card" style="margin-bottom:14px;">Remova as fotos ruins antes de publicar. <b>${fotos.length}</b> foto(s) em <b>${esc(d.nome||alb)}</b>.</div>
+    <div class="grid">${fotos.map(f=>`
+      <div class="tile" id="tri-${esc(f.arquivo)}">
+        <button class="x" title="Excluir" onclick="excluirTriagem('${esc(alb)}','${esc(f.arquivo)}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        <img loading="lazy" src="${apiUrl(f.url)}" alt="">
+        <div class="meta"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(f.arquivo)}</span><span style="display:inline-flex;align-items:center;gap:3px;"><i data-lucide="user" style="width:12px;height:12px;"></i>${f.rostos||0}</span></div>
+      </div>`).join('')||'<p style="color:#94A3B8;padding:20px;">Sem fotos neste álbum.</p>'}</div>`;
+  icons();
+}
+async function excluirTriagem(alb,arq){
+  if(!(await vtConfirm('Remover esta foto da galeria? Não dá pra desfazer.',{ok:'Remover',danger:true,title:'Remover foto'}))) return;
+  const r=await fetch(apiUrl('/api/albuns/'+encodeURIComponent(alb)+'/fotos/'+encodeURIComponent(arq)+'/excluir'),{method:'POST'});
+  if(r.ok){ const el=document.getElementById('tri-'+arq); if(el) el.remove(); } else vtToast('Falha ao excluir.');
+}
+
+init();
 </script>
 </body>
 </html>

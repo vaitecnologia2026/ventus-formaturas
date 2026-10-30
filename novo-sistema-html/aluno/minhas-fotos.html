@@ -4,6 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Minhas fotos — Ventus</title>
 <script src="/assets/js/config.js"></script>
+<script src="/assets/js/vtui.js"></script>
 <style>
   :root{--azul:#2563EB;--azul-d:#1D4ED8;--verde:#16A34A;--linha:#E2E8F0;--cinza:#64748B;--cinza2:#334155;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -88,7 +89,7 @@ async function boot(){
   if(!token){ app().innerHTML='<div class="card"><h1>Link inválido</h1><p class="sub">Peça um novo link à comissão.</p></div>'; return; }
   let d; try{ d=await (await fetch(A(''))).json(); }catch(e){ app().innerHTML='<div class="card"><p class="sub">Sem conexão. Tente de novo.</p></div>'; return; }
   DADOS=d;
-  document.getElementById('t-nome').textContent='Olá, '+((d.aluno&&d.aluno.nome||'formando').split(' ')[0])+'! 👋';
+  document.getElementById('t-nome').textContent='Olá, '+((d.aluno&&d.aluno.nome||'formando').split(' ')[0]);
   document.getElementById('t-sub').textContent='Encontre e escolha suas fotos';
   // galeria tratada disponível?
   try{ const tr=await (await fetch(A('/tratadas'))).json(); if((tr.total_entregues||0)>0){ document.getElementById('t-trat').classList.remove('hidden'); } }catch(e){}
@@ -144,7 +145,7 @@ function telaSelfie(){
     <p class="sub">Vamos usar sua selfie só para achar as fotos em que você aparece. Boa luz e rosto centralizado ajudam.</p>
     <div id="cam-area"><video id="vid" autoplay playsinline muted></video></div>
     <div style="display:flex;gap:10px;margin-top:14px;">
-      <button class="btn btn-azul" id="btn-cap" onclick="capturar()">📸 Tirar selfie</button>
+      <button class="btn btn-azul" id="btn-cap" onclick="capturar()">Tirar selfie</button>
     </div>
     <div style="margin-top:12px;text-align:center;">
       <label class="link" style="cursor:pointer;">ou enviar uma foto do rolo
@@ -199,8 +200,8 @@ function telaSelecao(d){
   let html=`<div class="card">
     <h1>Suas fotos (${total})</h1>
     <p class="sub">Toque para escolher. ${d.tipo_contrato==='fotos_ilimitadas'?'Seu plano é ilimitado — escolha quantas quiser.':'Ao passar da cota, as extras são cobradas por foto.'}</p>
-    ${(DADOS&&DADOS.prazo_selecao_dias>0)?`<div class="aviso aviso-amarelo" style="margin-bottom:10px;">⏳ Escolha suas fotos em até <b>${DADOS.prazo_selecao_dias} dia(s)</b>.</div>`:''}
-    <button class="link" onclick="abrirSol()">⚠️ Não encontrei uma foto em que apareço</button>
+    ${(DADOS&&DADOS.prazo_selecao_dias>0)?`<div class="aviso aviso-amarelo" style="margin-bottom:10px;">Escolha suas fotos em até <b>${DADOS.prazo_selecao_dias} dia(s)</b>.</div>`:''}
+    <button class="link" onclick="abrirSol()">Não encontrei uma foto em que apareço</button>
   </div>`;
   if(!total){
     html+=`<div class="card"><p class="sub">Nenhuma foto encontrada com seu rosto ainda. Se você aparece em alguma, use o botão acima para pedir ao editor.</p></div>`;
@@ -255,9 +256,9 @@ async function finalizar(){
   const b=document.getElementById('btn-finalizar'); b.disabled=true; b.textContent='Enviando…';
   let r,d;
   try{ r=await fetch(A('/selecao'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fotos})}); d=await r.json().catch(()=>({})); }
-  catch(e){ b.disabled=false; b.textContent='Finalizar'; return alert('Sem conexão.'); }
-  if(r.status===409){ b.disabled=false; b.textContent='Finalizar'; return alert(d.detail||'Não foi possível finalizar.'); }
-  if(!r.ok){ b.disabled=false; b.textContent='Finalizar'; return alert(d.detail||'Falha ao finalizar.'); }
+  catch(e){ b.disabled=false; b.textContent='Finalizar'; return vtToast('Sem conexão.'); }
+  if(r.status===409){ b.disabled=false; b.textContent='Finalizar'; return vtToast(d.detail||'Não foi possível finalizar.'); }
+  if(!r.ok){ b.disabled=false; b.textContent='Finalizar'; return vtToast(d.detail||'Falha ao finalizar.'); }
   if(d.status==='aguardando_pagamento' && d.excedente && d.excedente.qtd_excedente>0){ telaExcedente(fotos, d.excedente); }
   else telaConcluido(false);
 }
@@ -294,7 +295,7 @@ async function pagarExcedente(metodo,btn){
 function telaConcluido(){
   document.getElementById('barra').classList.add('hidden');
   app().innerHTML=`<div class="card" style="text-align:center;">
-    <div style="font-size:48px;">✅</div>
+    <div style="width:64px;height:64px;border-radius:50%;background:#16A34A;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
     <h1>Seleção confirmada!</h1>
     <p class="sub">Suas fotos foram enviadas para edição. Você será avisado quando as fotos tratadas estiverem prontas para baixar.</p>
     <a class="btn btn-ghost" href="galeria-tratada.html?t=${encodeURIComponent(token)}">Ver fotos tratadas</a>
@@ -311,10 +312,10 @@ function fecharSol(){ document.getElementById('ov-sol').classList.remove('on'); 
 async function enviarSol(){
   const evento_id=document.getElementById('sol-evento').value||null;
   const descricao=document.getElementById('sol-desc').value.trim();
-  if(!descricao){ alert('Descreva a foto que faltou.'); return; }
+  if(!descricao){ vtToast('Descreva a foto que faltou.'); return; }
   try{ await fetch(A('/solicitacao'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({evento_id:evento_id?+evento_id:null, tipo:'foto_nao_encontrada', descricao})}); }catch(e){}
   fecharSol(); document.getElementById('sol-desc').value='';
-  alert('Solicitação enviada! O editor vai localizar e incluir a foto na sua galeria.');
+  vtToast('Solicitação enviada. O editor vai localizar e incluir a foto na sua galeria.');
 }
 document.getElementById('ov-sol').onclick=e=>{ if(e.target.id==='ov-sol') fecharSol(); };
 boot();

@@ -22,7 +22,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Minhas fotos tratadas 🎨</h1>
+  <h1>Minhas fotos tratadas</h1>
   <p class="sub">As fotos finais, já editadas e sem marca d'água, ficam disponíveis aqui quando o editor publica.</p>
   <div id="conteudo"><p class="empty">Carregando…</p></div>
 </div>
@@ -46,7 +46,7 @@ async function carregar(){
       </div>
       ${e.disponivel
         ? e.fotos.map(f=>`<div class="foto"><span style="flex:1;word-break:break-all;">${esc(f.nome)}</span>
-            <a class="btn" href="${f.url}" target="_blank" download>⬇ Baixar</a></div>`).join('')
+            <a class="btn" href="${f.url}" target="_blank" download>Baixar</a></div>`).join('')
         : `<p style="color:#94A3B8;font-size:13px;margin:4px 0 0;">${e.qtd} foto(s) em tratamento — aguarde a publicação.</p>`}
     </div>`).join('');
 }
